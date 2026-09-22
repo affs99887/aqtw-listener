@@ -1,0 +1,11 @@
+.tools/
+**/bin/
+**/obj/
+artifacts/
+.vs/
+*.user
+local-data/
+
+# 本机 IDE 配置及可重建的识别引擎
+.idea/
+data/engine/

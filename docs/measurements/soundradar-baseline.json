@@ -1,0 +1,925 @@
+{
+  "kind": "derived-engineering-only",
+  "rows": [
+    {
+      "expectedGroup": "537b0217",
+      "falsePositive": false,
+      "file": "537b0217-0-clean.wav",
+      "hit": true,
+      "milliseconds": 7,
+      "mode": "clean",
+      "predictedGroup": "537b0217",
+      "score": 0.9816958081034554
+    },
+    {
+      "expectedGroup": "537b0217",
+      "falsePositive": false,
+      "file": "537b0217-0-quiet20.wav",
+      "hit": true,
+      "milliseconds": 9.0012,
+      "mode": "quiet20",
+      "predictedGroup": "537b0217",
+      "score": 0.9817206705617201
+    },
+    {
+      "expectedGroup": "537b0217",
+      "falsePositive": false,
+      "file": "537b0217-0-quiet04.wav",
+      "hit": false,
+      "milliseconds": 5.9988,
+      "mode": "quiet04",
+      "predictedGroup": "",
+      "score": 0
+    },
+    {
+      "expectedGroup": "537b0217",
+      "falsePositive": false,
+      "file": "537b0217-0-noise10db.wav",
+      "hit": true,
+      "milliseconds": 9.0003,
+      "mode": "noise10db",
+      "predictedGroup": "537b0217",
+      "score": 0.9590757175192571
+    },
+    {
+      "expectedGroup": "537b0217",
+      "falsePositive": false,
+      "file": "537b0217-0-noise0db.wav",
+      "hit": true,
+      "milliseconds": 6.9996,
+      "mode": "noise0db",
+      "predictedGroup": "537b0217",
+      "score": 0.7725737510205096
+    },
+    {
+      "expectedGroup": "537b0217",
+      "falsePositive": false,
+      "file": "537b0217-0-rumble.wav",
+      "hit": false,
+      "milliseconds": 7.0001,
+      "mode": "rumble",
+      "predictedGroup": "",
+      "score": 0.3369904260788316
+    },
+    {
+      "expectedGroup": "983e0b90",
+      "falsePositive": false,
+      "file": "983e0b90-0-clean.wav",
+      "hit": true,
+      "milliseconds": 6.9998,
+      "mode": "clean",
+      "predictedGroup": "983e0b90",
+      "score": 0.984256013661965
+    },
+    {
+      "expectedGroup": "983e0b90",
+      "falsePositive": false,
+      "file": "983e0b90-0-quiet20.wav",
+      "hit": true,
+      "milliseconds": 8.5093,
+      "mode": "quiet20",
+      "predictedGroup": "983e0b90",
+      "score": 0.9842483302953066
+    },
+    {
+      "expectedGroup": "983e0b90",
+      "falsePositive": false,
+      "file": "983e0b90-0-quiet04.wav",
+      "hit": false,
+      "milliseconds": 5.9993,
+      "mode": "quiet04",
+      "predictedGroup": "",
+      "score": 0
+    },
+    {
+      "expectedGroup": "983e0b90",
+      "falsePositive": false,
+      "file": "983e0b90-0-noise10db.wav",
+      "hit": true,
+      "milliseconds": 8.0007,
+      "mode": "noise10db",
+      "predictedGroup": "983e0b90",
+      "score": 0.9837715825448964
+    },
+    {
+      "expectedGroup": "983e0b90",
+      "falsePositive": false,
+      "file": "983e0b90-0-noise0db.wav",
+      "hit": true,
+      "milliseconds": 7.9996,
+      "mode": "noise0db",
+      "predictedGroup": "983e0b90",
+      "score": 0.9797177215018819
+    },
+    {
+      "expectedGroup": "983e0b90",
+      "falsePositive": false,
+      "file": "983e0b90-0-rumble.wav",
+      "hit": false,
+      "milliseconds": 8.5069,
+      "mode": "rumble",
+      "predictedGroup": "",
+      "score": 0.7469337466515555
+    },
+    {
+      "expectedGroup": "56dfb35b",
+      "falsePositive": false,
+      "file": "56dfb35b-0-clean.wav",
+      "hit": true,
+      "milliseconds": 10.0011,
+      "mode": "clean",
+      "predictedGroup": "56dfb35b",
+      "score": 0.9764497194325685
+    },
+    {
+      "expectedGroup": "56dfb35b",
+      "falsePositive": false,
+      "file": "56dfb35b-0-quiet20.wav",
+      "hit": false,
+      "milliseconds": 6.9992,
+      "mode": "quiet20",
+      "predictedGroup": "",
+      "score": 0
+    },
+    {
+      "expectedGroup": "56dfb35b",
+      "falsePositive": false,
+      "file": "56dfb35b-0-quiet04.wav",
+      "hit": false,
+      "milliseconds": 6.5113,
+      "mode": "quiet04",
+      "predictedGroup": "",
+      "score": 0
+    },
+    {
+      "expectedGroup": "56dfb35b",
+      "falsePositive": false,
+      "file": "56dfb35b-0-noise10db.wav",
+      "hit": true,
+      "milliseconds": 9.999,
+      "mode": "noise10db",
+      "predictedGroup": "56dfb35b",
+      "score": 0.9757019456833519
+    },
+    {
+      "expectedGroup": "56dfb35b",
+      "falsePositive": false,
+      "file": "56dfb35b-0-noise0db.wav",
+      "hit": true,
+      "milliseconds": 10.0001,
+      "mode": "noise0db",
+      "predictedGroup": "56dfb35b",
+      "score": 0.9697517510207168
+    },
+    {
+      "expectedGroup": "56dfb35b",
+      "falsePositive": false,
+      "file": "56dfb35b-0-rumble.wav",
+      "hit": false,
+      "milliseconds": 10.0018,
+      "mode": "rumble",
+      "predictedGroup": "",
+      "score": 0.5873094142897608
+    },
+    {
+      "expectedGroup": "388e122c",
+      "falsePositive": false,
+      "file": "388e122c-0-clean.wav",
+      "hit": true,
+      "milliseconds": 8.9982,
+      "mode": "clean",
+      "predictedGroup": "388e122c",
+      "score": 0.9855188773749755
+    },
+    {
+      "expectedGroup": "388e122c",
+      "falsePositive": false,
+      "file": "388e122c-0-quiet20.wav",
+      "hit": true,
+      "milliseconds": 9.0001,
+      "mode": "quiet20",
+      "predictedGroup": "388e122c",
+      "score": 0.9855131595422317
+    },
+    {
+      "expectedGroup": "388e122c",
+      "falsePositive": false,
+      "file": "388e122c-0-quiet04.wav",
+      "hit": true,
+      "milliseconds": 9,
+      "mode": "quiet04",
+      "predictedGroup": "388e122c",
+      "score": 0.9854850395564559
+    },
+    {
+      "expectedGroup": "388e122c",
+      "falsePositive": false,
+      "file": "388e122c-0-noise10db.wav",
+      "hit": true,
+      "milliseconds": 9.0008,
+      "mode": "noise10db",
+      "predictedGroup": "388e122c",
+      "score": 0.9786357016392776
+    },
+    {
+      "expectedGroup": "388e122c",
+      "falsePositive": false,
+      "file": "388e122c-0-noise0db.wav",
+      "hit": true,
+      "milliseconds": 8.9998,
+      "mode": "noise0db",
+      "predictedGroup": "388e122c",
+      "score": 0.9685876796290367
+    },
+    {
+      "expectedGroup": "388e122c",
+      "falsePositive": false,
+      "file": "388e122c-0-rumble.wav",
+      "hit": false,
+      "milliseconds": 8.9983,
+      "mode": "rumble",
+      "predictedGroup": "",
+      "score": 0.7474982135301729
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-0-clean.wav",
+      "hit": true,
+      "milliseconds": 8.0003,
+      "mode": "clean",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9975051603461464
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-0-quiet20.wav",
+      "hit": true,
+      "milliseconds": 6.9997,
+      "mode": "quiet20",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9974685118863609
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-0-quiet04.wav",
+      "hit": true,
+      "milliseconds": 9.0006,
+      "mode": "quiet04",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9972784724340474
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-0-noise10db.wav",
+      "hit": true,
+      "milliseconds": 8.5073,
+      "mode": "noise10db",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9952008103689121
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-0-noise0db.wav",
+      "hit": true,
+      "milliseconds": 8.0007,
+      "mode": "noise0db",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.995650607067841
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-0-rumble.wav",
+      "hit": true,
+      "milliseconds": 6.9998,
+      "mode": "rumble",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.7978804561022597
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-1-clean.wav",
+      "hit": true,
+      "milliseconds": 8,
+      "mode": "clean",
+      "predictedGroup": "cb1c0d1d",
+      "score": 1
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-1-quiet20.wav",
+      "hit": true,
+      "milliseconds": 7.9996,
+      "mode": "quiet20",
+      "predictedGroup": "cb1c0d1d",
+      "score": 1
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-1-quiet04.wav",
+      "hit": true,
+      "milliseconds": 8.0022,
+      "mode": "quiet04",
+      "predictedGroup": "cb1c0d1d",
+      "score": 1
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-1-noise10db.wav",
+      "hit": true,
+      "milliseconds": 7.5081,
+      "mode": "noise10db",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9991615535415902
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-1-noise0db.wav",
+      "hit": true,
+      "milliseconds": 8.0008,
+      "mode": "noise0db",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9940983738632332
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-1-rumble.wav",
+      "hit": true,
+      "milliseconds": 6.9997,
+      "mode": "rumble",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.7960284031622138
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-2-clean.wav",
+      "hit": true,
+      "milliseconds": 8.0141,
+      "mode": "clean",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9902914959833167
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-2-quiet20.wav",
+      "hit": true,
+      "milliseconds": 8.0006,
+      "mode": "quiet20",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9902752018276938
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-2-quiet04.wav",
+      "hit": true,
+      "milliseconds": 8.0017,
+      "mode": "quiet04",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9901802260542101
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-2-noise10db.wav",
+      "hit": true,
+      "milliseconds": 7.9983,
+      "mode": "noise10db",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9866334973055378
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-2-noise0db.wav",
+      "hit": true,
+      "milliseconds": 8.51,
+      "mode": "noise0db",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9821788148028551
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-2-rumble.wav",
+      "hit": true,
+      "milliseconds": 7.998,
+      "mode": "rumble",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.7868614381243311
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-3-clean.wav",
+      "hit": true,
+      "milliseconds": 9.999,
+      "mode": "clean",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9904064701391918
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-3-quiet20.wav",
+      "hit": true,
+      "milliseconds": 9.5051,
+      "mode": "quiet20",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9909841198578362
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-3-quiet04.wav",
+      "hit": false,
+      "milliseconds": 7.0002,
+      "mode": "quiet04",
+      "predictedGroup": "",
+      "score": 0
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-3-noise10db.wav",
+      "hit": true,
+      "milliseconds": 8.9998,
+      "mode": "noise10db",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9834102773490878
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-3-noise0db.wav",
+      "hit": true,
+      "milliseconds": 10.506,
+      "mode": "noise0db",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.9823165791449462
+    },
+    {
+      "expectedGroup": "cb1c0d1d",
+      "falsePositive": false,
+      "file": "cb1c0d1d-3-rumble.wav",
+      "hit": true,
+      "milliseconds": 11.0004,
+      "mode": "rumble",
+      "predictedGroup": "cb1c0d1d",
+      "score": 0.8181469181516826
+    },
+    {
+      "expectedGroup": "9e7e9e83",
+      "falsePositive": false,
+      "file": "9e7e9e83-0-clean.wav",
+      "hit": true,
+      "milliseconds": 8.9996,
+      "mode": "clean",
+      "predictedGroup": "9e7e9e83",
+      "score": 0.980812079553998
+    },
+    {
+      "expectedGroup": "9e7e9e83",
+      "falsePositive": false,
+      "file": "9e7e9e83-0-quiet20.wav",
+      "hit": true,
+      "milliseconds": 10.0003,
+      "mode": "quiet20",
+      "predictedGroup": "9e7e9e83",
+      "score": 0.9808031390001081
+    },
+    {
+      "expectedGroup": "9e7e9e83",
+      "falsePositive": false,
+      "file": "9e7e9e83-0-quiet04.wav",
+      "hit": true,
+      "milliseconds": 10.6395,
+      "mode": "quiet04",
+      "predictedGroup": "9e7e9e83",
+      "score": 0.980763950012288
+    },
+    {
+      "expectedGroup": "9e7e9e83",
+      "falsePositive": false,
+      "file": "9e7e9e83-0-noise10db.wav",
+      "hit": true,
+      "milliseconds": 10.5205,
+      "mode": "noise10db",
+      "predictedGroup": "9e7e9e83",
+      "score": 0.9724541541183993
+    },
+    {
+      "expectedGroup": "9e7e9e83",
+      "falsePositive": false,
+      "file": "9e7e9e83-0-noise0db.wav",
+      "hit": true,
+      "milliseconds": 9.9997,
+      "mode": "noise0db",
+      "predictedGroup": "9e7e9e83",
+      "score": 0.9724799438042498
+    },
+    {
+      "expectedGroup": "9e7e9e83",
+      "falsePositive": false,
+      "file": "9e7e9e83-0-rumble.wav",
+      "hit": true,
+      "milliseconds": 8.9996,
+      "mode": "rumble",
+      "predictedGroup": "9e7e9e83",
+      "score": 0.7549648372728656
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-0-clean.wav",
+      "hit": true,
+      "milliseconds": 8.0003,
+      "mode": "clean",
+      "predictedGroup": "361affd2",
+      "score": 0.9703978579901577
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-0-quiet20.wav",
+      "hit": true,
+      "milliseconds": 7.5048,
+      "mode": "quiet20",
+      "predictedGroup": "361affd2",
+      "score": 0.9703864214533134
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-0-quiet04.wav",
+      "hit": false,
+      "milliseconds": 6,
+      "mode": "quiet04",
+      "predictedGroup": "",
+      "score": 0
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-0-noise10db.wav",
+      "hit": true,
+      "milliseconds": 7.9977,
+      "mode": "noise10db",
+      "predictedGroup": "361affd2",
+      "score": 0.9682692600229299
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-0-noise0db.wav",
+      "hit": true,
+      "milliseconds": 10,
+      "mode": "noise0db",
+      "predictedGroup": "361affd2",
+      "score": 0.9104597769589504
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-0-rumble.wav",
+      "hit": false,
+      "milliseconds": 8.9997,
+      "mode": "rumble",
+      "predictedGroup": "",
+      "score": 0.37462341320157033
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-1-clean.wav",
+      "hit": true,
+      "milliseconds": 8.0002,
+      "mode": "clean",
+      "predictedGroup": "361affd2",
+      "score": 0.9783579942281375
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-1-quiet20.wav",
+      "hit": true,
+      "milliseconds": 7.5296,
+      "mode": "quiet20",
+      "predictedGroup": "361affd2",
+      "score": 0.9783840361020101
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-1-quiet04.wav",
+      "hit": false,
+      "milliseconds": 5.0008,
+      "mode": "quiet04",
+      "predictedGroup": "",
+      "score": 0
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-1-noise10db.wav",
+      "hit": true,
+      "milliseconds": 8,
+      "mode": "noise10db",
+      "predictedGroup": "361affd2",
+      "score": 0.9761745959685662
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-1-noise0db.wav",
+      "hit": true,
+      "milliseconds": 8.0015,
+      "mode": "noise0db",
+      "predictedGroup": "361affd2",
+      "score": 0.9249909924336226
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-1-rumble.wav",
+      "hit": false,
+      "milliseconds": 8.0115,
+      "mode": "rumble",
+      "predictedGroup": "",
+      "score": 0.3874656341903541
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-2-clean.wav",
+      "hit": true,
+      "milliseconds": 8.0005,
+      "mode": "clean",
+      "predictedGroup": "361affd2",
+      "score": 0.978828698697016
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-2-quiet20.wav",
+      "hit": true,
+      "milliseconds": 7.9994,
+      "mode": "quiet20",
+      "predictedGroup": "361affd2",
+      "score": 0.9788646420291875
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-2-quiet04.wav",
+      "hit": false,
+      "milliseconds": 6.0001,
+      "mode": "quiet04",
+      "predictedGroup": "",
+      "score": 0
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-2-noise10db.wav",
+      "hit": true,
+      "milliseconds": 8,
+      "mode": "noise10db",
+      "predictedGroup": "361affd2",
+      "score": 0.9763532012943786
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-2-noise0db.wav",
+      "hit": true,
+      "milliseconds": 7.0149,
+      "mode": "noise0db",
+      "predictedGroup": "361affd2",
+      "score": 0.9169813226226181
+    },
+    {
+      "expectedGroup": "361affd2",
+      "falsePositive": false,
+      "file": "361affd2-2-rumble.wav",
+      "hit": false,
+      "milliseconds": 7.9994,
+      "mode": "rumble",
+      "predictedGroup": "",
+      "score": 0.38573648055149784
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-0.wav",
+      "hit": false,
+      "milliseconds": 9.0004,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-1.wav",
+      "hit": false,
+      "milliseconds": 17.0003,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.15845251701680066
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-2.wav",
+      "hit": false,
+      "milliseconds": 12.5037,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.14539413526289247
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-3.wav",
+      "hit": false,
+      "milliseconds": 13.5085,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.16519961317572532
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-4.wav",
+      "hit": false,
+      "milliseconds": 12.9999,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.20655369613887545
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-5.wav",
+      "hit": false,
+      "milliseconds": 12.9953,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.1910600493313191
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-6.wav",
+      "hit": false,
+      "milliseconds": 13.506,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.19029853462820234
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-7.wav",
+      "hit": false,
+      "milliseconds": 12.9991,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.19374159004882058
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-8.wav",
+      "hit": false,
+      "milliseconds": 13.0154,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.2177044753162343
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-9.wav",
+      "hit": false,
+      "milliseconds": 13.0151,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.1887471301381832
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-10.wav",
+      "hit": false,
+      "milliseconds": 13.5073,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.6394824180466795
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-11.wav",
+      "hit": false,
+      "milliseconds": 12.5057,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.06460601302802374
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-12.wav",
+      "hit": false,
+      "milliseconds": 12.5063,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.11915114298629369
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-13.wav",
+      "hit": false,
+      "milliseconds": 13.0005,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.032741703085445314
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-14.wav",
+      "hit": false,
+      "milliseconds": 12.5053,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.05039473087762004
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-15.wav",
+      "hit": false,
+      "milliseconds": 12.5061,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.1769827592500027
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-16.wav",
+      "hit": false,
+      "milliseconds": 14.0021,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.06298491471380156
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-17.wav",
+      "hit": false,
+      "milliseconds": 12.9981,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0.009300415293409029
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-18.wav",
+      "hit": false,
+      "milliseconds": 12.9989,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0
+    },
+    {
+      "expectedGroup": "",
+      "falsePositive": false,
+      "file": "noise-19.wav",
+      "hit": false,
+      "milliseconds": 13.5051,
+      "mode": "negative",
+      "predictedGroup": "",
+      "score": 0
+    }
+  ]
+}

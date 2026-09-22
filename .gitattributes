@@ -1,0 +1,2 @@
+# 保留随包附带的第三方许可文本，不对其应用空白风格检查。
+docs/licenses/* -whitespace

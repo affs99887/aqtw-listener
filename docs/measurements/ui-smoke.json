@@ -1,0 +1,9 @@
+{
+  "images": 51,
+  "clickThrough": true,
+  "noActivate": true,
+  "layered": true,
+  "topmost": true,
+  "foregroundPreserved": true,
+  "note": "仅桌面浮窗属性与渲染检查，未在游戏中测试输入或独占全屏覆盖"
+}

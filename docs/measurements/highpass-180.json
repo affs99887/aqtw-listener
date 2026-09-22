@@ -1,0 +1,1126 @@
+{
+  "kind": "derived-engineering-only",
+  "eligibleForAcceptance": false,
+  "acceptancePassed": false,
+  "note": "仅离线音频匹配；不代表点击到浮窗的端到端延迟，也不代表真实对局准确率。来源编号必须反映原始录制，转载和变速版本仍属同一来源。",
+  "total": 92,
+  "candidateHitRate": 0.9444444444444444,
+  "uniquePrecision": 1,
+  "uniqueCoverage": 0.1956521739130435,
+  "noiseFalsePositiveRate": 0,
+  "candidateCountDistribution": {
+    "2": 29,
+    "0": 24,
+    "1": 18,
+    "5": 6,
+    "13": 15
+  },
+  "computeP95Milliseconds": 16.1928,
+  "rows": [
+    {
+      "file": "537b0217-0-clean.wav",
+      "expectedItemId": "537b0217-0",
+      "candidates": [
+        "537b0217-0",
+        "537b0217-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 62.4557
+    },
+    {
+      "file": "537b0217-0-quiet20.wav",
+      "expectedItemId": "537b0217-0",
+      "candidates": [
+        "537b0217-0",
+        "537b0217-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.8374
+    },
+    {
+      "file": "537b0217-0-quiet04.wav",
+      "expectedItemId": "537b0217-0",
+      "candidates": [
+        "537b0217-0",
+        "537b0217-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.0791
+    },
+    {
+      "file": "537b0217-0-noise10db.wav",
+      "expectedItemId": "537b0217-0",
+      "candidates": [
+        "537b0217-0",
+        "537b0217-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.0214
+    },
+    {
+      "file": "537b0217-0-noise0db.wav",
+      "expectedItemId": "537b0217-0",
+      "candidates": [
+        "537b0217-0",
+        "537b0217-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.3608
+    },
+    {
+      "file": "537b0217-0-rumble.wav",
+      "expectedItemId": "537b0217-0",
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 9.1397
+    },
+    {
+      "file": "983e0b90-0-clean.wav",
+      "expectedItemId": "983e0b90-0",
+      "candidates": [
+        "983e0b90-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.2445
+    },
+    {
+      "file": "983e0b90-0-quiet20.wav",
+      "expectedItemId": "983e0b90-0",
+      "candidates": [
+        "983e0b90-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.8067
+    },
+    {
+      "file": "983e0b90-0-quiet04.wav",
+      "expectedItemId": "983e0b90-0",
+      "candidates": [
+        "983e0b90-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 12.6754
+    },
+    {
+      "file": "983e0b90-0-noise10db.wav",
+      "expectedItemId": "983e0b90-0",
+      "candidates": [
+        "983e0b90-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.1503
+    },
+    {
+      "file": "983e0b90-0-noise0db.wav",
+      "expectedItemId": "983e0b90-0",
+      "candidates": [
+        "983e0b90-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.7567
+    },
+    {
+      "file": "983e0b90-0-rumble.wav",
+      "expectedItemId": "983e0b90-0",
+      "candidates": [
+        "983e0b90-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.8995
+    },
+    {
+      "file": "56dfb35b-0-clean.wav",
+      "expectedItemId": "56dfb35b-0",
+      "candidates": [
+        "56dfb35b-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.7397
+    },
+    {
+      "file": "56dfb35b-0-quiet20.wav",
+      "expectedItemId": "56dfb35b-0",
+      "candidates": [
+        "56dfb35b-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 13.0671
+    },
+    {
+      "file": "56dfb35b-0-quiet04.wav",
+      "expectedItemId": "56dfb35b-0",
+      "candidates": [
+        "56dfb35b-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 12.7926
+    },
+    {
+      "file": "56dfb35b-0-noise10db.wav",
+      "expectedItemId": "56dfb35b-0",
+      "candidates": [
+        "56dfb35b-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 15.1611
+    },
+    {
+      "file": "56dfb35b-0-noise0db.wav",
+      "expectedItemId": "56dfb35b-0",
+      "candidates": [
+        "56dfb35b-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 17.9637
+    },
+    {
+      "file": "56dfb35b-0-rumble.wav",
+      "expectedItemId": "56dfb35b-0",
+      "candidates": [
+        "56dfb35b-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 12.4927
+    },
+    {
+      "file": "388e122c-0-clean.wav",
+      "expectedItemId": "388e122c-0",
+      "candidates": [
+        "388e122c-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 14.4334
+    },
+    {
+      "file": "388e122c-0-quiet20.wav",
+      "expectedItemId": "388e122c-0",
+      "candidates": [
+        "388e122c-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 12.2361
+    },
+    {
+      "file": "388e122c-0-quiet04.wav",
+      "expectedItemId": "388e122c-0",
+      "candidates": [
+        "388e122c-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 12.7753
+    },
+    {
+      "file": "388e122c-0-noise10db.wav",
+      "expectedItemId": "388e122c-0",
+      "candidates": [
+        "388e122c-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.5309
+    },
+    {
+      "file": "388e122c-0-noise0db.wav",
+      "expectedItemId": "388e122c-0",
+      "candidates": [
+        "388e122c-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 12.2905
+    },
+    {
+      "file": "388e122c-0-rumble.wav",
+      "expectedItemId": "388e122c-0",
+      "candidates": [
+        "388e122c-0"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.8367
+    },
+    {
+      "file": "cb1c0d1d-0-clean.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.8113
+    },
+    {
+      "file": "cb1c0d1d-0-quiet20.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.0968
+    },
+    {
+      "file": "cb1c0d1d-0-quiet04.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.3786
+    },
+    {
+      "file": "cb1c0d1d-0-noise10db.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.0937
+    },
+    {
+      "file": "cb1c0d1d-0-noise0db.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.5414
+    },
+    {
+      "file": "cb1c0d1d-0-rumble.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.6527
+    },
+    {
+      "file": "cb1c0d1d-1-clean.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.6142
+    },
+    {
+      "file": "cb1c0d1d-1-quiet20.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.6267
+    },
+    {
+      "file": "cb1c0d1d-1-quiet04.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.6334
+    },
+    {
+      "file": "cb1c0d1d-1-noise10db.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.603
+    },
+    {
+      "file": "cb1c0d1d-1-noise0db.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.7003
+    },
+    {
+      "file": "cb1c0d1d-1-rumble.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.6207
+    },
+    {
+      "file": "cb1c0d1d-2-clean.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.8244
+    },
+    {
+      "file": "cb1c0d1d-2-quiet20.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.1475
+    },
+    {
+      "file": "cb1c0d1d-2-quiet04.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.7202
+    },
+    {
+      "file": "cb1c0d1d-2-noise10db.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.4875
+    },
+    {
+      "file": "cb1c0d1d-2-noise0db.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.4812
+    },
+    {
+      "file": "cb1c0d1d-2-rumble.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.8932
+    },
+    {
+      "file": "cb1c0d1d-3-clean.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.1851
+    },
+    {
+      "file": "cb1c0d1d-3-quiet20.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.4023
+    },
+    {
+      "file": "cb1c0d1d-3-quiet04.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.6297
+    },
+    {
+      "file": "cb1c0d1d-3-noise10db.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.5586
+    },
+    {
+      "file": "cb1c0d1d-3-noise0db.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.9705
+    },
+    {
+      "file": "cb1c0d1d-3-rumble.wav",
+      "expectedItemId": "cb1c0d1d-0",
+      "candidates": [
+        "cb1c0d1d-0",
+        "cb1c0d1d-1"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.5183
+    },
+    {
+      "file": "9e7e9e83-0-clean.wav",
+      "expectedItemId": "9e7e9e83-0",
+      "candidates": [
+        "9e7e9e83-0",
+        "9e7e9e83-1",
+        "9e7e9e83-2",
+        "9e7e9e83-3",
+        "9e7e9e83-4"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.1162
+    },
+    {
+      "file": "9e7e9e83-0-quiet20.wav",
+      "expectedItemId": "9e7e9e83-0",
+      "candidates": [
+        "9e7e9e83-0",
+        "9e7e9e83-1",
+        "9e7e9e83-2",
+        "9e7e9e83-3",
+        "9e7e9e83-4"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 12.109
+    },
+    {
+      "file": "9e7e9e83-0-quiet04.wav",
+      "expectedItemId": "9e7e9e83-0",
+      "candidates": [
+        "9e7e9e83-0",
+        "9e7e9e83-1",
+        "9e7e9e83-2",
+        "9e7e9e83-3",
+        "9e7e9e83-4"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.7744
+    },
+    {
+      "file": "9e7e9e83-0-noise10db.wav",
+      "expectedItemId": "9e7e9e83-0",
+      "candidates": [
+        "9e7e9e83-0",
+        "9e7e9e83-1",
+        "9e7e9e83-2",
+        "9e7e9e83-3",
+        "9e7e9e83-4"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.9278
+    },
+    {
+      "file": "9e7e9e83-0-noise0db.wav",
+      "expectedItemId": "9e7e9e83-0",
+      "candidates": [
+        "9e7e9e83-0",
+        "9e7e9e83-1",
+        "9e7e9e83-2",
+        "9e7e9e83-3",
+        "9e7e9e83-4"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 13.5371
+    },
+    {
+      "file": "9e7e9e83-0-rumble.wav",
+      "expectedItemId": "9e7e9e83-0",
+      "candidates": [
+        "9e7e9e83-0",
+        "9e7e9e83-1",
+        "9e7e9e83-2",
+        "9e7e9e83-3",
+        "9e7e9e83-4"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 20.7281
+    },
+    {
+      "file": "361affd2-0-clean.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 13.5137
+    },
+    {
+      "file": "361affd2-0-quiet20.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.654
+    },
+    {
+      "file": "361affd2-0-quiet04.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 11.0421
+    },
+    {
+      "file": "361affd2-0-noise10db.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.1028
+    },
+    {
+      "file": "361affd2-0-noise0db.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.6004
+    },
+    {
+      "file": "361affd2-0-rumble.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 9.4045
+    },
+    {
+      "file": "361affd2-1-clean.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.0184
+    },
+    {
+      "file": "361affd2-1-quiet20.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.5548
+    },
+    {
+      "file": "361affd2-1-quiet04.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 10.5446
+    },
+    {
+      "file": "361affd2-1-noise10db.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.802
+    },
+    {
+      "file": "361affd2-1-noise0db.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.1929
+    },
+    {
+      "file": "361affd2-1-rumble.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 9.114
+    },
+    {
+      "file": "361affd2-2-clean.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.2721
+    },
+    {
+      "file": "361affd2-2-quiet20.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 8.9795
+    },
+    {
+      "file": "361affd2-2-quiet04.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.648
+    },
+    {
+      "file": "361affd2-2-noise10db.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.0053
+    },
+    {
+      "file": "361affd2-2-noise0db.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [
+        "361affd2-0",
+        "361affd2-1",
+        "361affd2-10",
+        "361affd2-11",
+        "361affd2-12",
+        "361affd2-2",
+        "361affd2-3",
+        "361affd2-4",
+        "361affd2-5",
+        "361affd2-6",
+        "361affd2-7",
+        "361affd2-8",
+        "361affd2-9"
+      ],
+      "status": "Matched",
+      "hit": true,
+      "milliseconds": 9.6324
+    },
+    {
+      "file": "361affd2-2-rumble.wav",
+      "expectedItemId": "361affd2-0",
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 9.8549
+    },
+    {
+      "file": "noise-0.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "NoSound",
+      "hit": false,
+      "milliseconds": 0.1046
+    },
+    {
+      "file": "noise-1.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.4628
+    },
+    {
+      "file": "noise-2.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 16.2897
+    },
+    {
+      "file": "noise-3.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.5206
+    },
+    {
+      "file": "noise-4.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.714
+    },
+    {
+      "file": "noise-5.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 16.1928
+    },
+    {
+      "file": "noise-6.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.9214
+    },
+    {
+      "file": "noise-7.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.3098
+    },
+    {
+      "file": "noise-8.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.5721
+    },
+    {
+      "file": "noise-9.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.7203
+    },
+    {
+      "file": "noise-10.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.0412
+    },
+    {
+      "file": "noise-11.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 16.0545
+    },
+    {
+      "file": "noise-12.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.5752
+    },
+    {
+      "file": "noise-13.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.8049
+    },
+    {
+      "file": "noise-14.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.2131
+    },
+    {
+      "file": "noise-15.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.573
+    },
+    {
+      "file": "noise-16.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.95
+    },
+    {
+      "file": "noise-17.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.9527
+    },
+    {
+      "file": "noise-18.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.8616
+    },
+    {
+      "file": "noise-19.wav",
+      "expectedItemId": null,
+      "candidates": [],
+      "status": "Unknown",
+      "hit": false,
+      "milliseconds": 15.5296
+    }
+  ]
+}

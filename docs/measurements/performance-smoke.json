@@ -1,0 +1,10 @@
+{
+  "mode": "静态浮窗预览，监听关闭；非游戏运行性能",
+  "seconds": 5.0113619,
+  "processCount": 2,
+  "cpuPercentOfOneCore": 0.6235828082949005,
+  "totalWorkingSetMiB": 253.15625,
+  "totalPrivateBytesMiB": 238.25390625,
+  "appWorkingSetMiB": 246.69140625,
+  "engineWorkingSetMiB": 6.46484375
+}

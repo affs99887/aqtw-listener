@@ -1,0 +1,61 @@
+{
+  "operationId": 0,
+  "status": "matched",
+  "isFinal": true,
+  "candidates": [
+    {
+      "item": {
+        "id": "537b0217-0",
+        "name": "卡莫纳之星",
+        "isGold": true,
+        "referenceValue": null,
+        "valueSource": null,
+        "valueDate": null,
+        "gridWidth": 2,
+        "gridHeight": 2,
+        "thumbnail": "images/537b0217-0.png",
+        "cells": 4
+      },
+      "score": 0.9825485234428658,
+      "groupId": "537b0217"
+    },
+    {
+      "item": {
+        "id": "537b0217-1",
+        "name": "宝石项链",
+        "isGold": true,
+        "referenceValue": null,
+        "valueSource": null,
+        "valueDate": null,
+        "gridWidth": 2,
+        "gridHeight": 2,
+        "thumbnail": "images/537b0217-1.png",
+        "cells": 4
+      },
+      "score": 0.9825485234428658,
+      "groupId": "537b0217"
+    }
+  ],
+  "elapsedMilliseconds": 77.0248,
+  "message": "识别完成",
+  "candidateCount": 2,
+  "goldCount": 2,
+  "goldCandidateRatio": 1,
+  "bestMatch": {
+    "item": {
+      "id": "537b0217-0",
+      "name": "卡莫纳之星",
+      "isGold": true,
+      "referenceValue": null,
+      "valueSource": null,
+      "valueDate": null,
+      "gridWidth": 2,
+      "gridHeight": 2,
+      "thumbnail": "images/537b0217-0.png",
+      "cells": 4
+    },
+    "score": 0.9825485234428658,
+    "groupId": "537b0217"
+  },
+  "highestValue": null
+}
