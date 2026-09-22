@@ -7,11 +7,13 @@ internal sealed record ListeningDiagnostics(bool Enabled, string TargetProcess, 
     long TriggerCount, string LastTriggerSource, DateTimeOffset? LastTriggerAt,
     string LastIgnoredReason, string LastRecognition, string ManualTestStatus,
     bool AutomaticRecognition, long AutomaticScans, string AutomaticStatus, double AutomaticWindowRms);
+internal enum AssistantMode { Listening, Interaction, Learning }
+internal sealed record RecognitionActivity(long OperationId, bool Busy, string Message);
 
 internal sealed class ListeningController : IAsyncDisposable
 {
     private readonly Settings settings;
-    private readonly IRecognizer recognizer;
+    private IRecognizer recognizer;
     private readonly IPlaybackCapture capture;
     private readonly Func<string> foregroundProcess;
     private readonly Func<double> clock;
@@ -24,6 +26,8 @@ internal sealed class ListeningController : IAsyncDisposable
     private long automaticScans;
     private string automaticStatus = "等待声音";
     private bool transitioning;
+    private bool resumeCooling;
+    private long modeEpoch;
     private bool disposed;
     private double lastClick = double.NegativeInfinity;
     private string lastState = "";
@@ -35,6 +39,14 @@ internal sealed class ListeningController : IAsyncDisposable
     public string ManualTestStatus { get; private set; } = "";
     public bool Enabled { get; private set; }
     public RecognitionHistory History { get; } = new();
+    public SessionAudioStore Audio { get; } = new();
+    public SoundLibrary Library { get; private set; } = new();
+    public string LibraryRoot { get; private set; } = "";
+    public string CaptureSession { get; } = Guid.NewGuid().ToString("N");
+    public AssistantMode Mode { get; private set; }
+    public RecognitionActivity CurrentActivity { get; private set; } = new(0, false, "等待声音");
+    public event Action<RecognitionActivity>? Activity;
+    public event Action? SnapshotAdded;
     public event Action<string>? State;
     public event Action<RecognitionResult?>? Result;
     public bool Foreground => string.Equals(foregroundProcess(), Settings.GameProcessName, StringComparison.OrdinalIgnoreCase);
@@ -44,15 +56,17 @@ internal sealed class ListeningController : IAsyncDisposable
         settings.AutomaticRecognition, automaticScans,
         !settings.AutomaticRecognition ? "已关闭（仅鼠标触发）" : !Enabled ? "等待开启监听" :
             !capture.Running ? "等待切回游戏" : automaticStatus, scanner.LastWindowRms);
-    public ListeningController(Settings settings, SoundLibrary library, Dispatcher dispatcher)
-        : this(settings, RecognizerFactory.Create(library), new LoopbackAudio(), dispatcher,
-            NativeInput.ForegroundProcess, () => NativeInput.Now) { }
+    public ListeningController(Settings settings, SoundLibrary library, Dispatcher dispatcher, string? root = null)
+        : this(settings, RecognizerFactory.Create(library, root), new LoopbackAudio(), dispatcher,
+            NativeInput.ForegroundProcess, () => NativeInput.Now)
+    { Library = library; LibraryRoot = root ?? Path.Combine(AppContext.BaseDirectory, "library"); }
 
     internal ListeningController(Settings settings, IRecognizer recognizer, IPlaybackCapture capture,
         Dispatcher dispatcher, Func<string> foregroundProcess, Func<double> clock, bool startPolling = true)
     {
         this.settings = settings; this.recognizer = recognizer; this.capture = capture; this.dispatcher = dispatcher;
         this.foregroundProcess = foregroundProcess; this.clock = clock;
+        History.Changed += () => Audio.Retain(History.Entries.Select(e => e.SnapshotId).Append(History.Latest?.SnapshotId));
         capture.Failed += message => dispatcher.BeginInvoke(async () =>
         {
             if (!disposed)
@@ -66,6 +80,41 @@ internal sealed class ListeningController : IAsyncDisposable
         if (!startPolling) poll.Stop();
     }
     internal Task PendingRecognition => recognitionTask ?? Task.CompletedTask;
+    private void SetActivity(long id, bool busy, string message)
+    { CurrentActivity = new(id, busy, message); Activity?.Invoke(CurrentActivity); }
+    private async Task ShowAutomaticLoading(long id, CancellationToken token)
+    {
+        try { await Task.Delay(150, token); if (epoch.IsCurrent(id) && recognitionTask is { IsCompleted: false } &&
+            !(CurrentActivity.OperationId == id && !CurrentActivity.Busy)) SetActivity(id, true, "识别中…"); }
+        catch (OperationCanceledException) { }
+    }
+    public async Task SetMode(AssistantMode mode)
+    {
+        var generation = ++modeEpoch;
+        resumeCooling = mode == AssistantMode.Listening;
+        Mode = mode; CancelTest(); Invalidate();
+        if (mode == AssistantMode.Listening) await Task.Delay(300);
+        if (generation != modeEpoch || disposed) return;
+        resumeCooling = false;
+        while (transitioning) await Task.Delay(10);
+        if (generation != modeEpoch || disposed) return;
+        capture.Timeline.Clear(); await Reconcile();
+    }
+    public bool ReadyForLearning => Mode == AssistantMode.Learning && Foreground && capture.Running;
+    public string LearningUnavailableReason => !Foreground ? "学习已暂停 · 切回游戏后重新倒计时" : captureError ?? "学习已暂停 · 正在准备播放设备";
+    public double Now => clock();
+    public AudioClip LearningSlice(double start, double end) => new(capture.Timeline.Slice(start, end), capture.Timeline.SampleRate);
+    public async Task InstallLibrary(SoundLibrary library, string root)
+    {
+        var next = await Task.Run(() => RecognizerFactory.Create(library, root));
+        Invalidate();
+        try { await PendingRecognition; }
+        catch (OperationCanceledException) { }
+        catch { next.Dispose(); throw; }
+        var old = recognizer; recognizer = next; Library = library; LibraryRoot = root;
+        await Task.Run(old.Dispose);
+        SetActivity(0, false, "音效库已更新 · " + library.Version);
+    }
     public void SetAutomaticRecognition(bool enabled)
     {
         settings.AutomaticRecognition = enabled;
@@ -74,10 +123,26 @@ internal sealed class ListeningController : IAsyncDisposable
     private void PublishState(string message) { if (message == lastState) return; lastState = message; State?.Invoke(message); }
     private RecognitionResult? RetainedResult => History.Latest is { } entry
         ? entry.Result with { Message = $"{entry.LastSeen:HH:mm:ss} · 已保留 · {entry.Source}" } : null;
-    private void PublishResult(RecognitionResult result, string source, bool automatic = false)
+    private void PublishResult(RecognitionResult result, string source, bool automatic = false, AnalysisSnapshot? snapshot = null)
     {
-        if (History.Remember(result, source, automatic, DateTimeOffset.Now)) Result?.Invoke(RetainedResult);
+        if (History.Remember(result, source, automatic, DateTimeOffset.Now, snapshot?.Id, Library.Version, LibraryRoot)) Result?.Invoke(RetainedResult);
         else if (History.Latest is null) Result?.Invoke(result);
+        var message = result.Status switch {
+            RecognitionStatus.Analyzing => "识别中…",
+            RecognitionStatus.Matched => result.IsFinal ? "已匹配" : "初步匹配 · 继续识别…",
+            RecognitionStatus.Unknown => "本次未匹配", RecognitionStatus.NoSound => "本次未采到声音",
+            _ => result.Message };
+        if (History.Latest is not null && result.Status != RecognitionStatus.Matched) message += " · 下方为上次匹配结果";
+        SetActivity(result.OperationId, !result.IsFinal, message);
+    }
+    private void PublishAnalysis(RecognitionAnalysis analysis, float[] samples, int rate, string source, bool automatic = false, double? start = null, double? end = null)
+    {
+        AnalysisSnapshot? snapshot = null;
+        if (analysis.Result.Status is RecognitionStatus.Matched or RecognitionStatus.Unknown or RecognitionStatus.Interference)
+            snapshot = Audio.Add(new(samples, rate), analysis, source, Library, LibraryRoot, CaptureSession, start, end);
+        PublishResult(analysis.Result, source, automatic, snapshot);
+        Audio.Retain(History.Entries.Select(e => e.SnapshotId).Append(History.Latest?.SnapshotId));
+        if (snapshot is not null) SnapshotAdded?.Invoke();
     }
     public void ClearCurrentResult()
     {
@@ -97,7 +162,7 @@ internal sealed class ListeningController : IAsyncDisposable
     }
     public void ForegroundChanged()
     {
-        if (disposed || !Enabled) return;
+        if (disposed || !Enabled && Mode == AssistantMode.Listening) return;
         if (!Foreground) { Invalidate(); capture.Timeline.Clear(); }
         _ = Reconcile();
     }
@@ -108,6 +173,7 @@ internal sealed class ListeningController : IAsyncDisposable
         automaticStatus = "等待声音";
         if (lastRecognition == "正在听这件货物…") lastRecognition = "本次识别已取消（切出游戏或关闭监听）";
         lastClick = double.NegativeInfinity; Result?.Invoke(RetainedResult);
+        SetActivity(0, false, Mode == AssistantMode.Interaction ? "操作模式 · 识别已暂停" : "等待声音");
     }
     internal async Task Reconcile()
     {
@@ -115,19 +181,19 @@ internal sealed class ListeningController : IAsyncDisposable
         transitioning = true;
         try
         {
-            var active = Enabled && Foreground;
+            var active = !resumeCooling && (Enabled && Mode == AssistantMode.Listening || Mode == AssistantMode.Learning) && Foreground;
             if (!active)
             {
                 if (capture.Running) { Invalidate(); await capture.Stop(); }
                 var foreground = foregroundProcess();
-                PublishState(Enabled ? $"已暂停 · 等待切回暗区突围，当前：{(foreground.Length == 0 ? "无法读取" : foreground)}" : captureError ?? "监听已关闭"); return;
+                PublishState(Mode == AssistantMode.Interaction ? "操作模式 · 识别已暂停" : Mode == AssistantMode.Learning ? "学习已暂停 · 请切回游戏" : Enabled ? $"已暂停 · 等待切回暗区突围，当前：{(foreground.Length == 0 ? "无法读取" : foreground)}" : captureError ?? "监听已关闭"); return;
             }
             var selected = capture.Resolve(settings.DeviceId);
             if (capture.Running && capture.DeviceId != selected) { Invalidate(); await capture.Stop(); }
-            if (!Enabled || !Foreground) return;
+            if ((!Enabled && Mode != AssistantMode.Learning) || Mode == AssistantMode.Interaction || !Foreground) return;
             if (!capture.Running) { Invalidate(); capture.Start(selected); }
-            PublishState("正在监听 · " + capture.DeviceName);
-            PollAutomaticRecognition();
+            PublishState((Mode == AssistantMode.Learning ? "学习采样 · " : "正在监听 · ") + capture.DeviceName);
+            if (Mode == AssistantMode.Listening) PollAutomaticRecognition();
         }
         catch (Exception ex)
         {
@@ -139,7 +205,7 @@ internal sealed class ListeningController : IAsyncDisposable
     public void Click(double clickedAt, string origin)
     {
         if (disposed) return;
-        lastIgnoredReason = !Enabled ? "监听未开启" : !Foreground ? "当前前台不是暗区突围" :
+        lastIgnoredReason = Mode != AssistantMode.Listening ? "操作或学习期间暂停识别" : !Enabled ? "监听未开启" : !Foreground ? "当前前台不是暗区突围" :
             !capture.Running || transitioning ? "采音正在准备，请再次拖动" : "";
         if (lastIgnoredReason.Length != 0) return;
         scanner.Reset(clickedAt + 2.2); // Prioritize the two click-triggered recognition stages.
@@ -166,8 +232,8 @@ internal sealed class ListeningController : IAsyncDisposable
                     if (remaining > 0) await Task.Delay(TimeSpan.FromSeconds(remaining), token);
                     token.ThrowIfCancellationRequested();
                     var audio = timeline.Slice(start, clickedAt + (final ? 1.0 : .4));
-                    var result = recognizer.Recognize(audio, timeline.SampleRate, id, final, token)
-                        with { ElapsedMilliseconds = (clock() - clickedAt) * 1000 };
+                    var analysis = recognizer.Analyze(audio, timeline.SampleRate, id, final, token);
+                    var result = analysis.Result with { ElapsedMilliseconds = (clock() - clickedAt) * 1000 };
                     if (result.Status == RecognitionStatus.NoSound)
                         result = result with { Message = "已收到触发，但没有听到声音 · 请检查游戏音量和播放设备（包括 UU 虚拟声卡）" };
                     await dispatcher.InvokeAsync(() =>
@@ -175,7 +241,7 @@ internal sealed class ListeningController : IAsyncDisposable
                         if (epoch.IsCurrent(id) && !token.IsCancellationRequested && Enabled && Foreground)
                         {
                             lastRecognition = result.Message;
-                            PublishResult(result with { ElapsedMilliseconds = (clock() - clickedAt) * 1000 }, origin);
+                            PublishAnalysis(analysis with { Result = result }, audio, timeline.SampleRate, origin, start: start, end: clickedAt + (final ? 1.0 : .4));
                         }
                     });
                 }
@@ -193,7 +259,7 @@ internal sealed class ListeningController : IAsyncDisposable
     }
     private void PollAutomaticRecognition()
     {
-        if (!settings.AutomaticRecognition || !Enabled || !Foreground || !capture.Running) return;
+        if (Mode != AssistantMode.Listening || !settings.AutomaticRecognition || !Enabled || !Foreground || !capture.Running) return;
         var now = clock();
         var window = scanner.TryTakeWindow(capture.Timeline, now, active: true,
             busy: recognitionTask is { IsCompleted: false });
@@ -206,12 +272,14 @@ internal sealed class ListeningController : IAsyncDisposable
         operation?.Dispose(); operation = new();
         var token = operation.Token; var id = epoch.Next();
         automaticScans++; automaticStatus = "正在分析声音";
+        _ = ShowAutomaticLoading(id, token);
         recognitionTask = Task.Run(async () =>
         {
             try
             {
                 token.ThrowIfCancellationRequested();
-                var result = recognizer.Recognize(window.Samples, window.SampleRate, id, true, token);
+                var analysis = recognizer.Analyze(window.Samples, window.SampleRate, id, true, token);
+                var result = analysis.Result;
                 await dispatcher.InvokeAsync(() =>
                 {
                     if (!epoch.IsCurrent(id) || token.IsCancellationRequested || !settings.AutomaticRecognition || !Enabled || !Foreground) return;
@@ -219,14 +287,14 @@ internal sealed class ListeningController : IAsyncDisposable
                     {
                         automaticStatus = "已匹配 · 继续听音";
                         lastRecognition = "声音自动识别 · 最近匹配";
-                        PublishResult(result with { Message = lastRecognition }, "声音自动识别", automatic: true);
                     }
                     else
                     {
                         automaticStatus = result.Status == RecognitionStatus.Unknown ? "已分析，暂未匹配" : result.Message;
                         lastRecognition = "声音自动识别 · " + automaticStatus;
-                        PublishResult(result with { Message = lastRecognition }, "声音自动识别", automatic: true);
                     }
+                    PublishAnalysis(analysis with { Result = result with { Message = lastRecognition } }, window.Samples, window.SampleRate, "声音自动识别", automatic: true,
+                        start: window.EndSeconds - AutomaticAudioScanner.WindowSeconds, end: window.EndSeconds);
                 });
             }
             catch (OperationCanceledException) { }
@@ -269,6 +337,8 @@ internal sealed class ListeningController : IAsyncDisposable
     }
     public async ValueTask DisposeAsync()
     {
-        disposed = true; poll.Stop(); Enabled = false; CancelTest(); Invalidate(); await capture.DisposeAsync(); recognizer.Dispose();
+        disposed = true; poll.Stop(); Enabled = false; CancelTest(); Invalidate(); await capture.DisposeAsync();
+        try { await PendingRecognition; } catch (OperationCanceledException) { }
+        finally { await Task.Run(recognizer.Dispose); }
     }
 }

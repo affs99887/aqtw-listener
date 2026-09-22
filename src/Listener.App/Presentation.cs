@@ -1,23 +1,26 @@
-using System.Windows.Media.Imaging;
+﻿using System.Windows.Media.Imaging;
 
 namespace Listener.App;
 
 internal static class Theme
 {
-    public static readonly Brush Background = Brush("#0D1118"), Panel = Brush("#161D27"), Muted = Brush("#8C9BB0"),
-        Text = Brush("#F2F5F9"), Accent = Brush("#7CE6C2"), Gold = Brush("#F1C879"), Line = Brush("#2B3747");
+    public static readonly Brush Background = Brush("#101214"), Panel = Brush("#1A1E20"), Muted = Brush("#969E9C"),
+        Text = Brush("#E4E8E5"), Accent = Brush("#A8BDB1"), Gold = Brush("#F1C879"), Line = Brush("#3B4245"),
+        Raised = Brush("#252B2F"), Selected = Brush("#2D3836");
     public static SolidColorBrush Brush(string hex) { var b = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)); b.Freeze(); return b; }
     public static TextBlock Label(string text, double size = 13, Brush? color = null) => new()
     { Text = text, FontSize = size, Foreground = color ?? Text, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 7) };
     public static Border Box(UIElement child, double padding = 16) => new()
-    { Child = child, Padding = new Thickness(padding), Background = Panel, CornerRadius = new CornerRadius(14), BorderBrush = Line, BorderThickness = new Thickness(1) };
+    { Child = child, Padding = new Thickness(padding), Background = Panel, CornerRadius = new CornerRadius(1), BorderBrush = Line, BorderThickness = new Thickness(1) };
     public static Button Button(string text, RoutedEventHandler click, bool primary = false)
     {
         var button = new Button { Content = text, Padding = new Thickness(14, 10, 14, 10), Margin = new Thickness(0, 4, 8, 4),
-            Background = primary ? Accent : Brush("#263347"), Foreground = primary ? Background : Text, BorderThickness = new Thickness(0),
+            Background = primary ? Accent : Raised, Foreground = primary ? Background : Text, BorderThickness = new Thickness(1), BorderBrush = primary ? Accent : Line,
             FontWeight = FontWeights.SemiBold, Cursor = System.Windows.Input.Cursors.Hand };
         button.Click += click; return button;
     }
+    public static TextBlock Glyph(string glyph, double size = 18) => new()
+    { Text = glyph, FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"), FontSize = size, VerticalAlignment = VerticalAlignment.Center };
 }
 
 internal sealed class CandidatePanel : Border
@@ -33,37 +36,61 @@ internal sealed class CandidatePanel : Border
     private readonly TextBlock pageLabel = Theme.Label("", 11, Theme.Muted);
     private readonly Button previousPage, nextPage;
     private readonly Dictionary<string, BitmapImage> images = new();
-    private readonly string libraryRoot;
+    private string libraryRoot;
     private readonly Settings settings;
+    private readonly bool compact, minimal;
     private RecognitionResult? lastResult;
     private bool lastDemo, lastListening;
+    private double thumbnailLimit = 120;
+    private readonly ProgressBar progress = new() { Width = 18, Height = 4, Visibility = Visibility.Hidden,
+        Margin = new Thickness(4, 5, 0, 0), Foreground = Theme.Accent };
+    internal string Summary => lastResult is { CandidateCount: > 0 } ? $"{headline.Text} · {lastResult.CandidateCount} 件候选 · 大金 {lastResult.GoldCandidateRatio:P0}" : headline.Text;
     public int PageCount => pages.PageCount;
     public int PageIndex => pages.PageIndex;
     internal IReadOnlyList<string> VisibleIds => pages.VisibleIds;
     internal bool PageFits => pages.Fits;
+    internal string LayoutInfo => $"image {ThumbnailSize}, missing {pages.MissingHeight}, page {pages.DesiredSize.Height}";
     public event Action? PagesChanged;
     public void MovePage(int delta) => pages.MovePage(delta);
-    public CandidatePanel(string libraryRoot, Settings settings, bool interactive = true)
+    public CandidatePanel(string libraryRoot, Settings settings, bool interactive = true, bool compact = false, bool minimal = false)
     {
-        this.libraryRoot = libraryRoot; this.settings = settings;
+        this.libraryRoot = libraryRoot; this.settings = settings; this.compact = compact; this.minimal = minimal;
         pages = new(BuildGroups);
         Background = Theme.Background; BorderBrush = Theme.Line; BorderThickness = new Thickness(1);
-        CornerRadius = new CornerRadius(18); Padding = new Thickness(16);
+        CornerRadius = new CornerRadius(1); Padding = new Thickness(compact ? 8 : 16);
         var body = new DockPanel(); Child = body;
         var header = new StackPanel(); DockPanel.SetDock(header, Dock.Top); body.Children.Add(header);
         var titleRow = new DockPanel();
+        DockPanel.SetDock(progress, Dock.Right); titleRow.Children.Add(progress);
         var title = Theme.Label("行商听音", 18); title.FontWeight = FontWeights.Bold;
         var chip = Theme.Label("本地 · 音频识别", 10, Theme.Muted); chip.HorizontalAlignment = HorizontalAlignment.Right;
-        DockPanel.SetDock(chip, Dock.Right); titleRow.Children.Add(chip); titleRow.Children.Add(title);
-        header.Children.Add(titleRow); header.Children.Add(status); header.Children.Add(diagnostics);
-        header.Children.Add(new Border { Height = 1, Background = Theme.Line, Margin = new Thickness(0, 2, 0, 9) });
-        header.Children.Add(Theme.Label("大金候选占比", 12, Theme.Muted));
+        if (compact)
+        {
+            title.FontSize = 14; title.Margin = new Thickness(0, 0, 8, 3);
+            status.FontSize = 10; status.TextWrapping = TextWrapping.NoWrap;
+            status.TextTrimming = TextTrimming.CharacterEllipsis; status.Margin = new Thickness(0, 2, 0, 3);
+            DockPanel.SetDock(title, Dock.Left); titleRow.Children.Add(title); titleRow.Children.Add(status);
+            header.Children.Add(titleRow);
+            ratio.FontSize = 22; ratio.Margin = new Thickness(0, 0, 0, 3);
+            count.FontSize = 11;
+            headline.FontSize = 11; headline.TextWrapping = TextWrapping.NoWrap;
+            headline.TextTrimming = TextTrimming.CharacterEllipsis; headline.Margin = new Thickness(0, 0, 0, 3);
+        }
+        else
+        {
+            DockPanel.SetDock(chip, Dock.Right); titleRow.Children.Add(chip); titleRow.Children.Add(title);
+            header.Children.Add(titleRow); header.Children.Add(status); header.Children.Add(diagnostics);
+            header.Children.Add(new Border { Height = 1, Background = Theme.Line, Margin = new Thickness(0, 2, 0, 9) });
+            header.Children.Add(Theme.Label("大金候选占比", 12, Theme.Muted));
+        }
         var ratioRow = new DockPanel();
-        count.VerticalAlignment = VerticalAlignment.Bottom; count.Margin = new Thickness(12, 0, 0, 14);
+        count.VerticalAlignment = VerticalAlignment.Bottom; count.Margin = new Thickness(12, 0, 0, compact ? 5 : 14);
         DockPanel.SetDock(ratio, Dock.Left); ratioRow.Children.Add(ratio); ratioRow.Children.Add(count); header.Children.Add(ratioRow);
-        header.Children.Add(headline); header.Children.Add(value); header.Children.Add(phase);
-        var footer = new StackPanel { Margin = new Thickness(0, 10, 0, 0) };
-        var navigation = new DockPanel { Height = 34 };
+        header.Children.Add(headline); header.Children.Add(value); if (!compact) header.Children.Add(phase);
+        if (minimal) header.Visibility = Visibility.Collapsed;
+        var footer = new StackPanel { Margin = new Thickness(0, compact ? 4 : 10, 0, 0) };
+        var navigation = new DockPanel { Height = compact ? 18 : 34 };
+        if (compact) { pageLabel.FontSize = 10; pageLabel.Margin = new Thickness(0); pageLabel.TextWrapping = TextWrapping.NoWrap; pageLabel.TextTrimming = TextTrimming.CharacterEllipsis; }
         previousPage = Theme.Button("上一页", (_, _) => MovePage(-1));
         nextPage = Theme.Button("下一页", (_, _) => MovePage(1));
         foreach (var button in new[] { previousPage, nextPage })
@@ -79,15 +106,24 @@ internal sealed class CandidatePanel : Border
             previousPage.IsEnabled = PageIndex > 0; nextPage.IsEnabled = PageIndex + 1 < PageCount;
             PagesChanged?.Invoke();
         };
-        footer.Children.Add(Theme.Label("已知候选比例 ≠ 真实出货概率", 10, Theme.Muted));
-        footer.Children.Add(Theme.Label("实验音效库 · 阈值和同音关系待实机验证", 10, Theme.Muted));
-        footer.Children.Add(Theme.Label("回收参考价以核实后的目录记录为准", 10, Theme.Muted));
+        var note = Theme.Label(compact ? "候选占比 ≠ 出货概率 · 音效库待验证" : "已知候选比例 ≠ 真实出货概率", 10, Theme.Muted);
+        if (compact) note.Margin = new Thickness(0);
+        footer.Children.Add(note);
+        if (minimal) note.Visibility = Visibility.Collapsed;
+        if (!compact)
+        {
+            footer.Children.Add(Theme.Label("实验音效库 · 阈值和同音关系待实机验证", 10, Theme.Muted));
+            footer.Children.Add(Theme.Label("回收参考价以核实后的目录记录为准", 10, Theme.Muted));
+        }
         DockPanel.SetDock(footer, Dock.Bottom); body.Children.Add(footer);
         body.Children.Add(pages);
         ShowResult(null);
     }
-    public void SetState(string text) => status.Text = text;
-    public void SetDiagnostics(string text) => diagnostics.Text = text;
+    public void SetState(string text) { status.Text = text; status.ToolTip = text; }
+    public void SetDiagnostics(string text) { diagnostics.Text = text; if (compact) ToolTip = text; }
+    public void SetActivity(RecognitionActivity activity)
+    { headline.Text = activity.Message; headline.ToolTip = activity.Message; progress.IsIndeterminate = activity.Busy; progress.Visibility = activity.Busy ? Visibility.Visible : Visibility.Hidden; }
+    public void SetLibraryRoot(string root) { if (root == libraryRoot) return; libraryRoot = root; images.Clear(); RefreshAppearance(); }
     public void ShowResult(RecognitionResult? result, bool demo = false, bool listening = false)
     {
         lastResult = result; lastDemo = demo; lastListening = listening;
@@ -112,6 +148,8 @@ internal sealed class CandidatePanel : Border
     {
         if (candidates.Count == 0)
         {
+            if (compact) return new Border { Padding = new Thickness(0, 6, 0, 6),
+                Child = Theme.Label("等待物品声音，匹配后显示候选图片", 11, Theme.Muted) };
             var empty = new StackPanel { Margin = new Thickness(0, 20, 0, 20), HorizontalAlignment = HorizontalAlignment.Center };
             empty.Children.Add(Theme.Label("◌", 40, Theme.Line));
             empty.Children.Add(Theme.Label("声音出现后，候选图片会显示在这里", 12, Theme.Muted)); return empty;
@@ -126,10 +164,15 @@ internal sealed class CandidatePanel : Border
             var columns = Math.Max(1, (int)(available / tileWidth));
             var section = new StackPanel { Width = Math.Min(group.Count(), columns) * tileWidth, Margin = new Thickness(0, 0, 10, 0) };
             groups.Children.Add(section);
-            var row = new DockPanel { Margin = new Thickness(0, 7, 0, 0) };
-            var badge = Theme.Label($"{group.Count()} 件", 11, Theme.Muted); badge.Margin = new Thickness(0, 0, 9, 7);
+            var row = new DockPanel { Margin = new Thickness(0, compact ? 3 : 7, 0, 0) };
+            var badge = Theme.Label($"{group.Count()} 件", 11, Theme.Muted); badge.Margin = new Thickness(0, 0, 9, compact ? 3 : 7);
+            badge.TextWrapping = TextWrapping.NoWrap;
+            if (section.Width < 80) badge.Visibility = Visibility.Collapsed;
             DockPanel.SetDock(badge, Dock.Right); row.Children.Add(badge);
-            var label = Theme.Label($"{group.Key} 格", 13); label.FontWeight = FontWeights.SemiBold; row.Children.Add(label); section.Children.Add(row);
+            var label = Theme.Label($"{group.Key} 格", 13); label.FontWeight = FontWeights.SemiBold;
+            label.TextWrapping = TextWrapping.NoWrap;
+            if (compact) label.Margin = new Thickness(0, 0, 0, 3);
+            row.Children.Add(label); section.Children.Add(row);
             var wrap = new WrapPanel(); section.Children.Add(wrap);
             foreach (var candidate in group.OrderByDescending(c => c.Item.IsGold).ThenByDescending(c => c.Item.ReferenceValue))
                 wrap.Children.Add(Card(candidate, highest?.Item.Id == candidate.Item.Id,
@@ -137,8 +180,27 @@ internal sealed class CandidatePanel : Border
         }
         return groups;
     }
-    public void RefreshAppearance() => ShowResult(lastResult, lastDemo, lastListening);
-    private double ThumbnailSize => double.IsFinite(settings.ThumbnailSize) ? Math.Clamp(settings.ThumbnailSize, 60, 120) : 88;
+    public void RefreshAppearance()
+    {
+        var scale = double.IsFinite(settings.FontScale) ? Math.Clamp(settings.FontScale, .9, 1.15) : 1;
+        LayoutTransform = new ScaleTransform(scale, scale);
+        ShowResult(lastResult, lastDemo, lastListening);
+    }
+    protected override Size MeasureOverride(Size constraint)
+    {
+        var chrome = minimal ? (settings.ShowNames ? 96 : 78) : (settings.ShowNames ? 184 : 166);
+        var limit = compact && double.IsFinite(constraint.Height) ? Math.Max(24, constraint.Height - chrome) : 120;
+        if (Math.Abs(limit - thumbnailLimit) > .1) { thumbnailLimit = limit; pages.Refresh(); }
+        var result = base.MeasureOverride(constraint);
+        if (compact && !pages.Fits && thumbnailLimit > 24)
+        {
+            thumbnailLimit = Math.Max(24, thumbnailLimit - pages.MissingHeight - 1);
+            pages.Refresh(); result = base.MeasureOverride(constraint);
+        }
+        return result;
+    }
+    private double ThumbnailSize => Math.Min(thumbnailLimit,
+        (double.IsFinite(settings.ThumbnailSize) ? Math.Clamp(settings.ThumbnailSize, 60, 120) : 88) / Math.Clamp(settings.FontScale, .9, 1.15));
     private UIElement Card(Candidate candidate, bool highest, bool best, bool demo)
     {
         var item = candidate.Item;
@@ -146,13 +208,18 @@ internal sealed class CandidatePanel : Border
         var tile = new Grid { Width = size, Height = size + 8 };
         if (item.Thumbnail is not null)
         {
-            var path = Path.Combine(libraryRoot, item.Thumbnail);
-            if (!images.TryGetValue(path, out var image))
+            try
             {
-                image = new BitmapImage(); image.BeginInit(); image.CacheOption = BitmapCacheOption.OnLoad;
-                image.DecodePixelWidth = 160; image.UriSource = new Uri(path); image.EndInit(); image.Freeze(); images[path] = image;
+                var path = Path.Combine(libraryRoot, item.Thumbnail);
+                if (!images.TryGetValue(path, out var image))
+                {
+                    image = new BitmapImage(); image.BeginInit(); image.CacheOption = BitmapCacheOption.OnLoad;
+                    image.DecodePixelWidth = 160; image.UriSource = new Uri(path); image.EndInit(); image.Freeze(); images[path] = image;
+                }
+                tile.Children.Add(new Image { Source = image, Stretch = Stretch.Uniform, Margin = new Thickness(5, 4, 5, 16) });
             }
-            tile.Children.Add(new Image { Source = image, Stretch = Stretch.Uniform, Margin = new Thickness(5, 4, 5, 16) });
+            catch (Exception ex) when (ex is IOException or NotSupportedException or FileFormatException or ArgumentException)
+            { tile.Children.Add(Theme.Label("图片不可用", 10, Theme.Muted)); }
         }
         else tile.Children.Add(Theme.Label("缺少缩略图", 11, Theme.Muted));
         var tag = Theme.Label($"{item.GridWidth}×{item.GridHeight}", 10, Theme.Muted);
@@ -163,53 +230,15 @@ internal sealed class CandidatePanel : Border
         var stack = new StackPanel(); stack.Children.Add(tile);
         if (settings.ShowNames) stack.Children.Add(new TextBlock { Text = item.Name, Width = size, TextTrimming = TextTrimming.CharacterEllipsis,
             Foreground = Theme.Text, FontSize = 10, TextAlignment = TextAlignment.Center, Margin = new Thickness(0, 0, 0, 5) });
-        if (highest) stack.Children.Add(Theme.Label("参考价最高", 10, Theme.Gold));
+        if (highest)
+        {
+            var label = Theme.Label("参考价最高", 10, Theme.Gold); label.TextWrapping = TextWrapping.NoWrap;
+            label.Width = size; label.TextTrimming = TextTrimming.CharacterEllipsis; stack.Children.Add(label);
+        }
         return new Border { Child = stack, Background = Theme.Panel, BorderBrush = highest ? Theme.Gold : best && !demo ? Theme.Accent : Theme.Line,
-            BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), Margin = new Thickness(0, 0, 7, 7),
+            BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(1), Margin = new Thickness(0, 0, 7, 7),
             ToolTip = $"{item.Name}\n{item.GridWidth}×{item.GridHeight} · {(item.IsGold ? "红色收藏品 / 大金" : "非大金")}\n" +
                 (item.ReferenceValue.HasValue ? $"联络人回收参考价：{item.ReferenceValue:N0}" : "联络人回收参考价待核实") +
                 (best && !demo ? "\n绿色边框：并列最匹配音效组" : "") };
-    }
-}
-
-internal sealed class OverlayWindow : Window
-{
-    private Settings settings;
-    private bool sourceReady;
-    private Rect workArea = SystemParameters.WorkArea;
-    public CandidatePanel Panel { get; }
-    public OverlayWindow(string root, Settings settings)
-    {
-        this.settings = settings;
-        Title = "行商听音 · 浮窗"; WindowStyle = WindowStyle.None; AllowsTransparency = true;
-        Background = Brushes.Transparent; ShowInTaskbar = false; ShowActivated = false;
-        Topmost = true; ResizeMode = ResizeMode.NoResize;
-        Panel = new(root, settings, interactive: false); Content = Panel; Apply(settings);
-        SourceInitialized += (_, _) => { sourceReady = true; NativeInput.MakeOverlay(this); UpdateWorkArea(); };
-        DpiChanged += (_, _) => { if (sourceReady) UpdateWorkArea(); };
-        SizeChanged += (_, _) => KeepOnScreen();
-    }
-    public void Apply(Settings settings)
-    {
-        this.settings = settings;
-        Left = Math.Clamp(settings.Left, SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - 100);
-        Top = Math.Clamp(settings.Top, SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - 100);
-        Width = Math.Clamp(settings.Width, 300, 900);
-        MaxHeight = workArea.Height;
-        SizeToContent = SizeToContent.Height;
-        Opacity = Math.Clamp(settings.Opacity, .35, 1);
-        Panel.RefreshAppearance();
-        if (sourceReady) UpdateWorkArea();
-    }
-    private void UpdateWorkArea()
-    {
-        workArea = WindowPlacement.WorkArea(this);
-        MaxHeight = workArea.Height; KeepOnScreen();
-    }
-    private void KeepOnScreen()
-    {
-        if (!sourceReady) return;
-        Top = Math.Clamp(settings.Top, workArea.Top, Math.Max(workArea.Top, workArea.Bottom - ActualHeight));
-        Left = Math.Clamp(settings.Left, workArea.Left, Math.Max(workArea.Left, workArea.Right - ActualWidth));
     }
 }

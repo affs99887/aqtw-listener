@@ -2,6 +2,7 @@
 **/bin/
 **/obj/
 artifacts/
+portable/
 .vs/
 *.user
 local-data/

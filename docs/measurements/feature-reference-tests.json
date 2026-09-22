@@ -1,0 +1,229 @@
+{
+  "kind": "reference-regression",
+  "independent": false,
+  "note": "原参考片段及补零/降音量派生窗口，只检查接入和扫描窗口兼容性，不代表实战准确率。",
+  "total": 22,
+  "passed": 22,
+  "checks": [
+    {
+      "group": "537b0217",
+      "sample": "audio/537b0217-0.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "537b0217"
+      ]
+    },
+    {
+      "group": "983e0b90",
+      "sample": "audio/983e0b90-0.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "983e0b90"
+      ]
+    },
+    {
+      "group": "56dfb35b",
+      "sample": "audio/56dfb35b-0.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "56dfb35b"
+      ]
+    },
+    {
+      "group": "388e122c",
+      "sample": "audio/388e122c-0.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "388e122c"
+      ]
+    },
+    {
+      "group": "cb1c0d1d",
+      "sample": "audio/cb1c0d1d-0.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "cb1c0d1d"
+      ]
+    },
+    {
+      "group": "cb1c0d1d",
+      "sample": "audio/cb1c0d1d-1.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "cb1c0d1d"
+      ]
+    },
+    {
+      "group": "cb1c0d1d",
+      "sample": "audio/cb1c0d1d-2.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "cb1c0d1d"
+      ]
+    },
+    {
+      "group": "cb1c0d1d",
+      "sample": "audio/cb1c0d1d-3.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "cb1c0d1d"
+      ]
+    },
+    {
+      "group": "9e7e9e83",
+      "sample": "audio/9e7e9e83-0.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "9e7e9e83"
+      ]
+    },
+    {
+      "group": "267afca3",
+      "sample": "audio/267afca3-0.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "267afca3"
+      ]
+    },
+    {
+      "group": "267afca3",
+      "sample": "audio/267afca3-0.wav",
+      "variant": "auto-window-offset-0",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "267afca3"
+      ]
+    },
+    {
+      "group": "267afca3",
+      "sample": "audio/267afca3-0.wav",
+      "variant": "auto-window-offset-0.2",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "267afca3"
+      ]
+    },
+    {
+      "group": "267afca3",
+      "sample": "audio/267afca3-0.wav",
+      "variant": "auto-window-offset-0.4",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "267afca3"
+      ]
+    },
+    {
+      "group": "267afca3",
+      "sample": "audio/267afca3-0.wav",
+      "variant": "auto-window-offset-0.6",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "267afca3"
+      ]
+    },
+    {
+      "group": "e9f62d39",
+      "sample": "audio/e9f62d39-0.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "e9f62d39"
+      ]
+    },
+    {
+      "group": "e9f62d39",
+      "sample": "audio/e9f62d39-0.wav",
+      "variant": "auto-window-offset-0",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "e9f62d39"
+      ]
+    },
+    {
+      "group": "e9f62d39",
+      "sample": "audio/e9f62d39-0.wav",
+      "variant": "auto-window-offset-0.2",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "e9f62d39"
+      ]
+    },
+    {
+      "group": "e9f62d39",
+      "sample": "audio/e9f62d39-0.wav",
+      "variant": "auto-window-offset-0.4",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "e9f62d39"
+      ]
+    },
+    {
+      "group": "e9f62d39",
+      "sample": "audio/e9f62d39-0.wav",
+      "variant": "auto-window-offset-0.6",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "e9f62d39"
+      ]
+    },
+    {
+      "group": "361affd2",
+      "sample": "audio/361affd2-0.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "361affd2"
+      ]
+    },
+    {
+      "group": "361affd2",
+      "sample": "audio/361affd2-1.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "361affd2"
+      ]
+    },
+    {
+      "group": "361affd2",
+      "sample": "audio/361affd2-2.wav",
+      "variant": "reference",
+      "passed": true,
+      "status": "matched",
+      "matchedGroups": [
+        "361affd2"
+      ]
+    }
+  ]
+}

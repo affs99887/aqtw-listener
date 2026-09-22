@@ -1,0 +1,72 @@
+{
+  "version": 2,
+  "date": "2026-09-22",
+  "tool": "Built-in GPT Image",
+  "status": "design-only",
+  "file": "screens/07-live-comparison-v2.png",
+  "previousFile": "screens/07-live-comparison.png",
+  "requirements": [
+    "按格数分组，组头显示格数与候选数量；卡片继续标注宽×高。",
+    "顶部保留醒目的大金候选占比百分数和大金数量/总候选数量。",
+    "百分比按完整去重候选集合计算，分组、换行、字号及相近音效不改变分母。",
+    "保留回放、逐卡试听、小中大字号、单图钉亮暗状态；不分页。"
+  ],
+  "ratio": {
+    "label": "大金候选占比",
+    "numerator": 3,
+    "denominator": 6,
+    "display": "50%",
+    "emptyDisplay": "—",
+    "meaning": "大金候选数量 / 全部去重候选数量，不是实际出货概率"
+  },
+  "exampleNote": "仅为多格数布局示例，不声称这些物品在真实识别中属于同音候选。",
+  "candidates": [
+    {
+      "id": "267afca3-1",
+      "name": "热成像模块",
+      "gridWidth": 2,
+      "gridHeight": 1,
+      "isGold": true
+    },
+    {
+      "id": "267afca3-2",
+      "name": "数据线",
+      "gridWidth": 2,
+      "gridHeight": 1,
+      "isGold": false
+    },
+    {
+      "id": "56dfb35b-0",
+      "name": "古董茶壶",
+      "gridWidth": 2,
+      "gridHeight": 2,
+      "isGold": true
+    },
+    {
+      "id": "9e7e9e83-4",
+      "name": "密码机",
+      "gridWidth": 2,
+      "gridHeight": 2,
+      "isGold": false
+    },
+    {
+      "id": "983e0b90-0",
+      "name": "金狮雕像",
+      "gridWidth": 3,
+      "gridHeight": 2,
+      "isGold": true
+    },
+    {
+      "id": "9e7e9e83-3",
+      "name": "石膏像",
+      "gridWidth": 2,
+      "gridHeight": 3,
+      "isGold": false
+    }
+  ],
+  "prompt": "Use case: ui-mockup / precise-object-edit.\nEdit target: image 1, previous Chinese game-audio recognition floating-window concept. Style reference: image 2, actual Arena Breakout inventory UI.\nPrimary request: Revise this floating overlay to RESTORE TWO EXISTING CORE FEATURES OMITTED FROM THE OLD CONCEPT: clearly labeled GROUPS BY INVENTORY CELL COUNT, and a prominently displayed OVERALL GOLD CANDIDATE PERCENTAGE. This is a focused iteration, preserve charcoal tactical game UI, rectangular thin gray borders, pale sage active states, crisp Chinese text, readable thumbnails, per-item sample playback, size controls, ONE bright/dim pin icon.\nComposition: ONE finished desktop floating overlay, front-facing flat screenshot, 1792x1024 landscape or similar; window fills canvas with only 20px dark outer margin. Wide shallow compact arrangement. No browser, scene, sidebar, poster, exploded diagram, explanatory arrows, giant logo. No large unused areas.\nTop compact titlebar (roughly 58px): small crate/wave icon, \"行商听音助手\"; subtle status dot \"试听中 · 采音已暂停\"; right \"字号\" square segmented \"小\" \"中\" \"大\" (中 selected); one pin and close.\nSecond compact result bar (~110px): at left small label \"大金候选占比\" above large restrained warm off-white/pale-gold number \"50%\" (most prominent numerical information, about 54px text). Alongside it show exactly \"3 / 6 件候选为大金\" and smaller \"按全部候选计算\". Right side \"6 件候选\" and smaller note \"占比不代表真实出货概率\". DO NOT replace percentage with only a fraction; show both. Use one faint horizontal 50%-filled indicator if helpful, no donuts or dashboard graphs.\nThird short toolbar (~58px): rectangular direct buttons \"▶ 回放当前声音\", \"■ 停止\", \"保存 WAV\", \"返回监听\". One row, readable and moderately compact.\nCandidate area (~400px) MUST HAVE THREE VISIBLY DISTINCT SIDE-BY-SIDE GROUP PANELS separated by 16px gutters, all equal height. Each group has a single clear bold header ABOVE both its two cards and a divider line. Exact group headers \"2 格\" with small \"2 件\", \"4 格\" with small \"2 件\", and \"6 格\" with small \"2 件\". These are persistent section headings, NOT filter tabs. All six items visible simultaneously, two cards per group in one horizontal row. Cell-count classification must be immediately obvious from the panel structure, never merely dimensions under individual cards.\nGroup 1 (2 格, 2 件): card 热成像模块, text 2×1, red item-name text / gold marker (isGold true); card 数据线, 2×1, white name (not gold).\nGroup 2 (4 格, 2 件): card 古董茶壶, 2×2, red name / gold marker (isGold true); card 密码机, 2×2, white name (not gold).\nGroup 3 (6 格, 2 件): card 金狮雕像, 3×2, red name / gold marker (isGold true); card 石膏像, 2×3, white name (not gold).\nTotal exactly 6 cards, exactly 3 gold = 50%. DO NOT repeat, omit or add any item. Dimensions must multiply to corresponding group. Gold lion and plaster bust both under 6 格 even though different orientations. Each card has dark thumbnail compartment, modest realistic game-inventory object illustration, name, dimension, tiny rarity dot and rectangular \"▶ 听样本\" button. Keep thumbnail art compact, not giant product photography. Gold lion resembles small lion statue, thermal module a small electronic optical module, data cable coiled cable, antique teapot a small Chinese teapot, cipher machine portable cryptographic electronics, plaster bust a white bust.\nFooter thin and muted: unchecked square \"展开相近音效\" then \"仅供对比，不计入候选占比\"; far right \"布局示例\". No expanded near-sound results currently shown.\nColors and typography: near-black #101214, panels #1A1E20, controls #252B2F, one-pixel gray #3B4245 borders, off-white #E4E8E5, muted #969E9C, subtle sage #A8BDB1. Percentage may use restrained pale gold #F1C879 matching existing app; no bright green slab. Slight game texture only. Square corners max 2px. Good breathing room and hierarchy without oversizing controls.\nCritical invariants: a visible overall \"50%\" plus \"3 / 6\"; three explicit cell-count group headers; correct total 6; no pagination or previous/next arrows; no per-item percentages or scores; one pin only; no \"出货率50%\" or fake calibrated probability; no random prices; no giant demo captions. Faithfully restore existing functionality while modernizing appearance.",
+  "referenced_image_paths": [
+    "C:\\Users\\Dexin\\Documents\\ChatGPT\\暗区行商助手\\docs\\design\\screens\\07-live-comparison.png",
+    "C:\\Users\\Dexin\\Documents\\ChatGPT\\暗区行商助手\\docs\\design\\references\\game-inventory.png"
+  ]
+}

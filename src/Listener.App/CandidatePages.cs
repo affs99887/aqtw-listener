@@ -1,4 +1,4 @@
-namespace Listener.App;
+﻿namespace Listener.App;
 
 // Measure the full result first: short results request only their natural height.
 // Pagination is used only when the parent supplies a screen-height limit.
@@ -15,7 +15,9 @@ internal sealed class CandidatePages(Func<IReadOnlyList<Candidate>, double, Fram
     public IReadOnlyList<string> VisibleIds => pages.Count == 0 ? [] : items.Skip(pages[PageIndex].Start)
         .Take(pages[PageIndex].Count).Select(c => c.Item.Id).ToArray();
     public bool Fits { get; private set; } = true;
+    public double MissingHeight { get; private set; }
     public event Action? Changed;
+    public void Refresh() { dirty = true; renderedPage = -1; InvalidateMeasure(); }
 
     public void SetItems(IReadOnlyList<Candidate> value)
     {
@@ -41,7 +43,7 @@ internal sealed class CandidatePages(Func<IReadOnlyList<Candidate>, double, Fram
         {
             var full = MeasureItems(0, items.Count, width);
             desiredHeight = Math.Min(full.DesiredSize.Height, constraint.Height);
-            pages.Clear(); Fits = true;
+            pages.Clear(); Fits = true; MissingHeight = 0;
             if (full.DesiredSize.Height <= constraint.Height + .1 || items.Count == 0)
                 pages.Add((0, items.Count));
             else
@@ -57,7 +59,11 @@ internal sealed class CandidatePages(Func<IReadOnlyList<Candidate>, double, Fram
                         if (view.DesiredSize.Height <= constraint.Height + .1) { count = middle; low = middle + 1; }
                         else high = middle - 1;
                     }
-                    if (count == 0) { count = 1; Fits = false; }
+                    if (count == 0)
+                    {
+                        count = 1; Fits = false;
+                        MissingHeight = Math.Max(MissingHeight, MeasureItems(start, 1, width).DesiredSize.Height - constraint.Height);
+                    }
                     pages.Add((start, count)); start += count;
                 }
             }

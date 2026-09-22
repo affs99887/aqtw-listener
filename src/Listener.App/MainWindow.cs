@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -7,17 +7,22 @@ using Microsoft.Win32;
 
 namespace Listener.App;
 
-internal sealed class MainWindow : Window
+internal sealed partial class MainWindow : Window
 {
     private readonly Settings settings;
-    private readonly SoundLibrary library;
-    private readonly string libraryRoot;
+    private SoundLibrary library;
+    private string libraryRoot;
     private readonly OverlayWindow overlay;
     private readonly ListeningController controller;
+    private readonly PersonalLibraryStore personal;
+    private readonly OverlayWorkspace workspace;
+    private bool changingMode, leavingInteraction;
+    private nint returnWindow;
     private NativeInput? input;
     private System.Windows.Forms.NotifyIcon? tray;
     private readonly TextBlock status = Theme.Label("监听已关闭", 13, Theme.Accent);
     private readonly TextBlock diagnostics = Theme.Label("正在检查输入和采音…", 11, Theme.Muted);
+    private readonly TextBlock libraryInfo = Theme.Label("", 12, Theme.Muted);
     private readonly DispatcherTimer diagnosticsTimer;
     private string inputError = "";
     private readonly ComboBox devices = new();
@@ -25,6 +30,9 @@ internal sealed class MainWindow : Window
     private Button? historyButton;
     private readonly Slider thumbnailSize = new() { Minimum = 60, Maximum = 120, TickFrequency = 4, IsSnapToTickEnabled = true };
     private readonly TextBox hotkey = new(), x = new(), y = new(), width = new();
+    private readonly ComboBox positionMode = new();
+    private readonly ComboBox fontScale = new();
+    private readonly TextBox interactionHotkey = new();
     private readonly TextBlock candidatePageLabel = Theme.Label("", 11, Theme.Muted);
     private Button? previousCandidatePage, nextCandidatePage;
     private readonly Grid settingsPage = new();
@@ -36,19 +44,44 @@ internal sealed class MainWindow : Window
     private bool closing;
     public MainWindow(Settings settings, SoundLibrary library)
     {
-        this.settings = settings; this.library = library; libraryRoot = Path.Combine(AppContext.BaseDirectory, "library");
-        Title = "行商听音助手"; Width = 640; MinWidth = 540;
-        WindowPlacement.UseContentHeight(this);
+        this.settings = settings;
+        personal = new(Path.Combine(AppContext.BaseDirectory, "library"), Path.Combine(AppContext.BaseDirectory, "local-data", "personal"),
+            Path.Combine(AppContext.BaseDirectory, "engine", "Listener.Engine.exe"));
+        var active = personal.ResolveActive(); this.library = active.Library; libraryRoot = active.Root;
+        Title = "行商听音助手"; Width = Math.Min(900, SystemParameters.WorkArea.Width); MinWidth = Math.Min(760, Width);
+        Height = Math.Min(720, SystemParameters.WorkArea.Height); MinHeight = Math.Min(560, Height);
+        MaxHeight = SystemParameters.WorkArea.Height;
+        Icon = BrandAssets.Mark;
+        UseLayoutRounding = true; SnapsToDevicePixels = true;
         Background = Theme.Background; Foreground = Theme.Text; FontFamily = new FontFamily("Microsoft YaHei UI");
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         overlay = new(libraryRoot, settings);
-        controller = new(settings, library, Dispatcher);
+        controller = new(settings, this.library, Dispatcher, libraryRoot);
+        workspace = new(controller, personal, overlay, settings, ActivateLibrary);
+        overlay.ExitRequested += async () => await ExitInteraction();
+        overlay.HistoryRequested += ShowHistory;
+        overlay.PlacementChanged += SavePlacement;
+        workspace.CaptureStarted += () =>
+        {
+            overlay.SetInteractive(false); overlay.SetWorkspace(workspace); overlay.Show();
+            if (returnWindow != 0) NativeInput.SetForegroundWindow(returnWindow);
+        };
+        workspace.CaptureFinished += () =>
+        {
+            if (closing || leavingInteraction) return;
+            overlay.SetWorkspace(workspace); overlay.SetInteractive(true);
+        };
         controller.State += s =>
         {
-            status.Text = s; overlay.Panel.SetState(s);
-            if (controller.Enabled && controller.Foreground) overlay.Show(); else overlay.Hide();
+            status.Text = s; overlay.Panel.SetState(s); RefreshListeningPresentation();
+            RefreshOverlayVisibility();
         };
-        controller.Result += r => overlay.Panel.ShowResult(r, listening: controller.Enabled);
+        controller.Result += r =>
+        {
+            overlay.Panel.SetLibraryRoot(controller.History.Latest?.LibraryRoot ?? libraryRoot);
+            overlay.Panel.ShowResult(r, listening: controller.Enabled);
+        };
+        controller.Activity += overlay.Panel.SetActivity;
         Content = Build();
         overlay.Panel.PagesChanged += UpdateCandidateNavigation;
         controller.History.Changed += () => historyButton!.Content = $"识别历史（{controller.History.Entries.Count}）";
@@ -59,24 +92,73 @@ internal sealed class MainWindow : Window
         {
             if (closing) return;
             e.Cancel = true; closing = true; diagnosticsTimer.Stop(); input?.Dispose(); tray?.Dispose();
-            await controller.DisposeAsync(); overlay.Close(); _ = Dispatcher.BeginInvoke(Close);
+            workspace.Dispose(); await controller.DisposeAsync(); historyWindow?.Close(); overlay.Close(); _ = Dispatcher.BeginInvoke(Close);
         };
         StateChanged += (_, _) => { if (WindowState == WindowState.Minimized) Hide(); };
     }
+    private void RefreshOverlayVisibility()
+    {
+        if (closing) return;
+        if (controller.Mode == AssistantMode.Interaction || controller.Foreground && (controller.Enabled || controller.Mode == AssistantMode.Learning)) overlay.Show();
+        else overlay.Hide();
+    }
+    private async Task EnterInteraction(AnalysisSnapshot? snapshot = null, bool learn = false, bool move = false)
+    {
+        if (changingMode || closing) return;
+        changingMode = true;
+        try
+        {
+            leavingInteraction = false;
+            if (controller.Foreground) returnWindow = NativeInput.GetForegroundWindow();
+            var wasLearning = workspace.Learning;
+            workspace.PauseLearning(); await controller.SetMode(AssistantMode.Interaction);
+            overlay.SetWorkspace(workspace); overlay.SetInteractive(true);
+            if (snapshot is not null || !wasLearning) workspace.Select(snapshot);
+            if (learn) workspace.OpenLearning();
+            if (move) overlay.Unlock();
+        }
+        catch (Exception ex) { status.Text = "浮窗操作失败 · " + ex.Message; }
+        finally { changingMode = false; }
+    }
+    private async Task ExitInteraction()
+    {
+        if (changingMode || closing || controller.Mode == AssistantMode.Listening) return;
+        changingMode = true; leavingInteraction = true;
+        try
+        {
+            workspace.Stop(); overlay.SetInteractive(false);
+            if (NativeInput.ForegroundBelongsToApplication() && returnWindow != 0) NativeInput.SetForegroundWindow(returnWindow);
+            await controller.SetMode(AssistantMode.Listening); RefreshOverlayVisibility();
+        }
+        finally { changingMode = false; }
+    }
+    private void SavePlacement()
+    {
+        x.Text = settings.Left.ToString(CultureInfo.InvariantCulture); y.Text = settings.Top.ToString(CultureInfo.InvariantCulture);
+        positionMode.SelectedIndex = settings.EffectivePositionMode == OverlayPositionMode.GameTopCenter ? 0 : 1;
+        try { settings.Save(); } catch (Exception ex) { status.Text = "位置未保存 · " + ex.Message; }
+    }
+    private async Task ActivateLibrary(LibraryVersion version, bool rollback, CancellationToken token)
+    {
+        token.ThrowIfCancellationRequested();
+        var old = new LibraryVersion(controller.Library, controller.LibraryRoot);
+        await controller.InstallLibrary(version.Library, version.Root);
+        try { token.ThrowIfCancellationRequested(); if (rollback) personal.Rollback(); else personal.Activate(version); }
+        catch { await controller.InstallLibrary(old.Library, old.Root); throw; }
+        library = version.Library; libraryRoot = version.Root;
+        UpdateLibraryInfo();
+        status.Text = "音效库已更新 · " + library.Version;
+    }
+    private void UpdateLibraryInfo()
+    {
+        var covered = library.Groups.Where(g => g.Action == "pickup" && g.Templates.Count > 0).SelectMany(g => g.ItemIds).Distinct().Count();
+        libraryInfo.Text = $"{covered} 件候选已接入 / {library.Items.Count} 件目录\n{library.Version}";
+        dashboardLibraryInfo.Text = $"{covered} 件候选";
+    }
     private UIElement Build()
     {
-        var root = new DockPanel { Margin = new Thickness(28) };
-        var top = new DockPanel { Margin = new Thickness(0, 0, 0, 24) }; DockPanel.SetDock(top, Dock.Top); root.Children.Add(top);
-        var actions = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
-        actions.Children.Add(Theme.Button("最小化到托盘", (_, _) => { WindowState = WindowState.Minimized; }));
-        DockPanel.SetDock(actions, Dock.Right); top.Children.Add(actions);
-        var title = new StackPanel(); title.Children.Add(Theme.Label("行商听音助手", 28));
-        title.Children.Add(Theme.Label("听见线索，看清所有可能。 · 历史记录版", 13, Theme.Muted)); top.Children.Add(title);
-        var leftColumn = new DockPanel(); root.Children.Add(leftColumn);
-        var navigation = new WrapPanel { Margin = new Thickness(0, 0, 0, 12) };
-        DockPanel.SetDock(navigation, Dock.Top); leftColumn.Children.Add(navigation); leftColumn.Children.Add(settingsPage);
-        var stateBox = new StackPanel(); stateBox.Children.Add(Theme.Label("监听控制", 18)); stateBox.Children.Add(status);
-        stateBox.Children.Add(Theme.Label("暗区突围专用 · 切出游戏暂停，切回后恢复。", 12, Theme.Muted));
+        var root = BuildShell(out var navigation);
+        var stateBox = BuildListeningPage();
         automatic.IsChecked = settings.AutomaticRecognition;
         automatic.Click += (_, _) =>
         {
@@ -85,58 +167,56 @@ internal sealed class MainWindow : Window
             catch (Exception ex) { MessageBox.Show(this, ex.Message, "自动识别设置未保存"); }
             UpdateDiagnostics();
         };
-        stateBox.Children.Add(automatic);
-        stateBox.Children.Add(Theme.Button("开启 / 关闭监听", async (_, _) => await controller.Toggle(), true));
-        var diagnosticActions = new WrapPanel();
-        diagnosticActions.Children.Add(Theme.Button("3 秒后试识别", async (_, _) => await controller.TestAfterCountdown()));
-        diagnosticActions.Children.Add(Theme.Button("导出诊断", (_, _) => ExportDiagnostics()));
-        stateBox.Children.Add(diagnosticActions);
-        var resultActions = new WrapPanel();
-        historyButton = Theme.Button("识别历史（0）", (_, _) => ShowHistory());
-        resultActions.Children.Add(historyButton);
-        resultActions.Children.Add(Theme.Button("清除当前结果", (_, _) => controller.ClearCurrentResult()));
-        stateBox.Children.Add(resultActions);
-        var candidateNavigation = new DockPanel { Height = 32 };
-        previousCandidatePage = Theme.Button("候选上一页", (_, _) => overlay.Panel.MovePage(-1));
-        nextCandidatePage = Theme.Button("候选下一页", (_, _) => overlay.Panel.MovePage(1));
-        foreach (var button in new[] { nextCandidatePage, previousCandidatePage })
-        { button.Padding = new Thickness(8, 3, 8, 3); DockPanel.SetDock(button, Dock.Right); candidateNavigation.Children.Add(button); }
-        candidateNavigation.Children.Add(candidatePageLabel); stateBox.Children.Add(candidateNavigation);
         UpdateCandidateNavigation();
-        stateBox.Children.Add(Theme.Label("匹配结果持续保留，直到新的匹配或手动清除。", 11, Theme.Muted));
         var captureConfig = new StackPanel();
         captureConfig.Children.Add(Theme.Label("采音与快捷键", 18));
         Field(captureConfig, "播放设备 · 系统回环，不使用麦克风", devices);
         captureConfig.Children.Add(Theme.Label("UU 远程时也要选择游戏实际输出的设备；听不到声音时，检查 UU 虚拟声卡。", 11, Theme.Muted));
         captureConfig.Children.Add(Theme.Button("刷新播放设备", (_, _) => RefreshDevices()));
         Field(captureConfig, "启停快捷键", hotkey); hotkey.Text = settings.Hotkey;
+        Field(captureConfig, "浮窗操作快捷键", interactionHotkey); interactionHotkey.Text = settings.InteractionHotkey;
         captureConfig.Children.Add(Theme.Button("保存设置", SaveSettings, true));
-        var config = new StackPanel();
-        config.Children.Add(Theme.Label("浮窗外观", 18));
+        var placement = new StackPanel();
+        placement.Children.Add(Theme.Label("浮窗位置与移动", 18));
+        var positionRow = new DockPanel { Margin = new Thickness(0, 0, 0, 8) };
+        var positionLabel = Theme.Label("位置", 13); positionLabel.Width = 50; positionLabel.VerticalAlignment = VerticalAlignment.Center;
+        DockPanel.SetDock(positionLabel, Dock.Left); positionRow.Children.Add(positionLabel);
+        positionMode.ItemsSource = new[] { "游戏顶部居中（推荐）", "自定义坐标" };
+        positionMode.SelectedIndex = settings.EffectivePositionMode == OverlayPositionMode.GameTopCenter ? 0 : 1;
+        positionMode.Padding = new Thickness(8, 4, 8, 4);
+        positionMode.SelectionChanged += (_, _) => x.IsEnabled = y.IsEnabled = positionMode.SelectedIndex == 1;
+        x.IsEnabled = y.IsEnabled = positionMode.SelectedIndex == 1;
+        positionRow.Children.Add(positionMode); placement.Children.Add(positionRow);
         var geometry = new UniformGridCompat(3);
         foreach (var (label, box, v) in new[] { ("左", x, settings.Left), ("上", y, settings.Top), ("宽", width, settings.Width) })
         { var column = new StackPanel { Margin = new Thickness(0, 0, 10, 0) }; box.Text = v.ToString(CultureInfo.InvariantCulture); Field(column, label, box); geometry.Children.Add(column); }
-        config.Children.Add(geometry);
-        config.Children.Add(Theme.Label("高度随候选数量自动伸缩；达到屏幕上限后分页，使用 Ctrl+Alt+PgUp / PgDn 翻页。", 11, Theme.Muted));
+        placement.Children.Add(geometry);
+        placement.Children.Add(new WrapPanel { Children = { Theme.Button("移动浮窗", async (_, _) => await EnterInteraction(move: true)), Theme.Button("恢复顶部居中", (_, _) => overlay.RestoreTopCenter()) } });
+        placement.Children.Add(Theme.Label("顶部居中跟随游戏窗口，在上方区域自适应高度；候选多时分页，Ctrl+Alt+PgUp / PgDn 翻页。", 11, Theme.Muted));
+        placement.Children.Add(Theme.Button("保存设置", SaveSettings, true));
+        var config = new StackPanel();
+        config.Children.Add(Theme.Label("浮窗外观", 18));
         thumbnailSize.Value = settings.ThumbnailSize; Field(config, "候选图片大小 · 小 ← → 大", thumbnailSize);
+        fontScale.ItemsSource = new[] { "小 · 90%", "中 · 100%", "大 · 115%" }; fontScale.SelectedIndex = settings.FontScale < 1 ? 0 : settings.FontScale > 1 ? 2 : 1;
+        Field(config, "字号（独立于图片尺寸）", fontScale);
         Field(config, "透明度", opacity); opacity.Value = settings.Opacity;
         names.IsChecked = settings.ShowNames; config.Children.Add(names);
         acceleration.IsChecked = settings.HardwareAcceleration; config.Children.Add(acceleration);
         config.Children.Add(Theme.Button("保存设置", SaveSettings, true));
         var info = new StackPanel();
-        var covered = library.Groups.Where(g => g.Action == "pickup" && g.Templates.Count > 0).SelectMany(g => g.ItemIds).Distinct().Count();
-        info.Children.Add(Theme.Label("音效库", 18)); info.Children.Add(Theme.Label($"{covered} 件候选已接入  /  {library.Items.Count} 件目录\n{library.Version}", 12, Theme.Muted));
+        UpdateLibraryInfo(); info.Children.Add(Theme.Label("音效库", 18)); info.Children.Add(libraryInfo);
         info.Children.Add(Theme.Label("社区同音组资料，尚未完成独立准确率验收。", 12, Theme.Gold));
         var buttons = new WrapPanel(); buttons.Children.Add(Theme.Button("试听文件识别", Offline));
+        buttons.Children.Add(Theme.Button("补库 / 录入 / 学习", async (_, _) => await EnterInteraction(learn: true)));
         buttons.Children.Add(Theme.Button("查看覆盖清单", (_, _) => OpenDocument("COVERAGE.md")));
         buttons.Children.Add(Theme.Button("物品缩略图鉴", (_, _) => ShowCatalog()));
         buttons.Children.Add(Theme.Button("测试报告", (_, _) => OpenDocument("TEST-REPORT.md"))); info.Children.Add(buttons);
         var diagnosticPage = new StackPanel(); diagnosticPage.Children.Add(Theme.Label("运行诊断", 18)); diagnosticPage.Children.Add(diagnostics);
         diagnosticPage.Children.Add(Theme.Button("导出诊断", (_, _) => ExportDiagnostics()));
-        foreach (var (label, content) in new[] { ("监听", stateBox), ("采音", captureConfig), ("浮窗", config), ("音效库", info), ("诊断", diagnosticPage) })
+        foreach (var (label, content) in new[] { ("监听", stateBox), ("采音", captureConfig), ("位置", placement), ("浮窗", config), ("音效库", info), ("诊断", diagnosticPage) })
         {
-            var button = Theme.Button(label, (_, _) => ShowSettingsSection(label));
-            sections[label] = (button, Theme.Box(content)); navigation.Children.Add(button);
+            var button = NavigationButton(label);
+            sections[label] = (button, label == "监听" ? content : Theme.Box(content, 22)); navigation.Children.Add(button);
         }
         ShowSettingsSection("监听");
         return root;
@@ -146,10 +226,12 @@ internal sealed class MainWindow : Window
         settingsPage.Children.Clear(); settingsPage.Children.Add(sections[name].Content);
         foreach (var (label, section) in sections)
         {
-            section.Button.Background = label == name ? Theme.Accent : Theme.Brush("#263347");
-            section.Button.Foreground = label == name ? Theme.Background : Theme.Text;
+            section.Button.Background = label == name ? Theme.Selected : Brushes.Transparent;
+            section.Button.Foreground = label == name ? Theme.Accent : Theme.Muted;
+            section.Button.BorderBrush = label == name ? Theme.Brush("#63746B") : Brushes.Transparent;
         }
-        SizeToContent = SizeToContent.Height;
+        pageHeading.Text = SectionTitle(name);
+        pageDescription.Text = SectionDescription(name);
     }
     private static void Field(Panel panel, string label, Control control)
     {
@@ -175,16 +257,21 @@ internal sealed class MainWindow : Window
         {
             input = new(this); input.Toggle += async () => await controller.Toggle(); input.MouseDown += controller.Click;
             input.ForegroundChanged += controller.ForegroundChanged;
+            input.InteractionToggle += async () => { if (controller.Mode == AssistantMode.Interaction) await ExitInteraction(); else await EnterInteraction(); };
             input.CandidatePage += delta => { if (controller.Enabled && controller.Foreground) overlay.Panel.MovePage(delta); };
-            input.SetHotkey(settings.Hotkey);
+            input.SetHotkey(settings.Hotkey); input.SetInteractionHotkey(settings.InteractionHotkey);
         }
         catch (Exception ex) { inputError = ex.Message; status.Text = ex.Message; }
         UpdateDiagnostics();
-        var menu = new System.Windows.Forms.ContextMenuStrip();
+        var menu = BrandAssets.TrayMenu();
         menu.Items.Add("打开设置", null, (_, _) => Dispatcher.Invoke(() => { Show(); WindowState = WindowState.Normal; Activate(); }));
         menu.Items.Add("开启 / 关闭监听", null, (_, _) => Dispatcher.InvokeAsync(async () => await controller.Toggle()));
+        menu.Items.Add("浮窗声音对比", null, (_, _) => Dispatcher.InvokeAsync(async () => await EnterInteraction()));
+        menu.Items.Add("移动浮窗", null, (_, _) => Dispatcher.InvokeAsync(async () => await EnterInteraction(move: true)));
+        menu.Items.Add("恢复顶部居中", null, (_, _) => Dispatcher.Invoke(overlay.RestoreTopCenter));
+        menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
         menu.Items.Add("退出", null, (_, _) => Dispatcher.Invoke(Close));
-        tray = new System.Windows.Forms.NotifyIcon { Text = "行商听音助手", Icon = System.Drawing.SystemIcons.Information, ContextMenuStrip = menu, Visible = true };
+        tray = new System.Windows.Forms.NotifyIcon { Text = "行商听音助手 · 监听已关闭", Icon = BrandAssets.TrayIcon, ContextMenuStrip = menu, Visible = true };
         tray.DoubleClick += (_, _) => Dispatcher.Invoke(() => { Show(); WindowState = WindowState.Normal; Activate(); });
         if (Environment.GetCommandLineArgs().Contains("--performance-smoke"))
             _ = PerformanceSmoke();
@@ -200,14 +287,17 @@ internal sealed class MainWindow : Window
             }
             var nx = Number(x, -10000, 10000); var ny = Number(y, -10000, 10000);
             var nw = Number(width, 300, 900);
-            input?.SetHotkey(hotkey.Text.Trim());
+            input?.SetHotkey(hotkey.Text.Trim()); input?.SetInteractionHotkey(interactionHotkey.Text.Trim());
             var resume = controller.Enabled;
             await controller.Disable();
             settings.DeviceId = (devices.SelectedItem as OutputDevice)?.Id ?? ""; settings.Hotkey = hotkey.Text.Trim();
-            settings.Left = nx; settings.Top = ny; settings.Width = nw; settings.Opacity = opacity.Value;
+            if (settings.Left != nx || settings.Top != ny) settings.MonitorName = null;
+            settings.Left = nx; settings.Top = ny; settings.Width = nw; settings.Opacity = opacity.Value; settings.InteractionHotkey = interactionHotkey.Text.Trim();
+            settings.FontScale = fontScale.SelectedIndex == 0 ? .9 : fontScale.SelectedIndex == 2 ? 1.15 : 1;
+            settings.PositionMode = positionMode.SelectedIndex == 0 ? OverlayPositionMode.GameTopCenter : OverlayPositionMode.Manual;
             settings.ThumbnailSize = thumbnailSize.Value;
             settings.ShowNames = names.IsChecked == true; settings.HardwareAcceleration = acceleration.IsChecked == true;
-            settings.Save(); overlay.Apply(settings);
+            settings.Save(); overlay.Apply(settings); RefreshListeningPresentation();
             if (resume) await controller.Toggle();
             else status.Text = "设置已保存 · 监听未开启，请点击开启或按快捷键";
             UpdateDiagnostics();
@@ -216,6 +306,7 @@ internal sealed class MainWindow : Window
     }
     private void UpdateDiagnostics()
     {
+        RefreshListeningPresentation();
         UpdateCandidateNavigation();
         var d = controller.Diagnostics();
         var audio = !d.Capturing ? "未采集（仅游戏前台采集）" :
@@ -272,14 +363,19 @@ internal sealed class MainWindow : Window
         var catalog = new CandidatePanel(libraryRoot, new Settings { ShowNames = true });
         catalog.SetState("物品图鉴 · 全目录，不是识别结果");
         catalog.ShowResult(new(0, RecognitionStatus.Matched, true, library.Items.Select(i => new Candidate(i, 0, "catalog")).ToArray(), 0, ""), true);
-        var window = new Window { Owner = this, Title = "物品图鉴 · 51 件社区资料", Width = Math.Min(880, SystemParameters.WorkArea.Width),
+        var window = new Window { Owner = this, Title = $"物品图鉴 · {library.Items.Count} 件目录物品", Width = Math.Min(880, SystemParameters.WorkArea.Width),
             Background = Theme.Background, Content = catalog, WindowStartupLocation = WindowStartupLocation.CenterOwner };
-        WindowPlacement.UseContentHeight(window); window.Show();
+        BrandAssets.StyleWindow(window); WindowPlacement.UseContentHeight(window); window.Show();
     }
     private void ShowHistory()
     {
         if (historyWindow is not null) { historyWindow.Activate(); return; }
-        historyWindow = new(controller.History, libraryRoot, settings) { Owner = this };
+        historyWindow = new(controller.History, libraryRoot, settings, async entry =>
+        {
+            var snapshot = controller.Audio.Get(entry.SnapshotId);
+            if (snapshot is null) { MessageBox.Show(this, "此记录的声音片段已过期，文字候选仍保留。", "声音对比"); return; }
+            await EnterInteraction(snapshot);
+        }) { Owner = this };
         historyWindow.Closed += (_, _) => historyWindow = null;
         historyWindow.Show();
     }
@@ -295,7 +391,7 @@ internal sealed class MainWindow : Window
             results.SetState("离线文件 · " + Path.GetFileName(picker.FileName)); results.ShowResult(result);
             var window = new Window { Owner = this, Title = "音频文件识别结果", Width = Math.Min(540, SystemParameters.WorkArea.Width),
                 Background = Theme.Background, Content = results, WindowStartupLocation = WindowStartupLocation.CenterOwner };
-            WindowPlacement.UseContentHeight(window); window.Show();
+            BrandAssets.StyleWindow(window); WindowPlacement.UseContentHeight(window); window.Show();
         }
         catch (Exception ex) { MessageBox.Show(this, ex.Message, "音频读取失败"); }
     }
@@ -334,17 +430,23 @@ internal sealed class MainWindow : Window
         var styles = NativeInput.OverlayStyles(overlay);
         var preserved = foregroundBefore == NativeInput.GetForegroundWindow();
         var largeHeight = overlay.ActualHeight;
+        var largeBounds = NativeInput.WindowPixels(overlay);
+        var viewport = overlay.PlacementViewport;
         var largePages = overlay.Panel.PageCount;
         RenderSmoke(overlay, "overlay-smoke.png");
         var one = new RecognitionResult(999, RecognitionStatus.Matched, true,
             [new(library.Items[0], .9, "smoke")], 1, "布局测试 · 模拟结果");
         overlay.Panel.ShowResult(one, true); await Task.Delay(100);
         var smallHeight = overlay.ActualHeight;
+        var smallBounds = NativeInput.WindowPixels(overlay);
+        var centered = Math.Abs((smallBounds.Left + smallBounds.Width / 2) - (viewport.Left + viewport.Width / 2)) <= 2;
+        var topAnchored = Math.Abs(smallBounds.Top - largeBounds.Top) <= 1;
         var smallPages = overlay.Panel.PageCount;
         RenderSmoke(overlay, "overlay-small-smoke.png");
         overlay.Panel.ShowResult(one with { Candidates = library.Items.Select(i => new Candidate(i, .9, "smoke")).ToArray() }, true);
         await Task.Delay(100);
         var overflowHeight = overlay.ActualHeight;
+        var staysAboveCenter = NativeInput.WindowPixels(overlay).Bottom <= viewport.Top + viewport.Height / 3 + 2;
         var overflowPages = overlay.Panel.PageCount;
         await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
         overlay.UpdateLayout();
@@ -386,19 +488,50 @@ internal sealed class MainWindow : Window
         { historyIds.AddRange(fullHistoryView.VisibleRecordIds); fullHistoryView.ChangeRecordPage(1); await Task.Delay(10); }
         var allHistoryReachable = historyIds.Count == 100 && historyIds.Distinct().Count() == 100;
         fullHistoryView.Close();
+        var reference = ReferenceAudio.Load(libraryRoot).Samples[0];
+        var sound = WaveAudio.Read(ReferenceAudio.VerifiedPath(libraryRoot, reference));
+        using var smokeRecognizer = RecognizerFactory.Create(library, libraryRoot);
+        var analysis = await Task.Run(() => smokeRecognizer.Analyze(sound.Samples, sound.SampleRate));
+        var snapshot = controller.Audio.Add(sound, analysis, "参考录音 · 界面检查", library, libraryRoot);
+        await EnterInteraction(snapshot); await Task.Delay(100);
+        var interactiveStyles = NativeInput.OverlayStyles(overlay);
+        var operationFit = new Dictionary<string, bool>();
+        async Task CheckWorkspace(string name)
+        {
+            await Task.Delay(100); overlay.UpdateLayout();
+            operationFit[name] = Descendants<Button>(workspace).Where(b => b.IsVisible).All(b =>
+            {
+                var rect = b.TransformToAncestor(overlay).TransformBounds(new Rect(b.RenderSize));
+                return rect.Bottom <= overlay.ActualHeight + 1 && rect.Right <= overlay.ActualWidth + 1;
+            });
+            RenderSmoke(overlay, "operation-" + name + "-smoke.png");
+        }
+        void ClickWorkspace(string label) => Descendants<Button>(workspace).Single(b => Equals(b.Content, label)).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        await CheckWorkspace("sound");
+        foreach (var (label, name) in new[] { ("完整候选", "candidates"), ("个人库", "personal"), ("补库 / 学习", "learn"), ("录入新物品", "new-item") })
+        { ClickWorkspace(label); await CheckWorkspace(name); }
+        overlay.ToggleLock(); var unlocked = !settings.PositionLocked; overlay.ToggleLock();
+        await ExitInteraction();
+        var restoredStyles = NativeInput.OverlayStyles(overlay);
         JsonFile.Write(Path.Combine(AppContext.BaseDirectory, "ui-smoke.json"), new
         {
             images = library.Items.Count(i => i.Thumbnail is not null && File.Exists(Path.Combine(libraryRoot, i.Thumbnail))),
             clickThrough = (styles & 0x20) != 0, noActivate = (styles & 0x08000000) != 0,
             layered = (styles & 0x80000) != 0, topmost = overlay.Topmost,
             foregroundPreserved = preserved,
+            operation = new { operationFit, unlocked, enabledInteraction = (interactiveStyles & (0x20 | 0x08000000)) == 0,
+                restoredPassThrough = (restoredStyles & (0x20 | 0x08000000)) == (0x20 | 0x08000000),
+                recognitionRemainedOff = !controller.Enabled },
+            placement = new { mode = settings.EffectivePositionMode.ToString(), viewport, smallBounds, largeBounds,
+                centered, topAnchored, staysAboveCenter },
             layout = new { thumbnailSize = settings.ThumbnailSize, smallHeight, smallPages, largeHeight, largePages,
                 overflowHeight, overflowPages, maximumHeight, allCandidatesReachable, shrunkAgain, overlayHasScrollViewer, overlayPageHint,
                 historySmallHeight, historyLargeHeight, historyOnScreen,
                 allHistoryReachable, historyPages, settingsFit,
                 adaptivePassed = largeHeight > smallHeight && smallPages == 1 && overflowHeight <= maximumHeight + 1 &&
                     overflowPages > 1 && overlayPageHint && allCandidatesReachable && allHistoryReachable && settingsFit.Values.All(fit => fit) &&
-                    shrunkAgain && !overlayHasScrollViewer && historyOnScreen && historyLargeHeight > historySmallHeight },
+                    shrunkAgain && !overlayHasScrollViewer && historyOnScreen && historyLargeHeight > historySmallHeight &&
+                    centered && topAnchored && staysAboveCenter },
             inputMode = input?.HookStatus, inputError, diagnostics = controller.Diagnostics(),
             note = "仅桌面浮窗属性与渲染检查，未在游戏中测试输入或独占全屏覆盖"
         });

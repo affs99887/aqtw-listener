@@ -1,4 +1,4 @@
-namespace Listener.App;
+﻿namespace Listener.App;
 
 internal sealed class HistoryWindow : Window
 {
@@ -14,19 +14,25 @@ internal sealed class HistoryWindow : Window
     internal int RecordPageCount => Math.Max(1, (history.Entries.Count + recordsPerPage - 1) / recordsPerPage);
     internal IReadOnlyList<long> VisibleRecordIds => records.Items.Cast<ListBoxItem>().Select(row => ((RecognitionEntry)row.Tag).Id).ToArray();
 
-    public HistoryWindow(RecognitionHistory history, string libraryRoot, Settings settings)
+    public HistoryWindow(RecognitionHistory history, string libraryRoot, Settings settings, Action<RecognitionEntry>? compare = null)
     {
         this.history = history;
+        BrandAssets.StyleWindow(this);
         Title = "识别历史 · 本次运行"; Width = Math.Min(1060, SystemParameters.WorkArea.Width);
         WindowPlacement.UseContentHeight(this); ResizeMode = ResizeMode.CanMinimize;
         Background = Theme.Background; Foreground = Theme.Text; FontFamily = new FontFamily("Microsoft YaHei UI");
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        details = new(libraryRoot, new Settings { ShowNames = true, ThumbnailSize = settings.ThumbnailSize });
+        details = new(libraryRoot, new Settings { ShowNames = true, ThumbnailSize = settings.ThumbnailSize, FontScale = settings.FontScale });
         var root = new DockPanel { Margin = new Thickness(20) }; Content = root;
         var header = new StackPanel(); DockPanel.SetDock(header, Dock.Top); root.Children.Add(header);
         header.Children.Add(Theme.Label("识别历史", 24));
         header.Children.Add(Theme.Label("保留本次运行最近 100 条。相邻重复声音会合并；退出软件后清空。", 12, Theme.Muted));
         var actions = new DockPanel();
+        if (compare is not null)
+        {
+            var button = Theme.Button("在浮窗中对比", (_, _) => { if ((records.SelectedItem as ListBoxItem)?.Tag is RecognitionEntry entry) compare(entry); });
+            DockPanel.SetDock(button, Dock.Right); actions.Children.Add(button);
+        }
         var clear = Theme.Button("清空历史", (_, _) => history.ClearHistory());
         DockPanel.SetDock(clear, Dock.Right); actions.Children.Add(clear); actions.Children.Add(count); header.Children.Add(actions);
         var body = new Grid(); body.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(290) });
@@ -91,6 +97,7 @@ internal sealed class HistoryWindow : Window
     private void ShowSelection()
     {
         var entry = (records.SelectedItem as ListBoxItem)?.Tag as RecognitionEntry;
+        if (entry?.LibraryRoot is { Length: > 0 } root) details.SetLibraryRoot(root);
         details.SetState(entry is null ? "本次运行尚无历史记录" : $"历史记录 · {entry.LastSeen:yyyy-MM-dd HH:mm:ss}");
         details.ShowResult(entry is null
             ? new(0, RecognitionStatus.Unknown, true, [], 0, "识别成功后会保存在这里")

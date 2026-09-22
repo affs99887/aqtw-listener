@@ -1,0 +1,102 @@
+{
+  "samples": [
+    {
+      "groupId": "537b0217",
+      "templateId": "537b0217-1",
+      "file": "audio/537b0217-1.wav",
+      "sha256": "b31207675f1270055e627314c9c14366a595da4c42218fb942a56aca76a14043",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "983e0b90",
+      "templateId": "983e0b90-1",
+      "file": "audio/983e0b90-1.wav",
+      "sha256": "a6360cd3cf2192e8aff1dc53f4e6ff4177056decd0a20c2cc867241645798a57",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "56dfb35b",
+      "templateId": "56dfb35b-1",
+      "file": "audio/56dfb35b-1.wav",
+      "sha256": "d09dc9e609c81253a0a32ce8143e4b51dafbcd2686a7e99d36d46c2b9da69a22",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "388e122c",
+      "templateId": "388e122c-1",
+      "file": "audio/388e122c-1.wav",
+      "sha256": "91c981430c80c9cf1cf3db602ac340006bf32b804b2a8ed1fd3a99f33e57c122",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "cb1c0d1d",
+      "templateId": "cb1c0d1d-1",
+      "file": "audio/cb1c0d1d-1.wav",
+      "sha256": "444d1f81e79356639ef57169fd8f014d431d622a2918f12bbc0a584ef74c2e68",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "cb1c0d1d",
+      "templateId": "cb1c0d1d-2",
+      "file": "audio/cb1c0d1d-2.wav",
+      "sha256": "05bae7a5067a3d138fabfd51479eca541a2ca5029ba8fc15c137744fc2d1b747",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "cb1c0d1d",
+      "templateId": "cb1c0d1d-3",
+      "file": "audio/cb1c0d1d-3.wav",
+      "sha256": "55cf3a37d1ed0289baa395f8e91f63a59afcc241847d4d470edf2a3e3ce7ab4f",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "cb1c0d1d",
+      "templateId": "cb1c0d1d-4",
+      "file": "audio/cb1c0d1d-4.wav",
+      "sha256": "8337fde6f9d4f216852b8a1a532d17e281bdc0deda86357b6a089ea549fcc1d2",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "9e7e9e83",
+      "templateId": "9e7e9e83-1",
+      "file": "audio/9e7e9e83-1.wav",
+      "sha256": "ff429e761882816f453dc88cf57c4d11eb76d14764545f78276e131e84a68f73",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "267afca3",
+      "templateId": "267afca3-1",
+      "file": "audio/267afca3-1.wav",
+      "sha256": "1227b7929939a5d203959504787caf3c0ba6ecacb0829033de239c7c27a20196",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "e9f62d39",
+      "templateId": "e9f62d39-1",
+      "file": "audio/e9f62d39-1.wav",
+      "sha256": "91af3f1c01afaf610966ccfb9322705c384b3a3e3e9be5f8f29892c9284b592d",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "361affd2",
+      "templateId": "361affd2-1",
+      "file": "audio/361affd2-1.wav",
+      "sha256": "f68901df12f459f8e0bfb6161317613b0fd6774c09c366c8b7e3148949bf5068",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "361affd2",
+      "templateId": "361affd2-2",
+      "file": "audio/361affd2-2.wav",
+      "sha256": "9f926f04bdf3944ed2c2e2ba07225a0093d2316bf2400ef12114c131ee6f55bf",
+      "recordingId": "soundradar-community-20260919-20"
+    },
+    {
+      "groupId": "361affd2",
+      "templateId": "361affd2-3",
+      "file": "audio/361affd2-3.wav",
+      "sha256": "5da6521bd53eb53e8a4424d3ce80bc705b2bba4c00990ae48d00a9c7d6f73f2b",
+      "recordingId": "soundradar-community-20260919-20"
+    }
+  ]
+}

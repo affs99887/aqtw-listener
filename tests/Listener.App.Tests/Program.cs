@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Windows.Threading;
@@ -120,6 +120,54 @@ internal static class Program
                 f.Controller.Click(f.Now - 2, "test click"); f.Finish();
                 Check(f.Controller.History.Entries.Count == 2 && f.Controller.History.Entries[0].Result.IsFinal, "click stages duplicated history");
             }),
+            ("加载状态延迟显示、完成结束，错误保留候选并标明旧结果", () =>
+            {
+                using var f = new Fixture(); f.StartSound(); f.Finish();
+                Check(!f.Controller.CurrentActivity.Busy, "quick completion kept spinner");
+                f.Recognizer.Release.Reset(); f.Recognizer.Entered.Reset(); f.Recognizer.Status = RecognitionStatus.Unknown;
+                f.Capture.Timeline.Append(Fixture.Sound(), f.Now); f.Tick(f.Now + .65);
+                PumpUntil(() => f.Controller.CurrentActivity.Busy);
+                Check(f.Results.Last()?.CandidateCount == 1, "loading blanked candidates");
+                f.Recognizer.Release.Set(); f.Finish();
+                Check(!f.Controller.CurrentActivity.Busy && f.Controller.CurrentActivity.Message.Contains("上次匹配"), "miss did not finish activity");
+            }),
+            ("操作期间不采音或识别，退出冷却完整300毫秒并保留监听开关", () =>
+            {
+                using var f = new Fixture(); f.StartSound(); f.Finish();
+                var enter = f.Controller.SetMode(AssistantMode.Interaction); PumpUntil(() => enter.IsCompleted); enter.GetAwaiter().GetResult();
+                Check(!f.Capture.Running && f.Controller.Enabled, "interaction changed user listening toggle");
+                f.Capture.Timeline.Append(Fixture.Sound(), f.Now); f.Controller.Click(f.Now, "should-ignore"); f.Tick(f.Now + .8);
+                Check(f.Recognizer.Calls == 1, "preview contaminated recognition");
+                var watch = Stopwatch.StartNew(); var exit = f.Controller.SetMode(AssistantMode.Listening);
+                f.Tick(f.Now + .01); Check(!f.Capture.Running, "poll bypassed cooldown");
+                PumpUntil(() => exit.IsCompleted); exit.GetAwaiter().GetResult();
+                Check(watch.ElapsedMilliseconds >= 290 && f.Capture.Running && f.Recognizer.Calls == 1, "cooldown or buffer clear failed");
+                f.Controller.Disable().GetAwaiter().GetResult(); f.Controller.SetMode(AssistantMode.Interaction).GetAwaiter().GetResult();
+                exit = f.Controller.SetMode(AssistantMode.Listening); PumpUntil(() => exit.IsCompleted);
+                Check(!f.Capture.Running && !f.Controller.Enabled, "exit restarted disabled listener");
+            }),
+            ("零鼠标引导学习：切出暂停续录，三参考一留出，普通识别不调用", () =>
+            {
+                using var f = new Fixture();
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var store = new PersonalLibraryStore(root, Path.Combine(Path.GetTempPath(), "aqtw-guided-tests", Guid.NewGuid().ToString("N")), Path.Combine(AppContext.BaseDirectory, "engine", "Listener.Engine.exe"));
+                var draft = new LearningDraft { Item = new("user-guide", "test", true), GroupId = "user-guide", IsNewItem = true };
+                var tick = 0; var paused = false; var completed = false;
+                var learning = new GuidedLearning(f.Controller, store, (milliseconds, token) =>
+                {
+                    token.ThrowIfCancellationRequested(); tick++;
+                    if (tick > 400) throw new Exception("learning never progressed");
+                    if (tick == 5) { f.Foreground = "notepad"; f.Controller.ForegroundChanged(); }
+                    if (tick == 6) { f.Foreground = "UAGame"; f.Controller.ForegroundChanged(); }
+                    var count = milliseconds * 24;
+                    f.Capture.Timeline.Append(Enumerable.Range(0, count).Select(i => (float)(.1 * Math.Sin((i + tick * 97) * .2))).ToArray(), f.Now);
+                    f.Now += milliseconds / 1000.0; return Task.CompletedTask;
+                });
+                learning.Progress += message => paused |= message.Contains("暂停"); learning.Completed += _ => completed = true;
+                var run = learning.Start(draft); PumpUntil(() => run.IsCompleted); run.GetAwaiter().GetResult();
+                Check(paused && completed && !learning.Running && draft.Samples.Count(s => !s.CheckOnly) == 3 && draft.Samples.Count(s => s.CheckOnly) == 1, "rounds/pause failed: " + draft.Status);
+                Check(f.Recognizer.Calls == 0 && f.Controller.Diagnostics().TriggerCount == 0 && f.Controller.Mode == AssistantMode.Interaction && !f.Capture.Running, "learning leaked into normal recognition");
+            }),
             ("少量候选按内容收缩，多量扩展，减少后能再次收缩", () =>
             {
                 var (panel, library) = CreatePanel();
@@ -146,6 +194,76 @@ internal static class Program
                     Check(!Descendants<System.Windows.Controls.ScrollViewer>(panel).Any(), "candidate view still scrolls");
                 }
             }),
+            ("旧默认坐标升级到顶部居中，自定义位置和明确选择保持", () =>
+            {
+                var defaults = JsonSerializer.Deserialize<Settings>("{\"left\":32,\"top\":110}", JsonFile.Options)!;
+                var moved = JsonSerializer.Deserialize<Settings>("{\"left\":850,\"top\":24}", JsonFile.Options)!;
+                Check(defaults.EffectivePositionMode == OverlayPositionMode.GameTopCenter, "old default not migrated");
+                Check(moved.EffectivePositionMode == OverlayPositionMode.Manual, "custom position overwritten");
+                defaults.PositionMode = OverlayPositionMode.Manual;
+                var saved = JsonSerializer.Deserialize<Settings>(JsonSerializer.Serialize(defaults, JsonFile.Options), JsonFile.Options)!;
+                Check(saved.EffectivePositionMode == OverlayPositionMode.Manual, "explicit manual position lost after reload");
+            }),
+            ("顶部居中按游戏区域和DPI计算，覆盖窗口化与负坐标显示器", () =>
+            {
+                foreach (var viewport in new[] { new System.Windows.Rect(0, 0, 1920, 1080), new System.Windows.Rect(240, 80, 1280, 720),
+                    new System.Windows.Rect(-2560, -1440, 2560, 1440) })
+                foreach (var scale in new[] { 1.0, 1.25, 1.5, 2.0 })
+                foreach (var width in new[] { 470.0, 900.0 })
+                {
+                    var b = OverlayPlacement.TopCenter(viewport, scale, scale, width);
+                    Check(Math.Abs(b.LeftPixels + b.Width * scale / 2 - (viewport.Left + viewport.Width / 2)) < .01, "not centered inside game");
+                    Check(b.TopPixels > viewport.Top && b.TopPixels < viewport.Top + viewport.Height * .05, "not near game top");
+                    Check(b.TopPixels + b.MaximumHeight * scale <= viewport.Top + viewport.Height / 3 + .01, "covers center of game");
+                    Check(b.Width * scale <= viewport.Width * .4 + .01, "covers side inventories");
+                }
+            }),
+            ("顶部紧凑浮窗保留大图，全51候选在顶部区域分页可达", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                foreach (var (pixelWidth, pixelHeight, scale, imageSize) in new[] {
+                    (1280, 720, 1.0, 88.0), (1920, 1080, 1.5, 120.0), (2560, 1440, 2.0, 120.0) })
+                {
+                    var bounds = OverlayPlacement.TopCenter(new System.Windows.Rect(0, 0, pixelWidth, pixelHeight), scale, scale, 470);
+                    var panel = new CandidatePanel(root, new Settings { ThumbnailSize = imageSize, ShowNames = true }, interactive: false, compact: true);
+                    panel.ShowResult(CatalogResult(library, 1)); Layout(panel, bounds.Width, 1000);
+                    var natural = panel.DesiredSize.Height;
+                    Layout(panel, bounds.Width, bounds.MaximumHeight);
+                    var small = panel.DesiredSize.Height;
+                    Check(panel.PageFits && panel.PageCount == 1, $"single thumbnail cannot fit: {pixelWidth}x{pixelHeight}, DPI {scale}, image {imageSize}, natural {natural}, limit {bounds.MaximumHeight}, {panel.LayoutInfo}");
+                    panel.ShowResult(CatalogResult(library, 51)); Layout(panel, bounds.Width, bounds.MaximumHeight);
+                    Check(panel.DesiredSize.Height > small && panel.PageCount > 1, "height did not adapt");
+                    var ids = new List<string>();
+                    for (var page = 0; page < panel.PageCount; page++)
+                    {
+                        Check(panel.PageFits, "top area clips a full card"); ids.AddRange(panel.VisibleIds);
+                        panel.MovePage(1); Layout(panel, bounds.Width, bounds.MaximumHeight);
+                    }
+                    Check(ids.Count == 51 && ids.Distinct().Count() == 51, "some top-area candidates are unreachable");
+                    panel.ShowResult(CatalogResult(library, 1)); Layout(panel, bounds.Width, bounds.MaximumHeight);
+                    Check(Math.Abs(panel.DesiredSize.Height - small) < 1, "top area stayed expanded");
+                }
+            }),
+            ("字号与缩略图组合在有限顶部空间中分页，操作候选无滚动条", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                foreach (var font in new[] { .9, 1.0, 1.15 })
+                foreach (var minimal in new[] { false, true })
+                {
+                    var settings = new Settings { FontScale = font, ThumbnailSize = 120, ShowNames = true };
+                    var panel = new CandidatePanel(root, settings, interactive: minimal, compact: true, minimal: minimal);
+                    panel.ShowResult(CatalogResult(library, 51)); panel.RefreshAppearance(); Layout(panel, 470, minimal ? 175 : 280);
+                    var ids = new List<string>();
+                    for (var i = 0; i < panel.PageCount; i++)
+                    {
+                        Check(panel.PageFits, "font size caused clipping: " + font + " " + minimal + " " + panel.LayoutInfo);
+                        ids.AddRange(panel.VisibleIds); panel.MovePage(1); Layout(panel, 470, minimal ? 175 : 280);
+                    }
+                    Check(ids.Count == 51 && ids.Distinct().Count() == 51 && settings.ThumbnailSize == 120, "pagination lost items or overwrote preferred size");
+                }
+            }),
             ("重复匹配保留正在看的页，新候选重置到第一页", () =>
             {
                 var (panel, library) = CreatePanel(); var result = CatalogResult(library, 51);
@@ -158,12 +276,12 @@ internal static class Program
             })
         };
         var report = new List<object>(); var failed = 0;
-        foreach (var (name, run) in tests)
+        foreach (var (name, run) in tests.Concat(PersonalLibraryTests.Cases()))
         {
             try { run(); report.Add(new { name, passed = true }); Console.WriteLine("PASS " + name); }
             catch (Exception ex) { failed++; report.Add(new { name, passed = false, error = ex.Message }); Console.WriteLine("FAIL " + name + ": " + ex.Message); }
         }
-        if (args.Length > 0) JsonFile.Write(args[0], new { total = tests.Length, passed = tests.Length - failed, failed, tests = report });
+        if (args.Length > 0) JsonFile.Write(args[0], new { total = report.Count, passed = report.Count - failed, failed, tests = report });
         return failed == 0 ? 0 : 1;
     }
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }

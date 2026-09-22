@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -9,6 +9,13 @@ namespace Listener.App;
 internal sealed class NativeInput : IDisposable
 {
     [DllImport("user32.dll")] internal static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")] private static extern bool GetClientRect(IntPtr window, out NativeRect rect);
+    [DllImport("user32.dll")] private static extern bool ClientToScreen(IntPtr window, ref NativePoint point);
+    [DllImport("user32.dll")] private static extern bool GetWindowRect(IntPtr window, out NativeRect rect);
+    [DllImport("user32.dll")] private static extern bool SetWindowPos(IntPtr window, IntPtr after, int x, int y, int cx, int cy, uint flags);
+    [DllImport("user32.dll")] internal static extern bool SetForegroundWindow(IntPtr window);
+    [StructLayout(LayoutKind.Sequential)] private struct NativeRect { public int Left, Top, Right, Bottom; }
+    [StructLayout(LayoutKind.Sequential)] private struct NativePoint { public int X, Y; }
     [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr window, out uint process);
     [DllImport("user32.dll")] private static extern short GetAsyncKeyState(int key);
     [DllImport("user32.dll")] private static extern int GetSystemMetrics(int index);
@@ -34,12 +41,14 @@ internal sealed class NativeInput : IDisposable
     private readonly DispatcherTimer mousePoll;
     private bool disposed;
     private string registeredHotkey = "";
+    private string registeredInteractionHotkey = "";
     private bool pagingRequested;
     public string PagingStatus { get; private set; } = "";
     public long HookPresses { get; private set; }
     public long PollTriggers { get; private set; }
     public string HookStatus { get; }
     public event Action? Toggle;
+    public event Action? InteractionToggle;
     public event Action<double, string>? MouseDown;
     public event Action? ForegroundChanged;
     public event Action<int>? CandidatePage;
@@ -83,9 +92,23 @@ internal sealed class NativeInput : IDisposable
     private IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wp, IntPtr lp, ref bool handled)
     {
         if (msg == 0x312 && wp.ToInt32() == 71) { Toggle?.Invoke(); handled = true; }
+        else if (msg == 0x312 && wp.ToInt32() == 75) { InteractionToggle?.Invoke(); handled = true; }
         else if (msg == 0x312 && wp.ToInt32() is 73 or 74)
         { CandidatePage?.Invoke(wp.ToInt32() == 73 ? -1 : 1); handled = true; }
         return IntPtr.Zero;
+    }
+    public void SetInteractionHotkey(string text)
+    {
+        if (text == registeredInteractionHotkey) return;
+        var parts = text.Split('+', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        uint modifiers = 0x4000;
+        foreach (var part in parts.SkipLast(1)) modifiers |= part.ToLowerInvariant() switch
+        { "ctrl" => 2u, "alt" => 1u, "shift" => 4u, "win" => 8u, _ => throw new ArgumentException("快捷键格式无效") };
+        if (parts.Length < 2 || !Enum.TryParse<Key>(parts[^1], true, out var key) || key == Key.None) throw new ArgumentException("请输入有效的组合键");
+        if (!RegisterHotKey(source.Handle, 76, modifiers, (uint)KeyInterop.VirtualKeyFromKey(key))) throw new InvalidOperationException("操作快捷键被占用，可从主窗口或托盘打开浮窗操作");
+        UnregisterHotKey(source.Handle, 75); UnregisterHotKey(source.Handle, 76);
+        if (!RegisterHotKey(source.Handle, 75, modifiers, (uint)KeyInterop.VirtualKeyFromKey(key))) throw new InvalidOperationException("操作快捷键注册失败");
+        registeredInteractionHotkey = text;
     }
     public void SetPagingEnabled(bool enabled)
     {
@@ -154,6 +177,41 @@ internal sealed class NativeInput : IDisposable
         var style = GetWindowLongPtr(handle, -20).ToInt64();
         SetWindowLongPtr(handle, -20, new IntPtr(style | 0x20 | 0x80 | 0x08000000));
     }
+    public static void SetOverlayInteractive(Window window, bool interactive)
+    {
+        var handle = new WindowInteropHelper(window).EnsureHandle();
+        var style = GetWindowLongPtr(handle, -20).ToInt64();
+        const long flags = 0x20 | 0x08000000;
+        SetWindowLongPtr(handle, -20, new IntPtr(interactive ? style & ~flags : style | flags));
+    }
+    public static bool ForegroundBelongsToApplication()
+    { GetWindowThreadProcessId(GetForegroundWindow(), out var pid); return pid == Environment.ProcessId; }
+    public static Rect? ForegroundGameViewport()
+    {
+        var handle = GetForegroundWindow();
+        if (handle == IntPtr.Zero || !string.Equals(ForegroundProcess(), Settings.GameProcessName, StringComparison.OrdinalIgnoreCase)
+            || !GetClientRect(handle, out var client) || client.Right <= 0 || client.Bottom <= 0) return null;
+        var origin = new NativePoint();
+        if (!ClientToScreen(handle, ref origin)) return null;
+        var viewport = new Rect(origin.X, origin.Y, client.Right, client.Bottom);
+        var work = System.Windows.Forms.Screen.FromHandle(handle).WorkingArea;
+        viewport.Intersect(new Rect(work.X, work.Y, work.Width, work.Height));
+        return viewport.IsEmpty || viewport.Width < 300 || viewport.Height < 200 ? null : viewport;
+    }
+    internal static Rect WindowPixels(Window window)
+    {
+        return GetWindowRect(new WindowInteropHelper(window).Handle, out var r)
+            ? new Rect(r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top) : Rect.Empty;
+    }
+    public static void PositionOverlay(Window window, double x, double y)
+    {
+        var actual = WindowPixels(window);
+        var left = (int)Math.Round(x); var top = (int)Math.Round(y);
+        if (actual.Left == left && actual.Top == top) return;
+        // Physical desktop coordinates avoid mixing monitor origins with WPF's per-monitor DPI.
+        SetWindowPos(new WindowInteropHelper(window).Handle, IntPtr.Zero, left, top, 0, 0,
+            0x0001 | 0x0004 | 0x0010); // NOSIZE | NOZORDER | NOACTIVATE
+    }
     public static long OverlayStyles(Window window) => GetWindowLongPtr(new WindowInteropHelper(window).Handle, -20).ToInt64();
     public void Dispose()
     {
@@ -161,6 +219,7 @@ internal sealed class NativeInput : IDisposable
         disposed = true; mousePoll.Stop();
         UnregisterHotKey(source.Handle, 71); UnregisterHotKey(source.Handle, 72);
         UnregisterHotKey(source.Handle, 73); UnregisterHotKey(source.Handle, 74);
+        UnregisterHotKey(source.Handle, 75); UnregisterHotKey(source.Handle, 76);
         if (mouseHook != IntPtr.Zero) UnhookWindowsHookEx(mouseHook);
         source.RemoveHook(WindowProc);
         if (foregroundHook != IntPtr.Zero) UnhookWinEvent(foregroundHook);
