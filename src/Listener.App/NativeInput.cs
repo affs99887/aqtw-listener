@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Threading;
 
 namespace Listener.App;
 
@@ -9,6 +10,8 @@ internal sealed class NativeInput : IDisposable
 {
     [DllImport("user32.dll")] internal static extern IntPtr GetForegroundWindow();
     [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr window, out uint process);
+    [DllImport("user32.dll")] private static extern short GetAsyncKeyState(int key);
+    [DllImport("user32.dll")] private static extern int GetSystemMetrics(int index);
     [DllImport("user32.dll", SetLastError = true)] private static extern bool RegisterHotKey(IntPtr window, int id, uint modifiers, uint key);
     [DllImport("user32.dll")] private static extern bool UnregisterHotKey(IntPtr window, int id);
     [DllImport("user32.dll", SetLastError = true)] private static extern IntPtr SetWindowsHookEx(int type, Hook callback, IntPtr module, uint thread);
@@ -26,22 +29,39 @@ internal sealed class NativeInput : IDisposable
     private readonly IntPtr mouseHook;
     private readonly IntPtr foregroundHook;
     private readonly WinEvent foregroundCallback;
-    private readonly ClickLatch latch = new();
+    private readonly MouseButtonTracker buttons = new();
+    private readonly Dispatcher dispatcher;
+    private readonly DispatcherTimer mousePoll;
+    private bool disposed;
     private string registeredHotkey = "";
+    private bool pagingRequested;
+    public string PagingStatus { get; private set; } = "";
+    public long HookPresses { get; private set; }
+    public long PollTriggers { get; private set; }
+    public string HookStatus { get; }
     public event Action? Toggle;
-    public event Action<double>? MouseDown;
+    public event Action<double, string>? MouseDown;
     public event Action? ForegroundChanged;
+    public event Action<int>? CandidatePage;
     public static double Now => (double)Stopwatch.GetTimestamp() / Stopwatch.Frequency;
 
     public NativeInput(Window window)
     {
+        dispatcher = window.Dispatcher;
         source = HwndSource.FromHwnd(new WindowInteropHelper(window).EnsureHandle());
         source.AddHook(WindowProc);
         callback = MouseProc;
         mouseHook = SetWindowsHookEx(14, callback, GetModuleHandle(null), 0);
-        if (mouseHook == IntPtr.Zero) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error(), "鼠标监听注册失败");
-        foregroundCallback = (_, _, _, _, _, _, _) => { try { ForegroundChanged?.Invoke(); } catch { } };
+        HookStatus = mouseHook == IntPtr.Zero
+            ? "鼠标事件注册失败，使用按键检测：" + new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()).Message
+            : "鼠标事件 + 按键检测";
+        foregroundCallback = (_, _, _, _, _, _, _) =>
+        {
+            try { if (!disposed) _ = dispatcher.BeginInvoke(new Action(() => { if (!disposed) ForegroundChanged?.Invoke(); })); }
+            catch { } // The dispatcher can be shutting down as Windows delivers a callback.
+        };
         foregroundHook = SetWinEventHook(3, 3, IntPtr.Zero, foregroundCallback, 0, 0, 0);
+        mousePoll = new DispatcherTimer(TimeSpan.FromMilliseconds(25), DispatcherPriority.Input, (_, _) => PollMouse(), dispatcher);
     }
     public void SetHotkey(string text)
     {
@@ -63,27 +83,70 @@ internal sealed class NativeInput : IDisposable
     private IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wp, IntPtr lp, ref bool handled)
     {
         if (msg == 0x312 && wp.ToInt32() == 71) { Toggle?.Invoke(); handled = true; }
+        else if (msg == 0x312 && wp.ToInt32() is 73 or 74)
+        { CandidatePage?.Invoke(wp.ToInt32() == 73 ? -1 : 1); handled = true; }
         return IntPtr.Zero;
+    }
+    public void SetPagingEnabled(bool enabled)
+    {
+        if (pagingRequested == enabled) return;
+        pagingRequested = enabled;
+        UnregisterHotKey(source.Handle, 73); UnregisterHotKey(source.Handle, 74); PagingStatus = "";
+        if (!enabled) return;
+        var previous = RegisterHotKey(source.Handle, 73, 0x4003, 0x21);
+        var next = RegisterHotKey(source.Handle, 74, 0x4003, 0x22);
+        if (!previous || !next)
+        {
+            UnregisterHotKey(source.Handle, 73); UnregisterHotKey(source.Handle, 74);
+            PagingStatus = "翻页快捷键被占用，可在主窗口或识别历史翻页";
+        }
     }
     private IntPtr MouseProc(int code, IntPtr message, IntPtr data)
     {
-        if (code >= 0)
+        try
         {
-            if (message.ToInt32() == 0x202) latch.Up();
-            else if (message.ToInt32() == 0x201 && latch.Down())
+            if (code >= 0 && !disposed)
             {
-                // Never swallow input or let exceptions cross the native callback boundary.
-                try { MouseDown?.Invoke(Now); } catch { }
+                var now = Now;
+                if (message.ToInt32() == 0x202) buttons.HookUp(now);
+                else if (message.ToInt32() == 0x201)
+                {
+                    HookPresses++;
+                    if (buttons.HookDown(now)) QueueClick(now, "鼠标事件");
+                }
             }
         }
+        catch { } // Never let exceptions cross the native callback boundary.
         return CallNextHookEx(mouseHook, code, message, data);
+    }
+    private void PollMouse()
+    {
+        if (disposed) return;
+        // GetAsyncKeyState uses physical buttons; the hook uses logical buttons.
+        var key = GetSystemMetrics(23) != 0 ? 0x02 : 0x01;
+        var now = Now;
+        if (buttons.Poll((GetAsyncKeyState(key) & 0x8000) != 0, now))
+        {
+            PollTriggers++;
+            QueueClick(now, "按键检测（远程兼容）");
+        }
+    }
+    private void QueueClick(double now, string origin)
+    {
+        // Foreground lookup, cancellation and visual work run after the hook returns.
+        _ = dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+        { if (!disposed) MouseDown?.Invoke(now, origin); }));
     }
     public static string ForegroundProcess()
     {
-        GetWindowThreadProcessId(GetForegroundWindow(), out var pid);
+        var window = GetForegroundWindow();
+        if (window == IntPtr.Zero) return "";
+        GetWindowThreadProcessId(window, out var pid);
+        if (pid == 0) return "";
         try { using var process = Process.GetProcessById((int)pid); return process.ProcessName; }
         catch (ArgumentException) { return ""; }
         catch (InvalidOperationException) { return ""; }
+        catch (System.ComponentModel.Win32Exception) { return ""; }
     }
     public static void MakeOverlay(Window window)
     {
@@ -94,8 +157,12 @@ internal sealed class NativeInput : IDisposable
     public static long OverlayStyles(Window window) => GetWindowLongPtr(new WindowInteropHelper(window).Handle, -20).ToInt64();
     public void Dispose()
     {
+        if (disposed) return;
+        disposed = true; mousePoll.Stop();
         UnregisterHotKey(source.Handle, 71); UnregisterHotKey(source.Handle, 72);
-        UnhookWindowsHookEx(mouseHook); source.RemoveHook(WindowProc);
+        UnregisterHotKey(source.Handle, 73); UnregisterHotKey(source.Handle, 74);
+        if (mouseHook != IntPtr.Zero) UnhookWindowsHookEx(mouseHook);
+        source.RemoveHook(WindowProc);
         if (foregroundHook != IntPtr.Zero) UnhookWinEvent(foregroundHook);
     }
 }

@@ -11,7 +11,7 @@
 已取得的 SoundRadar 资料可以重复导入：
 
 ```powershell
-python scripts\import_soundradar.py PATH\library.srz .tools\research\imported --revision d94dc00e871eed3498e5e6be53edf1ad85cb383c
+python scripts\import_soundradar.py PATH\library.srz .tools\research\imported --revision eaa0348fa60e8b8477e82b72591f74f40f9574bf
 .\.tools\dotnet\dotnet.exe run --project src\Listener.Cli -- build .tools\research\imported\import.json data\library\library.json
 python scripts\build-reference-archive.py .tools\research\imported\import.json .tools\research\reference.srz
 .\data\engine\Listener.Engine.exe build .tools\research\reference.srz data\library\radar-index.bin

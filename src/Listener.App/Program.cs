@@ -5,7 +5,8 @@ internal static class Program
     [STAThread]
     public static int Main(string[] args)
     {
-        using var singleton = new Mutex(true, "AqtwListener-Desktop-v1", out var first);
+        var smoke = args.Contains("--ui-smoke");
+        using var singleton = new Mutex(true, "AqtwListener-Desktop-v1" + (smoke ? $"-ui-smoke-{Environment.ProcessId}" : ""), out var first);
         if (!first) { MessageBox.Show("听音助手已在运行，请从托盘打开。"); return 0; }
         try
         {
@@ -37,6 +38,6 @@ internal static class Program
         capture.Start(""); await Task.Delay(1000);
         var frames = capture.Timeline.Slice(NativeInput.Now - .5, NativeInput.Now);
         JsonFile.Write(Path.Combine(AppContext.BaseDirectory, "audio-smoke.json"), new
-        { devices, capture.DeviceName, capture.DeviceId, capture.Packets, capture.Timeline.SampleRate, frames = frames.Length, rms = AudioFeatures.Rms(frames) });
+        { devices, capture.DeviceName, capture.DeviceId, capture.Packets, health = capture.Health(), capture.Timeline.SampleRate, frames = frames.Length, rms = AudioFeatures.Rms(frames) });
     }
 }

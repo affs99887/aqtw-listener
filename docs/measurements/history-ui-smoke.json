@@ -1,0 +1,48 @@
+{
+  "images": 51,
+  "clickThrough": true,
+  "noActivate": true,
+  "layered": true,
+  "topmost": true,
+  "foregroundPreserved": true,
+  "layout": {
+    "thumbnailSize": 88,
+    "smallHeight": 457.09,
+    "smallScroll": 0,
+    "largeHeight": 938.1099999999999,
+    "largeScroll": 0,
+    "overflowHeight": 1032,
+    "overflowScroll": 881.6199999999999,
+    "maximumHeight": 1032,
+    "fixedHeight": 640,
+    "adaptivePassed": true
+  },
+  "inputMode": null,
+  "inputError": "",
+  "diagnostics": {
+    "enabled": false,
+    "targetProcess": "UAGame",
+    "foregroundProcess": "",
+    "state": "监听已关闭",
+    "capturing": false,
+    "deviceName": "",
+    "selectedDeviceId": "",
+    "audio": {
+      "packets": 0,
+      "lastPacketAgeSeconds": null,
+      "rms": 0,
+      "lastSoundAgeSeconds": null
+    },
+    "triggerCount": 0,
+    "lastTriggerSource": "尚未触发",
+    "lastTriggerAt": null,
+    "lastIgnoredReason": "",
+    "lastRecognition": "尚未识别",
+    "manualTestStatus": "",
+    "automaticRecognition": true,
+    "automaticScans": 0,
+    "automaticStatus": "等待开启监听",
+    "automaticWindowRms": 0
+  },
+  "note": "仅桌面浮窗属性与渲染检查，未在游戏中测试输入或独占全屏覆盖"
+}

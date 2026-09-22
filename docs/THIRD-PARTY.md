@@ -3,6 +3,7 @@
 用户明确指定复用的项目：[blood77458/soundradar](https://github.com/blood77458/soundradar)。
 
 - 固定提交：`d94dc00e871eed3498e5e6be53edf1ad85cb383c`。
+- 本轮音效资料导入固定于 `eaa0348fa60e8b8477e82b72591f74f40f9574bf`，并对照 `4f8289d5bb32813cd7c15922df1a2a769128740a` 的原始拿起/放下文件复核；未更新 Go 源码。详情见 [素材复核](COVERAGE-REVIEW.md)。
 - 演示来源：[BLOOD味道的视频](https://www.bilibili.com/video/BV1HNeY6mEhH/)。视频说明提到素材贡献者六豪物语、QJHWC。
 - `src/Listener.Engine/internal/{dsp,index,library,wav}`：保留该提交的原始 Go 文件及其测试，没有改写原始算法。
 - `src/Listener.Engine/cmd/listener-engine`：本项目新增的 stdin/stdout 协议适配。

@@ -14,9 +14,15 @@ non_red = {'石膏像','密码机','数据线','电台','检测仪','钯金线�
            '激光指示模块','天线','红外理疗灯','工具套组','钢筋剪','吹风机','电钻','炮弹',
            '手持接收机','航天实验室','人工心脏','单兵通讯装置'}
 source = 'https://github.com/blood77458/soundradar/blob/'+a.revision+'/soundradar/data/library.srz'
-library = dict(schemaVersion=1, version='0.1.0-community-preview', gameVersion='来源未明确标注版本，2026-09-19/20 素材',
+library = dict(schemaVersion=1, version='0.1.1-pickup-source-fix', gameVersion='来源未明确标注版本，2026-09-19/20 素材',
     validationStatus='uncalibrated', notes='SoundRadar 社区样本。阈值未以独立验证集校准；同音关系和格数沿用来源，未逐件实机复核。', items=[], groups=[])
 samples=[]; provenance=[]
+# Rechecked against the original starter archive at 4f8289d5: these bytes are
+# tagged 拿起 there and differ from every 放下 sample. See docs/COVERAGE-REVIEW.md.
+verified_pickups = {
+ '267afca3': ('merged:目标定位-拿起', 'cf3d1e09c17a5df040400e1fe03e29c137ce7cf00d7e8fa0fe4ca45ee1d3c7ec'),
+ 'e9f62d39': ('merged:琥珀天心-拿起', '8117b13cfcd61e667f560d3b431a4c4113b5cc4be51470df4b9f1f66b17bf89c'),
+}
 with zipfile.ZipFile(a.archive) as z:
  for name in z.namelist():
   if not name.endswith('/meta.json'): continue
@@ -28,8 +34,11 @@ with zipfile.ZipFile(a.archive) as z:
    image='images/'+item_id+'.png'; (root/image).write_bytes(z.read(base+h['icon']))
    library['items'].append(dict(id=item_id,name=h['name'],isGold=h['name'] not in non_red,
       gridWidth=w,gridHeight=ht,thumbnail=image,referenceValue=None))
-  # These groups contain a conflicting merged:放下 provenance. Do not silently call it pickup.
-  enabled = meta['id'] not in {'267afca3','e9f62d39'}
+  enabled = bool(meta['samples']) and not any('放下' in s.get('source', '') for s in meta['samples'])
+  if meta['id'] in verified_pickups:
+   expected_source, expected_hash = verified_pickups[meta['id']]
+   enabled = len(meta['samples']) == 1 and all(s.get('source') == expected_source
+       and hashlib.sha256(z.read(base+s['file'])).hexdigest() == expected_hash for s in meta['samples'])
   library['groups'].append(dict(id=meta['id'],name=meta['name'],action='pickup' if enabled else 'unverified',
                                itemIds=ids,threshold=0.86,templates=[]))
   for i,s in enumerate(meta['samples']):

@@ -9,6 +9,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Listener.App.Tests" />
     <ProjectReference Include="../Listener.Core/Listener.Core.csproj" />
     <PackageReference Include="NAudio.Wasapi" Version="3.1.0" />
     <Content Include="../../data/library/**/*" Link="library/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />

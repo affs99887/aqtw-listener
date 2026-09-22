@@ -1,0 +1,76 @@
+{
+  "checkedAt": "2026-09-22T11:54:30.3091135+08:00",
+  "originalArchive": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz",
+  "mergedArchive": "https://github.com/blood77458/soundradar/blob/eaa0348fa60e8b8477e82b72591f74f40f9574bf/soundradar/data/library.srz",
+  "files": [
+    {
+      "archive": "latest.srz",
+      "id": "267afca3",
+      "name": "同音·定位组",
+      "entry": "items/267afca3/samples/0001.wav",
+      "source": "merged:目标定位-拿起",
+      "sha256": "cf3d1e09c17a5df040400e1fe03e29c137ce7cf00d7e8fa0fe4ca45ee1d3c7ec"
+    },
+    {
+      "archive": "latest.srz",
+      "id": "e9f62d39",
+      "name": "同音·琥珀天心类",
+      "entry": "items/e9f62d39/samples/0001.wav",
+      "source": "merged:琥珀天心-拿起",
+      "sha256": "8117b13cfcd61e667f560d3b431a4c4113b5cc4be51470df4b9f1f66b17bf89c"
+    },
+    {
+      "archive": "original.srz",
+      "id": "ec9b8a7f",
+      "name": "目标定位-放下",
+      "entry": "items/ec9b8a7f/samples/0001.wav",
+      "source": "recall",
+      "sha256": "d48940eba2b373242840803ea1d3ede4e061a96655cad487c73b9883b938e269"
+    },
+    {
+      "archive": "original.srz",
+      "id": "ec9b8a7f",
+      "name": "目标定位-放下",
+      "entry": "items/ec9b8a7f/samples/0002.wav",
+      "source": "recall",
+      "sha256": "829236b1d9674526eca45f05de4252d9bb7c28a2f52f0b71b1bb9656fbae3369"
+    },
+    {
+      "archive": "original.srz",
+      "id": "99d97932",
+      "name": "目标定位-拿起",
+      "entry": "items/99d97932/samples/0001.wav",
+      "source": "recall",
+      "sha256": "cf3d1e09c17a5df040400e1fe03e29c137ce7cf00d7e8fa0fe4ca45ee1d3c7ec"
+    },
+    {
+      "archive": "original.srz",
+      "id": "ad6b7dfa",
+      "name": "琥珀天心-放下",
+      "entry": "items/ad6b7dfa/samples/0001.wav",
+      "source": "recall",
+      "sha256": "a63dea1b7d6bed4ee80afe17caa7139bdb183a838bb2a775fb633ac277deadd5"
+    },
+    {
+      "archive": "original.srz",
+      "id": "0c5ac384",
+      "name": "琥珀天心-拿起",
+      "entry": "items/0c5ac384/samples/0001.wav",
+      "source": "recall",
+      "sha256": "8117b13cfcd61e667f560d3b431a4c4113b5cc4be51470df4b9f1f66b17bf89c"
+    }
+  ],
+  "comparison": "两组与各自原始拿起 WAV 字节相同，与所有原始放下 WAV 不同；纠正旧整组禁用。哈希证明来源，不代替实机确认。",
+  "putdownChecks": [
+    {
+      "item": "琥珀天心-放下",
+      "status": "unknown",
+      "entry": "items/ad6b7dfa/samples/0001.wav"
+    },
+    {
+      "item": "目标定位-放下",
+      "status": "unknown",
+      "entry": "items/ec9b8a7f/samples/0001.wav"
+    }
+  ]
+}

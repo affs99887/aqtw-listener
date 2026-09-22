@@ -1,6 +1,6 @@
 {
-  "source": "https://github.com/blood77458/soundradar/blob/d94dc00e871eed3498e5e6be53edf1ad85cb383c/soundradar/data/library.srz",
-  "revision": "d94dc00e871eed3498e5e6be53edf1ad85cb383c",
+  "source": "https://github.com/blood77458/soundradar/blob/eaa0348fa60e8b8477e82b72591f74f40f9574bf/soundradar/data/library.srz",
+  "revision": "eaa0348fa60e8b8477e82b72591f74f40f9574bf",
   "samples": [
     {
       "group": "卡莫纳之星/宝石项链",
@@ -220,7 +220,7 @@
       "sha256": "cf3d1e09c17a5df040400e1fe03e29c137ce7cf00d7e8fa0fe4ca45ee1d3c7ec",
       "start": 1.9099999999999997,
       "end": 2.4099999999999997,
-      "enabled": false
+      "enabled": true
     },
     {
       "group": "同音·琥珀天心类",
@@ -242,7 +242,7 @@
       "sha256": "8117b13cfcd61e667f560d3b431a4c4113b5cc4be51470df4b9f1f66b17bf89c",
       "start": 1.9699999999999998,
       "end": 2.4699999999999998,
-      "enabled": false
+      "enabled": true
     },
     {
       "group": "同音·大框杂项",
