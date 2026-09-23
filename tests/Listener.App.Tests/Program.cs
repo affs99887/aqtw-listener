@@ -79,7 +79,7 @@ internal static class Program
                 var library = JsonFile.Read<SoundLibrary>(Path.Combine(AppContext.BaseDirectory, "library", "library.json"));
                 var now = 10.0; var capture = new FakeCapture();
                 var controller = new ListeningController(new Settings(), RecognizerFactory.Create(library), capture,
-                    Dispatcher.CurrentDispatcher, () => "UAGame", () => now, startPolling: false);
+                    Dispatcher.CurrentDispatcher, () => ("UAGame", 4242u), () => now, startPolling: false);
                 RecognitionResult? result = null; controller.Result += r => result = r;
                 try
                 {
@@ -141,6 +141,28 @@ internal static class Program
                 using var f = new Fixture(); f.Foreground = "notepad";
                 f.Controller.Toggle().GetAwaiter().GetResult(); f.Capture.Timeline.Append(Fixture.Sound(), 10); f.Tick(11);
                 Check(!f.Capture.Running && f.Recognizer.Calls == 0, "background audio scanned");
+            }),
+            ("采音仅绑定前台游戏进程，进程变化后重新绑定", () =>
+            {
+                using var f = new Fixture();
+                f.Controller.Toggle().GetAwaiter().GetResult();
+                Check(f.Capture.Running && f.Capture.StartedIds.SequenceEqual([4242u]),
+                    "capture did not bind to the game PID");
+                f.ForegroundProcessId = 5252; f.Tick(10.5);
+                Check(f.Capture.Running && f.Capture.TargetProcessId == 5252 &&
+                    f.Capture.StartedIds.SequenceEqual([4242u, 5252u]), "game restart did not rebind capture");
+                f.ForegroundProcessId = 0; f.Tick(10.6);
+                Check(!f.Capture.Running && f.Recognizer.Calls == 0,
+                    "capture continued without a verified game PID");
+            }),
+            ("游戏进程采音失败后停止监听，不分析混合声音", () =>
+            {
+                using var f = new Fixture(); f.Capture.FailStart = true;
+                f.Controller.Toggle().GetAwaiter().GetResult();
+                Check(!f.Controller.Enabled && !f.Capture.Running &&
+                    f.Capture.StartedIds.SequenceEqual([4242u]) && f.Recognizer.Calls == 0 &&
+                    f.Controller.Diagnostics().State.Contains("无法采音", StringComparison.Ordinal),
+                    "failed process capture did not stop recognition");
             }),
             ("识别引擎忙碌时不排队重复扫描", () =>
             {
@@ -747,13 +769,15 @@ internal static class Program
     {
         public double Now = 10;
         public string Foreground = "UAGame";
+        public uint ForegroundProcessId = 4242;
         public readonly FakeCapture Capture = new();
         public readonly FakeRecognizer Recognizer = new();
         public readonly ListeningController Controller;
         public readonly List<RecognitionResult?> Results = [];
         public Fixture()
         {
-            Controller = new(new Settings(), Recognizer, Capture, Dispatcher.CurrentDispatcher, () => Foreground, () => Now, startPolling: false);
+            Controller = new(new Settings(), Recognizer, Capture, Dispatcher.CurrentDispatcher,
+                () => (Foreground, ForegroundProcessId), () => Now, startPolling: false);
             Controller.Result += Results.Add;
         }
         public static float[] Sound() => Enumerable.Range(0, 12000).Select(i => (float)(.1 * Math.Sin(i * .2))).ToArray();
@@ -773,15 +797,21 @@ internal static class Program
     private sealed class FakeCapture : IPlaybackCapture
     {
         public AudioTimeline Timeline { get; } = new();
-        public string DeviceId => "test-device";
         public string DeviceName => "test";
+        public uint TargetProcessId { get; private set; }
+        public List<uint> StartedIds { get; } = [];
+        public bool FailStart;
         public bool Running { get; private set; }
         public event Action<string>? Failed { add { } remove { } }
         public AudioCaptureHealth Health() => new(1, 0, .1, 0);
-        public string Resolve(string requested) => DeviceId;
-        public void Start(string requested) => Running = true;
-        public Task Stop() { Running = false; Timeline.Clear(); return Task.CompletedTask; }
-        public ValueTask DisposeAsync() { Running = false; return ValueTask.CompletedTask; }
+        public Task Start(uint processId)
+        {
+            StartedIds.Add(processId);
+            if (FailStart) throw new NotSupportedException("process loopback unavailable");
+            TargetProcessId = processId; Running = true; return Task.CompletedTask;
+        }
+        public Task Stop() { Running = false; TargetProcessId = 0; Timeline.Clear(); return Task.CompletedTask; }
+        public ValueTask DisposeAsync() { Running = false; TargetProcessId = 0; return ValueTask.CompletedTask; }
     }
     private sealed class FakeRecognizer : IRecognizer
     {

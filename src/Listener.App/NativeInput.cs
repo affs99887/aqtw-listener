@@ -158,17 +158,18 @@ internal sealed class NativeInput : IDisposable
         _ = dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
         { if (!disposed) MouseDown?.Invoke(now, origin); }));
     }
-    public static string ForegroundProcess()
+    public static (string Name, uint Id) ForegroundProcessIdentity()
     {
         var window = GetForegroundWindow();
-        if (window == IntPtr.Zero) return "";
+        if (window == IntPtr.Zero) return ("", 0);
         GetWindowThreadProcessId(window, out var pid);
-        if (pid == 0) return "";
-        try { using var process = Process.GetProcessById((int)pid); return process.ProcessName; }
-        catch (ArgumentException) { return ""; }
-        catch (InvalidOperationException) { return ""; }
-        catch (System.ComponentModel.Win32Exception) { return ""; }
+        if (pid == 0 || pid > int.MaxValue) return ("", 0);
+        try { using var process = Process.GetProcessById((int)pid); return (process.ProcessName, pid); }
+        catch (ArgumentException) { return ("", 0); }
+        catch (InvalidOperationException) { return ("", 0); }
+        catch (System.ComponentModel.Win32Exception) { return ("", 0); }
     }
+    public static string ForegroundProcess() => ForegroundProcessIdentity().Name;
     public static void MakeOverlay(Window window)
     {
         var handle = new WindowInteropHelper(window).Handle;

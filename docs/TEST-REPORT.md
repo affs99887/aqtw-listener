@@ -2,6 +2,12 @@
 
 **结论：可运行的工程预览版，未通过实战验收。不能宣称识别率达到 95%。**
 
+## v0.3.1 游戏进程采音修复
+
+- 原采音路径是整播放设备回环；游戏在前台时，同设备上独立语音软件的播放声也会进入录音。现改为只采集 `UAGame` 及子进程的 WASAPI 进程回环；无法启动时停止识别，不回退到整设备回环。
+- Release 配置的核心测试 27/27、应用测试 41/41 与浮窗 UI 检查通过。报告为 `measurements/release-v0.3.1-core-tests.json`、`release-v0.3.1-app-tests.json`、`release-v0.3.1-ui-smoke.json`。应用测试覆盖按前台游戏 PID 启动、进程变化重新绑定、无有效 PID 时不采音，以及进程回环失败时停止监听。
+- Windows 11 build 26200 的实机音频探测：目标 `UAGame` 时，1 秒收到 99 个音频包，RMS 约 0.019；目标改为本身无播放声的助手进程时，收到的包 RMS 为 0。没有保存原始录音。该探测验证目标进程切换及游戏音频隔离，不等同于 Discord／QQ／UU 各版本的实战验收。
+
 ## v0.3.0 发布验证
 
 - Release 配置的核心测试 27/27、应用与布局测试 39/39，通过；报告为 `measurements/release-v0.3.0-core-tests.json` 和 `measurements/release-v0.3.0-app-tests.json`。
@@ -134,6 +140,6 @@
 
 ## 复现入口
 
-`tests/Listener.Tests`、`scripts/make_stress_set.py`、`scripts/soundradar_bench.go`，以及程序的 `--ui-smoke`、`--audio-smoke`、`--performance-smoke`。这些诊断入口仅在明确传入参数时运行，正常使用不生成诊断录音或自动上传。
+`tests/Listener.Tests`、`scripts/make_stress_set.py`、`scripts/soundradar_bench.go`，以及程序的 `--ui-smoke`、`--audio-smoke`（游戏进程）、`--audio-smoke-self`（助手进程静音对照）、`--performance-smoke`。这些诊断入口仅在明确传入参数时运行，正常使用不生成诊断录音或自动上传。
 
 UI 截图中的百分比和物品是标注了“布局演示”的样例，不代表某次游戏结果。

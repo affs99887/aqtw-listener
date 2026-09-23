@@ -3,7 +3,7 @@ using System.Windows.Threading;
 namespace Listener.App;
 
 internal sealed record ListeningDiagnostics(bool Enabled, string TargetProcess, string ForegroundProcess,
-    string State, bool Capturing, string DeviceName, string SelectedDeviceId, AudioCaptureHealth Audio,
+    string State, bool Capturing, string CaptureSource, uint CapturedProcessId, string PreviewDeviceId, AudioCaptureHealth Audio,
     long TriggerCount, string LastTriggerSource, DateTimeOffset? LastTriggerAt,
     string LastIgnoredReason, string LastRecognition, string ManualTestStatus,
     bool AutomaticRecognition, long AutomaticScans, string AutomaticStatus, double AutomaticWindowRms);
@@ -16,7 +16,7 @@ internal sealed class ListeningController : IAsyncDisposable
     private readonly Settings settings;
     private IRecognizer recognizer;
     private readonly IPlaybackCapture capture;
-    private readonly Func<string> foregroundProcess;
+    private readonly Func<(string Name, uint Id)> foregroundProcess;
     private readonly Func<double> clock;
     private readonly Dispatcher dispatcher;
     private readonly DispatcherTimer poll;
@@ -50,20 +50,22 @@ internal sealed class ListeningController : IAsyncDisposable
     public event Action? SnapshotAdded;
     public event Action<string>? State;
     public event Action<RecognitionResult?>? Result;
-    public bool Foreground => string.Equals(foregroundProcess(), Settings.GameProcessName, StringComparison.OrdinalIgnoreCase);
-    public ListeningDiagnostics Diagnostics() => new(Enabled, Settings.GameProcessName, foregroundProcess(),
-        lastState, capture.Running, capture.DeviceName, settings.DeviceId, capture.Health(), triggerCount,
+    private static bool IsGame((string Name, uint Id) process) => process.Id != 0 &&
+        string.Equals(process.Name, Settings.GameProcessName, StringComparison.OrdinalIgnoreCase);
+    public bool Foreground => IsGame(foregroundProcess());
+    public ListeningDiagnostics Diagnostics() => new(Enabled, Settings.GameProcessName, foregroundProcess().Name,
+        lastState, capture.Running, capture.DeviceName, capture.TargetProcessId, settings.DeviceId, capture.Health(), triggerCount,
         lastTriggerSource, lastTriggerAt, lastIgnoredReason, lastRecognition, ManualTestStatus,
         settings.AutomaticRecognition, automaticScans,
         !settings.AutomaticRecognition ? "已关闭（仅鼠标触发）" : !Enabled ? "等待开启监听" :
             !capture.Running ? "等待切回游戏" : automaticStatus, scanner.LastWindowRms);
     public ListeningController(Settings settings, SoundLibrary library, Dispatcher dispatcher, string? root = null)
         : this(settings, RecognizerFactory.Create(library, root), new LoopbackAudio(), dispatcher,
-            NativeInput.ForegroundProcess, () => NativeInput.Now)
+            NativeInput.ForegroundProcessIdentity, () => NativeInput.Now)
     { Library = library; LibraryRoot = root ?? Path.Combine(AppContext.BaseDirectory, "library"); }
 
     internal ListeningController(Settings settings, IRecognizer recognizer, IPlaybackCapture capture,
-        Dispatcher dispatcher, Func<string> foregroundProcess, Func<double> clock, bool startPolling = true)
+        Dispatcher dispatcher, Func<(string Name, uint Id)> foregroundProcess, Func<double> clock, bool startPolling = true)
     {
         this.settings = settings; this.recognizer = recognizer; this.capture = capture; this.dispatcher = dispatcher;
         this.foregroundProcess = foregroundProcess; this.clock = clock;
@@ -185,17 +187,24 @@ internal sealed class ListeningController : IAsyncDisposable
         transitioning = true;
         try
         {
-            var active = !resumeCooling && (Enabled && Mode == AssistantMode.Listening || Mode == AssistantMode.Learning) && Foreground;
+            var foreground = foregroundProcess();
+            var active = !resumeCooling && (Enabled && Mode == AssistantMode.Listening || Mode == AssistantMode.Learning) && IsGame(foreground);
             if (!active)
             {
                 if (capture.Running) { Invalidate(); await capture.Stop(); }
-                var foreground = foregroundProcess();
-                PublishState(Mode == AssistantMode.Interaction ? "操作模式 · 识别已暂停" : Mode == AssistantMode.Learning ? "学习已暂停 · 请切回游戏" : Enabled ? $"已暂停 · 等待切回暗区突围，当前：{(foreground.Length == 0 ? "无法读取" : foreground)}" : captureError ?? "监听已关闭"); return;
+                PublishState(Mode == AssistantMode.Interaction ? "操作模式 · 识别已暂停" : Mode == AssistantMode.Learning ? "学习已暂停 · 请切回游戏" : Enabled ? $"已暂停 · 等待切回暗区突围，当前：{(foreground.Name.Length == 0 ? "无法读取" : foreground.Name)}" : captureError ?? "监听已关闭"); return;
             }
-            var selected = capture.Resolve(settings.DeviceId);
-            if (capture.Running && capture.DeviceId != selected) { Invalidate(); await capture.Stop(); }
-            if ((!Enabled && Mode != AssistantMode.Learning) || Mode == AssistantMode.Interaction || !Foreground) return;
-            if (!capture.Running) { Invalidate(); capture.Start(selected); }
+            if (capture.Running && capture.TargetProcessId != foreground.Id) { Invalidate(); await capture.Stop(); }
+            if ((!Enabled && Mode != AssistantMode.Learning) || Mode == AssistantMode.Interaction || !IsGame(foreground)) return;
+            if (!capture.Running) { Invalidate(); await capture.Start(foreground.Id); }
+            // Async process activation may finish after focus or the game PID changes.
+            var current = foregroundProcess();
+            if (disposed || resumeCooling || !IsGame(current) || current.Id != foreground.Id ||
+                !(Enabled && Mode == AssistantMode.Listening || Mode == AssistantMode.Learning))
+            {
+                Invalidate(); await capture.Stop();
+                PublishState("已暂停 · 游戏进程已切换"); return;
+            }
             PublishState((Mode == AssistantMode.Learning ? "学习采样 · " : "正在监听 · ") + capture.DeviceName);
             if (Mode == AssistantMode.Listening) PollAutomaticRecognition();
         }
@@ -239,7 +248,7 @@ internal sealed class ListeningController : IAsyncDisposable
                     var analysis = recognizer.Analyze(audio, timeline.SampleRate, id, final, token);
                     var result = analysis.Result with { ElapsedMilliseconds = (clock() - clickedAt) * 1000 };
                     if (result.Status == RecognitionStatus.NoSound)
-                        result = result with { Message = "已收到触发，但没有听到声音 · 请检查游戏音量和播放设备（包括 UU 虚拟声卡）" };
+                        result = result with { Message = "已收到触发，但没有听到游戏进程声音 · 请检查游戏音量和声音输出" };
                     await dispatcher.InvokeAsync(() =>
                     {
                         if (epoch.IsCurrent(id) && !token.IsCancellationRequested && Enabled && Foreground)

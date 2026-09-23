@@ -178,8 +178,9 @@ internal sealed partial class MainWindow : Window
         };
         var captureConfig = new StackPanel();
         captureConfig.Children.Add(Theme.Label("采音与快捷键", 18));
-        Field(captureConfig, "播放设备 · 系统回环，不使用麦克风", devices);
-        captureConfig.Children.Add(Theme.Label("UU 远程时也要选择游戏实际输出的设备；听不到声音时，检查 UU 虚拟声卡。", 11, Theme.Muted));
+        captureConfig.Children.Add(Theme.Label("识别只采集 UAGame 进程声音，不收录 Discord／QQ／UU 等独立软件的播放声。", 11, Theme.Muted));
+        Field(captureConfig, "试听播放设备 · 仅用于回放和参考音效", devices);
+        captureConfig.Children.Add(Theme.Label("游戏采音不依赖此设备；试听听不到时再检查这里的播放路由。", 11, Theme.Muted));
         captureConfig.Children.Add(Theme.Button("刷新播放设备", (_, _) => RefreshDevices()));
         Field(captureConfig, "启停快捷键", hotkey); hotkey.Text = settings.Hotkey;
         Field(captureConfig, "浮窗操作快捷键", interactionHotkey); interactionHotkey.Text = settings.InteractionHotkey;
@@ -316,7 +317,7 @@ internal sealed partial class MainWindow : Window
         RefreshListeningPresentation();
         var d = controller.Diagnostics();
         var audio = !d.Capturing ? "未采集（仅游戏前台采集）" :
-            d.Audio.LastPacketAgeSeconds is null or > 2 ? "暂未收到音频包，请检查播放设备或播放声音" :
+            d.Audio.LastPacketAgeSeconds is null or > 2 ? "暂未收到游戏进程音频包，请在游戏内播放声音" :
             d.Audio.LastSoundAgeSeconds is < 2 ? "已收到声音" : "已收到音频包，当前静音";
         var inputState = input is null ? "输入未就绪" : $"鼠标事件 {input.HookPresses} / 备用触发 {input.PollTriggers}";
         diagnostics.Text = $"前台：{(d.ForegroundProcess.Length == 0 ? "无法读取" : d.ForegroundProcess)} · 目标：{d.TargetProcess}\n" +
