@@ -97,7 +97,7 @@ public enum RecognitionStatus { Listening, Analyzing, Matched, NoSound, Unknown,
 public enum RecognitionTag { Suspected, Exact }
 public sealed record Candidate(ItemDefinition Item, double Score, string GroupId, RecognitionTag Tag = RecognitionTag.Suspected);
 public sealed record RecognitionResult(long OperationId, RecognitionStatus Status, bool IsFinal,
-    IReadOnlyList<Candidate> Candidates, double ElapsedMilliseconds, string Message)
+    IReadOnlyList<Candidate> Candidates, double ElapsedMilliseconds, string Message, bool PutdownConfirmed = false)
 {
     public int CandidateCount => Candidates.Count;
     public int GoldCount => Candidates.Count(c => c.Item.IsGold);

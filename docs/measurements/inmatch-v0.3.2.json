@@ -1,0 +1,79 @@
+{
+  "kind": "local-gameplay-diagnostic-not-accuracy-benchmark",
+  "date": "2026-09-23",
+  "totalSeconds": 610,
+  "clips": [
+    {
+      "recording": "recording-a",
+      "startSeconds": 600,
+      "endSeconds": 810,
+      "scene": "trader",
+      "analysisCount": 87,
+      "pickupMatches": 21,
+      "putdownEvents": 0
+    },
+    {
+      "recording": "recording-b",
+      "startSeconds": 570,
+      "endSeconds": 760,
+      "scene": "trader",
+      "analysisCount": 76,
+      "pickupMatches": 5,
+      "putdownEvents": 0
+    },
+    {
+      "recording": "recording-a",
+      "startSeconds": 1100,
+      "endSeconds": 1170,
+      "scene": "backpack",
+      "analysisCount": 50,
+      "pickupMatches": 0,
+      "putdownEvents": 0
+    },
+    {
+      "recording": "recording-a",
+      "startSeconds": 350,
+      "endSeconds": 410,
+      "scene": "movement",
+      "analysisCount": 94,
+      "pickupMatches": 0,
+      "putdownEvents": 0
+    },
+    {
+      "recording": "recording-b",
+      "startSeconds": 980,
+      "endSeconds": 1060,
+      "scene": "movement-and-bandage",
+      "analysisCount": 92,
+      "pickupMatches": 1,
+      "putdownEvents": 0
+    }
+  ],
+  "regression": {
+    "recording": "recording-a",
+    "startSeconds": 623,
+    "endSeconds": 660,
+    "oldAutomaticAnalyses": 0,
+    "newAutomaticAnalyses": 9,
+    "visualPickupCheck": {
+      "onsetSeconds": 632.81,
+      "analyzedAtSeconds": 633.2,
+      "stillDraggingAtSeconds": 633.65,
+      "releasedBySeconds": 633.8
+    }
+  },
+  "knownFalsePositive": {
+    "recording": "recording-b",
+    "onsetSeconds": 1054.41,
+    "action": "bandage",
+    "group": "cb1c0d1d",
+    "score": 0.7995480777091167
+  },
+  "limitations": [
+    "Recordings contain mixed playback; not live process-loopback acceptance.",
+    "Hidden trader items lack independently revealed item labels; match counts are not accuracy.",
+    "Automatic minimum score 0.78 was adjusted on these clips.",
+    "No live putdown confirmation was accepted in these excerpts.",
+    "Source videos, derived PCM, frames and private paths are excluded."
+  ]
+}

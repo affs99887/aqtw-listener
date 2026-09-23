@@ -1,0 +1,61 @@
+{
+  "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz",
+  "archiveSha256": "a019fced1e3298f3ac087e1a574fca75ed6cd2ad068aef79294638582f43e610",
+  "samples": [
+    {
+      "groupId": "267afca3",
+      "action": "putdown",
+      "sourceName": "目标定位-放下",
+      "sourceFile": "items/ec9b8a7f/samples/0001.wav",
+      "sourceSha256": "d48940eba2b373242840803ea1d3ede4e061a96655cad487c73b9883b938e269",
+      "file": "audio/267afca3-1.wav",
+      "sha256": "c74560344662898a524fc8e7c2a88ebd2f6f2cf93f8716231af91b3efecc1d72",
+      "startSeconds": 1.6800000000000002,
+      "endSeconds": 2.18
+    },
+    {
+      "groupId": "267afca3",
+      "action": "putdown",
+      "sourceName": "目标定位-放下",
+      "sourceFile": "items/ec9b8a7f/samples/0002.wav",
+      "sourceSha256": "829236b1d9674526eca45f05de4252d9bb7c28a2f52f0b71b1bb9656fbae3369",
+      "file": "audio/267afca3-2.wav",
+      "sha256": "c74560344662898a524fc8e7c2a88ebd2f6f2cf93f8716231af91b3efecc1d72",
+      "startSeconds": 2.4,
+      "endSeconds": 2.9
+    },
+    {
+      "groupId": "cb1c0d1d",
+      "action": "putdown",
+      "sourceName": "天命泥板-放下",
+      "sourceFile": "items/e8b0425c/samples/0001.wav",
+      "sourceSha256": "c91e0063c0a3c14df78f11b435dfad7ecf11fb1c418fcb96df4a853be96d222a",
+      "file": "audio/cb1c0d1d-1.wav",
+      "sha256": "59d95be50def7a43cf13d60451e8ddf0f7152220e1c2526794c90196266ef329",
+      "startSeconds": 1.58,
+      "endSeconds": 2.08
+    },
+    {
+      "groupId": "e9f62d39",
+      "action": "putdown",
+      "sourceName": "琥珀天心-放下",
+      "sourceFile": "items/ad6b7dfa/samples/0001.wav",
+      "sourceSha256": "a63dea1b7d6bed4ee80afe17caa7139bdb183a838bb2a775fb633ac277deadd5",
+      "file": "audio/e9f62d39-1.wav",
+      "sha256": "7ea621df8a1321e93a9f16da90f6525564368b1121d6af3ef80958f7438ebdc0",
+      "startSeconds": 2.32,
+      "endSeconds": 2.82
+    },
+    {
+      "groupId": "56dfb35b",
+      "action": "putdown",
+      "sourceName": "古董茶壶-放下",
+      "sourceFile": "items/b9d3e597/samples/0001.wav",
+      "sourceSha256": "bf86bc5a3b509599b1b3cf45396b39c12e99a83179b94cb6492f286759627cc8",
+      "file": "audio/56dfb35b-1.wav",
+      "sha256": "542d3fcef11c0a376267d984afa979dd03e07c150f71924cb7c3a416ccc94ee7",
+      "startSeconds": 2.11,
+      "endSeconds": 2.61
+    }
+  ]
+}

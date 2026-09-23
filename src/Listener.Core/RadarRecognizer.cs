@@ -13,11 +13,12 @@ public sealed class RadarRecognizer : IRecognizer
     private readonly SoundLibrary library;
     private readonly Process worker;
     private readonly object sync = new();
+    private readonly string action;
     private long requestId;
     private bool disposed;
-    public RadarRecognizer(SoundLibrary library, string indexPath, string executable)
+    public RadarRecognizer(SoundLibrary library, string indexPath, string executable, string action = "pickup")
     {
-        library.Validate(); this.library = library;
+        library.Validate(); this.library = library; this.action = action;
         var hash = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(indexPath)));
         if (string.IsNullOrWhiteSpace(library.EngineIndexSha256) || !hash.Equals(library.EngineIndexSha256, StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException("声纹索引与物品目录不属于同一音效包，请整体替换 library 文件夹。");
@@ -52,7 +53,7 @@ public sealed class RadarRecognizer : IRecognizer
             var response = JsonSerializer.Deserialize<EngineResponse>(line, JsonFile.Options) ?? throw new IOException("识别引擎响应为空。");
             cancellation.ThrowIfCancellationRequested();
             if (response.Id != id || response.Error is not null) throw new IOException(response.Error ?? "识别引擎操作编号不一致。");
-            return library.Groups.Where(g => g.Action == "pickup" && g.Templates.Count > 0)
+            return library.Groups.Where(g => g.Action == action && (g.Templates.Count > 0 || action == "putdown"))
                 .Select(g => (g, response.Scores.GetValueOrDefault(g.Id))).ToArray();
         }
     }

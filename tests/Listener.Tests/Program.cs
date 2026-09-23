@@ -121,6 +121,28 @@ Test("持续背景声和窗口重叠不应凭音量反复触发", () =>
     for (var now = 10.6; now < 13; now += .6)
         Check(scanner.TryTakeWindow(ring, now, true, false) is null, "steady background was recognized");
 });
+Test("背景持续有声时拿起事件可在放下之前触发", () =>
+{
+    const int rate = 24000;
+    var random = new Random(73);
+    var samples = Enumerable.Range(0, rate * 3).Select(_ => (float)(.008 * (random.NextDouble() * 2 - 1))).ToArray();
+    var pickup = Tone(900, (int)(rate * .16), rate);
+    for (var i = 0; i < pickup.Length; i++) samples[rate + i] += pickup[i];
+    var putdown = Tone(1600, (int)(rate * .18), rate);
+    for (var i = 0; i < putdown.Length; i++) samples[rate * 2 + i] += putdown[i];
+    var scanner = new AutomaticAudioScanner(); scanner.Reset(0); var ring = new AudioTimeline(rate);
+    var windows = new List<AudioScanWindow>();
+    for (var first = 0; first < samples.Length; first += 2400)
+    {
+        ring.Append(samples.AsSpan(first, 2400).ToArray(), first / (double)rate);
+        var found = scanner.TryTakeWindow(ring, (first + 2400) / (double)rate, true, false);
+        if (found is not null) windows.Add(found);
+    }
+    var eventWindow = windows.Single(window => window.OnsetSeconds is >= .95 and < 1.2);
+    Check(eventWindow.EndSeconds < 1.7 && eventWindow.Focus().EndSeconds < 1.6,
+        "pickup required release or focused audio included putdown");
+    Check(windows.Count == 2, "background or overlapping windows retriggered the same events");
+});
 Test("高分单件可标精确，同音物品和边缘分数保持疑似", () =>
 {
     var library = Library();
@@ -203,6 +225,19 @@ Test("校准不能复用 test 集", () =>
 RecognitionResult HistoryMatch(long id, string item = "red", bool final = true) => new(id, RecognitionStatus.Matched, final,
     [new(new(item, item, true), .9, "group")], 1, "match");
 var historyAt = DateTimeOffset.Parse("2026-09-22T12:00:00+08:00");
+Test("辅助确认只接受近期同组的放下证据，保持拿起候选与录音", () =>
+{
+    var history = new RecognitionHistory(); var snapshot = Guid.NewGuid();
+    Check(!history.ConfirmPutdown(new("group", .99), 1), "putdown fabricated a primary result");
+    history.Remember(HistoryMatch(1), "auto", true, historyAt, snapshot);
+    Check(!history.ConfirmPutdown(new("other", .99), 1) &&
+        !history.ConfirmPutdown(new("group", .99), 9) && !history.ConfirmPutdown(new("group", .7), 1),
+        "unrelated, stale or weak confirmation was accepted");
+    Check(history.ConfirmPutdown(new("group", .96), 1), "matching putdown did not confirm");
+    Check(history.Latest!.Result.PutdownConfirmed && history.Latest.SnapshotId == snapshot &&
+        history.Latest.Result.Candidates.SequenceEqual(HistoryMatch(1).Candidates) && history.Latest.Matches == 1,
+        "confirmation replaced the primary evidence or created another recognition");
+});
 Test("历史只接收有效匹配，保存候选快照", () =>
 {
     var history = new RecognitionHistory();

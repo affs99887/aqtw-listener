@@ -2,7 +2,7 @@ using Listener.Core;
 
 try
 {
-    if (args.Length < 2) throw new ArgumentException("用法：build 清单.json 输出库.json | match 库.json 音频.wav | evaluate 库.json 测试清单.json 报告.json | calibrate 库.json 校准清单.json 输出库.json | coverage 库.json");
+    if (args.Length < 2) throw new ArgumentException("用法：build 清单.json 输出库.json | match 库.json 音频.wav | scan 库.json 音频.wav 报告.json | evaluate 库.json 测试清单.json 报告.json | calibrate 库.json 校准清单.json 输出库.json | coverage 库.json");
     switch (args[0])
     {
         case "build" when args.Length == 3:
@@ -15,6 +15,16 @@ try
         case "evaluate" when args.Length == 4:
             var report = Evaluation.Run(JsonFile.Read<SoundLibrary>(args[1]), args[2], Path.GetDirectoryName(Path.GetFullPath(args[1]))); JsonFile.Write(args[3], report);
             Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(report, JsonFile.Options)); break;
+        case "scan" when args.Length == 4:
+            using (var confirmation = PutdownRecognizer.TryLoad(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(args[1]))!, "putdown"),
+                Path.Combine(AppContext.BaseDirectory, "engine", "Listener.Engine.exe")))
+            using (var scannerRecognizer = RecognizerFactory.Create(JsonFile.Read<SoundLibrary>(args[1]), Path.GetDirectoryName(Path.GetFullPath(args[1]))))
+            {
+                var events = StreamEvaluation.Run(scannerRecognizer, WaveAudio.Read(args[2]), confirmation);
+                JsonFile.Write(args[3], events);
+                Console.WriteLine($"已分析 {events.Count} 个声音事件，{events.Count(entry => entry.Status == RecognitionStatus.Matched)} 个匹配；报告：{args[3]}");
+            }
+            break;
         case "calibrate" when args.Length == 4:
             JsonFile.Write(args[3], Evaluation.Calibrate(JsonFile.Read<SoundLibrary>(args[1]), args[2], Path.GetDirectoryName(Path.GetFullPath(args[1])))); break;
         case "coverage" when args.Length == 2:

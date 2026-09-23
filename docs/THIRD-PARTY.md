@@ -8,7 +8,8 @@
 - `src/Listener.Engine/internal/{dsp,index,library,wav}`：保留该提交的原始 Go 文件及其测试，没有改写原始算法。
 - `src/Listener.Engine/cmd/listener-engine`：本项目新增的 stdin/stdout 协议适配。
 - `data/library/images`：来自上游 `soundradar/data/library.srz` 的物品图片；格数与同音关系来自 `displayHints` 和 `tingsheng_merge.go` 等资料。
-- 大小、操作来源、时间范围与哈希记录于 `data/library/provenance.json`。长录音按能量区间裁剪，裁剪不视为新独立来源。原始音频留在本地研究目录，便携包包含预计算特征而不包含原始 WAV。
+- `data/library/putdown`：从 `4f8289d5bb32813cd7c15922df1a2a769128740a` 原始库中导入明确标记为放下的 4 组 / 5 条参考，仅供辅助确认。来源文件、完整来源哈希、裁剪范围和成品哈希在该目录的 `provenance.json` 中；不混入拿起索引。用户提供的实战录像、声音和截图没有加入发布包或参考库。
+- 大小、操作来源、时间范围与哈希记录于 `data/library/provenance.json`。长录音按能量区间裁剪，裁剪不视为新独立来源。完整原始录音留在本地研究目录，便携包包含索引及已裁剪的参考 WAV，供试听和回归。
 - 上游原始启动、构建脚本未用于成品；成品不启动上游 HTTP 服务、浏览器管理页或上游采音进程。
 
 本轮对其他公开项目的拾取音效资料作了[来源核查](SOUND-SOURCE-AUDIT.md)。仅有物品名称而无可核实声音关系的条目已从基础库撤回。

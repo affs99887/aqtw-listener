@@ -107,7 +107,72 @@ internal static class Program
                     Check(detected, "reference event was missed: " + reference.File);
                 }
             }),
-            ("完整窗口和事件附近音频对参考音效给出一致候选", () =>
+            ("局内持续底噪下每条参考的拿起声仍可触发", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                foreach (var reference in ReferenceAudio.Load(root).Samples)
+                {
+                    var clip = WaveAudio.Read(ReferenceAudio.VerifiedPath(root, reference));
+                    var rate = 24000; var signal = WaveAudio.Resample(clip.Samples, clip.SampleRate, rate);
+                    var noise = new Random(45); var level = AudioFeatures.Rms(signal) * .15;
+                    var samples = Enumerable.Range(0, rate * 3).Select(_ => (float)(level * (noise.NextDouble() * 2 - 1))).ToArray();
+                    for (var i = 0; i < signal.Length; i++) samples[rate + i] += signal[i];
+                    var scanner = new AutomaticAudioScanner(); scanner.Reset(0); var ring = new AudioTimeline(rate);
+                    AudioScanWindow? found = null;
+                    for (var first = 0; first < samples.Length; first += 2400)
+                    {
+                        ring.Append(samples.AsSpan(first, 2400).ToArray(), first / (double)rate);
+                        var window = scanner.TryTakeWindow(ring, (first + 2400) / (double)rate, true, false);
+                        if (window is { OnsetSeconds: >= .9 and < 1.5 }) found = window;
+                    }
+                    Check(found is not null, "ambient sound blocked " + reference.File);
+                }
+            }),
+            ("放下辅助库不会把拿起样本误当成放下，也不能独立提供候选", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                using var confirmation = new PutdownRecognizer(Path.Combine(root, "putdown"), Path.Combine(AppContext.BaseDirectory, "engine", "Listener.Engine.exe"));
+                using var recognizer = RecognizerFactory.Create(JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json")));
+                foreach (var reference in ReferenceAudio.Load(root).Samples)
+                {
+                    var clip = WaveAudio.Read(ReferenceAudio.VerifiedPath(root, reference));
+                    var pickup = recognizer.Analyze(clip.Samples, clip.SampleRate).Result;
+                    var drop = confirmation.Match(clip.Samples, clip.SampleRate);
+                    Check(drop is null || !drop.IsAuxiliary(pickup), "pickup mistaken for putdown: " + reference.File);
+                }
+                foreach (var file in Directory.GetFiles(Path.Combine(root, "putdown", "audio"), "*.wav"))
+                {
+                    var clip = WaveAudio.Read(file);
+                    var drop = confirmation.Match(clip.Samples, clip.SampleRate);
+                    Check(drop is not null && drop.GroupId == Path.GetFileName(file).Split('-')[0], "putdown reference missed: " + file);
+                }
+            }),
+            ("自动监听期间的连续鼠标点击不取消声音识别", () =>
+            {
+                using var f = new Fixture(); f.Controller.Toggle().GetAwaiter().GetResult();
+                f.Capture.Timeline.Append(Fixture.Sound(), 10);
+                for (var i = 0; i < 6; i++) { f.Controller.Click(10 + i * .1, "鼠标事件"); f.Tick(10 + i * .1); }
+                f.Tick(10.65); f.Finish();
+                Check(f.Controller.Diagnostics().AutomaticScans == 1 && f.Results.Last()?.Status == RecognitionStatus.Matched,
+                    "input kept postponing the automatic scan");
+                Check(f.Recognizer.Calls == 1 && f.Results.Last()!.IsFinal, "pickup waited for a later action");
+            }),
+            ("放下声只补充已有拿起结果，不新增候选或改分数", () =>
+            {
+                var confirmation = new FakePutdown();
+                using var f = new Fixture(confirmation); f.StartSound(); f.Finish();
+                var before = f.Controller.History.Latest!;
+                confirmation.Result = new("test", .95); f.Recognizer.Status = RecognitionStatus.Unknown;
+                f.Capture.Timeline.Append(Fixture.Sound(), f.Now + .3); f.Tick(f.Now + .95); f.Finish();
+                var after = f.Controller.History.Latest!;
+                Check(after.Result.PutdownConfirmed && after.SnapshotId == before.SnapshotId &&
+                    after.Result.Candidates.SequenceEqual(before.Result.Candidates) && f.Controller.History.Entries.Count == 1,
+                    "auxiliary confirmation changed pickup evidence");
+                f.Controller.ClearCurrentResult();
+                f.Capture.Timeline.Append(Fixture.Sound(), f.Now + .3); f.Tick(f.Now + .95); f.Finish();
+                Check(f.Controller.History.Latest is null, "standalone putdown created a result");
+            }),
+            ("仅拿起声音即可确认全部参考，不依赖放下或长窗口", () =>
             {
                 var root = Path.Combine(AppContext.BaseDirectory, "library");
                 var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
@@ -120,20 +185,10 @@ internal static class Program
                     var scanner = new AutomaticAudioScanner(); scanner.Reset(9.5);
                     var window = new[] { 10.65, 10.85, 11.05 }.Select(now => scanner.TryTakeWindow(ring, now, true, false))
                         .FirstOrDefault(found => found is not null)!;
-                    var first = (int)Math.Clamp(Math.Round((window.OnsetSeconds - .12 -
-                        (window.EndSeconds - AutomaticAudioScanner.WindowSeconds)) * window.SampleRate), 0, window.Samples.Length);
-                    var length = Math.Min(window.Samples.Length - first, (int)(.72 * window.SampleRate));
-                    var fullAnalysis = recognizer.Analyze(window.Samples, window.SampleRate);
-                    var focusedAnalysis = recognizer.Analyze(window.Samples.AsSpan(first, length).ToArray(), window.SampleRate);
-                    var full = fullAnalysis.Result;
-                    var focused = focusedAnalysis.Result;
-                    Check(full.Candidates.Any(candidate => candidate.GroupId == reference.GroupId) &&
-                        focused.Candidates.Any(candidate => candidate.GroupId == reference.GroupId),
-                        "event focus disagreed on " + reference.File);
-                    var confirmed = AutomaticRecognitionConsensus.Resolve(fullAnalysis, focusedAnalysis).Result;
+                    var confirmed = PickupRecognition.Analyze(recognizer, window).Analysis.Result;
                     Check(confirmed.Status == RecognitionStatus.Matched &&
                         confirmed.Candidates.Any(candidate => candidate.GroupId == reference.GroupId),
-                        "two-pass confirmation missed " + reference.File);
+                        "pickup-only analysis missed " + reference.File);
                 }
             }),
             ("非游戏前台不采音、不进行声音识别", () =>
@@ -230,6 +285,7 @@ internal static class Program
             ("点击分析和失败不清旧候选，同次点击两阶段只留一条历史", () =>
             {
                 using var f = new Fixture(); f.StartSound(); f.Finish();
+                f.Controller.SetAutomaticRecognition(false);
                 f.Recognizer.Status = RecognitionStatus.Unknown;
                 f.Controller.Click(f.Now - 2, "test click"); f.Finish();
                 Check(f.Results.Last()?.CandidateCount == 1 && f.Controller.History.Entries.Count == 1, "click miss cleared result");
@@ -774,10 +830,10 @@ internal static class Program
         public readonly FakeRecognizer Recognizer = new();
         public readonly ListeningController Controller;
         public readonly List<RecognitionResult?> Results = [];
-        public Fixture()
+        public Fixture(IPutdownRecognizer? putdown = null)
         {
             Controller = new(new Settings(), Recognizer, Capture, Dispatcher.CurrentDispatcher,
-                () => (Foreground, ForegroundProcessId), () => Now, startPolling: false);
+                () => (Foreground, ForegroundProcessId), () => Now, startPolling: false, putdown: putdown);
             Controller.Result += Results.Add;
         }
         public static float[] Sound() => Enumerable.Range(0, 12000).Select(i => (float)(.1 * Math.Sin(i * .2))).ToArray();
@@ -812,6 +868,12 @@ internal static class Program
         }
         public Task Stop() { Running = false; TargetProcessId = 0; Timeline.Clear(); return Task.CompletedTask; }
         public ValueTask DisposeAsync() { Running = false; TargetProcessId = 0; return ValueTask.CompletedTask; }
+    }
+    private sealed class FakePutdown : IPutdownRecognizer
+    {
+        public PutdownMatch? Result;
+        public PutdownMatch? Match(float[] samples, int sampleRate, CancellationToken cancellation = default) => Result;
+        public void Dispose() { }
     }
     private sealed class FakeRecognizer : IRecognizer
     {
