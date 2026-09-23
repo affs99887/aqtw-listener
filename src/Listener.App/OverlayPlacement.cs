@@ -7,9 +7,9 @@ internal static class OverlayPlacement
     // A ceiling on available content, never a fixed window height.
     public static OverlayBounds TopCenter(Rect viewportPixels, double scaleX, double scaleY, double requestedWidth)
     {
-        var width = Math.Min(Math.Clamp(requestedWidth, 300, 900), viewportPixels.Width * .4 / scaleX);
-        var gap = Math.Min(16 * scaleY, viewportPixels.Height / 12);
+        var width = Math.Min(Math.Clamp(double.IsFinite(requestedWidth) ? requestedWidth : 470, 280, 1600), viewportPixels.Width * .94 / scaleX);
+        var gap = Math.Min(12 * scaleY, viewportPixels.Height / 16);
         return new(viewportPixels.Left + (viewportPixels.Width - width * scaleX) / 2,
-            viewportPixels.Top + gap, width, Math.Max(1, (viewportPixels.Height / 3 - gap) / scaleY));
+            viewportPixels.Top + gap, width, Math.Max(1, (viewportPixels.Height - gap - 8 * scaleY) / scaleY));
     }
 }

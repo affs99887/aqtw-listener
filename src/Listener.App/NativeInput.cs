@@ -12,6 +12,9 @@ internal sealed class NativeInput : IDisposable
     [DllImport("user32.dll")] private static extern bool GetClientRect(IntPtr window, out NativeRect rect);
     [DllImport("user32.dll")] private static extern bool ClientToScreen(IntPtr window, ref NativePoint point);
     [DllImport("user32.dll")] private static extern bool GetWindowRect(IntPtr window, out NativeRect rect);
+    [DllImport("user32.dll")] private static extern IntPtr WindowFromPoint(NativePoint point);
+    [DllImport("user32.dll")] private static extern IntPtr GetAncestor(IntPtr window, uint flags);
+    [DllImport("user32.dll")] private static extern bool GetCursorPos(out NativePoint point);
     [DllImport("user32.dll")] private static extern bool SetWindowPos(IntPtr window, IntPtr after, int x, int y, int cx, int cy, uint flags);
     [DllImport("user32.dll")] internal static extern bool SetForegroundWindow(IntPtr window);
     [StructLayout(LayoutKind.Sequential)] private struct NativeRect { public int Left, Top, Right, Bottom; }
@@ -37,13 +40,12 @@ internal sealed class NativeInput : IDisposable
     private readonly IntPtr foregroundHook;
     private readonly WinEvent foregroundCallback;
     private readonly MouseButtonTracker buttons = new();
+    private static IntPtr overlayHandle;
     private readonly Dispatcher dispatcher;
     private readonly DispatcherTimer mousePoll;
     private bool disposed;
     private string registeredHotkey = "";
     private string registeredInteractionHotkey = "";
-    private bool pagingRequested;
-    public string PagingStatus { get; private set; } = "";
     public long HookPresses { get; private set; }
     public long PollTriggers { get; private set; }
     public string HookStatus { get; }
@@ -51,7 +53,6 @@ internal sealed class NativeInput : IDisposable
     public event Action? InteractionToggle;
     public event Action<double, string>? MouseDown;
     public event Action? ForegroundChanged;
-    public event Action<int>? CandidatePage;
     public static double Now => (double)Stopwatch.GetTimestamp() / Stopwatch.Frequency;
 
     public NativeInput(Window window)
@@ -93,8 +94,6 @@ internal sealed class NativeInput : IDisposable
     {
         if (msg == 0x312 && wp.ToInt32() == 71) { Toggle?.Invoke(); handled = true; }
         else if (msg == 0x312 && wp.ToInt32() == 75) { InteractionToggle?.Invoke(); handled = true; }
-        else if (msg == 0x312 && wp.ToInt32() is 73 or 74)
-        { CandidatePage?.Invoke(wp.ToInt32() == 73 ? -1 : 1); handled = true; }
         return IntPtr.Zero;
     }
     public void SetInteractionHotkey(string text)
@@ -110,20 +109,6 @@ internal sealed class NativeInput : IDisposable
         if (!RegisterHotKey(source.Handle, 75, modifiers, (uint)KeyInterop.VirtualKeyFromKey(key))) throw new InvalidOperationException("操作快捷键注册失败");
         registeredInteractionHotkey = text;
     }
-    public void SetPagingEnabled(bool enabled)
-    {
-        if (pagingRequested == enabled) return;
-        pagingRequested = enabled;
-        UnregisterHotKey(source.Handle, 73); UnregisterHotKey(source.Handle, 74); PagingStatus = "";
-        if (!enabled) return;
-        var previous = RegisterHotKey(source.Handle, 73, 0x4003, 0x21);
-        var next = RegisterHotKey(source.Handle, 74, 0x4003, 0x22);
-        if (!previous || !next)
-        {
-            UnregisterHotKey(source.Handle, 73); UnregisterHotKey(source.Handle, 74);
-            PagingStatus = "翻页快捷键被占用，可在主窗口或识别历史翻页";
-        }
-    }
     private IntPtr MouseProc(int code, IntPtr message, IntPtr data)
     {
         try
@@ -134,8 +119,12 @@ internal sealed class NativeInput : IDisposable
                 if (message.ToInt32() == 0x202) buttons.HookUp(now);
                 else if (message.ToInt32() == 0x201)
                 {
-                    HookPresses++;
-                    if (buttons.HookDown(now)) QueueClick(now, "鼠标事件");
+                    var triggered = buttons.HookDown(now);
+                    if (!PointerTargetsOverlay(Marshal.PtrToStructure<NativePoint>(data)))
+                    {
+                        HookPresses++;
+                        if (triggered) QueueClick(now, "鼠标事件");
+                    }
                 }
             }
         }
@@ -150,9 +139,18 @@ internal sealed class NativeInput : IDisposable
         var now = Now;
         if (buttons.Poll((GetAsyncKeyState(key) & 0x8000) != 0, now))
         {
-            PollTriggers++;
-            QueueClick(now, "按键检测（远程兼容）");
+            if (!GetCursorPos(out var point) || !PointerTargetsOverlay(point))
+            {
+                PollTriggers++;
+                QueueClick(now, "按键检测（远程兼容）");
+            }
         }
+    }
+    private static bool PointerTargetsOverlay(NativePoint point)
+    {
+        var target = WindowFromPoint(point);
+        return overlayHandle != IntPtr.Zero && target != IntPtr.Zero &&
+            GetAncestor(target, 2) == overlayHandle; // GA_ROOT
     }
     private void QueueClick(double now, string origin)
     {
@@ -174,6 +172,7 @@ internal sealed class NativeInput : IDisposable
     public static void MakeOverlay(Window window)
     {
         var handle = new WindowInteropHelper(window).Handle;
+        overlayHandle = handle;
         var style = GetWindowLongPtr(handle, -20).ToInt64();
         SetWindowLongPtr(handle, -20, new IntPtr(style | 0x20 | 0x80 | 0x08000000));
     }
@@ -183,6 +182,13 @@ internal sealed class NativeInput : IDisposable
         var style = GetWindowLongPtr(handle, -20).ToInt64();
         const long flags = 0x20 | 0x08000000;
         SetWindowLongPtr(handle, -20, new IntPtr(interactive ? style & ~flags : style | flags));
+    }
+    public static void SetOverlayListeningControls(Window window)
+    {
+        var handle = new WindowInteropHelper(window).EnsureHandle();
+        var style = GetWindowLongPtr(handle, -20).ToInt64();
+        // Buttons can receive clicks without stealing focus from UAGame.
+        SetWindowLongPtr(handle, -20, new IntPtr((style & ~0x20) | 0x08000000));
     }
     public static bool ForegroundBelongsToApplication()
     { GetWindowThreadProcessId(GetForegroundWindow(), out var pid); return pid == Environment.ProcessId; }
@@ -218,7 +224,6 @@ internal sealed class NativeInput : IDisposable
         if (disposed) return;
         disposed = true; mousePoll.Stop();
         UnregisterHotKey(source.Handle, 71); UnregisterHotKey(source.Handle, 72);
-        UnregisterHotKey(source.Handle, 73); UnregisterHotKey(source.Handle, 74);
         UnregisterHotKey(source.Handle, 75); UnregisterHotKey(source.Handle, 76);
         if (mouseHook != IntPtr.Zero) UnhookWindowsHookEx(mouseHook);
         source.RemoveHook(WindowProc);

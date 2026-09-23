@@ -26,9 +26,10 @@ public static class JsonFile
 
 public sealed record ItemDefinition(string Id, string Name, bool IsGold, decimal? ReferenceValue = null,
     string? ValueSource = null, string? ValueDate = null, int GridWidth = 1, int GridHeight = 1,
-    string? Thumbnail = null)
+    string? Thumbnail = null, bool GridVerified = true, string? CatalogSource = null)
 {
-    public int Cells => GridWidth * GridHeight;
+    public int Cells => GridVerified ? GridWidth * GridHeight : 0;
+    [JsonIgnore] public string GridLabel => GridVerified ? $"{GridWidth}×{GridHeight}" : "格数待核实";
 }
 
 public sealed class SoundGroup
@@ -93,7 +94,8 @@ public sealed class SoundLibrary
 }
 
 public enum RecognitionStatus { Listening, Analyzing, Matched, NoSound, Unknown, Interference, LibraryEmpty, Error }
-public sealed record Candidate(ItemDefinition Item, double Score, string GroupId);
+public enum RecognitionTag { Suspected, Exact }
+public sealed record Candidate(ItemDefinition Item, double Score, string GroupId, RecognitionTag Tag = RecognitionTag.Suspected);
 public sealed record RecognitionResult(long OperationId, RecognitionStatus Status, bool IsFinal,
     IReadOnlyList<Candidate> Candidates, double ElapsedMilliseconds, string Message)
 {

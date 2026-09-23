@@ -8,7 +8,8 @@ internal sealed record ListeningDiagnostics(bool Enabled, string TargetProcess, 
     string LastIgnoredReason, string LastRecognition, string ManualTestStatus,
     bool AutomaticRecognition, long AutomaticScans, string AutomaticStatus, double AutomaticWindowRms);
 internal enum AssistantMode { Listening, Interaction, Learning }
-internal sealed record RecognitionActivity(long OperationId, bool Busy, string Message);
+internal sealed record RecognitionActivity(long OperationId, bool Busy, string Message,
+    RecognitionStatus Status = RecognitionStatus.Listening);
 
 internal sealed class ListeningController : IAsyncDisposable
 {
@@ -80,12 +81,12 @@ internal sealed class ListeningController : IAsyncDisposable
         if (!startPolling) poll.Stop();
     }
     internal Task PendingRecognition => recognitionTask ?? Task.CompletedTask;
-    private void SetActivity(long id, bool busy, string message)
-    { CurrentActivity = new(id, busy, message); Activity?.Invoke(CurrentActivity); }
+    private void SetActivity(long id, bool busy, string message, RecognitionStatus status = RecognitionStatus.Listening)
+    { CurrentActivity = new(id, busy, message, status); Activity?.Invoke(CurrentActivity); }
     private async Task ShowAutomaticLoading(long id, CancellationToken token)
     {
         try { await Task.Delay(150, token); if (epoch.IsCurrent(id) && recognitionTask is { IsCompleted: false } &&
-            !(CurrentActivity.OperationId == id && !CurrentActivity.Busy)) SetActivity(id, true, "识别中…"); }
+            !(CurrentActivity.OperationId == id && !CurrentActivity.Busy)) SetActivity(id, true, "识别中…", RecognitionStatus.Analyzing); }
         catch (OperationCanceledException) { }
     }
     public async Task SetMode(AssistantMode mode)
@@ -129,11 +130,14 @@ internal sealed class ListeningController : IAsyncDisposable
         else if (History.Latest is null) Result?.Invoke(result);
         var message = result.Status switch {
             RecognitionStatus.Analyzing => "识别中…",
-            RecognitionStatus.Matched => result.IsFinal ? "已匹配" : "初步匹配 · 继续识别…",
-            RecognitionStatus.Unknown => "本次未匹配", RecognitionStatus.NoSound => "本次未采到声音",
+            RecognitionStatus.Matched => result.IsFinal ? "识别完成" : "初步匹配 · 继续识别…",
+            RecognitionStatus.Unknown => "识别失败 · 未匹配到已收录音效", RecognitionStatus.NoSound => "识别失败 · 未采到有效声音",
+            RecognitionStatus.Interference => "识别失败 · 声音干扰过强",
+            RecognitionStatus.LibraryEmpty => "识别失败 · 音效库无可用样本",
+            RecognitionStatus.Error => "识别失败 · " + result.Message,
             _ => result.Message };
         if (History.Latest is not null && result.Status != RecognitionStatus.Matched) message += " · 下方为上次匹配结果";
-        SetActivity(result.OperationId, !result.IsFinal, message);
+        SetActivity(result.OperationId, !result.IsFinal, message, result.Status);
     }
     private void PublishAnalysis(RecognitionAnalysis analysis, float[] samples, int rate, string source, bool automatic = false, double? start = null, double? end = null)
     {
@@ -279,6 +283,21 @@ internal sealed class ListeningController : IAsyncDisposable
             {
                 token.ThrowIfCancellationRequested();
                 var analysis = recognizer.Analyze(window.Samples, window.SampleRate, id, true, token);
+                if (analysis.Result.Status is RecognitionStatus.Matched or RecognitionStatus.Unknown)
+                {
+                    // The event-centred pass excludes much of the surrounding
+                    // game audio without changing the stored reference index.
+                    var first = (int)Math.Clamp(Math.Round((window.OnsetSeconds - .12 -
+                        (window.EndSeconds - AutomaticAudioScanner.WindowSeconds)) * window.SampleRate), 0, window.Samples.Length);
+                    var length = Math.Min(window.Samples.Length - first, (int)(.72 * window.SampleRate));
+                    if (length >= window.SampleRate * .4)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        var focused = window.Samples.AsSpan(first, length).ToArray();
+                        var retry = recognizer.Analyze(focused, window.SampleRate, id, true, token);
+                        analysis = AutomaticRecognitionConsensus.Resolve(analysis, retry);
+                    }
+                }
                 var result = analysis.Result;
                 await dispatcher.InvokeAsync(() =>
                 {

@@ -68,11 +68,8 @@ public sealed class RadarRecognizer : IRecognizer
         if (samples.Count(v => Math.Abs(v) > .995) > samples.Length * .05) return Empty(RecognitionStatus.Interference, "声音削波严重，请降低音量");
         var scores = ScoreAudio(samples, sampleRate, cancellation);
         ranked = scores.OrderByDescending(s => s.Score).Select(s => new GroupScore(s.Group.Id, s.Score)).ToArray();
-        var items = library.Items.ToDictionary(i => i.Id);
-        var candidates = scores.Where(s => s.Score >= s.Group.Threshold)
-            .SelectMany(s => s.Group.ItemIds.Select(id => new Candidate(items[id], s.Score, s.Group.Id)))
-            .GroupBy(c => c.Item.Id).Select(g => g.MaxBy(c => c.Score)!).OrderByDescending(c => c.Score).ThenBy(c => c.Item.Id).ToArray();
-        return candidates.Length == 0 ? Empty(RecognitionStatus.Unknown, "未匹配，请再听一次")
+        var candidates = CandidateSelection.Select(library, scores);
+        return candidates.Length == 0 ? Empty(RecognitionStatus.Unknown, "识别失败 · 未匹配到已收录音效")
             : new(new(operationId, RecognitionStatus.Matched, final, candidates, watch.Elapsed.TotalMilliseconds, final ? "识别完成" : "初步候选 · 正在继续听"), ranked);
     }
     public void Dispose()

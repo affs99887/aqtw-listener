@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Windows.Threading;
@@ -19,11 +19,59 @@ internal static class Program
                 var disabled = JsonSerializer.Deserialize<Settings>("{\"automaticRecognition\":false}", JsonFile.Options)!;
                 Check(!disabled.AutomaticRecognition, "explicit opt-out ignored");
             }),
+            ("监听浮窗显示加载动画、醒目失败和两种识别标签", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                var panel = new CandidatePanel(root, new Settings(), interactive: false, compact: true);
+                var items = library.Items.Take(2).ToArray();
+                panel.ShowResult(new(1, RecognitionStatus.Matched, true,
+                    [new(items[0], .95, "exact", RecognitionTag.Exact),
+                     new(items[1], .83, "suspected", RecognitionTag.Suspected)], 1, "test"));
+                panel.SetActivity(new(1, true, "识别中…", RecognitionStatus.Analyzing));
+                Layout(panel, 780, 500);
+                var progress = Descendants<System.Windows.Controls.ProgressBar>(panel).Single();
+                Check(progress.IsIndeterminate && progress.Visibility == System.Windows.Visibility.Visible,
+                    "loading animation missing");
+                var labels = Descendants<System.Windows.Controls.TextBlock>(panel).Select(label => label.Text).ToArray();
+                Check(labels.Contains("精确识别") && labels.Contains("疑似"), "recognition tags missing");
+                panel.SetActivity(new(2, false, "未匹配到已收录音效", RecognitionStatus.Unknown));
+                Layout(panel, 780, 500);
+                Check(progress.Visibility == System.Windows.Visibility.Collapsed &&
+                    Descendants<System.Windows.Controls.TextBlock>(panel).Any(label => label.Text.StartsWith("识别失败")),
+                    "failure did not replace the loading status");
+                var group = library.Groups.Single(group => group.Id == "361affd2");
+                var design = new CandidatePanel(root, new Settings(), interactive: true, compact: true);
+                design.ShowResult(new(3, RecognitionStatus.Matched, true,
+                    group.ItemIds.Select(id => new Candidate(library.Items.Single(item => item.Id == id), .9, group.Id)).ToArray(),
+                    1, "test"));
+                Layout(design, 900, 720);
+                Check(!Descendants<System.Windows.Controls.TextBlock>(design).Any(label =>
+                        label.Text is "同音候选" or "疑似") &&
+                    Descendants<System.Windows.Controls.TextBlock>(design).Count(label =>
+                        label.Text.StartsWith("大红概率 ", StringComparison.Ordinal)) == 4,
+                    "the shared-sound badge remains or size groups lack red-item percentages");
+            }),
+            ("基础图鉴只包含已关联音效的物品", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                library.Validate();
+                var unlinked = library.Items.Where(item => !library.Groups.Any(group => group.ItemIds.Contains(item.Id))).ToArray();
+                Check(library.Items.Count == 51 && unlinked.Length == 0,
+                    "unverified items entered the runtime catalog");
+                var panel = new CandidatePanel(root, new Settings { ShowNames = true });
+                var result = new RecognitionResult(1, RecognitionStatus.Matched, true,
+                    library.Items.Select(item => new Candidate(item, 0, "catalog")).ToArray(), 0, "");
+                panel.ShowResult(result, demo: true); Layout(panel, 820, 760);
+                CheckCandidateCoverage(panel, result);
+            }),
             ("控制器在零鼠标触发时自动调用识别并发布结果", () =>
             {
                 using var f = new Fixture(); f.StartSound(); f.Finish();
                 var d = f.Controller.Diagnostics();
-                Check(d.TriggerCount == 0 && d.AutomaticScans == 1 && f.Recognizer.Calls == 1, "audio never reached recognizer");
+                Check(d.TriggerCount == 0 && d.AutomaticScans == 1 && f.Recognizer.Calls is >= 1 and <= 2,
+                    "audio never reached recognizer");
                 Check(f.Results.Last()?.Status == RecognitionStatus.Matched, "audio result not published");
             }),
             ("零鼠标触发的音频能通过实际 SoundRadar 工作进程返回判定", () =>
@@ -42,6 +90,51 @@ internal static class Program
                     Check(result?.Status is RecognitionStatus.Matched or RecognitionStatus.Unknown, "real engine did not return a sound verdict");
                 }
                 finally { controller.DisposeAsync().AsTask().GetAwaiter().GetResult(); }
+            }),
+            ("自动声音事件门能接住全部已收录参考片段", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var references = ReferenceAudio.Load(root).Samples;
+                Check(references.Count >= 14, "reference archive is incomplete");
+                foreach (var reference in references)
+                {
+                    var clip = WaveAudio.Read(ReferenceAudio.VerifiedPath(root, reference));
+                    var ring = new AudioTimeline();
+                    ring.Append(WaveAudio.Resample(clip.Samples, clip.SampleRate, ring.SampleRate), 10);
+                    var scanner = new AutomaticAudioScanner(); scanner.Reset(9.5);
+                    var detected = new[] { 10.65, 10.85, 11.05 }
+                        .Any(now => scanner.TryTakeWindow(ring, now, true, false) is not null);
+                    Check(detected, "reference event was missed: " + reference.File);
+                }
+            }),
+            ("完整窗口和事件附近音频对参考音效给出一致候选", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                using var recognizer = RecognizerFactory.Create(library);
+                foreach (var reference in ReferenceAudio.Load(root).Samples)
+                {
+                    var clip = WaveAudio.Read(ReferenceAudio.VerifiedPath(root, reference));
+                    var ring = new AudioTimeline();
+                    ring.Append(WaveAudio.Resample(clip.Samples, clip.SampleRate, ring.SampleRate), 10);
+                    var scanner = new AutomaticAudioScanner(); scanner.Reset(9.5);
+                    var window = new[] { 10.65, 10.85, 11.05 }.Select(now => scanner.TryTakeWindow(ring, now, true, false))
+                        .FirstOrDefault(found => found is not null)!;
+                    var first = (int)Math.Clamp(Math.Round((window.OnsetSeconds - .12 -
+                        (window.EndSeconds - AutomaticAudioScanner.WindowSeconds)) * window.SampleRate), 0, window.Samples.Length);
+                    var length = Math.Min(window.Samples.Length - first, (int)(.72 * window.SampleRate));
+                    var fullAnalysis = recognizer.Analyze(window.Samples, window.SampleRate);
+                    var focusedAnalysis = recognizer.Analyze(window.Samples.AsSpan(first, length).ToArray(), window.SampleRate);
+                    var full = fullAnalysis.Result;
+                    var focused = focusedAnalysis.Result;
+                    Check(full.Candidates.Any(candidate => candidate.GroupId == reference.GroupId) &&
+                        focused.Candidates.Any(candidate => candidate.GroupId == reference.GroupId),
+                        "event focus disagreed on " + reference.File);
+                    var confirmed = AutomaticRecognitionConsensus.Resolve(fullAnalysis, focusedAnalysis).Result;
+                    Check(confirmed.Status == RecognitionStatus.Matched &&
+                        confirmed.Candidates.Any(candidate => candidate.GroupId == reference.GroupId),
+                        "two-pass confirmation missed " + reference.File);
+                }
             }),
             ("非游戏前台不采音、不进行声音识别", () =>
             {
@@ -71,14 +164,16 @@ internal static class Program
                 PumpUntil(() => f.Recognizer.Entered.IsSet);
                 f.Controller.SetAutomaticRecognition(false); f.Recognizer.Release.Set(); f.Finish();
                 f.Tick(11.5);
-                Check(f.Recognizer.Calls == 1 && f.Results.All(r => r?.Status != RecognitionStatus.Matched), "disabled scan leaked result");
+                Check(f.Controller.Diagnostics().AutomaticScans == 1 && f.Recognizer.Calls is >= 1 and <= 2 &&
+                    f.Results.All(r => r?.Status != RecognitionStatus.Matched), "disabled scan leaked result");
             }),
             ("静音不会清除候选，切出并恢复也保留已接受结果", () =>
             {
                 using var f = new Fixture(); f.StartSound(); f.Finish();
+                var initialCalls = f.Recognizer.Calls;
                 f.Capture.Timeline.Clear(); f.Tick(60);
                 Check(f.Results.Last()?.CandidateCount == 1, "retained candidate expired");
-                Check(f.Recognizer.Calls == 1, "silence sent to recognizer");
+                Check(initialCalls is >= 1 and <= 2 && f.Recognizer.Calls == initialCalls, "silence sent to recognizer");
                 f.Foreground = "notepad"; f.Controller.ForegroundChanged();
                 Check(!f.Capture.Running && f.Results.Last()?.CandidateCount == 1, "pause cleared accepted result");
                 f.Foreground = "UAGame"; f.Tick(61);
@@ -134,14 +229,16 @@ internal static class Program
             ("操作期间不采音或识别，退出冷却完整300毫秒并保留监听开关", () =>
             {
                 using var f = new Fixture(); f.StartSound(); f.Finish();
+                var initialCalls = f.Recognizer.Calls;
                 var enter = f.Controller.SetMode(AssistantMode.Interaction); PumpUntil(() => enter.IsCompleted); enter.GetAwaiter().GetResult();
                 Check(!f.Capture.Running && f.Controller.Enabled, "interaction changed user listening toggle");
                 f.Capture.Timeline.Append(Fixture.Sound(), f.Now); f.Controller.Click(f.Now, "should-ignore"); f.Tick(f.Now + .8);
-                Check(f.Recognizer.Calls == 1, "preview contaminated recognition");
+                Check(initialCalls is >= 1 and <= 2 && f.Recognizer.Calls == initialCalls, "preview contaminated recognition");
                 var watch = Stopwatch.StartNew(); var exit = f.Controller.SetMode(AssistantMode.Listening);
                 f.Tick(f.Now + .01); Check(!f.Capture.Running, "poll bypassed cooldown");
                 PumpUntil(() => exit.IsCompleted); exit.GetAwaiter().GetResult();
-                Check(watch.ElapsedMilliseconds >= 290 && f.Capture.Running && f.Recognizer.Calls == 1, "cooldown or buffer clear failed");
+                Check(watch.ElapsedMilliseconds >= 290 && f.Capture.Running && f.Recognizer.Calls == initialCalls,
+                    "cooldown or buffer clear failed");
                 f.Controller.Disable().GetAwaiter().GetResult(); f.Controller.SetMode(AssistantMode.Interaction).GetAwaiter().GetResult();
                 exit = f.Controller.SetMode(AssistantMode.Listening); PumpUntil(() => exit.IsCompleted);
                 Check(!f.Capture.Running && !f.Controller.Enabled, "exit restarted disabled listener");
@@ -168,30 +265,29 @@ internal static class Program
                 Check(paused && completed && !learning.Running && draft.Samples.Count(s => !s.CheckOnly) == 3 && draft.Samples.Count(s => s.CheckOnly) == 1, "rounds/pause failed: " + draft.Status);
                 Check(f.Recognizer.Calls == 0 && f.Controller.Diagnostics().TriggerCount == 0 && f.Controller.Mode == AssistantMode.Interaction && !f.Capture.Running, "learning leaked into normal recognition");
             }),
-            ("少量候选按内容收缩，多量扩展，减少后能再次收缩", () =>
+            ("候选优先横向扩展，减少后宽高再次收缩", () =>
             {
                 var (panel, library) = CreatePanel();
-                panel.ShowResult(CatalogResult(library, 1)); Layout(panel, 470, 1000);
-                var small = panel.DesiredSize.Height;
-                panel.ShowResult(CatalogResult(library, 13)); Layout(panel, 470, 1000);
-                Check(panel.DesiredSize.Height > small + 100, "height is fixed instead of content-driven");
-                panel.ShowResult(CatalogResult(library, 1)); Layout(panel, 470, 1000);
-                Check(Math.Abs(panel.DesiredSize.Height - small) < 1 && panel.PageCount == 1, "height stayed expanded");
+                panel.ShowResult(CatalogResult(library, 1));
+                var smallWidth = panel.GetPreferredWidth(1300, 360); Layout(panel, smallWidth, 360);
+                var smallHeight = panel.DesiredSize.Height;
+                panel.ShowResult(CatalogResult(library, 13));
+                var wide = panel.GetPreferredWidth(1300, 360); Layout(panel, wide, 360);
+                Check(wide > smallWidth && wide <= 1300, "more candidates did not use available horizontal space");
+                panel.ShowResult(CatalogResult(library, 1));
+                var restoredWidth = panel.GetPreferredWidth(1300, 360); Layout(panel, restoredWidth, 360);
+                Check(Math.Abs(restoredWidth - smallWidth) < 1 && Math.Abs(panel.DesiredSize.Height - smallHeight) < 1, "small result kept expanded geometry");
             }),
-            ("不同窗口宽度和大图下分页可访问全部候选，不裁掉或重复物品", () =>
+            ("不同窗口宽度下全部候选保留在同一布局，宽裕时无需滚动", () =>
             {
-                foreach (var (width, height, size) in new[] { (300, 620, 120), (470, 680, 88), (900, 760, 120) })
+                foreach (var (width, height, size, count) in new[] { (300, 620, 120, 51), (470, 680, 88, 51), (780, 460, 120, 6) })
                 {
                     var (panel, library) = CreatePanel(size);
-                    panel.ShowResult(CatalogResult(library, 51)); Layout(panel, width, height);
-                    var ids = new List<string>();
-                    for (var page = 0; page < panel.PageCount; page++)
-                    {
-                        Check(panel.PageFits, "one page clips an entire card");
-                        ids.AddRange(panel.VisibleIds); panel.MovePage(1); Layout(panel, width, height);
-                    }
-                    Check(ids.Count == 51 && ids.Distinct().Count() == 51, "pagination lost or duplicated candidates");
-                    Check(!Descendants<System.Windows.Controls.ScrollViewer>(panel).Any(), "candidate view still scrolls");
+                    var result = CatalogResult(library, count);
+                    panel.ShowResult(result); Layout(panel, width, height);
+                    CheckCandidateCoverage(panel, result);
+                    Check(panel.DesiredSize.Height <= height + 1, "candidate panel exceeds available height");
+                    if (count == 6) Check(!panel.NeedsScroll, "moderate result scrolls despite generous available space");
                 }
             }),
             ("旧默认坐标升级到顶部居中，自定义位置和明确选择保持", () =>
@@ -209,82 +305,412 @@ internal static class Program
                 foreach (var viewport in new[] { new System.Windows.Rect(0, 0, 1920, 1080), new System.Windows.Rect(240, 80, 1280, 720),
                     new System.Windows.Rect(-2560, -1440, 2560, 1440) })
                 foreach (var scale in new[] { 1.0, 1.25, 1.5, 2.0 })
-                foreach (var width in new[] { 470.0, 900.0 })
+                foreach (var width in new[] { 470.0, 780.0 })
                 {
                     var b = OverlayPlacement.TopCenter(viewport, scale, scale, width);
                     Check(Math.Abs(b.LeftPixels + b.Width * scale / 2 - (viewport.Left + viewport.Width / 2)) < .01, "not centered inside game");
                     Check(b.TopPixels > viewport.Top && b.TopPixels < viewport.Top + viewport.Height * .05, "not near game top");
-                    Check(b.TopPixels + b.MaximumHeight * scale <= viewport.Top + viewport.Height / 3 + .01, "covers center of game");
-                    Check(b.Width * scale <= viewport.Width * .4 + .01, "covers side inventories");
+                    Check(b.TopPixels + b.MaximumHeight * scale <= viewport.Bottom - 8 * scale + .01,
+                        "one-page layout extends beyond game viewport");
+                    Check(b.Width * scale <= viewport.Width * .94 + .01, "one-page layout extends beyond game width");
                 }
             }),
-            ("顶部紧凑浮窗保留大图，全51候选在顶部区域分页可达", () =>
+            ("顶部候选在多分辨率和DPI下不丢失，字号不改写缩略图偏好", () =>
             {
                 var root = Path.Combine(AppContext.BaseDirectory, "library");
                 var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
-                foreach (var (pixelWidth, pixelHeight, scale, imageSize) in new[] {
-                    (1280, 720, 1.0, 88.0), (1920, 1080, 1.5, 120.0), (2560, 1440, 2.0, 120.0) })
-                {
-                    var bounds = OverlayPlacement.TopCenter(new System.Windows.Rect(0, 0, pixelWidth, pixelHeight), scale, scale, 470);
-                    var panel = new CandidatePanel(root, new Settings { ThumbnailSize = imageSize, ShowNames = true }, interactive: false, compact: true);
-                    panel.ShowResult(CatalogResult(library, 1)); Layout(panel, bounds.Width, 1000);
-                    var natural = panel.DesiredSize.Height;
-                    Layout(panel, bounds.Width, bounds.MaximumHeight);
-                    var small = panel.DesiredSize.Height;
-                    Check(panel.PageFits && panel.PageCount == 1, $"single thumbnail cannot fit: {pixelWidth}x{pixelHeight}, DPI {scale}, image {imageSize}, natural {natural}, limit {bounds.MaximumHeight}, {panel.LayoutInfo}");
-                    panel.ShowResult(CatalogResult(library, 51)); Layout(panel, bounds.Width, bounds.MaximumHeight);
-                    Check(panel.DesiredSize.Height > small && panel.PageCount > 1, "height did not adapt");
-                    var ids = new List<string>();
-                    for (var page = 0; page < panel.PageCount; page++)
-                    {
-                        Check(panel.PageFits, "top area clips a full card"); ids.AddRange(panel.VisibleIds);
-                        panel.MovePage(1); Layout(panel, bounds.Width, bounds.MaximumHeight);
-                    }
-                    Check(ids.Count == 51 && ids.Distinct().Count() == 51, "some top-area candidates are unreachable");
-                    panel.ShowResult(CatalogResult(library, 1)); Layout(panel, bounds.Width, bounds.MaximumHeight);
-                    Check(Math.Abs(panel.DesiredSize.Height - small) < 1, "top area stayed expanded");
-                }
-            }),
-            ("字号与缩略图组合在有限顶部空间中分页，操作候选无滚动条", () =>
-            {
-                var root = Path.Combine(AppContext.BaseDirectory, "library");
-                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                foreach (var (pixelWidth, pixelHeight, scale) in new[] {
+                    (1280, 720, 1.0), (1920, 1080, 1.5), (2560, 1440, 2.0) })
                 foreach (var font in new[] { .9, 1.0, 1.15 })
-                foreach (var minimal in new[] { false, true })
+                {
+                    var settings = new Settings { ThumbnailSize = 120, ShowNames = true, FontScale = font };
+                    var panel = new CandidatePanel(root, settings, interactive: false, compact: true);
+                    foreach (var count in new[] { 1, 6, 13, 51 })
+                    {
+                        var result = CatalogResult(library, count); panel.ShowResult(result); panel.RefreshAppearance();
+                        var budget = OverlayPlacement.TopCenter(new System.Windows.Rect(0, 0, pixelWidth, pixelHeight), scale, scale, pixelWidth / scale);
+                        var preferred = panel.GetPreferredWidth(budget.Width, budget.MaximumHeight);
+                        var bounds = OverlayPlacement.TopCenter(new System.Windows.Rect(0, 0, pixelWidth, pixelHeight), scale, scale, preferred);
+                        Layout(panel, bounds.Width, bounds.MaximumHeight);
+                        CheckCandidateCoverage(panel, result);
+                        Check(!panel.NeedsScroll && panel.ContentHeight <= bounds.MaximumHeight + 1,
+                            "DPI one-page layout exceeds game height: " + panel.LayoutInfo);
+                        Check(settings.ThumbnailSize == 120 && panel.LayoutTransform.Value.IsIdentity, "font or adaptive layout changed image preference or scaled whole UI");
+                    }
+                }
+            }),
+            ("对比卡片逐件提供参考试听按钮，极端空间仍保留全部候选", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                var previousNameSize = 0d;
+                foreach (var font in new[] { .9, 1.0, 1.15 })
                 {
                     var settings = new Settings { FontScale = font, ThumbnailSize = 120, ShowNames = true };
-                    var panel = new CandidatePanel(root, settings, interactive: minimal, compact: true, minimal: minimal);
-                    panel.ShowResult(CatalogResult(library, 51)); panel.RefreshAppearance(); Layout(panel, 470, minimal ? 175 : 280);
-                    var ids = new List<string>();
-                    for (var i = 0; i < panel.PageCount; i++)
-                    {
-                        Check(panel.PageFits, "font size caused clipping: " + font + " " + minimal + " " + panel.LayoutInfo);
-                        ids.AddRange(panel.VisibleIds); panel.MovePage(1); Layout(panel, 470, minimal ? 175 : 280);
-                    }
-                    Check(ids.Count == 51 && ids.Distinct().Count() == 51 && settings.ThumbnailSize == 120, "pagination lost items or overwrote preferred size");
+                    var panel = new CandidatePanel(root, settings, interactive: true, compact: true, minimal: true);
+                    string? played = null; panel.SetAudioPreview(candidate => played = candidate.Item.Id, _ => true);
+                    var result = CatalogResult(library, 51); panel.ShowResult(result); panel.RefreshAppearance(); Layout(panel, 470, 175);
+                    CheckCandidateCoverage(panel, result);
+                    var buttons = Descendants<System.Windows.Controls.Button>(panel).Where(b => b.Tag is Candidate).ToArray();
+                    Check(buttons.Length == 51 && buttons.All(b => System.Windows.Automation.AutomationProperties.GetName(b).Contains(((Candidate)b.Tag).Item.Name)), "candidate preview buttons missing or unnamed");
+                    var button = buttons.Last(); button.RaiseEvent(new System.Windows.RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
+                    Check(button.IsEnabled && played == ((Candidate)button.Tag).Item.Id, "reference button did not replay its own candidate");
+                    var name = Descendants<System.Windows.Controls.TextBlock>(panel).First(text => text.Text == library.Items[0].Name);
+                    Check(name.FontSize > previousNameSize, "small/medium/large selection did not enlarge readable text"); previousNameSize = name.FontSize;
                 }
             }),
-            ("重复匹配保留正在看的页，新候选重置到第一页", () =>
+            ("监听浮窗按宽度排列候选分组并铺满末行", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                foreach (var font in new[] { 1.0, 1.15 })
+                {
+                    var panel = new CandidatePanel(root, new Settings { FontScale = font, ThumbnailSize = 120, ShowNames = true }, interactive: true, compact: true);
+                    var names = new[] { "热成像模块", "数据线", "古董茶壶", "密码机", "金狮雕像", "石膏像" };
+                    var candidates = names.Select(name => library.Items.Single(item => item.Name == name))
+                        .Select(item => new Candidate(item, .9, library.Groups.First(group => group.ItemIds.Contains(item.Id)).Id)).ToArray();
+                    var result = new RecognitionResult(1, RecognitionStatus.Matched, true, candidates, 1, "design");
+                    panel.ShowResult(result); Layout(panel, 780, 460);
+                    CheckCandidateCoverage(panel, result);
+                    Layout(panel, 780, 520);
+                    Check(!panel.NeedsScroll && panel.ThumbnailSize >= 104,
+                        "six candidates have unreadably small pictures: " + panel.LayoutInfo);
+                    var sections = Descendants<System.Windows.Controls.Border>(panel)
+                        .Where(border => border.Child is System.Windows.Controls.Grid grid &&
+                            grid.ColumnDefinitions.Count == 2 &&
+                            grid.Children.OfType<System.Windows.Controls.Border>().Any(child =>
+                                ReferenceEquals(child.Background, Theme.Raised))).ToArray();
+                    Check(!panel.NeedsScroll && sections.Length == 3,
+                        "wide listening layout should fit: " + font + " " + panel.LayoutInfo);
+                    Layout(panel, 520, 620); CheckCandidateCoverage(panel, result);
+                    var narrowSections = Descendants<System.Windows.Controls.Border>(panel)
+                        .Where(border => border.Child is System.Windows.Controls.Grid grid &&
+                            grid.ColumnDefinitions.Count == 2 &&
+                            grid.Children.OfType<System.Windows.Controls.Border>().Any(child =>
+                                ReferenceEquals(child.Background, Theme.Raised))).ToArray();
+                    var sectionBounds = narrowSections.Select(section => section.TransformToAncestor(panel)
+                        .TransformBounds(new System.Windows.Rect(section.RenderSize))).ToArray();
+                    Check(!panel.NeedsScroll && !Descendants<System.Windows.Controls.ScrollViewer>(panel).Any() &&
+                        sectionBounds.Length == 3 &&
+                        sectionBounds.All(bounds => bounds.Right <= panel.ActualWidth + 1),
+                        "narrow listening layout clips a group: " + font + " " + panel.LayoutInfo);
+                    Check(sectionBounds[2].Top > sectionBounds[0].Top + 10 &&
+                        panel.ActualWidth - sectionBounds[2].Right <= 2,
+                        "last listening row does not use the available width");
+                    if (font == 1.0)
+                    {
+                        var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(520,
+                            (int)Math.Ceiling(panel.ActualHeight), 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+                        bitmap.Render(panel);
+                        var png = new System.Windows.Media.Imaging.PngBitmapEncoder();
+                        png.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+                        using var stream = File.Create(Path.Combine(AppContext.BaseDirectory, "listening-narrow-smoke.png"));
+                        png.Save(stream);
+                    }
+                }
+            }),
+            ("多候选一页展示，保留可读缩略图与逐件匹配度", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                var result = CatalogResult(library, 51);
+                foreach (var (width, viewportHeight) in new[] { (1203d, 720d), (1362d, 813d), (1600d, 1032d) })
+                foreach (var scale in new[] { .9, 1.0, 1.15 })
+                {
+                    var panel = new CandidatePanel(root, new Settings { FontScale = scale, ShowNames = true },
+                        interactive: true, compact: true);
+                    panel.SetAudioPreview(_ => { }, _ => true); panel.ShowResult(result);
+                    var height = Math.Min(1000, viewportHeight - 24) - 48 * scale - 26;
+                    Layout(panel, width, height); CheckCandidateCoverage(panel, result);
+                    var cards = Descendants<System.Windows.Controls.Border>(panel)
+                        .Where(border => border.Tag is Candidate).ToArray();
+                    Check(!panel.NeedsScroll && panel.ThumbnailSize >= 80 &&
+                        !Descendants<System.Windows.Controls.ScrollViewer>(panel).Any(),
+                        $"{width}×{viewportHeight}, 字号{scale}: " + panel.LayoutInfo);
+                    Check(cards.All(card =>
+                    {
+                        var bounds = card.TransformToAncestor(panel).TransformBounds(new System.Windows.Rect(card.RenderSize));
+                        return bounds.Right <= panel.ActualWidth + 1 && bounds.Bottom <= panel.ActualHeight + 1;
+                    }), $"{width}×{viewportHeight}, 字号{scale}: a candidate lies outside the listening surface");
+                    var scoreLabels = Descendants<System.Windows.Controls.TextBlock>(panel)
+                        .Count(label => label.Text.Contains("匹配", StringComparison.Ordinal));
+                    Check(scoreLabels >= 51, "a candidate lacks its visible match score");
+                }
+            }),
+            ("十三候选以较窄宽度向下排布且完整显示名称", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                var group = library.Groups.Single(g => g.Id == "361affd2");
+                var result = new RecognitionResult(1, RecognitionStatus.Matched, true,
+                    group.ItemIds.Select(id => new Candidate(library.Items.Single(item => item.Id == id), .99, group.Id)).ToArray(), 1, "test");
+                Check(result.Candidates.Count == 13, "the crowded reference group changed");
+                foreach (var font in new[] { .9, 1.0, 1.15 })
+                {
+                    var panel = new CandidatePanel(root, new Settings { FontScale = font, ShowNames = true },
+                        interactive: true, compact: true);
+                    panel.SetAudioPreview(_ => { }, _ => true); panel.ShowResult(result);
+                    var width = panel.GetPreferredWidth(1600, 720);
+                    var height = 720 - 24 - 48 * font - 40;
+                    Layout(panel, width, height);
+                    Check(width <= 900 && !panel.NeedsScroll && panel.ThumbnailSize >= 80,
+                        "thirteen candidates are too wide or tall: " + panel.LayoutInfo);
+                    var cards = Descendants<System.Windows.Controls.Border>(panel)
+                        .Where(border => border.Tag is Candidate).ToArray();
+                    var groupHeadings = Descendants<System.Windows.Controls.TextBlock>(panel)
+                        .Where(label => new[] { "2 格", "3 格", "4 格", "6 格" }.Contains(label.Text)).ToArray();
+                    var probabilityLabels = Descendants<System.Windows.Controls.TextBlock>(panel)
+                        .Where(label => label.Text.StartsWith("大红概率 ", StringComparison.Ordinal)).ToArray();
+                    Check(cards.Length == 13 && groupHeadings.Length == 4 &&
+                        groupHeadings.Select(label => label.Text).SequenceEqual(new[] {
+                            "2 格", "3 格", "4 格", "6 格" }) &&
+                        probabilityLabels.Length == 4 && probabilityLabels.All(label =>
+                            label.TextTrimming == System.Windows.TextTrimming.None &&
+                            label.DesiredSize.Height <= label.ActualHeight + 1 &&
+                            label.TransformToAncestor(panel).TransformBounds(new System.Windows.Rect(label.RenderSize)).Bottom
+                                <= panel.ActualHeight + 1),
+                        "the narrow layout does not show clear size sections");
+                    Check(!Descendants<System.Windows.Controls.TextBlock>(panel).Any(label =>
+                            label.Text is "同音候选" or "疑似"),
+                        "unrequested or uncertain badge remains on a high sound match");
+                    foreach (var card in cards)
+                    {
+                        var candidate = (Candidate)card.Tag;
+                        var name = Descendants<System.Windows.Controls.TextBlock>(card)
+                            .Single(label => label.Text == candidate.Item.Name);
+                        var score = Descendants<System.Windows.Controls.TextBlock>(card)
+                            .Single(label => label.Text.Contains("匹配", StringComparison.Ordinal));
+                        var bounds = card.TransformToAncestor(panel).TransformBounds(new System.Windows.Rect(card.RenderSize));
+                        Check(name.TextTrimming == System.Windows.TextTrimming.None &&
+                            score.Text == "匹配度 99%" && score.TextTrimming == System.Windows.TextTrimming.None &&
+                            name.FontSize >= 13 * font && score.FontSize >= 12 * font &&
+                            name.DesiredSize.Height <= name.ActualHeight + 1 &&
+                            score.DesiredSize.Height <= score.ActualHeight + 1 &&
+                            bounds.Right <= panel.ActualWidth + 1 && bounds.Bottom <= panel.ActualHeight + 1,
+                            "narrow card clips its name or score: " + candidate.Item.Name);
+                    }
+                }
+            }),
+            ("不均衡的十五候选保留独立格数分区，不留下半幅空白", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                var candidates = new[] { (Cells: 2, Count: 3), (Cells: 4, Count: 9), (Cells: 6, Count: 3) }
+                    .SelectMany(group => library.Items.Where(item => item.Cells == group.Cells).Take(group.Count))
+                    .Select(item => new Candidate(item, .96, "layout"))
+                    .ToArray();
+                Check(candidates.Length == 15, "the uneven candidate fixture is incomplete");
+                var result = new RecognitionResult(1, RecognitionStatus.Matched, true, candidates, 1, "test");
+                foreach (var font in new[] { .9, 1.0, 1.15 })
+                {
+                    var panel = new CandidatePanel(root, new Settings { FontScale = font, ShowNames = true },
+                        interactive: true, compact: true);
+                    panel.SetAudioPreview(_ => { }, _ => true);
+                    panel.ShowResult(result); Layout(panel, 900, 650);
+                    CheckCandidateCoverage(panel, result);
+                    var cards = Descendants<System.Windows.Controls.Border>(panel)
+                        .Where(border => border.Tag is Candidate).ToArray();
+                    var rows = cards.Select(card => Math.Round(card.TransformToAncestor(panel)
+                        .TransformBounds(new System.Windows.Rect(card.RenderSize)).Top)).Distinct().Count();
+                    var headings = Descendants<System.Windows.Controls.TextBlock>(panel)
+                        .Where(label => new[] { "2 格", "4 格", "6 格" }.Contains(label.Text))
+                        .Select(label => label.Text).ToArray();
+                    var bandBounds = new[] { 2, 4, 6 }.Select(cells => cards
+                        .Where(card => ((Candidate)card.Tag).Item.Cells == cells)
+                        .Select(card => card.TransformToAncestor(panel)
+                            .TransformBounds(new System.Windows.Rect(card.RenderSize))).ToArray()).ToArray();
+                    var expectedRatios = new[] { 2, 4, 6 }.Select(cells =>
+                    {
+                        var sizeGroup = candidates.Where(candidate => candidate.Item.Cells == cells).ToArray();
+                        return $"大红概率 {sizeGroup.Count(candidate => candidate.Item.IsGold) / (double)sizeGroup.Length:P0}";
+                    }).ToArray();
+                    var shownRatios = Descendants<System.Windows.Controls.TextBlock>(panel)
+                        .Where(label => label.Text.StartsWith("大红概率 ", StringComparison.Ordinal))
+                        .Select(label => label.Text).ToArray();
+                    Check(rows == 5 && headings.SequenceEqual(new[] { "2 格", "4 格", "6 格" }) &&
+                        shownRatios.SequenceEqual(expectedRatios) &&
+                        bandBounds[0].Max(bounds => bounds.Bottom) <= bandBounds[1].Min(bounds => bounds.Top) + 1 &&
+                        bandBounds[1].Max(bounds => bounds.Bottom) <= bandBounds[2].Min(bounds => bounds.Top) + 1 &&
+                        !panel.NeedsScroll && panel.ThumbnailSize >= 96 && panel.ContentHeight <= 530 &&
+                        !Descendants<System.Windows.Controls.Border>(panel).Any(border =>
+                            border.Height == 5 && ReferenceEquals(border.Background, Theme.Gold)),
+                        "uneven groups mix hierarchy, waste space or retain the ratio bar: " + panel.LayoutInfo);
+                    foreach (var card in cards)
+                    {
+                        var candidate = (Candidate)card.Tag;
+                        var name = Descendants<System.Windows.Controls.TextBlock>(card)
+                            .Single(label => label.Text == candidate.Item.Name);
+                        var match = Descendants<System.Windows.Controls.TextBlock>(card)
+                            .Single(label => label.Text == "匹配度 96%");
+                        Check(name.DesiredSize.Height <= name.ActualHeight + 1 &&
+                            match.DesiredSize.Height <= match.ActualHeight + 1 &&
+                            name.TextTrimming == System.Windows.TextTrimming.None &&
+                            match.TextTrimming == System.Windows.TextTrimming.None,
+                            "packed candidate clips its name or match: " + candidate.Item.Name);
+                    }
+                    if (font != 1.0) continue;
+                    var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(900,
+                        (int)Math.Ceiling(panel.ActualHeight), 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+                    bitmap.Render(panel);
+                    var png = new System.Windows.Media.Imaging.PngBitmapEncoder();
+                    png.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+                    using var stream = File.Create(Path.Combine(AppContext.BaseDirectory, "listening-grouped-fifteen-smoke.png"));
+                    png.Save(stream);
+                }
+            }),
+            ("单行一至四件使用对应卡片布局且不拉长试听按钮", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                var sizes = new[] { (Cells: 3, Count: 1), (Cells: 2, Count: 2),
+                    (Cells: 4, Count: 3), (Cells: 6, Count: 4) };
+                var candidates = sizes.SelectMany(group => library.Items
+                    .Where(item => item.Cells == group.Cells).Take(group.Count))
+                    .Select(item => new Candidate(item, .96, "row-design")).ToArray();
+                Check(candidates.Length == 10, "the one-to-four fixture is incomplete");
+                var result = new RecognitionResult(1, RecognitionStatus.Matched, true, candidates, 1, "test");
+                foreach (var font in new[] { .9, 1.0, 1.15 })
+                {
+                    var panel = new CandidatePanel(root, new Settings { FontScale = font, ShowNames = true },
+                        interactive: true, compact: true);
+                    panel.SetAudioPreview(_ => { }, _ => true); panel.ShowResult(result);
+                    Layout(panel, 900, 620); CheckCandidateCoverage(panel, result);
+                    Check(!panel.NeedsScroll && panel.ThumbnailSize >= 80,
+                        "one-to-four rows overflow or shrink images: " + panel.LayoutInfo);
+                    var cards = Descendants<System.Windows.Controls.Border>(panel)
+                        .Where(border => border.Tag is Candidate).ToArray();
+                    var widths = sizes.Select(group => cards
+                        .Where(card => ((Candidate)card.Tag).Item.Cells == group.Cells)
+                        .Select(card => card.ActualWidth).Distinct().Single()).ToArray();
+                    Check(widths[0] > widths[1] && widths[1] > widths[2] && widths[2] > widths[3],
+                        "row density did not change card proportions");
+                    var bands = sizes.OrderBy(group => group.Cells).Select(group => cards
+                        .Where(card => ((Candidate)card.Tag).Item.Cells == group.Cells)
+                        .Select(card => card.TransformToAncestor(panel)
+                            .TransformBounds(new System.Windows.Rect(card.RenderSize))).ToArray()).ToArray();
+                    Check(bands.Zip(bands.Skip(1)).All(pair =>
+                            pair.First.Max(bounds => bounds.Bottom) <= pair.Second.Min(bounds => bounds.Top) + 1),
+                        "size sections overlap or share a row");
+                    foreach (var card in cards)
+                    {
+                        var candidate = (Candidate)card.Tag;
+                        var name = Descendants<System.Windows.Controls.TextBlock>(card)
+                            .Single(label => label.Text == candidate.Item.Name);
+                        var match = Descendants<System.Windows.Controls.TextBlock>(card)
+                            .Single(label => label.Text == "匹配度 96%");
+                        var play = Descendants<System.Windows.Controls.Button>(card)
+                            .Single(button => button.Tag is Candidate);
+                        var image = Descendants<System.Windows.Controls.Image>(card).Single();
+                        var playBounds = play.TransformToAncestor(card)
+                            .TransformBounds(new System.Windows.Rect(play.RenderSize));
+                        Check(name.TextTrimming == System.Windows.TextTrimming.None &&
+                            name.DesiredSize.Height <= name.ActualHeight + 1 &&
+                            match.DesiredSize.Height <= match.ActualHeight + 1 &&
+                            image.ActualWidth >= 80 && play.ActualWidth > 60 &&
+                            playBounds.Right <= card.ActualWidth + 1 && playBounds.Bottom <= card.ActualHeight + 1 &&
+                            (candidate.Item.Cells is not (2 or 3) || play.ActualWidth <= 158),
+                            "one-to-four card clips text, shrinks image or stretches its button: " + candidate.Item.Name);
+                    }
+                    if (font != 1.0) continue;
+                    var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(900,
+                        (int)Math.Ceiling(panel.ActualHeight), 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+                    bitmap.Render(panel);
+                    var png = new System.Windows.Media.Imaging.PngBitmapEncoder();
+                    png.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+                    using var stream = File.Create(Path.Combine(AppContext.BaseDirectory, "listening-one-to-four-smoke.png"));
+                    png.Save(stream);
+                }
+            }),
+            ("候选布局在不同输入状态下保持名称、分数和分组一致", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                var group = library.Groups.Single(g => g.Id == "361affd2");
+                var result = new RecognitionResult(1, RecognitionStatus.Matched, true,
+                    group.ItemIds.Select(id => new Candidate(library.Items.Single(item => item.Id == id), .9, group.Id)).ToArray(), 1, "test");
+                var live = new CandidatePanel(root, new Settings { ShowNames = false }, interactive: false, compact: true);
+                var operation = new CandidatePanel(root, new Settings { ShowNames = false }, interactive: true, compact: true);
+                foreach (var panel in new[] { live, operation })
+                {
+                    panel.ShowResult(result); Layout(panel, 900, 712);
+                    CheckCandidateCoverage(panel, result);
+                    var text = Descendants<System.Windows.Controls.TextBlock>(panel).ToArray();
+                    Check(!panel.NeedsScroll && text.Count(label =>
+                            label.Text.StartsWith("大红概率 ", StringComparison.Ordinal)) == 4 &&
+                        result.Candidates.All(candidate => text.Any(label => label.Text == candidate.Item.Name)) &&
+                        text.Count(label => label.Text == "匹配度 90%") == result.CandidateCount,
+                        "live overlay lost the operation view's readable names, scores or grouping");
+                }
+                Check(!Descendants<System.Windows.Controls.Button>(live).Any(button => button.Tag is Candidate) &&
+                    Descendants<System.Windows.Controls.Button>(operation).Count(button => button.Tag is Candidate) == result.CandidateCount,
+                    "click-through listening view exposes controls that cannot be clicked");
+            }),
+            ("相近参考与重复物品不改变同格大红概率，参考也只显示一次", () =>
+            {
+                var panel = new CandidatePanel(Path.Combine(AppContext.BaseDirectory, "library"),
+                    new Settings(), interactive: true, compact: true);
+                var gold = new Candidate(new("gold", "收藏品", true), .95, "gold");
+                var common = new Candidate(new("common", "普通物品", false), .9, "common");
+                var nearby = new Candidate(new("nearby", "相近参考", true), .8, "nearby");
+                panel.ShowResult(new(1, RecognitionStatus.Matched, true, [gold, common, gold], 1, "test"));
+                panel.SetNearCandidates([gold, nearby, nearby]); Layout(panel, 780, 460);
+                Check(panel.RenderedIds.Count == 3 && panel.RenderedIds.Distinct().Count() == 3, "references duplicated or replaced real candidates");
+                Check(panel.Summary.Contains("2 件候选") &&
+                    Descendants<System.Windows.Controls.TextBlock>(panel).Count(label => label.Text == "大红概率 50%") == 1,
+                    "near or duplicate items changed the size group's red-item denominator");
+                panel.SetNearCandidates([]); Layout(panel, 780, 460);
+                Check(panel.RenderedIds.Count == 2 && !panel.RenderedIds.Contains("nearby"), "collapsing references removed candidates or left reference cards");
+            }),
+            ("重复匹配与新结果更新全部卡片，空结果移除旧候选", () =>
             {
                 var (panel, library) = CreatePanel(); var result = CatalogResult(library, 51);
-                panel.ShowResult(result); Layout(panel, 470, 680); panel.MovePage(1); Layout(panel, 470, 680);
-                var index = panel.PageIndex;
+                panel.ShowResult(result); Layout(panel, 470, 680); CheckCandidateCoverage(panel, result);
                 panel.ShowResult(result with { OperationId = 99 }); Layout(panel, 470, 680);
-                Check(index > 0 && panel.PageIndex == index, "repeated match reset page");
-                panel.ShowResult(CatalogResult(library, 2)); Layout(panel, 470, 680);
-                Check(panel.PageIndex == 0 && panel.PageCount == 1, "new result kept an invalid page");
+                CheckCandidateCoverage(panel, result);
+                var changed = CatalogResult(library, 2); panel.ShowResult(changed); Layout(panel, 470, 680); CheckCandidateCoverage(panel, changed);
+                panel.ShowResult(new(0, RecognitionStatus.Unknown, true, [], 0, "test")); Layout(panel, 470, 680);
+                Check(panel.RenderedIds.Count == 0 && panel.VisibleIds.Count == 0, "empty result left stale candidates");
+            }),
+            ("历史记录以单一列表展示最近100条，更新保留选中项", () =>
+            {
+                var (_, library) = CreatePanel(); var history = new RecognitionHistory();
+                for (var i = 0; i < 105; i++) history.Remember(CatalogResult(library, 1) with { OperationId = i }, "test", false, DateTimeOffset.Now.AddSeconds(i * 3));
+                var window = new HistoryWindow(history, Path.Combine(AppContext.BaseDirectory, "library"), new Settings());
+                try
+                {
+                    Check(window.VisibleRecordIds.Count == 100 && window.VisibleRecordIds.SequenceEqual(history.Entries.Select(e => e.Id)), "history list omitted or reordered stored records");
+                    var content = (System.Windows.FrameworkElement)window.Content;
+                    content.Measure(new System.Windows.Size(1060, 700)); content.Arrange(new System.Windows.Rect(0, 0, 1060, 700)); content.UpdateLayout();
+                    var list = Descendants<System.Windows.Controls.ListBox>(content).Single();
+                    list.SelectedIndex = 25; var selected = ((RecognitionEntry)((System.Windows.Controls.ListBoxItem)list.SelectedItem).Tag).Id;
+                    history.Remember(CatalogResult(library, 2) with { OperationId = 200 }, "test", false, DateTimeOffset.Now.AddMinutes(20));
+                    Check(((RecognitionEntry)((System.Windows.Controls.ListBoxItem)list.SelectedItem).Tag).Id == selected, "new history entry reset selection");
+                    list.SelectedIndex = 99; list.ScrollIntoView(list.SelectedItem); content.UpdateLayout();
+                    Check(list.SelectedItem is not null && window.VisibleRecordIds.Count == 100, "last retained record cannot be selected");
+                    history.ClearHistory(); Check(window.VisibleRecordIds.Count == 0, "clear history left visible rows");
+                }
+                finally { window.Close(); }
             })
         };
         var report = new List<object>(); var failed = 0;
         foreach (var (name, run) in tests.Concat(PersonalLibraryTests.Cases()))
         {
             try { run(); report.Add(new { name, passed = true }); Console.WriteLine("PASS " + name); }
-            catch (Exception ex) { failed++; report.Add(new { name, passed = false, error = ex.Message }); Console.WriteLine("FAIL " + name + ": " + ex.Message); }
+            catch (Exception ex) { failed++; report.Add(new { name, passed = false, error = ex.ToString() }); Console.WriteLine("FAIL " + name + ": " + ex); }
         }
         if (args.Length > 0) JsonFile.Write(args[0], new { total = report.Count, passed = report.Count - failed, failed, tests = report });
         return failed == 0 ? 0 : 1;
     }
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
+    private static void CheckCandidateCoverage(CandidatePanel panel, RecognitionResult result)
+    {
+        var expected = result.Candidates.Select(c => c.Item.Id).ToHashSet();
+        Check(panel.RenderedIds.Count == expected.Count && panel.RenderedIds.Distinct().Count() == expected.Count && expected.SetEquals(panel.RenderedIds), "full candidate layout lost or duplicated items: " + panel.LayoutInfo);
+        Check(expected.SetEquals(panel.VisibleIds), "candidate IDs differ from complete result");
+        var cards = Descendants<System.Windows.Controls.Border>(panel).Where(border => border.Tag is Candidate)
+            .Select(border => ((Candidate)border.Tag).Item.Id).ToArray();
+        Check(cards.Length == expected.Count && expected.SetEquals(cards), "actual card tree does not contain the complete result");
+    }
     private static (CandidatePanel Panel, SoundLibrary Library) CreatePanel(double thumbnail = 88)
     {
         var root = Path.Combine(AppContext.BaseDirectory, "library");

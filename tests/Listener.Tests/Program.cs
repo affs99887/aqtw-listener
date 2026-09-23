@@ -13,7 +13,7 @@ SoundLibrary Library() => new()
     Groups = [new() { Id = "shared", Name = "shared", ItemIds = ["red", "cheap", "cheap2", "cheap3"], Threshold = .85,
         Templates = [new() { Id = "a", Features = features, RecordingId = "ref" }, new() { Id = "b", Features = features, RecordingId = "ref" }] }]
 };
-Test("同音候选按物品去重，4 件中 1 件大金为 25%", () =>
+Test("共享音效候选按物品去重，4 件中 1 件大红为 25%", () =>
 {
     var r = new Recognizer(Library()).Recognize(audio, 24000);
     Check(r.CandidateCount == 4 && r.GoldCount == 1 && r.GoldCandidateRatio == .25, "multiple templates changed denominator");
@@ -100,16 +100,60 @@ Test("没有任何鼠标事件也能从声音窗口识别候选", () =>
     var result = recognizer.Recognize(window!.Samples, window.SampleRate);
     Check(result.Status == RecognitionStatus.Matched && result.CandidateCount == 4, "audio-only recognition failed");
 });
-Test("连续声音按节奏分析，识别忙碌时不堆积任务", () =>
+Test("自动扫描只响应新的短声音事件，忙碌时不堆积任务", () =>
 {
-    var ring = new AudioTimeline(24000); ring.Append(Tone(800, 96000), 10);
+    var ring = new AudioTimeline(24000); ring.Append(Tone(800), 10);
     var scanner = new AutomaticAudioScanner(); scanner.Reset(10);
     Check(scanner.TryTakeWindow(ring, 10.2, true, false) is null, "capture warmup skipped");
     Check(scanner.TryTakeWindow(ring, 10.6, true, false) is not null, "first window lost");
     Check(scanner.TryTakeWindow(ring, 10.7, true, false) is null, "scan interval ignored");
     Check(scanner.TryTakeWindow(ring, 11.3, true, true) is null, "work queued while busy");
-    var next = scanner.TryTakeWindow(ring, 12.5, true, false);
-    Check(next is not null && Math.Abs(next.EndSeconds - 12.42) < .001, "stale window replayed after busy work");
+    Check(scanner.TryTakeWindow(ring, 11.4, true, false) is null, "same sound triggered twice");
+    ring.Append(Tone(800), 12);
+    var next = scanner.TryTakeWindow(ring, 12.65, true, false);
+    Check(next is not null && Math.Abs(next.EndSeconds - 12.57) < .001, "new sound after busy work was lost");
+});
+Test("持续背景声和窗口重叠不应凭音量反复触发", () =>
+{
+    var ring = new AudioTimeline(24000);
+    ring.Append(Enumerable.Repeat(.01f, 24000 * 3).ToArray(), 10);
+    var scanner = new AutomaticAudioScanner(); scanner.Reset(10);
+    for (var now = 10.6; now < 13; now += .6)
+        Check(scanner.TryTakeWindow(ring, now, true, false) is null, "steady background was recognized");
+});
+Test("高分单件可标精确，同音物品和边缘分数保持疑似", () =>
+{
+    var library = Library();
+    library.Groups.Add(new SoundGroup { Id = "single", Name = "single", ItemIds = ["red"], Threshold = .75,
+        Templates = [new SoundTemplate { Id = "single-reference", Features = features }] });
+    var exact = CandidateSelection.Select(library, [(library.Groups[1], .94), (library.Groups[0], .7)]);
+    Check(exact.Length == 1 && exact[0].Tag == RecognitionTag.Exact, "strong single item was not exact");
+    var ambiguous = CandidateSelection.Select(library, [(library.Groups[0], .91), (library.Groups[1], .88)]);
+    Check(ambiguous.Length == 4 && ambiguous.All(item => item.Tag == RecognitionTag.Suspected), "shared sound claimed exact item");
+    Check(CandidateSelection.Select(library, [(library.Groups[0], .7)]).Length == 0, "below threshold claimed a match");
+});
+Test("自动识别需前后主候选一致，无法确认时保留疑似", () =>
+{
+    Candidate A(double score = .94, RecognitionTag tag = RecognitionTag.Exact) =>
+        new(new("a", "a", false), score, "a", tag);
+    Candidate B(double score = .9) => new(new("b", "b", false), score, "b");
+    RecognitionAnalysis Analysis(RecognitionStatus status, Candidate[] candidates, params GroupScore[] scores) =>
+        new(new(1, status, true, candidates, 1, "test"), scores);
+    var full = Analysis(RecognitionStatus.Matched, [A(), B(.8)]);
+    var stable = AutomaticRecognitionConsensus.Resolve(full, Analysis(RecognitionStatus.Matched, [A(.9, RecognitionTag.Suspected)]));
+    Check(stable.Result.Status == RecognitionStatus.Matched &&
+        stable.Result.BestMatch?.Tag == RecognitionTag.Suspected, "one pass made a single item exact");
+    var switched = AutomaticRecognitionConsensus.Resolve(full, Analysis(RecognitionStatus.Matched, [B(.96), A(.8)]));
+    Check(switched.Result.Status == RecognitionStatus.Unknown && switched.Result.CandidateCount == 0,
+        "different leading sound replaced the result");
+    var focusedOnly = Analysis(RecognitionStatus.Matched, [A(.9)]);
+    var recovered = AutomaticRecognitionConsensus.Resolve(
+        Analysis(RecognitionStatus.Unknown, [], new GroupScore("a", .72)), focusedOnly);
+    Check(recovered.Result.Status == RecognitionStatus.Matched &&
+        recovered.Result.BestMatch?.Tag == RecognitionTag.Suspected, "focused recovery should remain suspected");
+    var unrelated = AutomaticRecognitionConsensus.Resolve(
+        Analysis(RecognitionStatus.Unknown, [], new GroupScore("b", .76)), focusedOnly);
+    Check(unrelated.Result.Status == RecognitionStatus.Unknown, "unrelated focused hit was accepted");
 });
 Test("关闭或切出游戏不自动扫描，恢复后静音不能复用旧声音", () =>
 {

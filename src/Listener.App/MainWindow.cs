@@ -33,12 +33,9 @@ internal sealed partial class MainWindow : Window
     private readonly ComboBox positionMode = new();
     private readonly ComboBox fontScale = new();
     private readonly TextBox interactionHotkey = new();
-    private readonly TextBlock candidatePageLabel = Theme.Label("", 11, Theme.Muted);
-    private Button? previousCandidatePage, nextCandidatePage;
     private readonly Grid settingsPage = new();
     private readonly Dictionary<string, (Button Button, UIElement Content)> sections = new();
     private readonly Slider opacity = new() { Minimum = .35, Maximum = 1, TickFrequency = .05 };
-    private readonly CheckBox names = new() { Content = "缩略图下显示物品名称", Foreground = Theme.Text, Margin = new Thickness(0, 10, 0, 6) };
     private readonly CheckBox acceleration = new() { Content = "硬件加速（高分辨率卡顿时启用，重启生效）", Foreground = Theme.Muted, FontSize = 11, Margin = new Thickness(0, 4, 0, 8) };
     private readonly CheckBox automatic = new() { Content = "声音自动识别（推荐 UU 远程使用）", Foreground = Theme.Text, Margin = new Thickness(0, 6, 0, 8) };
     private bool closing;
@@ -57,10 +54,16 @@ internal sealed partial class MainWindow : Window
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         overlay = new(libraryRoot, settings);
         controller = new(settings, this.library, Dispatcher, libraryRoot);
-        workspace = new(controller, personal, overlay, settings, ActivateLibrary);
+        workspace = new(controller, personal, overlay, settings, ActivateLibrary, () => EnterInteraction());
+        workspace.LayoutChanged += overlay.RefreshPlacement;
         overlay.ExitRequested += async () => await ExitInteraction();
         overlay.HistoryRequested += ShowHistory;
         overlay.PlacementChanged += SavePlacement;
+        overlay.AppearanceChanged += () =>
+        {
+            fontScale.SelectedIndex = settings.FontScale < 1 ? 0 : settings.FontScale > 1 ? 2 : 1;
+            SavePlacement();
+        };
         workspace.CaptureStarted += () =>
         {
             overlay.SetInteractive(false); overlay.SetWorkspace(workspace); overlay.Show();
@@ -73,17 +76,12 @@ internal sealed partial class MainWindow : Window
         };
         controller.State += s =>
         {
-            status.Text = s; overlay.Panel.SetState(s); RefreshListeningPresentation();
+            status.Text = s; overlay.SetHeaderStatus(s); RefreshListeningPresentation();
             RefreshOverlayVisibility();
         };
-        controller.Result += r =>
-        {
-            overlay.Panel.SetLibraryRoot(controller.History.Latest?.LibraryRoot ?? libraryRoot);
-            overlay.Panel.ShowResult(r, listening: controller.Enabled);
-        };
-        controller.Activity += overlay.Panel.SetActivity;
+        controller.Result += workspace.UpdateListeningResult;
+        controller.Activity += workspace.UpdateListeningActivity;
         Content = Build();
-        overlay.Panel.PagesChanged += UpdateCandidateNavigation;
         controller.History.Changed += () => historyButton!.Content = $"识别历史（{controller.History.Entries.Count}）";
         diagnosticsTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Background,
             (_, _) => UpdateDiagnostics(), Dispatcher);
@@ -99,7 +97,13 @@ internal sealed partial class MainWindow : Window
     private void RefreshOverlayVisibility()
     {
         if (closing) return;
-        if (controller.Mode == AssistantMode.Interaction || controller.Foreground && (controller.Enabled || controller.Mode == AssistantMode.Learning)) overlay.Show();
+        if (controller.Mode == AssistantMode.Listening)
+        {
+            overlay.SetListeningView();
+            overlay.SetInteractive(true, activate: false);
+        }
+        if (controller.Mode == AssistantMode.Interaction ||
+            controller.Foreground && (controller.Enabled || controller.Mode == AssistantMode.Learning)) overlay.Show();
         else overlay.Hide();
     }
     private async Task EnterInteraction(AnalysisSnapshot? snapshot = null, bool learn = false, bool move = false)
@@ -113,7 +117,11 @@ internal sealed partial class MainWindow : Window
             var wasLearning = workspace.Learning;
             workspace.PauseLearning(); await controller.SetMode(AssistantMode.Interaction);
             overlay.SetWorkspace(workspace); overlay.SetInteractive(true);
-            if (snapshot is not null || !wasLearning) workspace.Select(snapshot);
+            if (snapshot is not null || !wasLearning)
+            {
+                var latest = controller.History.Latest?.SnapshotId;
+                workspace.Select(snapshot ?? (latest.HasValue ? controller.Audio.Get(latest.Value) : null));
+            }
             if (learn) workspace.OpenLearning();
             if (move) overlay.Unlock();
         }
@@ -128,7 +136,7 @@ internal sealed partial class MainWindow : Window
         {
             workspace.Stop(); overlay.SetInteractive(false);
             if (NativeInput.ForegroundBelongsToApplication() && returnWindow != 0) NativeInput.SetForegroundWindow(returnWindow);
-            await controller.SetMode(AssistantMode.Listening); RefreshOverlayVisibility();
+            await controller.SetMode(AssistantMode.Listening); workspace.RefreshAppearance(); RefreshOverlayVisibility();
         }
         finally { changingMode = false; }
     }
@@ -136,7 +144,8 @@ internal sealed partial class MainWindow : Window
     {
         x.Text = settings.Left.ToString(CultureInfo.InvariantCulture); y.Text = settings.Top.ToString(CultureInfo.InvariantCulture);
         positionMode.SelectedIndex = settings.EffectivePositionMode == OverlayPositionMode.GameTopCenter ? 0 : 1;
-        try { settings.Save(); } catch (Exception ex) { status.Text = "位置未保存 · " + ex.Message; }
+        try { if (!Environment.GetCommandLineArgs().Contains("--ui-smoke")) settings.Save(); }
+        catch (Exception ex) { status.Text = "偏好未保存 · " + ex.Message; }
     }
     private async Task ActivateLibrary(LibraryVersion version, bool rollback, CancellationToken token)
     {
@@ -167,7 +176,6 @@ internal sealed partial class MainWindow : Window
             catch (Exception ex) { MessageBox.Show(this, ex.Message, "自动识别设置未保存"); }
             UpdateDiagnostics();
         };
-        UpdateCandidateNavigation();
         var captureConfig = new StackPanel();
         captureConfig.Children.Add(Theme.Label("采音与快捷键", 18));
         Field(captureConfig, "播放设备 · 系统回环，不使用麦克风", devices);
@@ -192,7 +200,7 @@ internal sealed partial class MainWindow : Window
         { var column = new StackPanel { Margin = new Thickness(0, 0, 10, 0) }; box.Text = v.ToString(CultureInfo.InvariantCulture); Field(column, label, box); geometry.Children.Add(column); }
         placement.Children.Add(geometry);
         placement.Children.Add(new WrapPanel { Children = { Theme.Button("移动浮窗", async (_, _) => await EnterInteraction(move: true)), Theme.Button("恢复顶部居中", (_, _) => overlay.RestoreTopCenter()) } });
-        placement.Children.Add(Theme.Label("顶部居中跟随游戏窗口，在上方区域自适应高度；候选多时分页，Ctrl+Alt+PgUp / PgDn 翻页。", 11, Theme.Muted));
+        placement.Children.Add(Theme.Label("顶部居中跟随游戏窗口。候选优先向两侧展开，再压缩图片与间距；全部候选连续展示。", 11, Theme.Muted));
         placement.Children.Add(Theme.Button("保存设置", SaveSettings, true));
         var config = new StackPanel();
         config.Children.Add(Theme.Label("浮窗外观", 18));
@@ -200,7 +208,6 @@ internal sealed partial class MainWindow : Window
         fontScale.ItemsSource = new[] { "小 · 90%", "中 · 100%", "大 · 115%" }; fontScale.SelectedIndex = settings.FontScale < 1 ? 0 : settings.FontScale > 1 ? 2 : 1;
         Field(config, "字号（独立于图片尺寸）", fontScale);
         Field(config, "透明度", opacity); opacity.Value = settings.Opacity;
-        names.IsChecked = settings.ShowNames; config.Children.Add(names);
         acceleration.IsChecked = settings.HardwareAcceleration; config.Children.Add(acceleration);
         config.Children.Add(Theme.Button("保存设置", SaveSettings, true));
         var info = new StackPanel();
@@ -252,13 +259,13 @@ internal sealed partial class MainWindow : Window
     {
         RefreshDevices();
         // UI checks may run beside the user's listener without installing input hooks or hotkeys.
-        if (Environment.GetCommandLineArgs().Contains("--ui-smoke")) { _ = ScreenshotSmoke(); return; }
+        if (Environment.GetCommandLineArgs().Contains("--ui-smoke")) { _ = RunScreenshotSmoke(); return; }
+        overlay.SetWorkspace(workspace);
         try
         {
             input = new(this); input.Toggle += async () => await controller.Toggle(); input.MouseDown += controller.Click;
             input.ForegroundChanged += controller.ForegroundChanged;
             input.InteractionToggle += async () => { if (controller.Mode == AssistantMode.Interaction) await ExitInteraction(); else await EnterInteraction(); };
-            input.CandidatePage += delta => { if (controller.Enabled && controller.Foreground) overlay.Panel.MovePage(delta); };
             input.SetHotkey(settings.Hotkey); input.SetInteractionHotkey(settings.InteractionHotkey);
         }
         catch (Exception ex) { inputError = ex.Message; status.Text = ex.Message; }
@@ -266,7 +273,7 @@ internal sealed partial class MainWindow : Window
         var menu = BrandAssets.TrayMenu();
         menu.Items.Add("打开设置", null, (_, _) => Dispatcher.Invoke(() => { Show(); WindowState = WindowState.Normal; Activate(); }));
         menu.Items.Add("开启 / 关闭监听", null, (_, _) => Dispatcher.InvokeAsync(async () => await controller.Toggle()));
-        menu.Items.Add("浮窗声音对比", null, (_, _) => Dispatcher.InvokeAsync(async () => await EnterInteraction()));
+        menu.Items.Add("打开监听浮窗", null, (_, _) => Dispatcher.InvokeAsync(async () => await EnterInteraction()));
         menu.Items.Add("移动浮窗", null, (_, _) => Dispatcher.InvokeAsync(async () => await EnterInteraction(move: true)));
         menu.Items.Add("恢复顶部居中", null, (_, _) => Dispatcher.Invoke(overlay.RestoreTopCenter));
         menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
@@ -296,7 +303,7 @@ internal sealed partial class MainWindow : Window
             settings.FontScale = fontScale.SelectedIndex == 0 ? .9 : fontScale.SelectedIndex == 2 ? 1.15 : 1;
             settings.PositionMode = positionMode.SelectedIndex == 0 ? OverlayPositionMode.GameTopCenter : OverlayPositionMode.Manual;
             settings.ThumbnailSize = thumbnailSize.Value;
-            settings.ShowNames = names.IsChecked == true; settings.HardwareAcceleration = acceleration.IsChecked == true;
+            settings.HardwareAcceleration = acceleration.IsChecked == true;
             settings.Save(); overlay.Apply(settings); RefreshListeningPresentation();
             if (resume) await controller.Toggle();
             else status.Text = "设置已保存 · 监听未开启，请点击开启或按快捷键";
@@ -307,7 +314,6 @@ internal sealed partial class MainWindow : Window
     private void UpdateDiagnostics()
     {
         RefreshListeningPresentation();
-        UpdateCandidateNavigation();
         var d = controller.Diagnostics();
         var audio = !d.Capturing ? "未采集（仅游戏前台采集）" :
             d.Audio.LastPacketAgeSeconds is null or > 2 ? "暂未收到音频包，请检查播放设备或播放声音" :
@@ -318,23 +324,6 @@ internal sealed partial class MainWindow : Window
         if (inputError.Length != 0) diagnostics.Text += "\n输入提示：" + inputError;
         else if (input?.HookStatus.StartsWith("鼠标事件注册失败", StringComparison.Ordinal) == true) diagnostics.Text += "\n" + input.HookStatus;
         if (d.ManualTestStatus.Length != 0) diagnostics.Text += "\n" + d.ManualTestStatus;
-        if (!string.IsNullOrEmpty(input?.PagingStatus)) diagnostics.Text += "\n" + input.PagingStatus;
-        var compact = $"鼠标触发 {d.TriggerCount} 次 · {audio}\n" +
-            (d.AutomaticRecognition ? $"声音分析 {d.AutomaticScans} 次 · {d.AutomaticStatus}" : "声音自动识别已关闭");
-        if (d.ManualTestStatus.Length != 0) compact += "\n" + d.ManualTestStatus;
-        overlay.Panel.SetDiagnostics(compact);
-    }
-    private void UpdateCandidateNavigation()
-    {
-        var multiple = overlay.Panel.PageCount > 1;
-        candidatePageLabel.Text = multiple ? $"候选第 {overlay.Panel.PageIndex + 1} / {overlay.Panel.PageCount} 页" : "";
-        if (previousCandidatePage is not null && nextCandidatePage is not null)
-        {
-            previousCandidatePage.Visibility = nextCandidatePage.Visibility = multiple ? Visibility.Visible : Visibility.Collapsed;
-            previousCandidatePage.IsEnabled = overlay.Panel.PageIndex > 0;
-            nextCandidatePage.IsEnabled = overlay.Panel.PageIndex + 1 < overlay.Panel.PageCount;
-        }
-        input?.SetPagingEnabled(multiple && controller.Enabled && controller.Foreground);
     }
     private void ExportDiagnostics()
     {
@@ -361,11 +350,14 @@ internal sealed partial class MainWindow : Window
     private void ShowCatalog()
     {
         var catalog = new CandidatePanel(libraryRoot, new Settings { ShowNames = true });
-        catalog.SetState("物品图鉴 · 全目录，不是识别结果");
+        var pending = library.Items.Count(item => !library.Groups.Any(group => group.ItemIds.Contains(item.Id) && group.Templates.Count > 0));
+        catalog.SetState($"物品图鉴 · {pending} 件待补拾取音效");
         catalog.ShowResult(new(0, RecognitionStatus.Matched, true, library.Items.Select(i => new Candidate(i, 0, "catalog")).ToArray(), 0, ""), true);
         var window = new Window { Owner = this, Title = $"物品图鉴 · {library.Items.Count} 件目录物品", Width = Math.Min(880, SystemParameters.WorkArea.Width),
-            Background = Theme.Background, Content = catalog, WindowStartupLocation = WindowStartupLocation.CenterOwner };
-        BrandAssets.StyleWindow(window); WindowPlacement.UseContentHeight(window); window.Show();
+            Height = Math.Min(760, SystemParameters.WorkArea.Height * .9), Background = Theme.Background,
+            Content = new ScrollViewer { Content = catalog, VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled }, WindowStartupLocation = WindowStartupLocation.CenterOwner };
+        BrandAssets.StyleWindow(window); window.Show();
     }
     private void ShowHistory()
     {
@@ -373,7 +365,7 @@ internal sealed partial class MainWindow : Window
         historyWindow = new(controller.History, libraryRoot, settings, async entry =>
         {
             var snapshot = controller.Audio.Get(entry.SnapshotId);
-            if (snapshot is null) { MessageBox.Show(this, "此记录的声音片段已过期，文字候选仍保留。", "声音对比"); return; }
+            if (snapshot is null) { MessageBox.Show(this, "此记录的声音片段已过期，文字候选仍保留。", "监听浮窗"); return; }
             await EnterInteraction(snapshot);
         }) { Owner = this };
         historyWindow.Closed += (_, _) => historyWindow = null;
@@ -409,6 +401,16 @@ internal sealed partial class MainWindow : Window
         }
         else MessageBox.Show(this, "请查看源码目录 docs/" + file);
     }
+    private async Task RunScreenshotSmoke()
+    {
+        try { await ScreenshotSmoke(); }
+        catch (Exception ex)
+        {
+            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "smoke-error.txt"), ex.ToString());
+            JsonFile.Write(Path.Combine(AppContext.BaseDirectory, "ui-smoke.json"), new { passed = false, error = ex.ToString() });
+            Close();
+        }
+    }
     private async Task ScreenshotSmoke()
     {
         PrepareOverlaySmoke(); await Task.Delay(400);
@@ -427,40 +429,56 @@ internal sealed partial class MainWindow : Window
         MaxHeight = originalMaximum; ShowSettingsSection("监听");
         var foregroundBefore = NativeInput.GetForegroundWindow();
         overlay.Show(); await Task.Delay(200);
-        var styles = NativeInput.OverlayStyles(overlay);
         var preserved = foregroundBefore == NativeInput.GetForegroundWindow();
         var largeHeight = overlay.ActualHeight;
         var largeBounds = NativeInput.WindowPixels(overlay);
         var viewport = overlay.PlacementViewport;
-        var largePages = overlay.Panel.PageCount;
+        var largeWidth = overlay.ActualWidth;
+        var commonGroupFits = !overlay.Panel.NeedsScroll;
+        var commonCards = Descendants<Border>(overlay.Panel).Where(card => card.Tag is Candidate).ToArray();
+        var bottomCardTop = commonCards.Max(card => card.TransformToAncestor(overlay.Panel).TransformBounds(new Rect(card.RenderSize)).Top);
+        var lastCardRight = commonCards.Where(card => Math.Abs(card.TransformToAncestor(overlay.Panel).TransformBounds(new Rect(card.RenderSize)).Top - bottomCardTop) < 2)
+            .Max(card => card.TransformToAncestor(overlay.Panel).TransformBounds(new Rect(card.RenderSize)).Right);
+        var bottomRowRightGap = overlay.Panel.ActualWidth - lastCardRight;
         RenderSmoke(overlay, "overlay-smoke.png");
+        var largest = library.Groups.OrderByDescending(g => g.ItemIds.Length).First();
+        overlay.Panel.ShowResult(new(998, RecognitionStatus.Matched, true, largest.ItemIds.Select(id =>
+            new Candidate(library.Items.Single(i => i.Id == id), .9, largest.Id)).ToArray(), 0, "布局演示 · 非识别结果"), true);
+        await Task.Delay(120); overlay.UpdateLayout(); var largestGroupFits = !overlay.Panel.NeedsScroll;
+        RenderSmoke(overlay, "overlay-largest-group-smoke.png");
         var one = new RecognitionResult(999, RecognitionStatus.Matched, true,
             [new(library.Items[0], .9, "smoke")], 1, "布局测试 · 模拟结果");
+        var indexedCandidates = library.Groups
+            .SelectMany(group => group.ItemIds.Select(id => new Candidate(
+                library.Items.Single(item => item.Id == id), .9, group.Id)))
+            .GroupBy(candidate => candidate.Item.Id)
+            .Select(group => group.First()).ToArray();
         overlay.Panel.ShowResult(one, true); await Task.Delay(100);
         var smallHeight = overlay.ActualHeight;
         var smallBounds = NativeInput.WindowPixels(overlay);
         var centered = Math.Abs((smallBounds.Left + smallBounds.Width / 2) - (viewport.Left + viewport.Width / 2)) <= 2;
         var topAnchored = Math.Abs(smallBounds.Top - largeBounds.Top) <= 1;
-        var smallPages = overlay.Panel.PageCount;
+        var smallWidth = overlay.ActualWidth;
         RenderSmoke(overlay, "overlay-small-smoke.png");
-        overlay.Panel.ShowResult(one with { Candidates = library.Items.Select(i => new Candidate(i, .9, "smoke")).ToArray() }, true);
+        overlay.Panel.ShowResult(one with { Candidates = indexedCandidates }, true);
         await Task.Delay(100);
         var overflowHeight = overlay.ActualHeight;
-        var staysAboveCenter = NativeInput.WindowPixels(overlay).Bottom <= viewport.Top + viewport.Height / 3 + 2;
-        var overflowPages = overlay.Panel.PageCount;
+        var staysInGame = NativeInput.WindowPixels(overlay).Bottom <= viewport.Bottom + 1;
+        var overflowWidth = overlay.ActualWidth;
         await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
         overlay.UpdateLayout();
-        var overlayPageHint = Descendants<TextBlock>(overlay.Panel).Any(t => t.Text.Contains("PgUp"));
-        var visibleIds = new List<string>();
-        for (var page = 0; page < overflowPages; page++)
+        var paginationPresent = Descendants<Button>(overlay.Panel).Any(b => Equals(b.Content, "上一页") || Equals(b.Content, "下一页"));
+        var visibleIds = overlay.Panel.RenderedIds;
+        RenderSmoke(overlay, "overlay-full-smoke.png");
+        var allCardsFit = Descendants<Border>(overlay.Panel).Where(card => card.Tag is Candidate).All(card =>
         {
-            visibleIds.AddRange(overlay.Panel.VisibleIds);
-            if (page == 0) RenderSmoke(overlay, "overlay-paged-smoke.png");
-            overlay.Panel.MovePage(1); await Task.Delay(50);
-        }
-        var allCandidatesReachable = visibleIds.Count == library.Items.Count && visibleIds.Distinct().Count() == library.Items.Count;
+            var rect = card.TransformToAncestor(overlay).TransformBounds(new Rect(card.RenderSize));
+            return rect.Right <= overlay.ActualWidth + 1 && rect.Bottom <= overlay.ActualHeight + 1;
+        });
+        var allCandidatesReachable = visibleIds.Count == indexedCandidates.Length &&
+            visibleIds.Distinct().Count() == indexedCandidates.Length && allCardsFit;
         var maximumHeight = overlay.MaxHeight;
-        var overlayHasScrollViewer = Descendants<ScrollViewer>(overlay.Panel).Any();
+        var overflowNeedsScroll = overlay.Panel.NeedsScroll;
         overlay.Panel.ShowResult(one, true); await Task.Delay(100);
         var shrunkAgain = Math.Abs(overlay.ActualHeight - smallHeight) < 1;
         var smokeHistory = new RecognitionHistory();
@@ -482,10 +500,8 @@ internal sealed partial class MainWindow : Window
         for (var i = 1; i <= 100; i++) fullHistory.Remember(one with { OperationId = i }, "模拟记录", false, DateTimeOffset.Now.AddSeconds(i));
         var fullHistoryView = new HistoryWindow(fullHistory, libraryRoot, settings) { Owner = this };
         fullHistoryView.Show(); await Task.Delay(100);
-        var historyIds = new List<long>(); var historyPages = fullHistoryView.RecordPageCount;
-        RenderSmoke(fullHistoryView, "history-paged-smoke.png");
-        for (var i = 0; i < historyPages; i++)
-        { historyIds.AddRange(fullHistoryView.VisibleRecordIds); fullHistoryView.ChangeRecordPage(1); await Task.Delay(10); }
+        var historyIds = fullHistoryView.VisibleRecordIds;
+        RenderSmoke(fullHistoryView, "history-full-smoke.png");
         var allHistoryReachable = historyIds.Count == 100 && historyIds.Distinct().Count() == 100;
         fullHistoryView.Close();
         var reference = ReferenceAudio.Load(libraryRoot).Samples[0];
@@ -508,33 +524,207 @@ internal sealed partial class MainWindow : Window
         }
         void ClickWorkspace(string label) => Descendants<Button>(workspace).Single(b => Equals(b.Content, label)).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         await CheckWorkspace("sound");
-        foreach (var (label, name) in new[] { ("完整候选", "candidates"), ("个人库", "personal"), ("补库 / 学习", "learn"), ("录入新物品", "new-item") })
+        ClickWorkspace("▶ 回放当前声音"); var replayStarted = workspace.IsPlaying;
+        var capturePausedDuringReplay = !controller.Diagnostics().Capturing;
+        ClickWorkspace("■ 停止"); var replayStopped = !workspace.IsPlaying;
+        var referenceButton = Descendants<Button>(workspace).First(b => b.Tag is Candidate && b.IsEnabled);
+        referenceButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); var referenceStarted = workspace.IsPlaying;
+        ClickWorkspace("■ 停止"); var referenceStopped = !workspace.IsPlaying;
+        foreach (var (label, name) in new[] { ("候选详情", "candidates"), ("个人库", "personal"), ("补库 / 学习", "learn"), ("录入新物品", "new-item") })
         { ClickWorkspace(label); await CheckWorkspace(name); }
-        overlay.ToggleLock(); var unlocked = !settings.PositionLocked; overlay.ToggleLock();
+        var nameField = Descendants<TextBox>(workspace).Single(t => t.IsVisible); nameField.Text = "字号保留测试";
+        overlay.SetFontScale(.9); await Task.Delay(80); var smallEditorFont = nameField.FontSize;
+        overlay.SetFontScale(1.15); await Task.Delay(80);
+        var editorFontPreservesText = ReferenceEquals(nameField, Descendants<TextBox>(workspace).Single(t => t.IsVisible)) &&
+            nameField.Text == "字号保留测试" && nameField.FontSize > smallEditorFont &&
+            Descendants<FrameworkElement>(workspace).All(e => e.LayoutTransform.Value.IsIdentity && e.RenderTransform.Value.IsIdentity);
+        overlay.SetFontScale(1); await Task.Delay(80);
+        var pinButton = Descendants<Button>(overlay).Single(b => System.Windows.Automation.AutomationProperties.GetName(b).StartsWith("已固定"));
+        var pinVisual = pinButton.Content;
+        overlay.ToggleLock(); var unlocked = !settings.PositionLocked;
+        var samePin = ReferenceEquals(pinVisual, pinButton.Content); overlay.ToggleLock();
+        workspace.Select(snapshot);
+        var demoNames = new[] { "热成像模块", "数据线", "古董茶壶", "密码机", "金狮雕像", "石膏像" };
+        var demoCandidates = demoNames.Select(name => library.Items.Single(i => i.Name == name))
+            .Select(item => new Candidate(item, .9, library.Groups.First(g => g.ItemIds.Contains(item.Id)).Id)).ToArray();
+        var demoResult = new RecognitionResult(1001, RecognitionStatus.Matched, true, demoCandidates, 0, "布局演示 · 非识别结果");
+        var demoSnapshot = controller.Audio.Add(sound, new(demoResult, analysis.Scores), "六件布局演示", library, libraryRoot);
+        var fontChecks = new Dictionary<string, object>();
+        var comparisonFits = true;
+        foreach (var (scenario, clip) in new[] { ("two", snapshot), ("six", demoSnapshot) })
+        foreach (var (label, scale) in new[] { ("small", .9), ("medium", 1.0), ("large", 1.15) })
+        {
+            workspace.Select(clip);
+            overlay.SetFontScale(scale); await Task.Delay(150); overlay.UpdateLayout();
+            var panel = Descendants<CandidatePanel>(workspace).First();
+            var sampleButtonsFit = Descendants<Button>(panel).Where(b => b.Tag is Candidate).All(b =>
+            {
+                var rect = b.TransformToAncestor(panel).TransformBounds(new Rect(b.RenderSize));
+                return rect.Top >= 0 && rect.Bottom <= panel.ActualHeight + 1 && rect.Right <= panel.ActualWidth + 1;
+            });
+            var toolbarButtonsFit = Descendants<Button>(panel).Where(b => b.Tag is not Candidate && b.IsVisible).All(b =>
+            {
+                var rect = b.TransformToAncestor(panel).TransformBounds(new Rect(b.RenderSize));
+                return rect.Top >= 0 && rect.Bottom <= panel.ActualHeight + 1 && rect.Right <= panel.ActualWidth + 1;
+            });
+            comparisonFits &= !panel.NeedsScroll && sampleButtonsFit && toolbarButtonsFit &&
+                (scenario != "six" || panel.ThumbnailSize >= 104);
+            fontChecks[scenario + "-" + label] = new { scale = settings.FontScale, overlay.ActualWidth, overlay.ActualHeight,
+                noWindowScale = overlay.LayoutTransform.Value.IsIdentity,
+                candidates = panel.RenderedIds.Count, panel.NeedsScroll, panel.ThumbnailSize, panel.ContentHeight, sampleButtonsFit, toolbarButtonsFit };
+            RenderSmoke(overlay, $"comparison-{scenario}-{label}-smoke.png");
+        }
+        overlay.SetFontScale(1); await Task.Delay(100); overlay.UpdateLayout();
+        var thirteenGroup = library.Groups.Single(group => group.Id == "361affd2");
+        var thirteenResult = new RecognitionResult(1003, RecognitionStatus.Matched, true,
+            thirteenGroup.ItemIds.Select(id => new Candidate(library.Items.Single(item => item.Id == id), .99,
+                thirteenGroup.Id)).ToArray(), 0, "十三件布局检查");
+        var thirteenSnapshot = controller.Audio.Add(sound, new(thirteenResult, analysis.Scores),
+            "十三件布局检查", library, libraryRoot);
+        workspace.Select(thirteenSnapshot); await Task.Delay(120); overlay.UpdateLayout();
+        var thirteenPanel = Descendants<CandidatePanel>(workspace).First();
+        var thirteenCards = Descendants<Border>(thirteenPanel).Where(card => card.Tag is Candidate).ToArray();
+        var thirteenHeadings = Descendants<TextBlock>(thirteenPanel)
+            .Where(label => new[] { "2 格", "3 格", "4 格", "6 格" }.Contains(label.Text)).ToArray();
+        var thirteenNamesFit = thirteenCards.Length == 13 && thirteenCards.All(card =>
+        {
+            var name = Descendants<TextBlock>(card).FirstOrDefault(label => label.Text == ((Candidate)card.Tag).Item.Name);
+            var score = Descendants<TextBlock>(card).FirstOrDefault(label => label.Text.Contains("匹配", StringComparison.Ordinal));
+            if (name is null || score is null) return false;
+            var bounds = card.TransformToAncestor(overlay).TransformBounds(new Rect(card.RenderSize));
+            return name.TextTrimming == TextTrimming.None && score.Text == "匹配度 99%" &&
+                score.TextTrimming == TextTrimming.None &&
+                name.FontSize >= 13 && score.FontSize >= 12 &&
+                name.DesiredSize.Height <= name.ActualHeight + 1 && score.DesiredSize.Height <= score.ActualHeight + 1 &&
+                bounds.Right <= overlay.ActualWidth + 1 && bounds.Bottom <= overlay.ActualHeight + 1;
+        });
+        var listeningThirteen = overlay.ActualWidth <= 930 && !thirteenPanel.NeedsScroll && thirteenNamesFit &&
+            thirteenHeadings.Length == 4 &&
+            Descendants<TextBlock>(thirteenPanel).Count(label =>
+                label.Text.StartsWith("大红概率 ", StringComparison.Ordinal)) == 4 &&
+            !Descendants<TextBlock>(thirteenPanel).Any(label => label.Text is "同音候选" or "疑似");
+        var thirteenMissingLabels = thirteenCards.Where(card =>
+            !Descendants<TextBlock>(card).Any(label => label.Text == ((Candidate)card.Tag).Item.Name) ||
+            !Descendants<TextBlock>(card).Any(label => label.Text.Contains("匹配", StringComparison.Ordinal)))
+            .Select(card => ((Candidate)card.Tag).Item.Name).ToArray();
+        var listeningThirteenDetails = new { overlay.ActualWidth, overlay.ActualHeight,
+            thirteenPanel.ThumbnailSize, groups = thirteenHeadings.Select(label => label.Text).ToArray(),
+            cards = thirteenCards.Length, thirteenNamesFit, thirteenMissingLabels, thirteenPanel.NeedsScroll };
+        RenderSmoke(overlay, "listening-thirteen-smoke.png");
+        var unevenCandidates = new[] { (Cells: 2, Count: 3), (Cells: 4, Count: 9), (Cells: 6, Count: 3) }
+            .SelectMany(group => library.Items.Where(item => item.Cells == group.Cells).Take(group.Count))
+            .Select(item => new Candidate(item, .96,
+                library.Groups.First(group => group.ItemIds.Contains(item.Id)).Id)).ToArray();
+        var unevenResult = new RecognitionResult(1004, RecognitionStatus.Matched, true,
+            unevenCandidates, 0, "十五件紧凑布局检查");
+        var unevenSnapshot = controller.Audio.Add(sound, new(unevenResult, analysis.Scores),
+            "十五件紧凑布局检查", library, libraryRoot);
+        workspace.Select(unevenSnapshot); await Task.Delay(120); overlay.UpdateLayout();
+        var unevenPanel = Descendants<CandidatePanel>(workspace).First();
+        var unevenCards = Descendants<Border>(unevenPanel).Where(card => card.Tag is Candidate).ToArray();
+        var unevenRows = unevenCards.Select(card => Math.Round(card.TransformToAncestor(overlay)
+            .TransformBounds(new Rect(card.RenderSize)).Top)).Distinct().Count();
+        var unevenBands = new[] { 2, 4, 6 }.Select(cells => unevenCards
+            .Where(card => ((Candidate)card.Tag).Item.Cells == cells)
+            .Select(card => card.TransformToAncestor(overlay).TransformBounds(new Rect(card.RenderSize)))
+            .ToArray()).ToArray();
+        var groupedFifteen = unevenCards.Length == 15 && unevenRows == 5 && !unevenPanel.NeedsScroll &&
+            unevenBands[0].Max(bounds => bounds.Bottom) <= unevenBands[1].Min(bounds => bounds.Top) + 1 &&
+            unevenBands[1].Max(bounds => bounds.Bottom) <= unevenBands[2].Min(bounds => bounds.Top) + 1 &&
+            unevenPanel.ThumbnailSize >= 96 && overlay.ActualWidth <= 930 && overlay.ActualHeight <= 760;
+        var groupedFifteenDetails = new { overlay.ActualWidth, overlay.ActualHeight,
+            unevenPanel.ThumbnailSize, unevenPanel.ContentHeight, rows = unevenRows,
+            cards = unevenCards.Length, unevenPanel.NeedsScroll };
+        RenderSmoke(overlay, "listening-fifteen-grouped-smoke.png");
+        workspace.Select(demoSnapshot); await Task.Delay(100); overlay.UpdateLayout();
+        var nearControlRemoved = !Descendants<CheckBox>(workspace).Any(b => Equals(b.Content, "展开相近音效"));
+        var allItemCandidates = indexedCandidates;
+        var allItemResult = new RecognitionResult(1002, RecognitionStatus.Matched, true,
+            allItemCandidates, 0, "全候选布局检查");
+        var allItemSnapshot = controller.Audio.Add(sound, new(allItemResult, analysis.Scores),
+            "全候选布局检查", library, libraryRoot);
+        workspace.Select(allItemSnapshot); await Task.Delay(120); overlay.UpdateLayout();
+        var allItemPanel = Descendants<CandidatePanel>(workspace).First();
+        var allItemCards = Descendants<Border>(allItemPanel).Where(card => card.Tag is Candidate).ToArray();
+        var allItemCardBounds = allItemCards.Select(card => card.TransformToAncestor(overlay)
+            .TransformBounds(new Rect(card.RenderSize))).ToArray();
+        var allItemCardsFit = allItemCardBounds.All(rect => rect.Right <= overlay.ActualWidth + 1 &&
+            rect.Bottom <= overlay.ActualHeight + 1);
+        var listeningOnePage = !allItemPanel.NeedsScroll && allItemPanel.ThumbnailSize >= 80 &&
+            !Descendants<ScrollViewer>(allItemPanel).Any() && allItemCards.Length == indexedCandidates.Length && allItemCardsFit;
+        var listeningOnePageDetails = new { overlay.ActualWidth, overlay.ActualHeight,
+            allItemPanel.NeedsScroll, allItemPanel.ThumbnailSize, allItemPanel.ContentHeight,
+            cards = allItemCards.Length, allItemCardsFit,
+            maxRight = allItemCardBounds.Max(rect => rect.Right), maxBottom = allItemCardBounds.Max(rect => rect.Bottom) };
+        RenderSmoke(overlay, "listening-all-smoke.png");
+        workspace.Select(demoSnapshot); await Task.Delay(80); overlay.UpdateLayout();
+        var listeningSurface = Descendants<CandidatePanel>(workspace).FirstOrDefault(panel => panel.IsVisible);
+        var listeningDesignVisible = listeningSurface is not null && listeningSurface.RenderedIds.Count == demoCandidates.Length &&
+            Descendants<Button>(listeningSurface).Count(button => button.Tag is Candidate) == demoCandidates.Length &&
+            overlay.ActualWidth >= 700 && overlay.ActualWidth <= 800 && !listeningSurface.NeedsScroll &&
+            listeningSurface.ThumbnailSize >= 104;
+        RenderSmoke(overlay, "listening-design-smoke.png");
         await ExitInteraction();
+        controller.History.Remember(thirteenResult, "布局模拟", false, DateTimeOffset.Now,
+            thirteenSnapshot.Id, library.Version, libraryRoot);
+        workspace.UpdateListeningResult(thirteenResult);
+        workspace.UpdateListeningActivity(new(1003, false, "监听中 · 继续听音"));
+        overlay.Show(); await Task.Delay(100); overlay.UpdateLayout();
+        var livePanel = Descendants<CandidatePanel>(workspace).First();
+        var liveCards = Descendants<Border>(livePanel).Where(card => card.Tag is Candidate).ToArray();
+        var liveLabels = Descendants<TextBlock>(livePanel).ToArray();
+        var liveStyles = NativeInput.OverlayStyles(overlay);
+        var liveThirteen = ReferenceEquals(Descendants<CandidatePanel>(overlay).FirstOrDefault(panel => panel.IsVisible), livePanel) &&
+            overlay.Interactive && !livePanel.NeedsScroll && liveCards.Length == thirteenResult.CandidateCount &&
+            thirteenResult.Candidates.All(candidate => liveLabels.Any(label => label.Text == candidate.Item.Name)) &&
+            liveLabels.Count(label => label.Text == "匹配度 99%") == thirteenResult.CandidateCount &&
+            Descendants<Button>(livePanel).Count(button => button.Tag is Candidate && button.IsEnabled) == thirteenResult.CandidateCount &&
+            (liveStyles & 0x20) == 0 && (liveStyles & 0x08000000) != 0;
+        RenderSmoke(overlay, "listening-live-thirteen-smoke.png");
+        if (Environment.GetCommandLineArgs().Contains("--ui-hold-live")) return;
+        var liveReplay = Descendants<Button>(livePanel).First(button => Equals(button.Content, "▶ 回放当前声音"));
+        liveReplay.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+        await Task.Delay(300);
+        var liveReplayPausesSampling = controller.Mode == AssistantMode.Interaction && workspace.IsPlaying;
+        await ExitInteraction();
+        controller.History.ClearCurrent(); workspace.UpdateListeningResult(null);
+        overlay.Show(); await Task.Delay(100); overlay.UpdateLayout();
+        var waitingSurface = Descendants<CandidatePanel>(overlay).FirstOrDefault(panel => panel.IsVisible);
+        var waitingViewVisible = ReferenceEquals(waitingSurface, Descendants<CandidatePanel>(workspace).FirstOrDefault()) && overlay.Interactive &&
+            overlay.ActualWidth <= 900;
+        RenderSmoke(overlay, "listening-waiting-smoke.png");
         var restoredStyles = NativeInput.OverlayStyles(overlay);
+        var adaptivePassed = largeWidth >= smallWidth && overflowHeight <= maximumHeight + 1 &&
+            !paginationPresent && allCandidatesReachable && allHistoryReachable && settingsFit.Values.All(fit => fit) &&
+            shrunkAgain && historyOnScreen && centered && topAnchored && staysInGame && !overflowNeedsScroll;
+        var passed = adaptivePassed && comparisonFits && listeningDesignVisible && waitingViewVisible && liveThirteen && liveReplayPausesSampling && listeningThirteen && groupedFifteen && listeningOnePage && commonGroupFits && bottomRowRightGap <= 32 && largestGroupFits && editorFontPreservesText && operationFit.Values.All(fit => fit) && samePin && unlocked &&
+            nearControlRemoved && replayStarted && replayStopped && referenceStarted && referenceStopped && capturePausedDuringReplay &&
+            (liveStyles & (0x20 | 0x08000000)) == 0x08000000 && preserved &&
+            (interactiveStyles & (0x20 | 0x08000000)) == 0 && (restoredStyles & (0x20 | 0x08000000)) == 0x08000000;
         JsonFile.Write(Path.Combine(AppContext.BaseDirectory, "ui-smoke.json"), new
         {
+            passed,
             images = library.Items.Count(i => i.Thumbnail is not null && File.Exists(Path.Combine(libraryRoot, i.Thumbnail))),
-            clickThrough = (styles & 0x20) != 0, noActivate = (styles & 0x08000000) != 0,
-            layered = (styles & 0x80000) != 0, topmost = overlay.Topmost,
+            clickThrough = (liveStyles & 0x20) != 0, noActivate = (liveStyles & 0x08000000) != 0,
+            layered = (liveStyles & 0x80000) != 0, topmost = overlay.Topmost,
             foregroundPreserved = preserved,
-            operation = new { operationFit, unlocked, enabledInteraction = (interactiveStyles & (0x20 | 0x08000000)) == 0,
-                restoredPassThrough = (restoredStyles & (0x20 | 0x08000000)) == (0x20 | 0x08000000),
+            operation = new { operationFit, unlocked, samePin, fontChecks, comparisonFits, listeningDesignVisible, waitingViewVisible, liveThirteen, liveReplayPausesSampling, listeningThirteen, listeningThirteenDetails, groupedFifteen, groupedFifteenDetails, listeningOnePage, listeningOnePageDetails, nearControlRemoved, editorFontPreservesText,
+                replayStarted, replayStopped, referenceStarted, referenceStopped, capturePausedDuringReplay,
+                enabledInteraction = (interactiveStyles & (0x20 | 0x08000000)) == 0,
+                restoredListeningControls = (restoredStyles & (0x20 | 0x08000000)) == 0x08000000,
                 recognitionRemainedOff = !controller.Enabled },
             placement = new { mode = settings.EffectivePositionMode.ToString(), viewport, smallBounds, largeBounds,
-                centered, topAnchored, staysAboveCenter },
-            layout = new { thumbnailSize = settings.ThumbnailSize, smallHeight, smallPages, largeHeight, largePages,
-                overflowHeight, overflowPages, maximumHeight, allCandidatesReachable, shrunkAgain, overlayHasScrollViewer, overlayPageHint,
+                centered, topAnchored, staysInGame },
+            layout = new { thumbnailSize = settings.ThumbnailSize, smallHeight, smallWidth, largeHeight, largeWidth,
+                overflowHeight, overflowWidth, maximumHeight, allCandidatesReachable, allCardsFit, shrunkAgain, overflowNeedsScroll, paginationPresent,
+                commonGroupFits, bottomRowRightGap, largestGroupFits,
                 historySmallHeight, historyLargeHeight, historyOnScreen,
-                allHistoryReachable, historyPages, settingsFit,
-                adaptivePassed = largeHeight > smallHeight && smallPages == 1 && overflowHeight <= maximumHeight + 1 &&
-                    overflowPages > 1 && overlayPageHint && allCandidatesReachable && allHistoryReachable && settingsFit.Values.All(fit => fit) &&
-                    shrunkAgain && !overlayHasScrollViewer && historyOnScreen && historyLargeHeight > historySmallHeight &&
-                    centered && topAnchored && staysAboveCenter },
+                allHistoryReachable, settingsFit,
+                adaptivePassed },
             inputMode = input?.HookStatus, inputError, diagnostics = controller.Diagnostics(),
             note = "仅桌面浮窗属性与渲染检查，未在游戏中测试输入或独占全屏覆盖"
         });
+        if (Environment.GetCommandLineArgs().Contains("--ui-hold")) { await EnterInteraction(demoSnapshot); return; }
         Close();
     }
     private static IEnumerable<T> Descendants<T>(DependencyObject parent) where T : DependencyObject

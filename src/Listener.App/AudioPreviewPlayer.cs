@@ -9,6 +9,7 @@ internal sealed class AudioPreviewPlayer : IDisposable
     private WasapiPlayer? player;
     private MMDevice? device;
     private RawSourceWaveStream? source;
+    internal bool IsPlaying => player is not null;
     public event Action<string>? Status;
     public void Play(AudioClip clip, string deviceId)
     {

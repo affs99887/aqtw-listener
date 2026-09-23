@@ -19,7 +19,7 @@ internal sealed partial class MainWindow
         { CaptionHeight = 43, ResizeBorderThickness = new Thickness(6), CornerRadius = new CornerRadius(1), GlassFrameThickness = new Thickness(0), UseAeroCaptionButtons = false });
         var shell = new DockPanel();
         var frame = new Border { Background = Theme.Background, BorderBrush = Theme.Line, BorderThickness = new Thickness(1), Child = shell };
-        var caption = new DockPanel { Height = 43, Background = Theme.Brush("#15191B") };
+        var caption = new DockPanel { Height = 43, Background = Theme.Panel };
         DockPanel.SetDock(caption, Dock.Top); shell.Children.Add(caption);
         var windowActions = new StackPanel { Orientation = Orientation.Horizontal };
         var minimize = CaptionButton("\uE921", "最小化到托盘", () => WindowState = WindowState.Minimized);
@@ -36,7 +36,7 @@ internal sealed partial class MainWindow
         var columns = new Grid(); columns.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(170) }); columns.ColumnDefinitions.Add(new ColumnDefinition());
         shell.Children.Add(columns);
         var side = new DockPanel { Margin = new Thickness(14, 23, 14, 16) };
-        var sidebar = new Border { Background = Theme.Brush("#15191B"), BorderBrush = Theme.Line, BorderThickness = new Thickness(0, 0, 1, 0), Child = side };
+        var sidebar = new Border { Background = Theme.Panel, BorderBrush = Theme.Line, BorderThickness = new Thickness(0, 0, 1, 0), Child = side };
         columns.Children.Add(sidebar);
         var brand = new StackPanel { Margin = new Thickness(9, 0, 0, 25) };
         brand.Children.Add(new Image { Source = BrandAssets.Mark, Width = 47, Height = 47, HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 0, 0, 12) });
@@ -45,7 +45,7 @@ internal sealed partial class MainWindow
         var footer = new StackPanel { Margin = new Thickness(10, 0, 0, 0) };
         footer.Children.Add(new Border { Height = 1, Background = Theme.Line, Margin = new Thickness(0, 0, 0, 15) });
         footer.Children.Add(Theme.Label("●  本地运行", 11, Theme.Accent));
-        footer.Children.Add(Theme.Label("声音对比与个人库 · 预览版", 9, Theme.Muted)); DockPanel.SetDock(footer, Dock.Bottom); side.Children.Add(footer);
+        footer.Children.Add(Theme.Label("监听浮窗与个人库 · 预览版", 9, Theme.Muted)); DockPanel.SetDock(footer, Dock.Bottom); side.Children.Add(footer);
         navigation = new StackPanel(); side.Children.Add(navigation);
         var main = new DockPanel { Margin = new Thickness(26, 24, 26, 18) }; Grid.SetColumn(main, 1); columns.Children.Add(main);
         var heading = new StackPanel { Margin = new Thickness(0, 0, 0, 14) };
@@ -105,7 +105,7 @@ internal sealed partial class MainWindow
         var automaticRow = new DockPanel(); DockPanel.SetDock(automatic, Dock.Left); automaticRow.Children.Add(automatic);
         var helper = Theme.Label("拖动物品发声后自动分析 · 适用于 UU 远程", 10, Theme.Muted); helper.Margin = new Thickness(14, 0, 0, 0); helper.VerticalAlignment = VerticalAlignment.Center;
         automaticRow.Children.Add(helper); hero.Children.Add(automaticRow);
-        var heroCard = Theme.Box(hero, 20); heroCard.BorderBrush = Theme.Brush("#52605A"); page.Children.Add(heroCard);
+        var heroCard = Theme.Box(hero, 20); heroCard.BorderBrush = Theme.Line; page.Children.Add(heroCard);
         var facts = new Grid { Margin = new Thickness(0, 12, 0, 14) };
         facts.ColumnDefinitions.Add(new ColumnDefinition()); facts.ColumnDefinitions.Add(new ColumnDefinition());
         var game = new StackPanel(); game.Children.Add(Theme.Label("游戏进程", 10, Theme.Muted)); game.Children.Add(Theme.Label("UAGame", 19)); game.Children.Add(gameInfo);
@@ -116,7 +116,8 @@ internal sealed partial class MainWindow
         var actions = new Grid { Margin = new Thickness(0, 0, 0, 12) };
         for (var i = 0; i < 3; i++) actions.ColumnDefinitions.Add(new ColumnDefinition());
         historyButton = Theme.Button("识别历史（0）", (_, _) => ShowHistory());
-        var compare = Theme.Button("浮窗对比 / 操作", async (_, _) => await EnterInteraction());
+        var compare = Theme.Button("打开监听浮窗", async (_, _) => await EnterInteraction());
+        compare.ToolTip = "暂停采音，在监听浮窗中回放录音和试听候选参考音效";
         var test = Theme.Button("3 秒后试识别", async (_, _) => await controller.TestAfterCountdown());
         var buttons = new[] { historyButton, compare, test };
         for (var i = 0; i < buttons.Length; i++) { buttons[i].Padding = new Thickness(4, 12, 4, 12); buttons[i].FontSize = 11; buttons[i].HorizontalContentAlignment = HorizontalAlignment.Center; buttons[i].Margin = new Thickness(0, 0, i == 2 ? 0 : 8, 0); Grid.SetColumn(buttons[i], i); actions.Children.Add(buttons[i]); }
@@ -124,9 +125,9 @@ internal sealed partial class MainWindow
         var navigation = new DockPanel { LastChildFill = true };
         var clear = Theme.Button("清除结果", (_, _) => controller.ClearCurrentResult()); clear.Padding = new Thickness(9, 5, 9, 5); clear.FontSize = 11; clear.Margin = new Thickness(6, 0, 0, 0);
         DockPanel.SetDock(clear, Dock.Right); navigation.Children.Add(clear);
-        previousCandidatePage = Theme.Button("上一页", (_, _) => overlay.Panel.MovePage(-1)); nextCandidatePage = Theme.Button("下一页", (_, _) => overlay.Panel.MovePage(1));
-        foreach (var button in new[] { nextCandidatePage, previousCandidatePage }) { button.Padding = new Thickness(8, 5, 8, 5); button.FontSize = 11; button.Margin = new Thickness(5, 0, 0, 0); DockPanel.SetDock(button, Dock.Right); navigation.Children.Add(button); }
-        candidatePageLabel.VerticalAlignment = VerticalAlignment.Center; candidatePageLabel.Margin = new Thickness(0); navigation.Children.Add(candidatePageLabel); page.Children.Add(navigation);
+        var resultHint = Theme.Label("候选按格数完整展示", 11, Theme.Muted);
+        resultHint.VerticalAlignment = VerticalAlignment.Center; resultHint.Margin = new Thickness(0);
+        navigation.Children.Add(resultHint); page.Children.Add(navigation);
         var note = Theme.Label("匹配结果持续保留，直到新的匹配或手动清除。", 10, Theme.Muted); note.Margin = new Thickness(0, 10, 0, 0); page.Children.Add(note);
         RefreshListeningPresentation(); return page;
     }

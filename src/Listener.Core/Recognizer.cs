@@ -13,11 +13,9 @@ public interface IRecognizer : IDisposable
 public sealed class Recognizer : IRecognizer
 {
     private readonly SoundLibrary library;
-    private readonly Dictionary<string, ItemDefinition> items;
     public Recognizer(SoundLibrary library)
     {
         library.Validate(); this.library = library;
-        items = library.Items.ToDictionary(x => x.Id);
     }
 
     public RecognitionResult Recognize(float[] samples, int sampleRate, long operationId = 0,
@@ -40,13 +38,8 @@ public sealed class Recognizer : IRecognizer
         if (query.Length < 3) return Empty(RecognitionStatus.NoSound, "声音过短，请重新拖动货物");
         var scores = Score(query, cancellation);
         ranked = scores.OrderByDescending(s => s.Score).Select(s => new GroupScore(s.Group.Id, s.Score)).ToArray();
-        var passing = scores.Where(x => x.Score >= x.Group.Threshold).ToArray();
-        if (passing.Length == 0) return Empty(RecognitionStatus.Unknown, "未匹配，请再听一次");
-        // 接近最佳匹配的组都保留；同音组内的全部物品共同返回。
-        var candidates = passing
-            .SelectMany(x => x.Group.ItemIds.Select(id => new Candidate(items[id], x.Score, x.Group.Id)))
-            .GroupBy(x => x.Item.Id).Select(g => g.MaxBy(x => x.Score)!)
-            .OrderByDescending(x => x.Score).ThenByDescending(x => x.Item.ReferenceValue).ThenBy(x => x.Item.Id).ToArray();
+        var candidates = CandidateSelection.Select(library, scores);
+        if (candidates.Length == 0) return Empty(RecognitionStatus.Unknown, "识别失败 · 未匹配到已收录音效");
         return new(new RecognitionResult(operationId, RecognitionStatus.Matched, final, candidates, clock.Elapsed.TotalMilliseconds,
             final ? "识别完成" : "初步候选 · 正在继续听"), ranked);
     }

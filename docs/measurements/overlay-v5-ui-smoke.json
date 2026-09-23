@@ -1,0 +1,278 @@
+{
+  "passed": true,
+  "images": 51,
+  "clickThrough": true,
+  "noActivate": true,
+  "layered": true,
+  "topmost": true,
+  "foregroundPreserved": true,
+  "operation": {
+    "operationFit": {
+      "sound": true,
+      "candidates": true,
+      "personal": true,
+      "learn": true,
+      "new-item": true
+    },
+    "unlocked": true,
+    "samePin": true,
+    "fontChecks": {
+      "two-small": {
+        "scale": 0.9,
+        "actualWidth": 1016,
+        "actualHeight": 852,
+        "noWindowScale": true,
+        "candidates": 2,
+        "needsScroll": false,
+        "thumbnailSize": 174,
+        "contentHeight": 442,
+        "sampleButtonsFit": true,
+        "toolbarButtonsFit": true
+      },
+      "two-medium": {
+        "scale": 1,
+        "actualWidth": 1016,
+        "actualHeight": 869,
+        "noWindowScale": true,
+        "candidates": 2,
+        "needsScroll": false,
+        "thumbnailSize": 174,
+        "contentHeight": 451,
+        "sampleButtonsFit": true,
+        "toolbarButtonsFit": true
+      },
+      "two-large": {
+        "scale": 1.15,
+        "actualWidth": 1016,
+        "actualHeight": 894,
+        "noWindowScale": true,
+        "candidates": 2,
+        "needsScroll": false,
+        "thumbnailSize": 174,
+        "contentHeight": 464,
+        "sampleButtonsFit": true,
+        "toolbarButtonsFit": true
+      },
+      "six-small": {
+        "scale": 0.9,
+        "actualWidth": 1600,
+        "actualHeight": 852,
+        "noWindowScale": true,
+        "candidates": 6,
+        "needsScroll": false,
+        "thumbnailSize": 174,
+        "contentHeight": 442,
+        "sampleButtonsFit": true,
+        "toolbarButtonsFit": true
+      },
+      "six-medium": {
+        "scale": 1,
+        "actualWidth": 1600,
+        "actualHeight": 869,
+        "noWindowScale": true,
+        "candidates": 6,
+        "needsScroll": false,
+        "thumbnailSize": 174,
+        "contentHeight": 451,
+        "sampleButtonsFit": true,
+        "toolbarButtonsFit": true
+      },
+      "six-large": {
+        "scale": 1.15,
+        "actualWidth": 1600,
+        "actualHeight": 894,
+        "noWindowScale": true,
+        "candidates": 6,
+        "needsScroll": false,
+        "thumbnailSize": 174,
+        "contentHeight": 464,
+        "sampleButtonsFit": true,
+        "toolbarButtonsFit": true
+      }
+    },
+    "comparisonFits": true,
+    "listeningDesignVisible": true,
+    "nearDoesNotChangeRatio": true,
+    "editorFontPreservesText": true,
+    "replayStarted": true,
+    "replayStopped": true,
+    "referenceStarted": true,
+    "referenceStopped": true,
+    "capturePausedDuringReplay": true,
+    "enabledInteraction": true,
+    "restoredPassThrough": true,
+    "recognitionRemainedOff": true
+  },
+  "placement": {
+    "mode": "GameTopCenter",
+    "viewport": {
+      "isEmpty": false,
+      "location": {
+        "x": 0,
+        "y": 0
+      },
+      "size": {
+        "isEmpty": false,
+        "width": 1920,
+        "height": 1032
+      },
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1032,
+      "left": 0,
+      "top": 0,
+      "right": 1920,
+      "bottom": 1032,
+      "topLeft": {
+        "x": 0,
+        "y": 0
+      },
+      "topRight": {
+        "x": 1920,
+        "y": 0
+      },
+      "bottomLeft": {
+        "x": 0,
+        "y": 1032
+      },
+      "bottomRight": {
+        "x": 1920,
+        "y": 1032
+      }
+    },
+    "smallBounds": {
+      "isEmpty": false,
+      "location": {
+        "x": 725,
+        "y": 16
+      },
+      "size": {
+        "isEmpty": false,
+        "width": 470,
+        "height": 256
+      },
+      "x": 725,
+      "y": 16,
+      "width": 470,
+      "height": 256,
+      "left": 725,
+      "top": 16,
+      "right": 1195,
+      "bottom": 272,
+      "topLeft": {
+        "x": 725,
+        "y": 16
+      },
+      "topRight": {
+        "x": 1195,
+        "y": 16
+      },
+      "bottomLeft": {
+        "x": 725,
+        "y": 272
+      },
+      "bottomRight": {
+        "x": 1195,
+        "y": 272
+      }
+    },
+    "largeBounds": {
+      "isEmpty": false,
+      "location": {
+        "x": 576,
+        "y": 16
+      },
+      "size": {
+        "isEmpty": false,
+        "width": 768,
+        "height": 316
+      },
+      "x": 576,
+      "y": 16,
+      "width": 768,
+      "height": 316,
+      "left": 576,
+      "top": 16,
+      "right": 1344,
+      "bottom": 332,
+      "topLeft": {
+        "x": 576,
+        "y": 16
+      },
+      "topRight": {
+        "x": 1344,
+        "y": 16
+      },
+      "bottomLeft": {
+        "x": 576,
+        "y": 332
+      },
+      "bottomRight": {
+        "x": 1344,
+        "y": 332
+      }
+    },
+    "centered": true,
+    "topAnchored": true,
+    "staysAboveCenter": true
+  },
+  "layout": {
+    "thumbnailSize": 88,
+    "smallHeight": 256,
+    "smallWidth": 470,
+    "largeHeight": 316,
+    "largeWidth": 768,
+    "overflowHeight": 328,
+    "overflowWidth": 768,
+    "maximumHeight": 328,
+    "allCandidatesReachable": true,
+    "shrunkAgain": true,
+    "overflowNeedsScroll": true,
+    "paginationPresent": false,
+    "commonGroupFits": true,
+    "bottomRowRightGap": 23,
+    "largestGroupFits": true,
+    "historySmallHeight": 625,
+    "historyLargeHeight": 1028,
+    "historyOnScreen": true,
+    "allHistoryReachable": true,
+    "settingsFit": {
+      "监听": true,
+      "采音": true,
+      "位置": true,
+      "浮窗": true,
+      "音效库": true,
+      "诊断": true
+    },
+    "adaptivePassed": true
+  },
+  "inputMode": null,
+  "inputError": "",
+  "diagnostics": {
+    "enabled": false,
+    "targetProcess": "UAGame",
+    "foregroundProcess": "",
+    "state": "监听已关闭",
+    "capturing": false,
+    "deviceName": "",
+    "selectedDeviceId": "",
+    "audio": {
+      "packets": 0,
+      "lastPacketAgeSeconds": null,
+      "rms": 0,
+      "lastSoundAgeSeconds": null
+    },
+    "triggerCount": 0,
+    "lastTriggerSource": "尚未触发",
+    "lastTriggerAt": null,
+    "lastIgnoredReason": "",
+    "lastRecognition": "尚未识别",
+    "manualTestStatus": "",
+    "automaticRecognition": true,
+    "automaticScans": 0,
+    "automaticStatus": "等待开启监听",
+    "automaticWindowRms": 0
+  },
+  "note": "仅桌面浮窗属性与渲染检查，未在游戏中测试输入或独占全屏覆盖"
+}

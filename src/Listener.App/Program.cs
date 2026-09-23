@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
 namespace Listener.App;
 
 internal static class Program
@@ -7,10 +10,14 @@ internal static class Program
     {
         var smoke = args.Contains("--ui-smoke");
         using var singleton = new Mutex(true, "AqtwListener-Desktop-v1" + (smoke ? $"-ui-smoke-{Environment.ProcessId}" : ""), out var first);
-        if (!first) { MessageBox.Show("听音助手已在运行，请从托盘打开。"); return 0; }
+        if (!first)
+        {
+            if (!ShowRunningWindow()) MessageBox.Show("听音助手已在运行，但无法找到它的窗口。请在任务管理器中结束 AqtwListener 后重试。");
+            return 0;
+        }
         try
         {
-            var settings = Settings.Load();
+            var settings = smoke ? new Settings() : Settings.Load();
             // The static overlay does not benefit from a permanent GPU rendering context.
             // Measured locally: software rendering reduced total working set from 253 to 167 MiB.
             System.Windows.Media.RenderOptions.ProcessRenderMode = settings.HardwareAcceleration
@@ -32,6 +39,30 @@ internal static class Program
             return 1;
         }
     }
+    private static bool ShowRunningWindow()
+    {
+        foreach (var process in Process.GetProcessesByName("AqtwListener"))
+        {
+            using (process)
+            {
+                if (process.Id == Environment.ProcessId) continue;
+                try
+                {
+                    process.Refresh();
+                    var window = process.MainWindowHandle;
+                    if (window == IntPtr.Zero) continue;
+                    ShowWindow(window, 9); // SW_RESTORE also shows a hidden main window.
+                    NativeInput.SetForegroundWindow(window);
+                    return true;
+                }
+                catch (InvalidOperationException) { }
+                catch (System.ComponentModel.Win32Exception) { }
+            }
+        }
+        return false;
+    }
+    [DllImport("user32.dll")] private static extern bool ShowWindow(IntPtr window, int command);
+
     private static async Task AudioSmoke()
     {
         await using var capture = new LoopbackAudio(); var devices = LoopbackAudio.Devices();

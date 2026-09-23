@@ -30,7 +30,7 @@ public static class Evaluation
             if (string.IsNullOrWhiteSpace(c.RecordingId) || c.Split != "test") throw new InvalidDataException("验收只接受有录制编号的 test 集。");
             if (c.ExpectedItemId is not null && !library.Items.Any(i => i.Id == c.ExpectedItemId)) throw new InvalidDataException("测试物品未在目录中定义。");
             if (c.IsNonGoldOrNoise != (c.ExpectedItemId is null || !library.Items.Single(i => i.Id == c.ExpectedItemId).IsGold))
-                throw new InvalidDataException("非大金标记与物品目录不一致。");
+                throw new InvalidDataException("非大红标记与物品目录不一致。");
             var path = LibraryBuilder.ResolveFile(root, c.File);
             var hash = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path)));
             if (manifest.Kind == "independent" && (recordings.Contains(c.RecordingId) || hashes.Contains(hash) || !seen.Add(hash)))

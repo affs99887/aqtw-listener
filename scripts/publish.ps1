@@ -9,9 +9,9 @@ if (-not (Test-Path $dotnet)) { $dotnet = (Get-Command dotnet -ErrorAction Stop)
 $env:DOTNET_CLI_HOME = Join-Path $root '.tools\cli-home'
 $env:NUGET_PACKAGES = Join-Path $root '.tools\nuget'
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
-& $dotnet publish src\Listener.App -c Release -r win-x64 --self-contained true -o $Output -p:DebugType=None -p:DebugSymbols=false -p:NuGetAudit=false
+& $dotnet publish src\Listener.App -c Release -r win-x64 --self-contained true --no-restore -o $Output -p:DebugType=None -p:DebugSymbols=false -p:NuGetAudit=false
 if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
-& $dotnet publish src\Listener.Cli -c Release -r win-x64 --self-contained true -o $Output -p:DebugType=None -p:DebugSymbols=false -p:NuGetAudit=false
+& $dotnet publish src\Listener.Cli -c Release -r win-x64 --self-contained true --no-restore -o $Output -p:DebugType=None -p:DebugSymbols=false -p:NuGetAudit=false
 if ($LASTEXITCODE -ne 0) { throw 'CLI publish failed' }
 Copy-Item README.md (Join-Path $Output '使用说明.md') -Force
 Copy-Item LICENSE (Join-Path $Output 'LICENSE') -Force
