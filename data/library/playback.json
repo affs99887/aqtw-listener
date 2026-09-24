@@ -1,0 +1,294 @@
+{
+  "note": "听样本只播放这些原始游戏录音：逐字节复制自 SoundRadar 固定版本的 library.srz，仅按时间窗口播放，未做滤波、归一化或重采样。识别用参考经过归一化与裁剪，不用于试听。",
+  "clips": [
+    {
+      "id": "sr-0c5ac384-0001",
+      "label": "琥珀天心拿起录音",
+      "action": "pickup",
+      "file": "playback/sr-0c5ac384-0001.wav",
+      "sha256": "8117b13cfcd61e667f560d3b431a4c4113b5cc4be51470df4b9f1f66b17bf89c",
+      "startSeconds": 1.857,
+      "endSeconds": 3.0,
+      "groupIds": [
+        "peer-012",
+        "peer-016",
+        "peer-021",
+        "peer-023",
+        "peer-024",
+        "peer-035",
+        "peer-037",
+        "peer-038",
+        "peer-040",
+        "peer-050",
+        "peer-053",
+        "peer-055"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/0c5ac384/samples/0001.wav (琥珀天心-拿起, recall, 000001-20260919-163049.wav)"
+    },
+    {
+      "id": "sr-ad6b7dfa-0001",
+      "label": "琥珀天心放下录音",
+      "action": "putdown",
+      "file": "playback/sr-ad6b7dfa-0001.wav",
+      "sha256": "a63dea1b7d6bed4ee80afe17caa7139bdb183a838bb2a775fb633ac277deadd5",
+      "startSeconds": 2.118,
+      "endSeconds": 3.0,
+      "groupIds": [
+        "peer-047"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/ad6b7dfa/samples/0001.wav (琥珀天心-放下, recall, 000002-20260919-163053.wav)"
+    },
+    {
+      "id": "sr-99d97932-0001",
+      "label": "目标定位拿起录音",
+      "action": "pickup",
+      "file": "playback/sr-99d97932-0001.wav",
+      "sha256": "cf3d1e09c17a5df040400e1fe03e29c137ce7cf00d7e8fa0fe4ca45ee1d3c7ec",
+      "startSeconds": 1.771,
+      "endSeconds": 2.971,
+      "groupIds": [
+        "peer-000",
+        "peer-006",
+        "peer-022",
+        "peer-030",
+        "peer-044",
+        "peer-046",
+        "peer-057",
+        "peer-060"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/99d97932/samples/0001.wav (目标定位-拿起, recall, 000001-20260919-160917.wav)"
+    },
+    {
+      "id": "sr-ec9b8a7f-0001",
+      "label": "目标定位放下录音 1",
+      "action": "putdown",
+      "file": "playback/sr-ec9b8a7f-0001.wav",
+      "sha256": "d48940eba2b373242840803ea1d3ede4e061a96655cad487c73b9883b938e269",
+      "startSeconds": 1.553,
+      "endSeconds": 2.753,
+      "groupIds": [
+        "peer-051"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/ec9b8a7f/samples/0001.wav (目标定位-放下, recall, 000003-20260919-160920.wav)"
+    },
+    {
+      "id": "sr-ec9b8a7f-0002",
+      "label": "目标定位放下录音 2",
+      "action": "putdown",
+      "file": "playback/sr-ec9b8a7f-0002.wav",
+      "sha256": "829236b1d9674526eca45f05de4252d9bb7c28a2f52f0b71b1bb9656fbae3369",
+      "startSeconds": 2.273,
+      "endSeconds": 3.0,
+      "groupIds": [
+        "peer-051"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/ec9b8a7f/samples/0002.wav (目标定位-放下, recall, 000002-20260919-160919.wav)"
+    },
+    {
+      "id": "sr-56dfb35b-0001",
+      "label": "古董茶壶拿起录音",
+      "action": "pickup",
+      "file": "playback/sr-56dfb35b-0001.wav",
+      "sha256": "041cfc6c1545de86a5508e4c47f0a4401c72e327320fb5053b8f89277793102b",
+      "startSeconds": 1.265,
+      "endSeconds": 2.465,
+      "groupIds": [
+        "peer-028"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/56dfb35b/samples/0001.wav (古董茶壶-拿起, recall, 000003-20260919-163224.wav)"
+    },
+    {
+      "id": "sr-388e122c-0001",
+      "label": "花瓶拿起录音",
+      "action": "pickup",
+      "file": "playback/sr-388e122c-0001.wav",
+      "sha256": "9fbae0f94fa4909654733af9c940b45574eb55f34504454894bbae306c4a5fc7",
+      "startSeconds": 0.379,
+      "endSeconds": 1.579,
+      "groupIds": [
+        "peer-005",
+        "peer-026"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/eaa0348fa60e8b8477e82b72591f74f40f9574bf/soundradar/data/library.srz items/388e122c/samples/0001.wav (花瓶, recall, 000004-20260920-141224.wav)"
+    },
+    {
+      "id": "sr-9e7e9e83-0001",
+      "label": "盛宴雕塑拿起录音",
+      "action": "pickup",
+      "file": "playback/sr-9e7e9e83-0001.wav",
+      "sha256": "cf0b4329c6bed0e5fc14c1a570539cfabc21d307b938736a69ea76805117871d",
+      "startSeconds": 2.209,
+      "endSeconds": 3.0,
+      "groupIds": [
+        "peer-008",
+        "peer-011",
+        "peer-020",
+        "peer-025",
+        "peer-027"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/eaa0348fa60e8b8477e82b72591f74f40f9574bf/soundradar/data/library.srz items/9e7e9e83/samples/0001.wav (同音·雕塑组, merged:盛宴雕塑, 000005-20260920-141513.wav)"
+    },
+    {
+      "id": "sr-7d037c31-0001",
+      "label": "天命泥板拖动录音 1",
+      "action": "pickup",
+      "file": "playback/sr-7d037c31-0001.wav",
+      "sha256": "444d1f81e79356639ef57169fd8f014d431d622a2918f12bbc0a584ef74c2e68",
+      "startSeconds": 0.0,
+      "endSeconds": null,
+      "groupIds": [
+        "peer-001",
+        "peer-002",
+        "peer-018",
+        "peer-042"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/7d037c31/samples/0001.wav (天命泥板-拖动, upload, 天命泥板-拖动.wav)"
+    },
+    {
+      "id": "sr-7d037c31-0002",
+      "label": "天命泥板拖动录音 2",
+      "action": "pickup",
+      "file": "playback/sr-7d037c31-0002.wav",
+      "sha256": "05bae7a5067a3d138fabfd51479eca541a2ca5029ba8fc15c137744fc2d1b747",
+      "startSeconds": 0.0,
+      "endSeconds": null,
+      "groupIds": [
+        "peer-001",
+        "peer-002",
+        "peer-018",
+        "peer-042"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/7d037c31/samples/0002.wav (天命泥板-拖动, upload, 天命泥板-拖动.wav)"
+    },
+    {
+      "id": "sr-7d037c31-0003",
+      "label": "天命泥板拖动录音 3",
+      "action": "pickup",
+      "file": "playback/sr-7d037c31-0003.wav",
+      "sha256": "55cf3a37d1ed0289baa395f8e91f63a59afcc241847d4d470edf2a3e3ce7ab4f",
+      "startSeconds": 0.0,
+      "endSeconds": null,
+      "groupIds": [
+        "peer-001",
+        "peer-002",
+        "peer-018",
+        "peer-042"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/7d037c31/samples/0003.wav (天命泥板-拖动, upload, 天命泥板-拖动.wav)"
+    },
+    {
+      "id": "sr-cb1c0d1d-0004",
+      "label": "天命泥板拖动录音 4",
+      "action": "pickup",
+      "file": "playback/sr-cb1c0d1d-0004.wav",
+      "sha256": "8935966b122f065c75f9ea98217f32203a6c4b2fc0e95737f9aba3202fd44272",
+      "startSeconds": 1.979,
+      "endSeconds": 3.0,
+      "groupIds": [
+        "peer-001",
+        "peer-002",
+        "peer-018",
+        "peer-042"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/eaa0348fa60e8b8477e82b72591f74f40f9574bf/soundradar/data/library.srz items/cb1c0d1d/samples/0004.wav (同音·泥板/理想国, recall, 000001-20260920-161956.wav)"
+    },
+    {
+      "id": "sr-537b0217-0001",
+      "label": "卡莫纳之星拖动录音",
+      "action": "pickup",
+      "file": "playback/sr-537b0217-0001.wav",
+      "sha256": "b31207675f1270055e627314c9c14366a595da4c42218fb942a56aca76a14043",
+      "startSeconds": 0.0,
+      "endSeconds": null,
+      "groupIds": [
+        "peer-029",
+        "peer-036",
+        "peer-045"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/537b0217/samples/0001.wav (卡莫纳之星-拖动, upload, 卡莫纳之星-拖动.wav)"
+    },
+    {
+      "id": "sr-983e0b90-0001",
+      "label": "金狮子拖动录音",
+      "action": "pickup",
+      "file": "playback/sr-983e0b90-0001.wav",
+      "sha256": "a6360cd3cf2192e8aff1dc53f4e6ff4177056decd0a20c2cc867241645798a57",
+      "startSeconds": 0.0,
+      "endSeconds": null,
+      "groupIds": [
+        "peer-009",
+        "peer-010"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/983e0b90/samples/0001.wav (金狮子-拖动, upload, 金狮子-拖动.wav)"
+    },
+    {
+      "id": "sr-ae5a6ebc-0001",
+      "label": "脑电接收装置拖动录音 1",
+      "action": "pickup",
+      "file": "playback/sr-ae5a6ebc-0001.wav",
+      "sha256": "f68901df12f459f8e0bfb6161317613b0fd6774c09c366c8b7e3148949bf5068",
+      "startSeconds": 0.0,
+      "endSeconds": null,
+      "groupIds": [
+        "peer-004",
+        "peer-013",
+        "peer-014",
+        "peer-015",
+        "peer-017",
+        "peer-019",
+        "peer-031",
+        "peer-032",
+        "peer-033",
+        "peer-034",
+        "peer-039"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/ae5a6ebc/samples/0001.wav (脑电接收装置-拖动, upload, 脑电接收装置-拖动.wav)"
+    },
+    {
+      "id": "sr-ae5a6ebc-0002",
+      "label": "脑电接收装置拖动录音 2",
+      "action": "pickup",
+      "file": "playback/sr-ae5a6ebc-0002.wav",
+      "sha256": "9f926f04bdf3944ed2c2e2ba07225a0093d2316bf2400ef12114c131ee6f55bf",
+      "startSeconds": 0.0,
+      "endSeconds": null,
+      "groupIds": [
+        "peer-004",
+        "peer-013",
+        "peer-014",
+        "peer-015",
+        "peer-017",
+        "peer-019",
+        "peer-031",
+        "peer-032",
+        "peer-033",
+        "peer-034",
+        "peer-039"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/ae5a6ebc/samples/0002.wav (脑电接收装置-拖动, upload, 脑电接收装置-拖动.wav)"
+    },
+    {
+      "id": "sr-ae5a6ebc-0003",
+      "label": "脑电接收装置拖动录音 3",
+      "action": "pickup",
+      "file": "playback/sr-ae5a6ebc-0003.wav",
+      "sha256": "5da6521bd53eb53e8a4424d3ce80bc705b2bba4c00990ae48d00a9c7d6f73f2b",
+      "startSeconds": 0.0,
+      "endSeconds": null,
+      "groupIds": [
+        "peer-004",
+        "peer-013",
+        "peer-014",
+        "peer-015",
+        "peer-017",
+        "peer-019",
+        "peer-031",
+        "peer-032",
+        "peer-033",
+        "peer-034",
+        "peer-039"
+      ],
+      "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/ae5a6ebc/samples/0003.wav (脑电接收装置-拖动, upload, 脑电接收装置-拖动.wav)"
+    }
+  ]
+}

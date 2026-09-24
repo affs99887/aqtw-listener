@@ -77,6 +77,14 @@ internal static class PersonalLibraryTests
         Check(ReferenceAudio.Load(version.Root).Samples.Count == ReferenceAudio.Load(Base).Samples.Count + 3,
             "held-out sample leaked into index or references missing");
         Check(ReferenceAudio.Load(version.Root).Samples.All(s => !s.TemplateId.Contains(heldout.Id)), "heldout indexed");
+        // 听样本 plays each recording as captured, not the resampled matching copy.
+        var playback = PlaybackAudio.Load(version.Root).Clips;
+        var recorded = draft.Samples.Where(s => !s.CheckOnly).ToArray();
+        Check(playback.Count == PlaybackAudio.Load(Base).Clips.Count + recorded.Length &&
+            recorded.All(s => playback.Any(c => c.Id == "user-" + s.Id && c.Sha256 == s.OriginalSha256 && c.GroupIds.SequenceEqual([draft.GroupId]) &&
+                c.StartSeconds == s.StartSeconds && c.EndSeconds == s.EndSeconds)) &&
+            playback.All(c => PlaybackAudio.Read(version.Root, c).Samples.Length > 0),
+            "the personal version does not audition the original captures");
         store.Activate(version);
         Check(store.ResolveActive().Library.Items.Any(i => i.Id == draft.Item.Id), "new item not activated");
         Check(new PersonalLibraryStore(Base, store.Root).ResolveActive().Root == version.Root, "active version not persistent");

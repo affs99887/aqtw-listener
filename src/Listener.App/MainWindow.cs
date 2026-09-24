@@ -187,7 +187,7 @@ internal sealed partial class MainWindow : Window
         var captureConfig = new StackPanel();
         captureConfig.Children.Add(Theme.Label("采音与快捷键", 18));
         captureConfig.Children.Add(Theme.Label("识别只采集 UAGame 进程声音，不收录 Discord／QQ／UU 等独立软件的播放声。", 11, Theme.Muted));
-        Field(captureConfig, "试听播放设备 · 仅用于回放和参考音效", devices);
+        Field(captureConfig, "试听播放设备 · 仅用于回放和试听原声", devices);
         captureConfig.Children.Add(Theme.Label("游戏采音不依赖此设备；试听听不到时再检查这里的播放路由。", 11, Theme.Muted));
         captureConfig.Children.Add(Theme.Button("刷新播放设备", (_, _) => RefreshDevices()));
         Field(captureConfig, "启停快捷键", hotkey); hotkey.Text = settings.Hotkey;
@@ -520,8 +520,8 @@ internal sealed partial class MainWindow : Window
             Descendants<TextBlock>(followView).Any(label => label.Text == "疑似放下声");
         RenderSmoke(followView, "history-followup-smoke.png"); followView.Close();
         var sampleMenu = new ContextMenu();
-        foreach (var number in Enumerable.Range(1, 3))
-            sampleMenu.Items.Add(new MenuItem { Header = $"参考 {number} · 激光指示模块", IsCheckable = true, IsChecked = number == 1 });
+        foreach (var (number, label) in new[] { (1, "目标定位拿起录音"), (2, "目标定位放下录音 1"), (3, "目标定位放下录音 2") })
+            sampleMenu.Items.Add(new MenuItem { Header = $"原声 {number} · {label}", IsCheckable = true, IsChecked = number == 1 });
         var titleMenu = new ContextMenu();
         foreach (var header in new[] { "恢复顶部居中", "识别历史" }) titleMenu.Items.Add(new MenuItem { Header = header });
         RenderSmoke(sampleMenu, "menu-samples-smoke.png"); RenderSmoke(titleMenu, "menu-title-smoke.png");
@@ -710,13 +710,17 @@ internal sealed partial class MainWindow : Window
         var liveCards = Descendants<Border>(livePanel).Where(card => card.Tag is Candidate).ToArray();
         var liveLabels = Descendants<TextBlock>(livePanel).ToArray();
         var liveStyles = NativeInput.OverlayStyles(overlay);
+        // 听样本 is enabled exactly for items with an unprocessed recording.
+        var recorded = PlaybackAudio.Load(libraryRoot).Clips.SelectMany(clip => clip.GroupIds).ToHashSet();
+        bool Recorded(Candidate candidate) => library.Groups.Any(group => group.ItemIds.Contains(candidate.Item.Id) && recorded.Contains(group.Id));
         var liveThirteen = ReferenceEquals(Descendants<CandidatePanel>(overlay).FirstOrDefault(panel => panel.IsVisible), livePanel) &&
             overlay.Interactive && !livePanel.NeedsScroll && liveCards.Length == liveResult.CandidateCount &&
             liveResult.Candidates.All(candidate => liveLabels.Any(label => label.Text == candidate.Item.Name)) &&
             liveLabels.Count(label => label.Text == "差异率 1.0%") == liveResult.CandidateCount &&
             !liveLabels.Any(label => label.Text.Contains("匹配", StringComparison.Ordinal)) &&
-            Descendants<Button>(livePanel).Count(button => button.Tag is Candidate && button.IsEnabled) == liveResult.CandidateCount &&
-            (liveStyles & 0x20) == 0 && (liveStyles & 0x08000000) != 0;
+            Descendants<Button>(livePanel).Count(button => button.Tag is Candidate) == liveResult.CandidateCount &&
+            Descendants<Button>(livePanel).Where(button => button.Tag is Candidate).All(button => button.IsEnabled == Recorded((Candidate)button.Tag)) &&
+            liveResult.Candidates.Any(Recorded) && (liveStyles & 0x20) == 0 && (liveStyles & 0x08000000) != 0;
         var liveFresh = liveLabels.Any(label => label.Text == "刚刚" && label.IsVisible) &&
             Descendants<CandidateLayout>(livePanel).Single().Opacity == 1;
         RenderSmoke(overlay, "listening-arrival-smoke.png");

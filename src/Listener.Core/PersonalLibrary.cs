@@ -133,12 +133,13 @@ public sealed class PersonalLibraryStore
         if (ReferenceAudio.Hash(path) != sample.Sha256) throw new InvalidDataException("个人样本校验失败");
         return WaveAudio.Read(path);
     }
-    public AudioClip ReadSource(PersonalSample sample)
+    public AudioClip ReadSource(PersonalSample sample) => WaveAudio.Read(VerifiedSourcePath(sample));
+    private string VerifiedSourcePath(PersonalSample sample)
     {
         var path = Local(sample.SourceFile);
         if (!ReferenceAudio.Hash(path).Equals(sample.OriginalSha256, StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException("原始录音校验失败");
-        return WaveAudio.Read(path);
+        return path;
     }
     public void TrimSample(LearningDraft draft, PersonalSample sample, double start, double end, bool checkOnly)
     {
@@ -219,6 +220,8 @@ public sealed class PersonalLibraryStore
         if (baseReferences.Samples.Count == 0) return new(null, "基础库缺少可重建的参考音频，请使用完整程序包", []);
         var references = Clone(baseReferences);
         foreach (var reference in baseReferences.Samples) CopyRelative(ReferenceAudio.VerifiedPath(BaseRoot, reference), output, reference.File);
+        var playback = PlaybackAudio.Load(BaseRoot);
+        foreach (var clip in playback.Clips) CopyRelative(PlaybackAudio.VerifiedPath(BaseRoot, clip), output, clip.File);
         foreach (var item in library.Items.Where(i => i.Thumbnail is not null)) CopyRelative(LibraryBuilder.ResolveFile(BaseRoot, item.Thumbnail!), output, item.Thumbnail!);
         foreach (var entry in profile.Items.Where(i => i.Enabled))
         {
@@ -243,6 +246,11 @@ public sealed class PersonalLibraryStore
                 AudioSha256 = sample.OriginalSha256, StartSeconds = sample.StartSeconds, EndSeconds = sample.EndSeconds,
                 Features = AudioFeatures.Extract(clip.Samples, clip.SampleRate) });
             references.Samples.Add(new(group.Id, "user-" + sample.Id, relative, sample.Sha256, sample.RecordingId));
+            // Audition the capture itself; the reference copy is resampled for matching.
+            var original = $"playback/user-{sample.Id}-source.wav"; CopyRelative(VerifiedSourcePath(sample), output, original);
+            var name = library.Items.First(i => i.Id == sample.ItemId).Name;
+            playback.Clips.Add(new("user-" + sample.Id, $"{name} 个人录音", "pickup", original, sample.OriginalSha256,
+                sample.StartSeconds, sample.EndSeconds, [group.Id], "个人学习录音 · " + sample.Source));
         }
         if (library.Groups.Any(g => g.Templates.Count == 0 && g.Action == "pickup")) throw new InvalidDataException("新物品没有启用的参考样本，请先补样本或禁用该物品");
         library.Version = "personal-" + Path.GetFileName(output); library.ValidationStatus = "personal-reference-checked";
@@ -255,6 +263,7 @@ public sealed class PersonalLibraryStore
             s.GroupId, s.TemplateId, reason = "未能生成声纹；音频可能过短或无有效频谱，请重新录制" }).ToArray() });
         if (skipped.Length > 0) return new(null, $"有 {skipped.Length} 段未生成声纹，原库保持不变", [], report);
         JsonFile.Write(Path.Combine(output, "references.json"), references);
+        JsonFile.Write(Path.Combine(output, PlaybackAudio.ManifestName), playback);
         library.EngineIndexSha256 = ReferenceAudio.Hash(Path.Combine(output, "references.json"));
         JsonFile.Write(Path.Combine(output, "library.json"), library);
         JsonFile.Write(Path.Combine(output, "personal.json"), profile);

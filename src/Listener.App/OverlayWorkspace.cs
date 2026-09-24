@@ -215,37 +215,43 @@ internal sealed class OverlayWorkspace : Border, IDisposable
         else selected ??= snapshots.FirstOrDefault();
         controller.Audio.Pin(selected?.Id);
         var library = selected?.Library ?? controller.Library; var root = selected?.LibraryRoot ?? controller.LibraryRoot;
-        var references = LoadPlayableReferences(root);
+        var (playbackRoot, playback) = LoadPlayback(root);
         var panel = new CandidatePanel(root, settings, interactive: true, compact: true);
         var chosenVersions = new Dictionary<string, int>();
+        // The recording of the sound that matched comes first, then the item's other sounds
+        // (a putdown match still offers the pickup recording).
+        PlaybackClip[] ClipsFor(Candidate candidate) => new[] { candidate.GroupId }
+            .Concat(library.Groups.Where(g => g.ItemIds.Contains(candidate.Item.Id)).Select(g => g.Id)).Distinct()
+            .SelectMany(group => playback.GetValueOrDefault(group) ?? []).DistinctBy(clip => clip.Id).ToArray();
+        string ChoiceKey(Candidate candidate) => candidate.GroupId + "/" + candidate.Item.Id;
         async void PreviewReference(Candidate candidate, int index)
         {
             try
             {
-                var samples = references.GetValueOrDefault(candidate.GroupId) ?? [];
-                if (samples.Length == 0) throw new InvalidOperationException("该物品尚无可试听的参考音效");
-                index = Math.Clamp(index, 0, samples.Length - 1); chosenVersions[candidate.GroupId] = index;
-                await Play(WaveAudio.Read(ReferenceAudio.VerifiedPath(root, samples[index])));
-                Message($"试听参考 · {candidate.Item.Name} · {index + 1}/{samples.Length} · 同音组共享，采音已暂停");
+                var clips = ClipsFor(candidate);
+                if (clips.Length == 0) throw new InvalidOperationException("该物品暂无未经处理的原声样本");
+                index = Math.Clamp(index, 0, clips.Length - 1); chosenVersions[ChoiceKey(candidate)] = index;
+                await Play(PlaybackAudio.Read(playbackRoot, clips[index]));
+                Message($"试听原声 · {candidate.Item.Name} · {clips[index].Label} · {index + 1}/{clips.Length} · 未经处理，采音已暂停");
             }
             catch (Exception ex) { Message(ex.Message); }
         }
-        panel.SetAudioPreview(candidate => PreviewReference(candidate, chosenVersions.GetValueOrDefault(candidate.GroupId)),
-            candidate => references.ContainsKey(candidate.GroupId));
+        panel.SetAudioPreview(candidate => PreviewReference(candidate, chosenVersions.GetValueOrDefault(ChoiceKey(candidate))),
+            candidate => ClipsFor(candidate).Length > 0);
         panel.SetReferenceChoices(candidate =>
         {
-            var samples = references.GetValueOrDefault(candidate.GroupId) ?? [];
-            if (samples.Length <= 1) return null;
+            var clips = ClipsFor(candidate);
+            if (clips.Length <= 1) return null;
             var menu = new ContextMenu();
-            foreach (var number in Enumerable.Range(0, samples.Length))
+            foreach (var number in Enumerable.Range(0, clips.Length))
             {
-                var option = new MenuItem { Header = $"参考 {number + 1} · {candidate.Item.Name}", IsCheckable = true,
-                    IsChecked = number == chosenVersions.GetValueOrDefault(candidate.GroupId) };
+                var option = new MenuItem { Header = $"原声 {number + 1} · {clips[number].Label}", IsCheckable = true,
+                    IsChecked = number == chosenVersions.GetValueOrDefault(ChoiceKey(candidate)) };
                 option.Click += (_, _) => PreviewReference(candidate, number); menu.Items.Add(option);
             }
             menu.Opened += (_, _) =>
             {
-                var current = chosenVersions.GetValueOrDefault(candidate.GroupId);
+                var current = chosenVersions.GetValueOrDefault(ChoiceKey(candidate));
                 for (var index = 0; index < menu.Items.Count; index++)
                     ((MenuItem)menu.Items[index]).IsChecked = index == current;
             };
@@ -310,17 +316,21 @@ internal sealed class OverlayWorkspace : Border, IDisposable
             : selected is null ? "采音已暂停 · 尚无声音片段；可进入补库选择物品"
                 : $"采音已暂停 · {selected.At:HH:mm:ss} · {selected.Analysis.Result.Message}");
     }
-    private static Dictionary<string, ReferenceSample[]> LoadPlayableReferences(string root)
+    // Only original recordings are auditioned. Personal versions built before playback
+    // clips existed fall back to the bundled ones, whose group ids they keep.
+    private (string Root, Dictionary<string, PlaybackClip[]> Clips) LoadPlayback(string root)
     {
+        var source = PlaybackAudio.Exists(root) ? root : store.BaseRoot;
         try
         {
-            return ReferenceAudio.Load(root).Samples.Where(sample =>
+            return (source, PlaybackAudio.Load(source).Clips.Where(clip =>
             {
-                try { _ = ReferenceAudio.VerifiedPath(root, sample); return true; }
-                catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException) { return false; }
-            }).GroupBy(sample => sample.GroupId).ToDictionary(group => group.Key, group => group.ToArray());
+                try { return File.Exists(LibraryBuilder.ResolveFile(source, clip.File)); }
+                catch (InvalidDataException) { return false; }
+            }).SelectMany(clip => clip.GroupIds.Select(group => (Group: group, Clip: clip)))
+                .GroupBy(entry => entry.Group).ToDictionary(group => group.Key, group => group.Select(entry => entry.Clip).ToArray()));
         }
-        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or System.Text.Json.JsonException) { return []; }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or System.Text.Json.JsonException) { return (source, []); }
     }
     private void SaveClip()
     {

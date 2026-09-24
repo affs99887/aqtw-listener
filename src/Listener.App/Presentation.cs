@@ -103,6 +103,7 @@ internal sealed class CandidatePanel : Border
             Padding = new Thickness(4, 1, 4, 1), Margin = new Thickness(2), IsHitTestVisible = false };
     }
     private const string DifferenceHelp = "差异率 = 100% − 本次声音与该物品参考音效的相似度，越低越接近；共用同一条参考的物品数值相同。不是单件物品的确定率。";
+    private const string NoPlayback = "暂无未经处理的原声：识别用参考经过音量归一化和裁剪，与游戏里听到的不同，因此不用于试听";
     private const string Disclaimer = "大红概率按同格候选计算，不是游戏的真实出货概率。\n" + DifferenceHelp;
     // Live results fade after this long so an earlier pickup is not read as the current one.
     public const double StaleSeconds = 10;
@@ -374,7 +375,7 @@ internal sealed class CandidatePanel : Border
         if (candidates.Count == 0)
         {
             return new Border { Padding = new Thickness(0, compact ? 8 : 20, 0, compact ? 8 : 20),
-                Child = Theme.Label("物品声音出现后，在这里查看图片并试听参考音效", 11 * FontScale, Theme.Muted) };
+                Child = Theme.Label("物品声音出现后，在这里查看图片并试听原声", 11 * FontScale, Theme.Muted) };
         }
         var rows = new StackPanel();
         var highest = lastResult?.HighestValue;
@@ -437,7 +438,7 @@ internal sealed class CandidatePanel : Border
     private FrameworkElement BuildDesignGroups(IReadOnlyList<Candidate> candidates, double availableWidth, double thumbnail)
     {
         if (candidates.Count == 0)
-            return new Border { Padding = new Thickness(18), Child = Theme.Label("物品声音出现后，在这里查看候选并试听参考音效", 12 * FontScale, Theme.Muted) };
+            return new Border { Padding = new Thickness(18), Child = Theme.Label("物品声音出现后，在这里查看候选并试听原声", 12 * FontScale, Theme.Muted) };
         if (candidates.Count > 20) return BuildDenseDesignGroups(candidates, availableWidth, thumbnail);
         return BuildSectionedDesignGroups(candidates, availableWidth, thumbnail);
     }
@@ -674,9 +675,9 @@ internal sealed class CandidatePanel : Border
             if (wide && !sideButton) { play.Width = 96 * FontScale; play.HorizontalAlignment = HorizontalAlignment.Left; }
             play.FontSize = (wide ? 10 : 9) * FontScale;
             play.Tag = candidate; play.IsEnabled = referenceAvailable?.Invoke(candidate) ?? (playReference is not null || ReferenceRequested is not null);
-            play.ToolTip = play.IsEnabled ? $"试听 {item.Name} 对应的参考音效" : "当前音效库没有可试听的音频样本";
+            play.ToolTip = play.IsEnabled ? $"试听 {item.Name} 的原声（未经处理的游戏录音）" : NoPlayback;
             play.ContextMenu = referenceChoices?.Invoke(candidate); ToolTipService.SetShowOnDisabled(play, true);
-            AutomationProperties.SetName(play, $"试听{item.Name}的参考音效");
+            AutomationProperties.SetName(play, $"试听{item.Name}的原声");
             if (sideButton) { Grid.SetColumn(play, 2); grid.Children.Add(play); }
             else details.Children.Add(play);
         }
@@ -730,9 +731,9 @@ internal sealed class CandidatePanel : Border
             play = Theme.Button("▶  听样本", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
             play.Height = 32; play.Padding = new Thickness(0); play.Margin = new Thickness(0); play.FontSize = 11 * FontScale;
             play.Tag = candidate; play.IsEnabled = referenceAvailable?.Invoke(candidate) ?? (playReference is not null || ReferenceRequested is not null);
-            play.ToolTip = play.IsEnabled ? $"试听 {item.Name} 对应的参考音效" : "当前音效库没有可试听的音频样本";
+            play.ToolTip = play.IsEnabled ? $"试听 {item.Name} 的原声（未经处理的游戏录音）" : NoPlayback;
             play.ContextMenu = referenceChoices?.Invoke(candidate);
-            ToolTipService.SetShowOnDisabled(play, true); AutomationProperties.SetName(play, $"试听{item.Name}的参考音效");
+            ToolTipService.SetShowOnDisabled(play, true); AutomationProperties.SetName(play, $"试听{item.Name}的原声");
             stack.Children.Add(play);
         }
         if (thumbnail <= 48 && play is not null)
@@ -827,10 +828,10 @@ internal sealed class CandidatePanel : Border
             var play = Theme.Button("▶ 听样本", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
             play.Padding = new Thickness(2, 3, 2, 3); play.Margin = new Thickness(0); play.FontSize = 10 * FontScale;
             play.Tag = candidate; play.IsEnabled = referenceAvailable?.Invoke(candidate) ?? (playReference is not null || ReferenceRequested is not null);
-            play.ToolTip = play.IsEnabled ? $"试听 {item.Name} 对应的参考音效" : "当前音效库没有可试听的音频样本";
+            play.ToolTip = play.IsEnabled ? $"试听 {item.Name} 的原声（未经处理的游戏录音）" : NoPlayback;
             play.ContextMenu = referenceChoices?.Invoke(candidate);
             ToolTipService.SetShowOnDisabled(play, true);
-            AutomationProperties.SetName(play, $"试听{item.Name}的参考音效");
+            AutomationProperties.SetName(play, $"试听{item.Name}的原声");
             stack.Children.Add(play);
             if (thumbnail <= 48)
             {

@@ -482,6 +482,30 @@ Test("基础库：琥珀天心类、定位组的拿起声与放下/转移声给�
         Check(pickup.Candidates.Select(c => c.GroupId).Distinct().Count() == members - 1, $"{item}: pickup lost the per-item references");
     }
 });
+Test("基础库「听样本」只放原始录音：不是处理过的识别参考，未归一化，匹配器把每段识别为所关联的音效组", () =>
+{
+    var library = BaseLibrary();
+    var playback = PlaybackAudio.Load(baseRoot);
+    using var recognizer = new InMatchRecognizer(library, baseRoot);
+    var groups = library.Groups.Select(g => g.Id).ToHashSet();
+    var processed = ReferenceAudio.Load(baseRoot).Samples.Select(s => s.Sha256.ToUpperInvariant()).ToHashSet();
+    Check(playback.Clips.Count > 0 && playback.Clips.Select(c => c.Id).Distinct().Count() == playback.Clips.Count, "playback manifest empty or duplicated");
+    foreach (var clip in playback.Clips)
+    {
+        var whole = WaveAudio.Read(PlaybackAudio.VerifiedPath(baseRoot, clip));
+        var window = PlaybackAudio.Read(baseRoot, clip);
+        var duration = whole.Samples.Length / (double)whole.SampleRate;
+        Check(!processed.Contains(clip.Sha256.ToUpperInvariant()), $"{clip.Id} reuses a processed matching reference");
+        Check(clip.StartSeconds >= 0 && (clip.EndSeconds ?? duration) <= duration + 1e-6 && window.Samples.Length >= whole.SampleRate * .3,
+            $"{clip.Id}: play window outside the recording or too short");
+        Check(window.Samples.Max(v => Math.Abs(v)) < .95, $"{clip.Id}: normalised to full scale");
+        Check(clip.GroupIds.Length > 0 && clip.GroupIds.All(groups.Contains), $"{clip.Id}: unknown groups");
+        var matched = recognizer.Recognize(whole.Samples, whole.SampleRate).Candidates.Select(c => c.GroupId).ToHashSet();
+        Check(matched.SetEquals(clip.GroupIds), $"{clip.Id} ({clip.Label}) is recognised as {string.Join(",", matched)}, not {string.Join(",", clip.GroupIds)}");
+    }
+    Check(new[] { "peer-047", "peer-051" }.All(group => playback.Clips.Any(c => c.Action == "putdown" && c.GroupIds.Contains(group))),
+        "a relabelled putdown sound has no putdown recording to audition");
+});
 Test("基础库：拖动胶囊电视后放下不改候选，单独快速转移也给出同类候选", () =>
 {
     const int rate = 48000;

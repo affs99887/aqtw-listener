@@ -118,7 +118,7 @@ internal sealed partial class MainWindow
         for (var i = 0; i < 3; i++) actions.ColumnDefinitions.Add(new ColumnDefinition());
         historyButton = Theme.Button("识别历史（0）", (_, _) => ShowHistory());
         var compare = Theme.Button("打开监听浮窗", async (_, _) => await EnterInteraction());
-        compare.ToolTip = "暂停采音，在监听浮窗中回放录音和试听候选参考音效";
+        compare.ToolTip = "暂停采音，在监听浮窗中回放录音和试听候选原声";
         var test = Theme.Button("3 秒后试识别", async (_, _) => await controller.TestAfterCountdown());
         var buttons = new[] { historyButton, compare, test };
         for (var i = 0; i < buttons.Length; i++) { buttons[i].Padding = new Thickness(4, 12, 4, 12); buttons[i].FontSize = 11; buttons[i].HorizontalContentAlignment = HorizontalAlignment.Center; buttons[i].Margin = new Thickness(0, 0, i == 2 ? 0 : 8, 0); Grid.SetColumn(buttons[i], i); actions.Children.Add(buttons[i]); }
