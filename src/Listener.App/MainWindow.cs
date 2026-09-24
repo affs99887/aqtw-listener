@@ -272,7 +272,7 @@ internal sealed partial class MainWindow : Window
         overlay.SetWorkspace(workspace);
         try
         {
-            input = new(this); input.Toggle += async () => await controller.Toggle(); input.MouseDown += controller.Click;
+            input = new(this); input.Toggle += async () => await controller.Toggle(); input.MouseDown += controller.Click; input.MouseUp += controller.Release;
             input.ForegroundChanged += controller.ForegroundChanged;
             input.InteractionToggle += async () => { if (controller.Mode == AssistantMode.Interaction) await ExitInteraction(); else await EnterInteraction(); };
             input.SetHotkey(settings.Hotkey); input.SetInteractionHotkey(settings.InteractionHotkey);

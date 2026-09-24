@@ -52,6 +52,7 @@ internal sealed class NativeInput : IDisposable
     public event Action? Toggle;
     public event Action? InteractionToggle;
     public event Action<double, string>? MouseDown;
+    public event Action<double, string>? MouseUp;
     public event Action? ForegroundChanged;
     public static double Now => (double)Stopwatch.GetTimestamp() / Stopwatch.Frequency;
 
@@ -116,7 +117,11 @@ internal sealed class NativeInput : IDisposable
             if (code >= 0 && !disposed)
             {
                 var now = Now;
-                if (message.ToInt32() == 0x202) buttons.HookUp(now);
+                if (message.ToInt32() == 0x202)
+                {
+                    if (buttons.HookUp(now) && !PointerTargetsOverlay(Marshal.PtrToStructure<NativePoint>(data)))
+                        QueueRelease(now, "鼠标事件");
+                }
                 else if (message.ToInt32() == 0x201)
                 {
                     var triggered = buttons.HookDown(now);
@@ -137,14 +142,14 @@ internal sealed class NativeInput : IDisposable
         // GetAsyncKeyState uses physical buttons; the hook uses logical buttons.
         var key = GetSystemMetrics(23) != 0 ? 0x02 : 0x01;
         var now = Now;
-        if (buttons.Poll((GetAsyncKeyState(key) & 0x8000) != 0, now))
+        var edge = buttons.Sample((GetAsyncKeyState(key) & 0x8000) != 0, now);
+        if (edge == MouseEdge.None || GetCursorPos(out var point) && PointerTargetsOverlay(point)) return;
+        if (edge == MouseEdge.Press)
         {
-            if (!GetCursorPos(out var point) || !PointerTargetsOverlay(point))
-            {
-                PollTriggers++;
-                QueueClick(now, "按键检测（远程兼容）");
-            }
+            PollTriggers++;
+            QueueClick(now, "按键检测（远程兼容）");
         }
+        else QueueRelease(now, "按键检测（远程兼容）");
     }
     private static bool PointerTargetsOverlay(NativePoint point)
     {
@@ -158,6 +163,8 @@ internal sealed class NativeInput : IDisposable
         _ = dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
         { if (!disposed) MouseDown?.Invoke(now, origin); }));
     }
+    private void QueueRelease(double now, string origin) =>
+        _ = dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => { if (!disposed) MouseUp?.Invoke(now, origin); }));
     public static (string Name, uint Id) ForegroundProcessIdentity()
     {
         var window = GetForegroundWindow();

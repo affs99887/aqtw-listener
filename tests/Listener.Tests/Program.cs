@@ -97,6 +97,25 @@ Test("漏掉松开事件后能恢复下一次拖动", () =>
     Check(!mouse.Poll(false, 1.2), "release triggered");
     Check(mouse.HookDown(1.3), "latch stuck after missed release");
 });
+Test("松开鼠标由事件或按键检测各报告一次，不重复", () =>
+{
+    var mouse = new MouseButtonTracker();
+    Check(mouse.HookDown(1) && mouse.HookUp(1.3), "hook release lost");
+    Check(mouse.Sample(false, 1.5) == MouseEdge.None, "the poll repeated a hook release");
+    Check(mouse.Sample(true, 2) == MouseEdge.Press && mouse.Sample(true, 2.1) == MouseEdge.None, "remote press lost or repeated");
+    Check(mouse.Sample(false, 2.4) == MouseEdge.Release && mouse.Sample(false, 2.5) == MouseEdge.None, "remote release lost or repeated");
+    Check(!mouse.HookUp(2.6), "a release without a press was reported");
+});
+Test("按下后的声音归为拿起声，松开后的归为放下声，远离鼠标操作的声音未知", () =>
+{
+    var log = new MouseEdgeLog();
+    Check(log.Classify(10) == SoundPhase.Unknown, "no input produced a phase");
+    log.Press(10); log.Release(10.9); log.Press(11.2);
+    Check(log.Classify(10.08) == SoundPhase.Pickup, "the sound after a press was not a pickup");
+    Check(log.Classify(10.97) == SoundPhase.Putdown, "the sound after a release was not a putdown");
+    Check(log.Classify(11.18) == SoundPhase.Pickup, "an onset placed just before the press timestamp lost its press");
+    Check(log.Classify(10.6) == SoundPhase.Unknown && log.Classify(12) == SoundPhase.Unknown, "a sound far from any edge was attributed to it");
+});
 Test("音量变化不改变匹配分数", () =>
 {
     using var recognizer = Engine(Library());
@@ -419,6 +438,27 @@ Test("放下声与拿起声候选相同时，再干净也不替换拿起结果�
     Check(history.Latest?.Id == pickup.Id && history.Entries[0].FollowUp, "same-item putdown replaced the pickup's scores");
     history.Remember(Result(3, ("c", "gc", .97)), "自动", true, historyAt.AddSeconds(.9), audioSeconds: 10.9);
     Check(history.Latest?.Result.BestMatch?.Item.Id == "c", "clearly stronger different item was held back");
+});
+Test("松开鼠标后的放下声再强也不替换拿起结果，按下后的拿起声不被当成放下声扣留", () =>
+{
+    RecognitionResult Result(long id, string item, double score) => new(id, RecognitionStatus.Matched, true,
+        [new(new(item, item, true), score, "g-" + item)], 1, "match");
+    var history = new RecognitionHistory();
+    history.Remember(Result(1, "pickup", .9), "自动", true, historyAt, audioSeconds: 10, phase: SoundPhase.Pickup);
+    var pickup = history.Latest!;
+    // Past the timing window and clearly stronger: only the mouse says it is a putdown.
+    history.Remember(Result(2, "lamp", .99), "自动", true, historyAt.AddSeconds(2.5), audioSeconds: 12.5, phase: SoundPhase.Putdown);
+    Check(history.Latest?.Id == pickup.Id && history.Entries[0] is { FollowUp: true, Phase: SoundPhase.Putdown }, "a putdown replaced the pickup");
+    history.Remember(Result(3, "lamp", .99), "自动", true, historyAt.AddSeconds(2.7), audioSeconds: 12.5, phase: SoundPhase.Putdown);
+    Check(history.Latest?.Id == pickup.Id && history.Entries.Count == 2, "an overlapping scan of the putdown was promoted");
+    // 0.6 s after a pickup and weaker, which timing alone holds as a putdown twin: a new press says pickup.
+    history.Remember(Result(4, "second", .8), "自动", true, historyAt.AddSeconds(3.1), audioSeconds: 13.1, phase: SoundPhase.Pickup);
+    history.Remember(Result(5, "third", .75), "自动", true, historyAt.AddSeconds(3.7), audioSeconds: 13.7, phase: SoundPhase.Pickup);
+    Check(history.Latest?.Result.BestMatch?.Item.Id == "third", "a pickup after a new press was held back");
+    var timed = new RecognitionHistory();
+    timed.Remember(Result(1, "pickup", .9), "自动", true, historyAt, audioSeconds: 10);
+    timed.Remember(Result(2, "second", .8), "自动", true, historyAt.AddSeconds(.6), audioSeconds: 10.6);
+    Check(timed.Latest?.Result.BestMatch?.Item.Id == "pickup" && timed.Entries[0].Phase == SoundPhase.Unknown, "the timing fallback changed");
 });
 var baseRoot = Path.Combine(AppContext.BaseDirectory, "library");
 SoundLibrary BaseLibrary() => JsonFile.Read<SoundLibrary>(Path.Combine(baseRoot, "library.json"));

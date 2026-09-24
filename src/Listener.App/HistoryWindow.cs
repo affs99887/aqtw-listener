@@ -27,7 +27,7 @@ internal sealed class HistoryWindow : Window
         var root = new DockPanel { Margin = new Thickness(20) }; Content = root;
         var header = new StackPanel(); DockPanel.SetDock(header, Dock.Top); root.Children.Add(header);
         header.Children.Add(Theme.Label("识别历史", 24));
-        header.Children.Add(Theme.Label("保留本次运行最近 100 条。相邻重复声音会合并；拿起后 1 秒内的其他音效标为疑似放下声，不替换浮窗；退出软件后清空。", 12, Theme.Muted));
+        header.Children.Add(Theme.Label("保留本次运行最近 100 条。相邻重复声音会合并；松开鼠标后的声音标为放下声，没有鼠标信号时拿起后 1 秒内的其他音效标为疑似放下声，均不替换浮窗；退出软件后清空。", 12, Theme.Muted));
         var actions = new DockPanel();
         if (compare is not null)
         {
@@ -71,9 +71,12 @@ internal sealed class HistoryWindow : Window
             var heading = new DockPanel();
             if (entry.FollowUp)
             {
+                var released = entry.Phase == SoundPhase.Putdown;
                 var tag = new Border { Background = Theme.Raised, BorderBrush = Theme.Gold, BorderThickness = new Thickness(1),
                     Padding = new Thickness(5, 0, 5, 1), VerticalAlignment = VerticalAlignment.Center,
-                    Child = Theme.Label("疑似放下声", 10, Theme.Gold), ToolTip = "拿起结果后 1 秒内出现的其他音效，多为同一件物品的放下声；未替换当时的浮窗结果" };
+                    Child = Theme.Label(released ? "放下声" : "疑似放下声", 10, Theme.Gold), ToolTip = released
+                        ? "松开鼠标后出现的声音，是物品的放下声；未替换当时的浮窗结果"
+                        : "拿起结果后 1 秒内出现的其他音效，多为同一件物品的放下声；未替换当时的浮窗结果" };
                 ((TextBlock)tag.Child).Margin = new Thickness(0);
                 DockPanel.SetDock(tag, Dock.Right); heading.Children.Add(tag);
             }
@@ -102,7 +105,8 @@ internal sealed class HistoryWindow : Window
         if (entry?.LibraryRoot is { Length: > 0 } root) details.SetLibraryRoot(root);
         detailTitle.Text = entry is null ? "本次运行尚无历史记录"
             : $"{entry.LastSeen:yyyy-MM-dd HH:mm:ss} · {entry.Source}" + (entry.Matches > 1 ? $" · 合并 {entry.Matches} 次" : "");
-        detailNote.Text = entry?.FollowUp == true ? "疑似放下声：出现在上一次拿起结果之后 1 秒内，未替换当时的浮窗结果。" : "";
+        detailNote.Text = entry is not { FollowUp: true } ? "" : entry.Phase == SoundPhase.Putdown
+            ? "放下声：出现在松开鼠标之后，未替换当时的浮窗结果。" : "疑似放下声：出现在上一次拿起结果之后 1 秒内，未替换当时的浮窗结果。";
         detailNote.Visibility = detailNote.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
         details.ShowResult(entry is null
             ? new(0, RecognitionStatus.Unknown, true, [], 0, "识别成功后会保存在这里")

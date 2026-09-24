@@ -8,5 +8,9 @@ public sealed class ClickLatch
         if (held) return false;
         held = true; return true;
     }
-    public void Up() => held = false;
+    public bool Up()
+    {
+        var released = held;
+        held = false; return released;
+    }
 }

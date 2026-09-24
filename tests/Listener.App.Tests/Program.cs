@@ -135,6 +135,23 @@ internal static class Program
                     "input kept postponing the automatic scan");
                 Check(f.Recognizer.Calls == 1 && f.Results.Last()!.IsFinal, "pickup waited for a later action");
             }),
+            ("按下鼠标后的拿起声发布结果，松开鼠标后的放下声只记历史不替换", () =>
+            {
+                using var f = new Fixture(); f.Controller.Toggle().GetAwaiter().GetResult();
+                f.Controller.Click(10, "鼠标事件"); f.Capture.Timeline.Append(Fixture.Sound(), 10.05); f.Tick(10.7); f.Finish();
+                Check(f.Controller.History.Latest?.Result.BestMatch?.Item.Id == "test", "the pickup after a press was not published");
+                // Held for 1.5 s, past the timing window: only the release marks the next sound as a putdown.
+                f.Recognizer.ItemId = "drop";
+                f.Controller.Release(11.5, "鼠标事件"); f.Capture.Timeline.Append(Fixture.Sound(), 11.55); f.Tick(12.2); f.Finish();
+                Check(f.Controller.History.Latest?.Result.BestMatch?.Item.Id == "test" &&
+                    f.Controller.History.Entries[0] is { FollowUp: true, Phase: SoundPhase.Putdown } &&
+                    f.Results.Last()?.BestMatch?.Item.Id == "test" && f.Controller.CurrentActivity.Message.Contains("放下声"),
+                    "the putdown after a release replaced the pickup");
+                f.Recognizer.ItemId = "next";
+                f.Controller.Click(13, "鼠标事件"); f.Capture.Timeline.Append(Fixture.Sound(), 13.05); f.Tick(13.7); f.Finish();
+                Check(f.Controller.History.Latest?.Result.BestMatch?.Item.Id == "next" && f.Controller.History.Latest.Phase == SoundPhase.Pickup,
+                    "the next pickup was held back");
+            }),
             ("后续未匹配声音保留已发布的拿起候选与录音", () =>
             {
                 using var f = new Fixture(); f.StartSound(); f.Finish();
