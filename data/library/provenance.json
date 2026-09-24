@@ -1,13 +1,13 @@
 {
-  "version": "0.3.3-peer-pickup-20260924",
+  "version": "0.4.0-inmatch-20260924",
   "source": "User-provided peer v0.67 packaged material library",
   "sourceExecutableSha256": "f421fc13e12dcb495ef143895e1398b9c44ac4c73ba3d94b74f3f17fb7cfec35",
   "sourceReferencesSha256": "d18ec01dd063745d5a7bed148ff438c9014bfbf079b9aad7a8ac812c4601fe3f",
   "sourceIndexSha256": "5ebb2a49a0d8fd43782ac4ccf57528e051188233351c7aaec60792a1027f7f68",
   "licenseStatus": "No verifiable source repository or license supplied for these peer materials; original rights retained.",
   "conversion": "stored float32 * 32767, truncate to signed PCM16; 48 kHz mono, 0.45 seconds; no additional processing",
-  "indexSha256": "b154e7b5a09acfaa14b5fc3a7aca607c377c432fbd8ff615875405d9ea89742a",
-  "recognition": "Existing SoundRadar-based matcher, pickup scanner and .75/.78 thresholds unchanged; no putdown auxiliary matching.",
+  "indexSha256": null,
+  "recognition": "v0.4.0: in-process in-match matcher (onset-anchored, pre-onset background subtraction, mel bands 16-55); group thresholds .82 with five short/noise-like references at .90, automatic single-event minimum .86; no putdown auxiliary matching. The Go SoundRadar index is no longer bundled.",
   "entries": [
     {
       "sourceReferenceId": "peer-000",
@@ -1063,5 +1063,6 @@
       "thumbnailSource": "user-provided-peer-v0.67",
       "gridEvidenceImageSha256": "73d1b64bd9e6c6083954fb3f758a89687fb794e9ff075a9141d80f76ca5a89d2"
     }
-  ]
+  ],
+  "referencesJsonSha256": "56C9566471523B7BF3E47B1799E1D53CB2E6B97DEFC26C128BDC33C55BCE8B8F"
 }

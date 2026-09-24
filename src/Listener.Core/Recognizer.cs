@@ -7,6 +7,10 @@ public interface IRecognizer : IDisposable
     RecognitionResult Recognize(float[] samples, int sampleRate, long operationId = 0, bool final = true, CancellationToken cancellation = default);
     RecognitionAnalysis Analyze(float[] samples, int sampleRate, long operationId = 0, bool final = true, CancellationToken cancellation = default)
         => new(Recognize(samples, sampleRate, operationId, final, cancellation), []);
+    // Analyse a clip whose sound event starts onsetSeconds into the clip. Engines that
+    // do not anchor on the onset simply analyse the whole clip.
+    RecognitionAnalysis AnalyzeAt(float[] samples, int sampleRate, double onsetSeconds, long operationId = 0, bool final = true, CancellationToken cancellation = default)
+        => Analyze(samples, sampleRate, operationId, final, cancellation);
     (SoundGroup Group, double Score)[] ScoreAudio(float[] samples, int sampleRate, CancellationToken cancellation = default);
 }
 

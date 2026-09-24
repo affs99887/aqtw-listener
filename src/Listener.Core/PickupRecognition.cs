@@ -4,27 +4,26 @@ public sealed record PickupAnalysis(RecognitionAnalysis Analysis, AudioScanWindo
 
 public static class PickupRecognition
 {
-    // Continuous listening also encounters footsteps and UI transients. Keep a
-    // small margin over the catalog's experimental 0.75 floor for an unattended
-    // single-event verdict; matching never becomes a mandatory two-action pair.
-    public const double MinimumAutomaticScore = .78;
+    // Continuous listening also encounters footsteps, UI clicks and other items'
+    // putdown sounds. Replaying five full raids with the in-match matcher put
+    // genuine pickups at 0.92–0.98 and the loose first-person false alarms at
+    // 0.85–0.90, so an unattended single-event verdict needs a little more than
+    // the catalogue floor; matching never becomes a mandatory two-action pair.
+    public const double MinimumAutomaticScore = .86;
     public static PickupAnalysis Analyze(IRecognizer recognizer, AudioScanWindow window,
         long operationId = 0, CancellationToken cancellation = default)
     {
+        // Analyse the pickup itself, anchored on its onset. The clip keeps the room
+        // tone before the sound so the matcher can subtract it, and enough tail to
+        // hold the longest catalogue sound. A later putdown or unrelated sound
+        // cannot veto the pickup or force the user to wait for a second action.
         var pickup = window.Focus();
-        var primary = recognizer.Analyze(pickup.Samples, pickup.SampleRate, operationId, true, cancellation);
-        if (primary.Result is { Status: RecognitionStatus.Matched, BestMatch.Score: < MinimumAutomaticScore })
-            primary = primary with { Result = primary.Result with
+        var analysis = recognizer.AnalyzeAt(pickup.Samples, pickup.SampleRate, window.OnsetSeconds - pickup.StartSeconds, operationId, true, cancellation);
+        if (analysis.Result is { Status: RecognitionStatus.Matched, BestMatch.Score: < MinimumAutomaticScore })
+            analysis = analysis with { Result = analysis.Result with
             {
                 Status = RecognitionStatus.Unknown, Candidates = [], Message = "拿起声证据偏弱 · 继续监听"
             } };
-        // A complete pickup is sufficient. A later putdown or unrelated sound
-        // cannot veto it or force the user to wait for a second action.
-        if (primary.Result.Status != RecognitionStatus.Unknown) return new(primary, pickup);
-        var longer = window.Focus(.08, .52);
-        if (longer.Samples.Length <= pickup.Samples.Length + pickup.SampleRate * .04) return new(primary, pickup);
-        var support = recognizer.Analyze(longer.Samples, longer.SampleRate, operationId, true, cancellation);
-        var resolved = AutomaticRecognitionConsensus.Resolve(primary, support);
-        return resolved.Result.Status == RecognitionStatus.Matched ? new(resolved, longer) : new(primary, pickup);
+        return new(analysis, pickup);
     }
 }

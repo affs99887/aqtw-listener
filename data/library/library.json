@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "featureVersion": "logmel24k-48-v1",
-  "version": "0.3.3-peer-pickup-20260924",
+  "version": "0.4.0-inmatch-20260924",
   "gameVersion": "peer-v0.67 reference library; unverified game version",
-  "validationStatus": "uncalibrated",
-  "primaryEngine": "soundradar",
-  "engineIndexSha256": "b154e7b5a09acfaa14b5fc3a7aca607c377c432fbd8ff615875405d9ea89742a",
-  "notes": "62 条用户指定的拿起参考；沿用本项目识别逻辑和阈值，一声可返回多件同音候选。不使用放下辅助库。匹配度不是单件确定率或实战正确率。",
+  "validationStatus": "replay-checked-5-raids",
+  "primaryEngine": "inmatch",
+  "engineIndexSha256": "56C9566471523B7BF3E47B1799E1D53CB2E6B97DEFC26C128BDC33C55BCE8B8F",
+  "notes": "62 条拿起参考不变；识别改用局内匹配器（起点锚定、扣除前 300 ms 背景谱、只比对约 0.9–11 kHz 频带）。组门限 0.82，五条短促或类噪声参考 0.90，自动单次结果另需 0.86；门限按 9 月 20–22 日五场完整录像回放校准，不是独立准确率验收。一声可返回多件同音候选，匹配度不是单件确定率。",
   "calibrationRecordingIds": [],
   "calibrationAudioHashes": [],
   "items": [
@@ -887,7 +887,7 @@
       "itemIds": [
         "267afca3-9"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-000-1",
@@ -1658,7 +1658,7 @@
       "itemIds": [
         "peer-001"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-001-1",
@@ -2779,7 +2779,7 @@
       "itemIds": [
         "peer-002"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-002-1",
@@ -3900,7 +3900,7 @@
       "itemIds": [
         "peer-003"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-003-1",
@@ -5121,7 +5121,7 @@
       "itemIds": [
         "361affd2-10"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-004-1",
@@ -6192,7 +6192,7 @@
       "itemIds": [
         "peer-005"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-005-1",
@@ -7713,7 +7713,7 @@
       "itemIds": [
         "267afca3-6"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-006-1",
@@ -8484,7 +8484,7 @@
       "itemIds": [
         "peer-007"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-007-1",
@@ -9555,7 +9555,7 @@
       "itemIds": [
         "peer-008"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-008-1",
@@ -10376,7 +10376,7 @@
       "itemIds": [
         "peer-009"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-009-1",
@@ -11697,7 +11697,7 @@
       "itemIds": [
         "983e0b90-0"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-010-1",
@@ -13018,7 +13018,7 @@
       "itemIds": [
         "9e7e9e83-0"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-011-1",
@@ -13839,7 +13839,7 @@
       "itemIds": [
         "peer-012"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-012-1",
@@ -14360,7 +14360,7 @@
       "itemIds": [
         "361affd2-2"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-013-1",
@@ -15431,7 +15431,7 @@
       "itemIds": [
         "361affd2-8"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-014-1",
@@ -16502,7 +16502,7 @@
       "itemIds": [
         "361affd2-7"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-015-1",
@@ -17573,7 +17573,7 @@
       "itemIds": [
         "e9f62d39-3"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-016-1",
@@ -18094,7 +18094,7 @@
       "itemIds": [
         "361affd2-9"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-017-1",
@@ -19165,7 +19165,7 @@
       "itemIds": [
         "cb1c0d1d-1"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-018-1",
@@ -20286,7 +20286,7 @@
       "itemIds": [
         "361affd2-3"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-019-1",
@@ -21357,7 +21357,7 @@
       "itemIds": [
         "peer-020"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-020-1",
@@ -22178,7 +22178,7 @@
       "itemIds": [
         "e9f62d39-7"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-021-1",
@@ -22699,7 +22699,7 @@
       "itemIds": [
         "267afca3-1"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-022-1",
@@ -23470,7 +23470,7 @@
       "itemIds": [
         "e9f62d39-0"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-023-1",
@@ -23991,7 +23991,7 @@
       "itemIds": [
         "e9f62d39-2"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-024-1",
@@ -24512,7 +24512,7 @@
       "itemIds": [
         "peer-025"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-025-1",
@@ -25333,7 +25333,7 @@
       "itemIds": [
         "388e122c-0"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-026-1",
@@ -26854,7 +26854,7 @@
       "itemIds": [
         "9e7e9e83-1"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-027-1",
@@ -27675,7 +27675,7 @@
       "itemIds": [
         "56dfb35b-0"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-028-1",
@@ -29246,7 +29246,7 @@
       "itemIds": [
         "537b0217-1"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-029-1",
@@ -29917,7 +29917,7 @@
       "itemIds": [
         "267afca3-0"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-030-1",
@@ -30688,7 +30688,7 @@
       "itemIds": [
         "361affd2-0"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-031-1",
@@ -31759,7 +31759,7 @@
       "itemIds": [
         "361affd2-6"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-032-1",
@@ -32830,7 +32830,7 @@
       "itemIds": [
         "361affd2-5"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-033-1",
@@ -33901,7 +33901,7 @@
       "itemIds": [
         "361affd2-4"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-034-1",
@@ -34972,7 +34972,7 @@
       "itemIds": [
         "e9f62d39-6"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-035-1",
@@ -35493,7 +35493,7 @@
       "itemIds": [
         "537b0217-0"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-036-1",
@@ -36164,7 +36164,7 @@
       "itemIds": [
         "e9f62d39-4"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-037-1",
@@ -36685,7 +36685,7 @@
       "itemIds": [
         "e9f62d39-5"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-038-1",
@@ -37206,7 +37206,7 @@
       "itemIds": [
         "361affd2-1"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-039-1",
@@ -38277,7 +38277,7 @@
       "itemIds": [
         "e9f62d39-1"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-040-1",
@@ -38798,7 +38798,7 @@
       "itemIds": [
         "peer-041"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-041-1",
@@ -39619,7 +39619,7 @@
       "itemIds": [
         "peer-042"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-042-1",
@@ -40740,7 +40740,7 @@
       "itemIds": [
         "peer-043"
       ],
-      "threshold": 0.75,
+      "threshold": 0.9,
       "templates": [
         {
           "id": "peer-043-1",
@@ -42161,7 +42161,7 @@
       "itemIds": [
         "peer-044"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-044-1",
@@ -42932,7 +42932,7 @@
       "itemIds": [
         "peer-045"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-045-1",
@@ -43603,7 +43603,7 @@
       "itemIds": [
         "peer-046"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-046-1",
@@ -44374,7 +44374,7 @@
       "itemIds": [
         "e9f62d39-8"
       ],
-      "threshold": 0.75,
+      "threshold": 0.9,
       "templates": [
         {
           "id": "peer-047-1",
@@ -44795,7 +44795,7 @@
       "itemIds": [
         "peer-048"
       ],
-      "threshold": 0.75,
+      "threshold": 0.9,
       "templates": [
         {
           "id": "peer-048-1",
@@ -45716,7 +45716,7 @@
       "itemIds": [
         "peer-049"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-049-1",
@@ -46687,7 +46687,7 @@
       "itemIds": [
         "peer-050"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-050-1",
@@ -47208,7 +47208,7 @@
       "itemIds": [
         "267afca3-10"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-051-1",
@@ -47929,7 +47929,7 @@
       "itemIds": [
         "peer-052"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-052-1",
@@ -48600,7 +48600,7 @@
       "itemIds": [
         "e9f62d39-10"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-053-1",
@@ -49121,7 +49121,7 @@
       "itemIds": [
         "peer-054"
       ],
-      "threshold": 0.75,
+      "threshold": 0.9,
       "templates": [
         {
           "id": "peer-054-1",
@@ -49692,7 +49692,7 @@
       "itemIds": [
         "peer-055"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-055-1",
@@ -50213,7 +50213,7 @@
       "itemIds": [
         "peer-056"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-056-1",
@@ -51634,7 +51634,7 @@
       "itemIds": [
         "peer-057"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-057-1",
@@ -52405,7 +52405,7 @@
       "itemIds": [
         "peer-058"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-058-1",
@@ -53826,7 +53826,7 @@
       "itemIds": [
         "peer-059"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-059-1",
@@ -55247,7 +55247,7 @@
       "itemIds": [
         "peer-060"
       ],
-      "threshold": 0.75,
+      "threshold": 0.82,
       "templates": [
         {
           "id": "peer-060-1",
@@ -56018,7 +56018,7 @@
       "itemIds": [
         "peer-061"
       ],
-      "threshold": 0.75,
+      "threshold": 0.9,
       "templates": [
         {
           "id": "peer-061-1",

@@ -5,7 +5,8 @@ Set-Location $root
 # Keep one directly runnable release in a stable folder. Do not clear local-data:
 # it contains the user's settings, recordings, drafts and personal library.
 if (-not $Output) { $Output = Join-Path $root 'portable' }
-$Output = [IO.Path]::GetFullPath($Output, $root)
+if (-not [IO.Path]::IsPathRooted($Output)) { $Output = Join-Path $root $Output }
+$Output = [IO.Path]::GetFullPath($Output)
 $workspacePrefix = [IO.Path]::GetFullPath($root).TrimEnd('\') + '\'
 if (-not $Output.StartsWith($workspacePrefix, [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Publish output must be a subdirectory of this workspace.'

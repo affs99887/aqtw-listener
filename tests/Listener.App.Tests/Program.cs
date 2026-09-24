@@ -73,7 +73,7 @@ internal static class Program
                     "audio never reached recognizer");
                 Check(f.Results.Last()?.Status == RecognitionStatus.Matched, "audio result not published");
             }),
-            ("零鼠标触发的音频能通过实际 SoundRadar 工作进程返回判定", () =>
+            ("零鼠标触发的音频能通过实际局内匹配器返回判定", () =>
             {
                 var library = JsonFile.Read<SoundLibrary>(Path.Combine(AppContext.BaseDirectory, "library", "library.json"));
                 var now = 10.0; var capture = new FakeCapture();
@@ -85,8 +85,8 @@ internal static class Program
                     controller.Toggle().GetAwaiter().GetResult(); capture.Timeline.Append(Fixture.Sound(), now);
                     now += .65; controller.Reconcile().GetAwaiter().GetResult();
                     var pending = controller.PendingRecognition; PumpUntil(() => pending.IsCompleted); pending.GetAwaiter().GetResult();
-                    Check(controller.Diagnostics().TriggerCount == 0 && controller.Diagnostics().AutomaticScans == 1, "real engine trigger missing");
-                    Check(result?.Status is RecognitionStatus.Matched or RecognitionStatus.Unknown, "real engine did not return a sound verdict");
+                    Check(controller.Diagnostics().TriggerCount == 0 && controller.Diagnostics().AutomaticScans == 1, "real matcher trigger missing");
+                    Check(result?.Status is RecognitionStatus.Matched or RecognitionStatus.Unknown, "real matcher did not return a sound verdict");
                 }
                 finally { controller.DisposeAsync().AsTask().GetAwaiter().GetResult(); }
             }),
@@ -151,7 +151,7 @@ internal static class Program
                 f.Capture.Timeline.Append(Fixture.Sound(), f.Now + .3); f.Tick(f.Now + .95); f.Finish();
                 Check(f.Controller.History.Latest is null, "unmatched sound created a result");
             }),
-            ("拿起短窗口保持原门限：59条可确认，三条边界参考仍拒绝", () =>
+            ("拿起窗口经扫描器与匹配器可确认全部 62 条参考", () =>
             {
                 var root = Path.Combine(AppContext.BaseDirectory, "library");
                 var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
@@ -173,11 +173,10 @@ internal static class Program
                             string.Join(",", confirmed.Candidates.Select(c => c.GroupId)) + " scores=" +
                             string.Join(",", analysis.Scores.Take(3).Select(s => $"{s.GroupId}:{s.Score:F5}")));
                 }
-                // Frozen pickup logic clips these three jewelry references below
-                // its existing floor. Preserve and report that limitation; changing
-                // the threshold to pass self-matches would change the user's chosen logic.
-                Check(failures.Keys.ToHashSet().SetEquals(new[] { "peer-029", "peer-036", "peer-045" }),
-                    "short-window behavior changed: " + string.Join("; ", failures.Values));
+                // The in-match matcher anchors on the onset and ignores the bands a
+                // 24 kHz timeline cannot carry, so the three jewelry references the
+                // previous engine rejected now confirm as well.
+                Check(failures.Count == 0, "scanner + matcher missed references: " + string.Join("; ", failures.Values));
             }),
             ("完整拿起参考均能匹配并试听，同波形关联的候选全部保留", () =>
             {
@@ -277,9 +276,23 @@ internal static class Program
             ("新有效候选替换浮窗，原候选仍可从历史查看", () =>
             {
                 using var f = new Fixture(); f.StartSound(); f.Finish();
-                f.Recognizer.ItemId = "next"; f.Capture.Timeline.Append(Fixture.Sound(), f.Now); f.Tick(f.Now + .65); f.Finish();
+                // A distinct sound well after the pickup (beyond the putdown window) is a new item.
+                f.Recognizer.ItemId = "next"; f.Capture.Timeline.Append(Fixture.Sound(), f.Now + .6); f.Tick(f.Now + 1.25); f.Finish();
                 Check(f.Results.Last()?.BestMatch?.Item.Id == "next", "next match not displayed");
                 Check(f.Controller.History.Entries.Count == 2 && f.Controller.History.Entries[1].Result.BestMatch?.Item.Id == "test", "previous match missing");
+            }),
+            ("拿起后一秒内的另一音效按放下声保留在历史，不替换浮窗", () =>
+            {
+                using var f = new Fixture(); f.StartSound(); f.Finish();
+                var pickup = f.Controller.History.Latest!;
+                // The putdown sound 0.6 s after the pickup resembles another catalogue item.
+                f.Recognizer.ItemId = "twin"; f.Capture.Timeline.Append(Fixture.Sound(), 10.6); f.Tick(11.3); f.Finish();
+                Check(f.Results.Last()?.BestMatch?.Item.Id == "test" && f.Controller.History.Latest?.Id == pickup.Id, "putdown twin replaced the pickup on the overlay");
+                Check(f.Controller.History.Entries.Count == 2 && f.Controller.History.Entries[0].FollowUp &&
+                    f.Controller.History.Entries[0].Result.BestMatch?.Item.Id == "twin", "follow-up sound was not kept for review");
+                // The next item, dragged later, still replaces the result.
+                f.Recognizer.ItemId = "later"; f.Capture.Timeline.Append(Fixture.Sound(), 12); f.Tick(12.65); f.Finish();
+                Check(f.Results.Last()?.BestMatch?.Item.Id == "later" && !f.Controller.History.Latest!.FollowUp, "later pickup was held back");
             }),
             ("手动清除取消正在计算的结果，但不删除历史", () =>
             {

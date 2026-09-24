@@ -4,9 +4,10 @@ public sealed record AudioScanWindow(float[] Samples, int SampleRate, double End
 {
     public double StartSeconds => EndSeconds - Samples.Length / (double)SampleRate;
 
-    // Analyse the pickup itself. Later putdown/UI sounds in the lookback window
-    // must not decide whether this first event was a valid pickup.
-    public AudioScanWindow Focus(double before = .08, double after = .36)
+    // Hand the matcher the pickup with enough context before it to estimate the
+    // room tone, and enough after it to hold the longest catalogue sound (~0.33 s).
+    // Later putdown/UI sounds must not decide whether this event was a valid pickup.
+    public AudioScanWindow Focus(double before = .45, double after = .36)
     {
         var first = (int)Math.Clamp(Math.Round((OnsetSeconds - before - StartSeconds) * SampleRate), 0, Samples.Length);
         var last = (int)Math.Clamp(Math.Round((OnsetSeconds + after - StartSeconds) * SampleRate), first, Samples.Length);
@@ -18,10 +19,21 @@ public sealed record AudioScanWindow(float[] Samples, int SampleRate, double End
 // Overlapping windows allow recognition even when remote input never reaches
 // Windows mouse hooks. The caller owns one recognition task; busy work is skipped,
 // never queued. All timestamps share AudioTimeline's monotonic clock.
+//
+// Onsets are judged on the audio above ~700 Hz. In a raid the broadband level is
+// dominated by rumble, footsteps and room tone, which hid the quiet item clicks
+// from a broadband detector; the item sounds themselves live almost entirely
+// above that corner. The background is the lower quartile of the preceding
+// 300 ms, so a louder click or footstep just before the pickup cannot mask it.
 public sealed class AutomaticAudioScanner
 {
     public const double IntervalSeconds = .18;
     public const double WindowSeconds = 1.15;
+    public const double HighPassHz = 700;
+    // Audio that must exist after the onset before the window is analysed: the
+    // longest catalogue sound is ~0.33 s and the matcher searches up to +128 ms.
+    public const double TailSeconds = .36;
+    public const double RefractorySeconds = .25;
     private double nextScanAt;
     private double lastOnsetAt = double.NegativeInfinity;
     public double LastWindowRms { get; private set; }
@@ -49,12 +61,32 @@ public sealed class AutomaticAudioScanner
         var onsetAt = end - WindowSeconds + onset.Value;
         // Wait until the entire pickup sound is available. An overlapping next
         // window still contains its rising edge.
-        if (end - onsetAt < .3 || onsetAt - lastOnsetAt < .32) return null;
+        if (end - onsetAt < TailSeconds || onsetAt - lastOnsetAt < RefractorySeconds) return null;
         lastOnsetAt = onsetAt;
         return new(samples, timeline.SampleRate, end, onsetAt);
     }
 
-    private static double? FindOnset(float[] samples, int rate, double previousOnset)
+    // 2nd-order Butterworth high-pass (RBJ cookbook), applied from a zero state to
+    // each window. The first blocks only ever serve as background.
+    internal static float[] HighPass(float[] samples, int rate, double cornerHz = HighPassHz)
+    {
+        var omega = 2 * Math.PI * cornerHz / rate;
+        var cos = Math.Cos(omega); var alpha = Math.Sin(omega) / (2 * Math.Sqrt(2));
+        var a0 = 1 + alpha;
+        double b0 = (1 + cos) / 2 / a0, b1 = -(1 + cos) / a0, b2 = (1 + cos) / 2 / a0, a1 = -2 * cos / a0, a2 = (1 - alpha) / a0;
+        var output = new float[samples.Length];
+        double x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+        for (var i = 0; i < samples.Length; i++)
+        {
+            double x = samples[i];
+            var y = b0 * x + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2;
+            x2 = x1; x1 = x; y2 = y1; y1 = y;
+            output[i] = (float)y;
+        }
+        return output;
+    }
+
+    internal static double[] BlockEnergies(float[] samples, int rate)
     {
         var block = Math.Max(1, rate / 50);
         var energy = new double[(samples.Length + block - 1) / block];
@@ -66,30 +98,42 @@ public sealed class AutomaticAudioScanner
             for (var i = start; i < start + count; i++) sum += samples[i] * samples[i];
             energy[frame] = Math.Sqrt(sum / count);
         }
-        // Compare each rise to the preceding 120 ms, not digital silence. In a
-        // match the room tone continues before, during and after item sounds.
-        // A local decay distinguishes a short event from capture/music startup;
-        // it does not wait for the user to release the item or for a silent tail.
-        var preceding = new double[6];
-        for (var frame = 6; frame + 15 < energy.Length; frame++)
+        return energy;
+    }
+
+    private static double? FindOnset(float[] samples, int rate, double previousOnset)
+    {
+        var block = Math.Max(1, rate / 50);
+        var energy = BlockEnergies(HighPass(samples, rate), rate);
+        // Background = mean of the 2nd–4th quietest 20 ms blocks of the preceding 300 ms:
+        // unaffected by a transient (or a longer sound) that ended shortly before,
+        // and not fooled by a single dropout block.
+        const int preceding = 15, quantileLow = 1, quantileHigh = 4, peakSpan = 8, decaySpan = 32;
+        var sorted = new double[preceding];
+        for (var frame = preceding; frame + 5 < energy.Length; frame++)
         {
             var onset = frame * block / (double)rate;
-            if (onset - previousOnset < .32) continue;
-            Array.Copy(energy, frame - 6, preceding, 0, 6);
-            Array.Sort(preceding);
-            var background = (preceding[2] + preceding[3]) / 2;
+            if (onset - previousOnset < RefractorySeconds) continue;
+            Array.Copy(energy, frame - preceding, sorted, 0, preceding);
+            Array.Sort(sorted);
+            double background = 0;
+            for (var i = quantileLow; i < quantileHigh; i++) background += sorted[i];
+            background /= quantileHigh - quantileLow;
             var threshold = Math.Max(.00012, background * 1.7);
+            // A rising edge: this block clears the threshold and the previous one did not.
             if (energy[frame] < threshold || energy[frame - 1] >= threshold) continue;
-            var limit = Math.Min(energy.Length, frame + 32);
-            var peakFrame = frame;
-            for (var i = frame + 1; i < limit; i++)
-                if (energy[i] > energy[peakFrame]) peakFrame = i;
-            var peak = energy[peakFrame];
+            // Item sounds reach their loudest point within ~160 ms; a later, louder
+            // sound must not decide this event's decay.
+            var peak = energy[frame];
+            for (var i = frame + 1; i < Math.Min(energy.Length, frame + peakSpan); i++) peak = Math.Max(peak, energy[i]);
             if (peak < Math.Max(.0002, background * 2.2) ||
                 energy.Skip(frame).Take(5).Count(value => value > threshold) < 2) continue;
+            // A short event falls back toward the background; capture start-up,
+            // music or a continuous drone does not. When the window ends before the
+            // decay, a later overlapping window confirms the same rising edge.
             var decayLevel = background + (peak - background) * .45;
             var decayed = false;
-            for (var i = Math.Max(frame + 5, peakFrame + 1); i + 1 < limit; i++)
+            for (var i = frame + 2; i + 1 < Math.Min(energy.Length, frame + decaySpan); i++)
                 if (energy[i] <= decayLevel && energy[i + 1] <= decayLevel) { decayed = true; break; }
             if (!decayed) continue;
             return onset;

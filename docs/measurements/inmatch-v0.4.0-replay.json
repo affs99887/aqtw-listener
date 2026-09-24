@@ -1,0 +1,357 @@
+{
+ "recordings": {
+  "record20260920-213509": {
+   "events": 3773,
+   "matched": 28,
+   "eventsSha256": "928386ee056e9b77d26fc76b602a8fcbb9c29172eb5e8c9e97b9bb55d00c27f0"
+  },
+  "record20260921-205434": {
+   "events": 1826,
+   "matched": 25,
+   "eventsSha256": "d298af55ed079460b7ca1265a553596d00ab9a94af24b155a648f8e4f536bd81"
+  },
+  "record20260922-214737": {
+   "events": 1933,
+   "matched": 5,
+   "eventsSha256": "2fcd53c95df6a971a6cd75ca2fb4ccc6c1788ce33db230eb0d1ff773d4611371"
+  },
+  "record20260922-205653": {
+   "events": 2054,
+   "matched": 55,
+   "eventsSha256": "dae8114a55c75e25c8481256cc1cf2d4d0373c0467cb5d78f8679df9e7167699"
+  },
+  "record20260920-205237": {
+   "events": 3344,
+   "matched": 39,
+   "eventsSha256": "2f1d865dd4e5d142efd85203eae40fa4ae3d154ba8c6bb2d2b0d920b560d66f7"
+  }
+ },
+ "known": [
+  {
+   "id": "tv-loot",
+   "name": "胶囊电视",
+   "action": "transfer",
+   "truthCluster": "量子F2000玩具机器人",
+   "hit": false,
+   "wrongMatches": 0,
+   "analyses": [
+    {
+     "onset": 64.33,
+     "matched": false,
+     "topGroup": "peer-054",
+     "topScore": 0.5112727780674685
+    },
+    {
+     "onset": 64.61,
+     "matched": false,
+     "topGroup": "peer-003",
+     "topScore": 0.2344486174938697
+    }
+   ]
+  },
+  {
+   "id": "tv-recovery",
+   "name": "胶囊电视",
+   "action": "transfer",
+   "truthCluster": "量子F2000玩具机器人",
+   "hit": false,
+   "wrongMatches": 1,
+   "analyses": [
+    {
+     "onset": 550.09,
+     "matched": false,
+     "topGroup": "peer-048",
+     "topScore": 0.6709902926159621
+    },
+    {
+     "onset": 550.37,
+     "matched": true,
+     "topGroup": "peer-047",
+     "topScore": 0.961659207271905
+    }
+   ]
+  },
+  {
+   "id": "egg-loot",
+   "name": "赫美拉彩蛋",
+   "action": "transfer",
+   "truthCluster": "量子F2000玩具机器人",
+   "hit": false,
+   "wrongMatches": 0,
+   "analyses": []
+  },
+  {
+   "id": "egg-drag",
+   "name": "赫美拉彩蛋",
+   "action": "drag",
+   "truthCluster": "量子F2000玩具机器人",
+   "hit": true,
+   "wrongMatches": 0,
+   "analyses": [
+    {
+     "onset": 67.00999999999999,
+     "matched": false,
+     "topGroup": "peer-054",
+     "topScore": 0.624378597697408
+    },
+    {
+     "onset": 67.28999999999999,
+     "matched": true,
+     "topGroup": "peer-035",
+     "topScore": 0.9353583345455228
+    }
+   ]
+  },
+  {
+   "id": "dawn-loot",
+   "name": "黎明",
+   "action": "transfer",
+   "truthCluster": "航天实验室",
+   "hit": false,
+   "wrongMatches": 0,
+   "analyses": []
+  },
+  {
+   "id": "dawn-drag",
+   "name": "黎明",
+   "action": "drag",
+   "truthCluster": "航天实验室",
+   "hit": false,
+   "wrongMatches": 0,
+   "analyses": [
+    {
+     "onset": 80.42999999999999,
+     "matched": false,
+     "topGroup": "peer-043",
+     "topScore": 0.6464687908473209
+    },
+    {
+     "onset": 80.69,
+     "matched": false,
+     "topGroup": "peer-014",
+     "topScore": 0.5396028178828783
+    }
+   ]
+  },
+  {
+   "id": "lens-loot",
+   "name": "阵列镜片",
+   "action": "transfer",
+   "truthCluster": "量子F2000玩具机器人",
+   "hit": false,
+   "wrongMatches": 1,
+   "analyses": [
+    {
+     "onset": 2004.8700000000001,
+     "matched": true,
+     "topGroup": "peer-047",
+     "topScore": 0.9600124639733818
+    }
+   ]
+  },
+  {
+   "id": "nav-loot",
+   "name": "航天导航仪",
+   "action": "transfer",
+   "truthCluster": "航天实验室",
+   "hit": false,
+   "wrongMatches": 0,
+   "analyses": [
+    {
+     "onset": 2010.37,
+     "matched": false,
+     "topGroup": "peer-047",
+     "topScore": 0.6972831796877019
+    }
+   ]
+  }
+ ],
+ "trader": [
+  {
+   "id": "trader-00",
+   "analysed": 1,
+   "matched": 1,
+   "matchedBeforeDrop": 0,
+   "clusters": [
+    "金杯"
+   ],
+   "topScore": 0.9671378078537293
+  },
+  {
+   "id": "trader-01",
+   "analysed": 1,
+   "matched": 1,
+   "matchedBeforeDrop": 0,
+   "clusters": [
+    "金杯"
+   ],
+   "topScore": 0.9789290570234453
+  },
+  {
+   "id": "trader-02",
+   "analysed": 1,
+   "matched": 1,
+   "matchedBeforeDrop": 0,
+   "clusters": [
+    "液压扩张器"
+   ],
+   "topScore": 0.9572541925139838
+  },
+  {
+   "id": "trader-03",
+   "analysed": 1,
+   "matched": 1,
+   "matchedBeforeDrop": 0,
+   "clusters": [
+    "液压扩张器"
+   ],
+   "topScore": 0.960200614875402
+  },
+  {
+   "id": "trader-04",
+   "analysed": 1,
+   "matched": 1,
+   "matchedBeforeDrop": 0,
+   "clusters": [
+    "燃料桶"
+   ],
+   "topScore": 0.9378933599837227
+  },
+  {
+   "id": "trader-05",
+   "analysed": 1,
+   "matched": 1,
+   "matchedBeforeDrop": 0,
+   "clusters": [
+    "燃料桶"
+   ],
+   "topScore": 0.9390842093443137
+  },
+  {
+   "id": "trader-06",
+   "analysed": 1,
+   "matched": 1,
+   "matchedBeforeDrop": 1,
+   "clusters": [
+    "燃料桶"
+   ],
+   "topScore": 0.9742529829093931
+  },
+  {
+   "id": "trader-07",
+   "analysed": 1,
+   "matched": 1,
+   "matchedBeforeDrop": 1,
+   "clusters": [
+    "军用电台"
+   ],
+   "topScore": 0.9387452494955953
+  },
+  {
+   "id": "trader-08",
+   "analysed": 1,
+   "matched": 1,
+   "matchedBeforeDrop": 0,
+   "clusters": [
+    "军用电台"
+   ],
+   "topScore": 0.9448784184050141
+  },
+  {
+   "id": "trader-09",
+   "analysed": 1,
+   "matched": 1,
+   "matchedBeforeDrop": 1,
+   "clusters": [
+    "军用电台"
+   ],
+   "topScore": 0.9455545145067002
+  }
+ ],
+ "false": [
+  {
+   "id": "fp-449.35",
+   "scene": "第一人称使用医疗用品，未操作目标物品",
+   "stillMatched": false,
+   "topScore": 0.636919302149871
+  },
+  {
+   "id": "fp-958.65",
+   "scene": "第一人称移动，未操作目标物品",
+   "stillMatched": false,
+   "topScore": null
+  },
+  {
+   "id": "fp-1562.21",
+   "scene": "第一人称持刀移动，未操作目标物品",
+   "stillMatched": false,
+   "topScore": 0.6559213229186222
+  },
+  {
+   "id": "fp-1818.75",
+   "scene": "进入行商对话，尚未进入货物界面",
+   "stillMatched": false,
+   "topScore": 0.6481118790182887
+  },
+  {
+   "id": "fp-99.39",
+   "scene": "打开文档箱并开始搜索，尚未出现可操作物品",
+   "stillMatched": false,
+   "topScore": 0.6764116599309352
+  },
+  {
+   "id": "fp-1247.67",
+   "scene": "结束行商对话，未操作目标物品",
+   "stillMatched": false,
+   "topScore": 0.3043472879719662
+  },
+  {
+   "id": "fp-891.67",
+   "scene": "第一人称武器/姿态动作，未操作目标物品",
+   "stillMatched": false,
+   "topScore": 0.5843383288799588
+  },
+  {
+   "id": "fp-1005.11",
+   "scene": "武器详情和背包界面，连续画面未见目标物品操作",
+   "stillMatched": false,
+   "topScore": 0.3289269845967542
+  },
+  {
+   "id": "fp-1323.73",
+   "scene": "第一人称持枪瞄准，未操作目标物品",
+   "stillMatched": false,
+   "topScore": 0.3309633727491993
+  },
+  {
+   "id": "fp-2011.75",
+   "scene": "拿起库外金魔方，错误输出雕塑组；不属于已标注导航仪拿起",
+   "stillMatched": true,
+   "topScore": 0.9562238228150316
+  }
+ ],
+ "labels": "docs/measurements/gameplay-v0.3.2-labels.json",
+ "outputsByCluster": {
+  "激光指示模块": 36,
+  "液压扩张器": 20,
+  "量子F2000玩具机器人": 13,
+  "红外线理疗灯": 12,
+  "金杯": 12,
+  "硝化棉": 10,
+  "天线": 10,
+  "专用电池组": 10,
+  "航天实验室": 8,
+  "燃料桶": 8,
+  "干花书签": 4,
+  "军用电台": 3,
+  "水壶": 3,
+  "畸变组织块": 2,
+  "金豹雕像": 1
+ },
+ "totals": {
+  "events": 12930,
+  "matched": 152,
+  "traderMatched": 10,
+  "knownHit": 1
+ }
+}

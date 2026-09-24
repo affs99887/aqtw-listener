@@ -126,9 +126,9 @@ internal sealed class ListeningController : IAsyncDisposable
     private void PublishState(string message) { if (message == lastState) return; lastState = message; State?.Invoke(message); }
     private RecognitionResult? RetainedResult => History.Latest is { } entry
         ? entry.Result with { Message = $"{entry.LastSeen:HH:mm:ss} · 已保留 · {entry.Source}" } : null;
-    private void PublishResult(RecognitionResult result, string source, bool automatic = false, AnalysisSnapshot? snapshot = null)
+    private void PublishResult(RecognitionResult result, string source, bool automatic = false, AnalysisSnapshot? snapshot = null, double? onset = null)
     {
-        if (History.Remember(result, source, automatic, DateTimeOffset.Now, snapshot?.Id, Library.Version, LibraryRoot)) Result?.Invoke(RetainedResult);
+        if (History.Remember(result, source, automatic, DateTimeOffset.Now, snapshot?.Id, Library.Version, LibraryRoot, onset)) Result?.Invoke(RetainedResult);
         else if (History.Latest is null) Result?.Invoke(result);
         var message = result.Status switch {
             RecognitionStatus.Analyzing => "识别中…",
@@ -141,12 +141,12 @@ internal sealed class ListeningController : IAsyncDisposable
         if (History.Latest is not null && result.Status != RecognitionStatus.Matched) message += " · 下方为上次匹配结果";
         SetActivity(result.OperationId, !result.IsFinal, message, result.Status);
     }
-    private void PublishAnalysis(RecognitionAnalysis analysis, float[] samples, int rate, string source, bool automatic = false, double? start = null, double? end = null)
+    private void PublishAnalysis(RecognitionAnalysis analysis, float[] samples, int rate, string source, bool automatic = false, double? start = null, double? end = null, double? onset = null)
     {
         AnalysisSnapshot? snapshot = null;
         if (analysis.Result.Status is RecognitionStatus.Matched or RecognitionStatus.Unknown or RecognitionStatus.Interference)
             snapshot = Audio.Add(new(samples, rate), analysis, source, Library, LibraryRoot, CaptureSession, start, end);
-        PublishResult(analysis.Result, source, automatic, snapshot);
+        PublishResult(analysis.Result, source, automatic, snapshot, onset);
         Audio.Retain(History.Entries.Select(e => e.SnapshotId).Append(History.Latest?.SnapshotId));
         if (snapshot is not null) SnapshotAdded?.Invoke();
     }
@@ -312,7 +312,7 @@ internal sealed class ListeningController : IAsyncDisposable
                         lastRecognition = "声音自动识别 · " + automaticStatus;
                     }
                     PublishAnalysis(analysis with { Result = result with { Message = lastRecognition } }, pickup.Window.Samples, window.SampleRate, "声音自动识别", automatic: true,
-                        start: pickup.Window.StartSeconds, end: pickup.Window.EndSeconds);
+                        start: pickup.Window.StartSeconds, end: pickup.Window.EndSeconds, onset: window.OnsetSeconds);
                 });
             }
             catch (OperationCanceledException) { }

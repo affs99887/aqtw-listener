@@ -104,7 +104,7 @@ public static class AudioFeatures
         }).ToArray()).ToArray();
     }
 
-    private static void Fft(Complex[] data)
+    internal static void Fft(Complex[] data)
     {
         var n = data.Length;
         for (int i = 1, j = 0; i < n; i++)

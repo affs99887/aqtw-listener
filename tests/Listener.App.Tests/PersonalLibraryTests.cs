@@ -9,7 +9,7 @@ internal static class PersonalLibraryTests
         yield return ("建库拒绝无效、重复和重叠录音，裁剪保留录音身份，草稿可恢复", DraftQuality);
         yield return ("真实引擎个人库：同音确认、三参考一试识别、启用、导入导出、回退", VersionLifecycle);
         yield return ("留出片段失败和取消建库不替换当前版本", FailedTrial);
-        yield return ("新音效组使用0.75阈值，原阈值保留，个人样本可禁用与删除", NewGroup);
+        yield return ("新音效组使用引擎默认阈值，原阈值保留，个人样本可禁用与删除", NewGroup);
     }
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
     private static void Reject(Action action)
@@ -96,7 +96,7 @@ internal static class PersonalLibraryTests
         var samples = ReferenceAudio.Load(Base).Samples;
         var source = Clip(samples.First(s => s.GroupId == draft.GroupId));
         foreach (var gain in new[] { .7, .8, .9 }) store.AddSample(draft, Variant(source, gain), "regression fixture");
-        using var recognizer = new RadarRecognizer(store.ResolveActive().Library, Path.Combine(Base, "radar-index.bin"), Engine);
+        using var recognizer = RecognizerFactory.Create(store.ResolveActive().Library, Base);
         var wrong = samples.First(s => s.GroupId != draft.GroupId && !recognizer.Recognize(Clip(s).Samples, Clip(s).SampleRate).Candidates.Any(c => c.GroupId == draft.GroupId));
         store.AddSample(draft, Clip(wrong), "deliberately wrong heldout", checkOnly: true);
         var built = store.BuildDraft(draft).GetAwaiter().GetResult();
@@ -116,8 +116,9 @@ internal static class PersonalLibraryTests
         var built = store.BuildDraft(draft).GetAwaiter().GetResult();
         Check(built.Version is not null, "independent group build failed: " + built.Message);
         var version = built.Version!;
-        Check(version.Library.Groups.Single(g => g.Id == draft.GroupId).Threshold == .75 && original.Library.Groups.All(old => version.Library.Groups.Single(g => g.Id == old.Id).Threshold == old.Threshold), "threshold changed");
-        using (var recognizer = new RadarRecognizer(version.Library, Path.Combine(version.Root, "radar-index.bin"), Engine))
+        Check(version.Library.Groups.Single(g => g.Id == draft.GroupId).Threshold == PersonalLibraryStore.DefaultGroupThreshold(version.Library) &&
+            original.Library.Groups.All(old => version.Library.Groups.Single(g => g.Id == old.Id).Threshold == old.Threshold), "threshold changed");
+        using (var recognizer = RecognizerFactory.Create(version.Library, version.Root))
         {
             var analysis = recognizer.Analyze(source.Samples, source.SampleRate);
             Check(analysis.Result.Candidates.Any(c => c.Item.Id == draft.Item.Id) && analysis.Scores.Count == version.Library.Groups.Count, "all-score analysis/recognition missing");

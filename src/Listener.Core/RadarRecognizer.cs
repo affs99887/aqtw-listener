@@ -94,6 +94,7 @@ public static class RecognizerFactory
     public static IRecognizer Create(SoundLibrary library, string? libraryRoot = null) => library.PrimaryEngine switch
     {
         "dtw" => new Recognizer(library),
+        "inmatch" => new InMatchRecognizer(library, libraryRoot ?? Path.Combine(AppContext.BaseDirectory, "library")),
         "soundradar" => new RadarRecognizer(library, Path.Combine(libraryRoot ?? Path.Combine(AppContext.BaseDirectory, "library"), "radar-index.bin"),
             Path.Combine(AppContext.BaseDirectory, "engine", "Listener.Engine.exe")),
         _ => throw new InvalidDataException("未知识别引擎：" + library.PrimaryEngine)

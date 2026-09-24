@@ -264,6 +264,118 @@ Test("历史限量100条，清除当前和清空历史相互独立", () =>
     history.Remember(HistoryMatch(106), "点击", false, historyAt.AddSeconds(106));
     history.ClearHistory(); Check(history.Entries.Count == 0 && history.Latest?.Result.OperationId == 106, "clearing history erased current");
 });
+// A decaying tone-plus-noise click, like the catalogue's 60–300 ms item sounds.
+float[] Burst(int seed, double hz, double ms = 80, int rate = 48000, double gain = 1)
+{
+    var random = new Random(seed); var n = (int)(rate * ms / 1000);
+    return Enumerable.Range(0, n).Select(i => (float)(gain * (.6 * Math.Sin(2 * Math.PI * hz * i / rate) + .4 * (random.NextDouble() * 2 - 1)) * Math.Exp(-2.5 * i / n))).ToArray();
+}
+float[] Reference(int seed, double hz) { var clip = new float[21600]; Burst(seed, hz).CopyTo(clip, 0); return clip; }
+// A raid: loud low-frequency rumble, a little hiss, and a quiet item click at `at` seconds.
+float[] Raid(float[] click, double at, double seconds = 1.2, int rate = 48000, double clickGain = .02, int seed = 9)
+{
+    var random = new Random(seed);
+    var samples = Enumerable.Range(0, (int)(rate * seconds)).Select(i => (float)(.05 * Math.Sin(2 * Math.PI * 90 * i / rate)
+        + .03 * Math.Sin(2 * Math.PI * 140 * i / rate) + .002 * (random.NextDouble() * 2 - 1))).ToArray();
+    for (var i = 0; i < click.Length; i++) samples[(int)(at * rate) + i] += (float)(clickGain * click[i]);
+    return samples;
+}
+(SoundLibrary Library, string Root) InMatchLibrary()
+{
+    var root = Path.Combine(Path.GetTempPath(), "aqtw-inmatch-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(Path.Combine(root, "audio"));
+    var library = new SoundLibrary { PrimaryEngine = "inmatch", Items = [new("a", "a", true), new("b", "b", false), new("c", "c", false)] };
+    var references = new ReferenceAudio();
+    // "c" is learned from a raid recording: room tone first, then the click.
+    foreach (var (id, clip) in new[] { ("a", Reference(1, 6000)), ("b", Reference(2, 3500)), ("c", Raid(Burst(3, 5000), .3, seconds: .9, seed: 11, clickGain: .03)) })
+    {
+        var file = $"audio/{id}.wav"; WaveAudio.Write(Path.Combine(root, file), clip, 48000);
+        library.Groups.Add(new() { Id = id, Name = id, ItemIds = [id], Threshold = .82,
+            Templates = [new() { Id = id + "-1", RecordingId = id, Features = AudioFeatures.Extract(clip, 48000) }] });
+        references.Samples.Add(new(id, id + "-1", file, ReferenceAudio.Hash(Path.Combine(root, file)), id));
+    }
+    JsonFile.Write(Path.Combine(root, "references.json"), references);
+    return (library, root);
+}
+Test("局内匹配器：低频轰鸣中的微弱拿起声仍能匹配，且不误认其他音效", () =>
+{
+    var (library, root) = InMatchLibrary();
+    using var recognizer = new InMatchRecognizer(library, root);
+    var raid = Raid(Burst(1, 6000), .5);
+    Check(AudioFeatures.Rms(raid) > AudioFeatures.Rms(Burst(1, 6000, gain: .02)) * 3, "fixture rumble is not louder than the click");
+    var scores = recognizer.ScoreAudio(raid, 48000, .5).ToDictionary(s => s.Group.Id, s => s.Score);
+    Check(scores["a"] >= .85 && scores["b"] < .6 && scores["c"] < .6, $"in-match scores a={scores["a"]:F3} b={scores["b"]:F3} c={scores["c"]:F3}");
+    var result = recognizer.AnalyzeAt(raid, 48000, .5).Result;
+    Check(result.Status == RecognitionStatus.Matched && result.Candidates.Single().Item.Id == "a", "raid pickup not recognised");
+    // A template learned inside a raid still matches the same click over a different background.
+    var learned = recognizer.ScoreAudio(Raid(Burst(3, 5000), .5), 48000, .5).ToDictionary(s => s.Group.Id, s => s.Score);
+    Check(learned["c"] >= .85 && learned["a"] < .6, $"raid-learned template scores c={learned["c"]:F3} a={learned["a"]:F3}");
+    var clean = recognizer.Recognize(Reference(1, 6000), 48000);
+    Check(clean.Status == RecognitionStatus.Matched && clean.BestMatch is { Score: >= .95, Item.Id: "a" }, "clean self-match failed");
+    Check(recognizer.Recognize(Raid(new float[1], .5), 48000).Status == RecognitionStatus.Unknown, "rumble alone matched");
+    Check(InMatchFeatures.Template(new float[9000]) is null && InMatchFeatures.Template(new float[48000]) is null, "silence produced a template");
+    Directory.Delete(root, true);
+});
+Test("局内匹配器：起点估计偏早或偏晚仍能对齐拿起声", () =>
+{
+    var (library, root) = InMatchLibrary();
+    using var recognizer = new InMatchRecognizer(library, root);
+    var raid = Raid(Burst(1, 6000), .5);
+    for (var i = 0; i < 960; i++) raid[(int)(.41 * 48000) + i] += (float)(.01 * Math.Sin(2 * Math.PI * 2000 * i / 48000.0));
+    foreach (var estimate in new[] { .42, .47, .53 })
+        Check(recognizer.AnalyzeAt(raid, 48000, estimate).Result is { Status: RecognitionStatus.Matched, BestMatch.Item.Id: "a" },
+            $"onset estimate {estimate} lost the pickup");
+    Directory.Delete(root, true);
+});
+Test("扫描器按高频能量检测起点，低频轰鸣不掩盖也不触发", () =>
+{
+    const int rate = 48000;
+    var samples = Raid(Burst(1, 6000), 1.5, seconds: 3);
+    var scanner = new AutomaticAudioScanner(); scanner.Reset(0); var ring = new AudioTimeline(rate);
+    var windows = new List<AudioScanWindow>();
+    for (var first = 0; first < samples.Length; first += 4800)
+    {
+        ring.Append(samples.AsSpan(first, 4800).ToArray(), first / (double)rate);
+        var found = scanner.TryTakeWindow(ring, (first + 4800) / (double)rate, true, false);
+        if (found is not null) windows.Add(found);
+    }
+    Check(windows.Count == 1 && windows[0].OnsetSeconds is >= 1.46 and <= 1.54, "quiet click over rumble was missed or rumble triggered: " +
+        string.Join(",", windows.Select(w => w.OnsetSeconds)));
+    var focus = windows[0].Focus();
+    Check(focus.StartSeconds <= windows[0].OnsetSeconds - .44 && focus.EndSeconds >= windows[0].OnsetSeconds + .35, "focus lacks room tone or tail");
+});
+Test("扫描器在更响的前置声音之后仍能检测紧随的拿起声", () =>
+{
+    const int rate = 48000;
+    var samples = Raid(Burst(1, 6000), 1.5, seconds: 3);
+    var earlier = Burst(4, 2500, 40, gain: .06);
+    for (var i = 0; i < earlier.Length; i++) samples[(int)(1.2 * rate) + i] += earlier[i];
+    var scanner = new AutomaticAudioScanner(); scanner.Reset(0); var ring = new AudioTimeline(rate);
+    var onsets = new List<double>();
+    for (var first = 0; first < samples.Length; first += 4800)
+    {
+        ring.Append(samples.AsSpan(first, 4800).ToArray(), first / (double)rate);
+        if (scanner.TryTakeWindow(ring, (first + 4800) / (double)rate, true, false) is { } found) onsets.Add(found.OnsetSeconds);
+    }
+    Check(onsets.Any(o => o is >= 1.18 and <= 1.24) && onsets.Any(o => o is >= 1.46 and <= 1.54),
+        "a louder click 0.3 s earlier masked the pickup: " + string.Join(",", onsets));
+});
+Test("拿起后一秒内的另一音效按放下声保留，不替换当前结果", () =>
+{
+    var history = new RecognitionHistory();
+    history.Remember(HistoryMatch(1), "自动", true, historyAt, audioSeconds: 10);
+    var pickup = history.Latest!;
+    history.Remember(HistoryMatch(2, "twin"), "自动", true, historyAt.AddSeconds(.6), audioSeconds: 10.6);
+    Check(history.Latest?.Id == pickup.Id && history.Entries.Count == 2 && history.Entries[0].FollowUp, "putdown twin replaced the pickup");
+    history.Remember(HistoryMatch(3, "twin"), "自动", true, historyAt.AddSeconds(.8), audioSeconds: 10.8);
+    Check(history.Latest?.Id == pickup.Id && history.Entries.Count == 2, "repeated twin scan was promoted");
+    var stronger = new RecognitionResult(4, RecognitionStatus.Matched, true, [new(new("strong", "strong", true), .97, "group")], 1, "match");
+    history.Remember(stronger, "自动", true, historyAt.AddSeconds(.9), audioSeconds: 10.9);
+    Check(history.Latest?.Result.BestMatch?.Item.Id == "strong", "clearly stronger follow-up was held back");
+    history.Remember(HistoryMatch(5, "next"), "自动", true, historyAt.AddSeconds(3), audioSeconds: 13);
+    Check(history.Latest?.Result.BestMatch?.Item.Id == "next" && !history.Latest.FollowUp, "later pickup was held back");
+    history.Remember(HistoryMatch(6, "click"), "点击", false, historyAt.AddSeconds(3.4), audioSeconds: 13.4);
+    Check(history.Latest?.Result.BestMatch?.Item.Id == "click", "manual click was held back");
+});
 var report = new List<object>(); var failed = 0;
 foreach (var (name, run) in tests)
 {
