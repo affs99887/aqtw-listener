@@ -26,9 +26,11 @@ if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
 & $dotnet publish src\Listener.Cli -c Release -r win-x64 --self-contained true --no-restore -o $Output -p:DebugType=None -p:DebugSymbols=false -p:NuGetAudit=false
 if ($LASTEXITCODE -ne 0) { throw 'CLI publish failed' }
 # MSBuild copies new content but leaves removed files behind. Replace only the
-# bundled library, including cleanup of pre-0.3.3 putdown samples and indices.
-# local-data is never cleared by this script.
+# bundled library, including cleanup of pre-0.3.3 putdown samples and indices,
+# and drop the retired Go engine folder. local-data is never cleared by this script.
 if (Test-Path -LiteralPath $libraryOutput) { Remove-Item -LiteralPath $libraryOutput -Recurse -Force }
+$engineOutput = Join-Path $Output 'engine'
+if (Test-Path -LiteralPath $engineOutput) { Remove-Item -LiteralPath $engineOutput -Recurse -Force }
 Copy-Item -LiteralPath (Join-Path $root 'data/library') -Destination $libraryOutput -Recurse
 Copy-Item README.md (Join-Path $Output '使用说明.md') -Force
 Copy-Item LICENSE (Join-Path $Output 'LICENSE') -Force

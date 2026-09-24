@@ -42,8 +42,7 @@ internal sealed partial class MainWindow : Window
     public MainWindow(Settings settings, SoundLibrary library)
     {
         this.settings = settings;
-        personal = new(Path.Combine(AppContext.BaseDirectory, "library"), Path.Combine(AppContext.BaseDirectory, "local-data", "personal"),
-            Path.Combine(AppContext.BaseDirectory, "engine", "Listener.Engine.exe"));
+        personal = new(Path.Combine(AppContext.BaseDirectory, "library"), Path.Combine(AppContext.BaseDirectory, "local-data", "personal"));
         var active = personal.ResolveActive(); this.library = active.Library; libraryRoot = active.Root;
         Title = "行商听音助手"; Width = Math.Min(900, SystemParameters.WorkArea.Width); MinWidth = Math.Min(760, Width);
         Height = Math.Min(720, SystemParameters.WorkArea.Height); MinHeight = Math.Min(560, Height);
@@ -743,22 +742,19 @@ internal sealed partial class MainWindow : Window
     {
         PrepareOverlaySmoke(); overlay.Show(); await Task.Delay(1000);
         using var own = Process.GetCurrentProcess();
-        var workers = Process.GetProcessesByName("Listener.Engine");
-        var before = own.TotalProcessorTime.TotalMilliseconds + workers.Sum(p => p.TotalProcessorTime.TotalMilliseconds);
+        var before = own.TotalProcessorTime.TotalMilliseconds;
         var clock = Stopwatch.StartNew(); await Task.Delay(5000);
-        own.Refresh(); foreach (var p in workers) p.Refresh();
-        var cpu = own.TotalProcessorTime.TotalMilliseconds + workers.Sum(p => p.TotalProcessorTime.TotalMilliseconds) - before;
+        own.Refresh();
+        var cpu = own.TotalProcessorTime.TotalMilliseconds - before;
         JsonFile.Write(Path.Combine(AppContext.BaseDirectory, "performance-smoke.json"), new
         {
             mode = "静态浮窗预览，监听关闭；非游戏运行性能", seconds = clock.Elapsed.TotalSeconds,
             rendering = System.Windows.Media.RenderOptions.ProcessRenderMode.ToString(),
             managedHeapMiB = GC.GetTotalMemory(false) / 1048576.0,
-            processCount = workers.Length + 1, cpuPercentOfOneCore = cpu / clock.Elapsed.TotalMilliseconds * 100,
-            totalWorkingSetMiB = (own.WorkingSet64 + workers.Sum(p => p.WorkingSet64)) / 1048576.0,
-            totalPrivateBytesMiB = (own.PrivateMemorySize64 + workers.Sum(p => p.PrivateMemorySize64)) / 1048576.0,
-            appWorkingSetMiB = own.WorkingSet64 / 1048576.0, engineWorkingSetMiB = workers.Sum(p => p.WorkingSet64) / 1048576.0
+            cpuPercentOfOneCore = cpu / clock.Elapsed.TotalMilliseconds * 100,
+            workingSetMiB = own.WorkingSet64 / 1048576.0, privateBytesMiB = own.PrivateMemorySize64 / 1048576.0
         });
-        foreach (var p in workers) p.Dispose(); Close();
+        Close();
     }
     private sealed class UniformGridCompat : System.Windows.Controls.Primitives.UniformGrid
     { public UniformGridCompat(int columns) { Columns = columns; } }

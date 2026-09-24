@@ -6,7 +6,8 @@
 - 改动：新增进程内 `InMatchRecognizer`（`primaryEngine: "inmatch"`，起点锚定、扣背景谱、第 16–55 Mel 带、-32 ms..+128 ms 非对称搜索）；`AutomaticAudioScanner` 改用 700 Hz 高通块能量与前 300 ms 安静块背景；`PickupRecognition` 单次分析、自动最低 0.86；`RecognitionHistory` 对拿起后 0.15–1.0 s 内的不同音效匹配只记历史不换浮窗；`library.json` 组门限 0.82（耐冲击硬胶、军用电台、干花书签、硝化棉、红外线理疗灯 0.90），`engineIndexSha256` 改绑 `references.json`，`radar-index.bin` 已从基础库移除；Go 引擎与 DTW 保留为可选。个人库新组门限随引擎（0.82）。
 - 结果：便携 CLI 回放五场录像，行商 10 次拿起 10/10 产生候选（0.94–0.98，重复拖动候选一致，此前 0/10）；已确认误报 10 处中 9 处消失（剩金魔方→金杯组属目录覆盖）；真实拖动 1/2；12,930 次分析 152 次输出。核心测试 33/33、应用测试 46/46，62 条参考全部可确认。详见 [局内识别复核](../INMATCH-VALIDATION-20260924.md)、[v0.4.0 说明](../releases/v0.4.0.md)与 `docs/measurements/inmatch-v0.4.0-*.json`。
 - 限制：门限在同批录像校准，无独立验证集；黎明拖动仍不匹配（可能为随机变体）；快速转移双击音会显示红外线理疗灯；激光指示模块簇在背包操作中频繁出现，疑为游戏对更多电子物品共用音效。研究脚本、48 kHz 解码音频、帧图与研究 venv 在本地 `.tools/research/inmatch-v2`（gitignored）。
-- 未做：没有下载 Go 工具链（本机无 Go，改造在 C# 进程内完成）；没有发布 GitHub Release；便携包仍附带 Go 引擎文件供可选引擎使用。
+- 未做：没有发布 GitHub Release。
+- v0.4.0 之后（分支 `remove-legacy-engines`）：移除已停用的 SoundRadar Go 引擎（`src/Listener.Engine`、`RadarRecognizer`、个人库 Go 建索引流程、`data/engine` 打包、专用脚本和 Go 许可文本）与 C# DTW 识别类及 `dtw` 选项；`RecognizerFactory` 只接受 `inmatch`，旧引擎个人库版本自动回退基础库。`AudioFeatures.Extract` 仍保留，供库格式中的模板特征与个人样本质检使用。识别结果与 v0.4.0 逐事件一致；核心测试 34/34、应用测试 46/46。README 去掉版本历史段落和 v0.67 素材行，来源说明留在 `docs/THIRD-PARTY.md`。
 
 以下为 v0.3.3 时的状态记录。
 

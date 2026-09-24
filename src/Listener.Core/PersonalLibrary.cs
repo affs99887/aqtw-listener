@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
@@ -36,12 +35,11 @@ public sealed class PersonalLibraryStore
 {
     public string BaseRoot { get; }
     public string Root { get; }
-    private readonly string engine;
     private readonly SemaphoreSlim buildGate = new(1);
     public string RecoveryNotice { get; private set; } = "";
     private string StatePath => Path.Combine(Root, "active.json");
-    public PersonalLibraryStore(string baseRoot, string root, string engine)
-    { BaseRoot = Path.GetFullPath(baseRoot); Root = Path.GetFullPath(root); this.engine = engine; }
+    public PersonalLibraryStore(string baseRoot, string root)
+    { BaseRoot = Path.GetFullPath(baseRoot); Root = Path.GetFullPath(root); }
     private static T Clone<T>(T value) => JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value, JsonFile.Options), JsonFile.Options)!;
     private string Local(string path) => LibraryBuilder.ResolveFile(Root, path);
     private PersonalLibraryState State()
@@ -62,7 +60,7 @@ public sealed class PersonalLibraryStore
                 if (relative != state.Current) RecoveryNotice = "当前个人库损坏，已恢复上一版本";
                 return version;
             }
-            catch (Exception ex) when (ex is IOException or ArgumentException or JsonException or InvalidOperationException)
+            catch (Exception ex) when (ex is IOException or ArgumentException or JsonException or InvalidOperationException or InvalidDataException)
             { RecoveryNotice = "个人库加载失败，使用可用版本：" + ex.Message; }
         }
         return LoadVersion(BaseRoot);
@@ -70,9 +68,9 @@ public sealed class PersonalLibraryStore
     private static LibraryVersion LoadVersion(string root)
     {
         var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json")); library.Validate();
-        if (library.PrimaryEngine == "soundradar" && !ReferenceAudio.Hash(Path.Combine(root, "radar-index.bin"))
-            .Equals(library.EngineIndexSha256, StringComparison.OrdinalIgnoreCase)) throw new InvalidDataException("目录与声纹索引不一致");
-        if (library.PrimaryEngine == "inmatch" && !string.IsNullOrWhiteSpace(library.EngineIndexSha256) &&
+        if (library.PrimaryEngine != RecognizerFactory.Engine)
+            throw new InvalidDataException($"该版本使用已停用的识别引擎「{library.PrimaryEngine}」，请重新建库");
+        if (!string.IsNullOrWhiteSpace(library.EngineIndexSha256) &&
             !ReferenceAudio.Hash(Path.Combine(root, "references.json")).Equals(library.EngineIndexSha256, StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException("目录与参考音频清单不一致");
         foreach (var sample in ReferenceAudio.Load(root).Samples) ReferenceAudio.VerifiedPath(root, sample);
@@ -176,7 +174,7 @@ public sealed class PersonalLibraryStore
         {
             var conflicts = await Task.Run(() =>
             {
-                using var recognizer = CreateRecognizer(active.Library, active.Root);
+                using var recognizer = RecognizerFactory.Create(active.Library, active.Root);
                 return references.SelectMany(sample => { var audio = ReadSample(sample);
                     return recognizer.Analyze(audio.Samples, audio.SampleRate, cancellation: token).Scores
                         .Where(s => s.GroupId != draft.GroupId && s.Score >= active.Library.Groups.Single(g => g.Id == s.GroupId).Threshold)
@@ -195,7 +193,7 @@ public sealed class PersonalLibraryStore
         { profile.Samples.RemoveAll(s => s.Id == sample.Id); profile.Samples.Add(sample with { GroupId = draft.GroupId }); }
         var built = await Build(profile, token);
         if (built.Version is not { } version) return built;
-        using var trial = CreateRecognizer(version.Library, version.Root);
+        using var trial = RecognizerFactory.Create(version.Library, version.Root);
         foreach (var check in checks)
         {
             var clip = ReadSample(check);
@@ -228,7 +226,7 @@ public sealed class PersonalLibraryStore
             library.Items.Add(entry.Item);
             if (entry.Item.Thumbnail is not null) CopyRelative(Local(entry.Item.Thumbnail), output, entry.Item.Thumbnail);
             var group = library.Groups.FirstOrDefault(g => g.Id == entry.GroupId);
-            if (group is null) library.Groups.Add(group = new() { Id = entry.GroupId, Name = entry.Item.Name, Threshold = DefaultGroupThreshold(library), ItemIds = [] });
+            if (group is null) library.Groups.Add(group = new() { Id = entry.GroupId, Name = entry.Item.Name, Threshold = NewGroupThreshold, ItemIds = [] });
             group.ItemIds = group.ItemIds.Append(entry.Item.Id).Distinct().ToArray();
         }
         foreach (var sample in profile.Samples.Where(s => s.Enabled && !s.CheckOnly))
@@ -249,57 +247,20 @@ public sealed class PersonalLibraryStore
         if (library.Groups.Any(g => g.Templates.Count == 0 && g.Action == "pickup")) throw new InvalidDataException("新物品没有启用的参考样本，请先补样本或禁用该物品");
         library.Version = "personal-" + Path.GetFileName(output); library.ValidationStatus = "personal-reference-checked";
         library.Validate();
+        // Templates are computed from the reference audio at load time; the catalogue
+        // is bound to the reference manifest by hash instead of an index file.
         var report = Path.Combine(output, "build-report.json");
-        ReferenceSample[] skipped;
-        if (library.PrimaryEngine == "inmatch")
-        {
-            // Templates are computed from the reference audio at load time; the
-            // catalogue is bound to the reference manifest by hash instead of an index file.
-            skipped = references.Samples.Where(s => !InMatchRecognizer.CanIndex(WaveAudio.Read(ReferenceAudio.VerifiedPath(output, s)))).ToArray();
-            JsonFile.Write(report, new { expected = references.Samples.Count, built = references.Samples.Count - skipped.Length, skipped = skipped.Select(s => new {
-                s.GroupId, s.TemplateId, reason = "未能生成声纹；音频可能过短或无有效频谱，请重新录制" }).ToArray() });
-            if (skipped.Length > 0) return new(null, $"有 {skipped.Length} 段未生成声纹，原库保持不变", [], report);
-            JsonFile.Write(Path.Combine(output, "references.json"), references);
-            library.EngineIndexSha256 = ReferenceAudio.Hash(Path.Combine(output, "references.json"));
-        }
-        else
-        {
-            var archive = Path.Combine(output, "build.srz");
-            using (var zip = ZipFile.Open(archive, ZipArchiveMode.Create))
-            {
-                WriteJson(zip, "manifest.json", new { schema = 1, name = library.Version, items = library.Groups.Where(g => g.Action == "pickup").Select(g => g.Id).ToArray() });
-                foreach (var group in library.Groups.Where(g => g.Action == "pickup"))
-                {
-                    var samples = references.Samples.Where(s => s.GroupId == group.Id).ToArray();
-                    WriteJson(zip, $"items/{group.Id}/meta.json", new { id = group.Id, name = group.Name, threshold = group.Threshold,
-                        samples = samples.Select(s => new { file = $"samples/{s.TemplateId}.wav", storedSampleRate = 48000, storedChannels = 1, storedBitsPerSample = 16 }).ToArray() });
-                    foreach (var sample in samples) zip.CreateEntryFromFile(ReferenceAudio.VerifiedPath(output, sample), $"items/{group.Id}/samples/{sample.TemplateId}.wav");
-                }
-            }
-            var info = new ProcessStartInfo(engine) { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
-            info.ArgumentList.Add("build"); info.ArgumentList.Add(archive); info.ArgumentList.Add(Path.Combine(output, "radar-index.bin"));
-            using (var process = Process.Start(info) ?? throw new IOException("无法启动建库引擎"))
-            {
-                using var cancel = token.Register(() => { try { if (!process.HasExited) process.Kill(); } catch (InvalidOperationException) { } });
-                var stdout = process.StandardOutput.ReadToEndAsync(); var stderr = process.StandardError.ReadToEndAsync();
-                if (!process.WaitForExit(60000)) { process.Kill(); throw new IOException("建库超时，原音效库仍保留"); }
-                Task.WhenAll(stdout, stderr).GetAwaiter().GetResult(); token.ThrowIfCancellationRequested();
-                if (process.ExitCode != 0) throw new IOException("建库失败：" + stderr.Result);
-            }
-            var included = IndexSamples(Path.Combine(output, "radar-index.bin"));
-            skipped = references.Samples.Where(s => !included.Contains((s.GroupId, $"samples/{s.TemplateId}.wav"))).ToArray();
-            JsonFile.Write(report, new { expected = references.Samples.Count, built = included.Count, skipped = skipped.Select(s => new {
-                s.GroupId, s.TemplateId, reason = "引擎未生成声纹；音频可能过短或无有效频谱，请重新录制" }).ToArray() });
-            if (skipped.Length > 0) return new(null, $"有 {skipped.Length} 段未生成声纹，原库保持不变", [], report);
-            File.Delete(archive);
-            library.EngineIndexSha256 = ReferenceAudio.Hash(Path.Combine(output, "radar-index.bin"));
-            JsonFile.Write(Path.Combine(output, "references.json"), references);
-        }
+        var skipped = references.Samples.Where(s => !InMatchRecognizer.CanIndex(WaveAudio.Read(ReferenceAudio.VerifiedPath(output, s)))).ToArray();
+        JsonFile.Write(report, new { expected = references.Samples.Count, built = references.Samples.Count - skipped.Length, skipped = skipped.Select(s => new {
+            s.GroupId, s.TemplateId, reason = "未能生成声纹；音频可能过短或无有效频谱，请重新录制" }).ToArray() });
+        if (skipped.Length > 0) return new(null, $"有 {skipped.Length} 段未生成声纹，原库保持不变", [], report);
+        JsonFile.Write(Path.Combine(output, "references.json"), references);
+        library.EngineIndexSha256 = ReferenceAudio.Hash(Path.Combine(output, "references.json"));
         JsonFile.Write(Path.Combine(output, "library.json"), library);
         JsonFile.Write(Path.Combine(output, "personal.json"), profile);
         var baseline = ResolveActive();
-        using var before = CreateRecognizer(baseline.Library, baseline.Root);
-        using var after = CreateRecognizer(library, output);
+        using var before = RecognizerFactory.Create(baseline.Library, baseline.Root);
+        using var after = RecognizerFactory.Create(library, output);
         var checks = new List<object>(); var failures = 0;
         foreach (var sample in ReferenceAudio.Load(baseline.Root).Samples)
         {
@@ -394,28 +355,10 @@ public sealed class PersonalLibraryStore
             if (!Id(sample.Id) || !Id(sample.ItemId) || !Id(sample.GroupId) || !double.IsFinite(sample.StartSeconds) || !double.IsFinite(sample.EndSeconds) || sample.StartSeconds < 0 || sample.EndSeconds <= sample.StartSeconds)
                 throw new InvalidDataException("个人样本元数据无效");
     }
-    // A new personal sound group starts at the bundled catalogue's floor for the
-    // active engine: .82 for the in-match matcher, the historical .75 otherwise.
-    public static double DefaultGroupThreshold(SoundLibrary library) => library.PrimaryEngine == "inmatch" ? .82 : .75;
-    private IRecognizer CreateRecognizer(SoundLibrary library, string root) => library.PrimaryEngine == "soundradar"
-        ? new RadarRecognizer(library, Path.Combine(root, "radar-index.bin"), engine)
-        : RecognizerFactory.Create(library, root);
+    // A new personal sound group starts at the bundled catalogue's group floor.
+    public const double NewGroupThreshold = .82;
     private static void CopyRelative(string from, string root, string relative)
     { var path = LibraryBuilder.ResolveFile(root, relative); Directory.CreateDirectory(Path.GetDirectoryName(path)!); File.Copy(from, path, true); }
     private static void WriteJson(ZipArchive archive, string name, object data)
     { using var writer = new StreamWriter(archive.CreateEntry(name).Open(), new UTF8Encoding(false)); writer.Write(JsonSerializer.Serialize(data, JsonFile.Options)); }
-    internal static HashSet<(string Group, string Sample)> IndexSamples(string path)
-    {
-        using var reader = new BinaryReader(File.OpenRead(path), Encoding.UTF8);
-        string Text() => Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadUInt16()));
-        if (Encoding.ASCII.GetString(reader.ReadBytes(4)) != "SRZ1" || reader.ReadUInt32() != 1) throw new InvalidDataException("索引格式不支持");
-        Text(); Text(); Text(); reader.ReadUInt32(); var count = reader.ReadUInt64(); var groups = reader.ReadUInt32();
-        if (count > 100000 || groups > 10000) throw new InvalidDataException("索引数量异常");
-        var ids = new List<string>();
-        for (var i = 0; i < groups; i++) { ids.Add(Text()); Text(); reader.ReadUInt32(); reader.ReadUInt32(); reader.ReadSingle(); reader.ReadUInt32(); }
-        var result = new HashSet<(string, string)>();
-        for (ulong i = 0; i < count; i++) { var name = Text(); reader.ReadUInt32(); var group = reader.ReadUInt16(); reader.ReadSingle();
-            if (group >= ids.Count) throw new InvalidDataException("索引组编号无效"); result.Add((ids[group], name)); }
-        return result;
-    }
 }

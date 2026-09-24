@@ -2,6 +2,8 @@ using System.Numerics;
 
 namespace Listener.Core;
 
+// Frames stored as SoundTemplate.Features (library schema v1) and used to reject
+// recordings without a usable sound. Recognition itself is InMatchRecognizer's.
 public static class AudioFeatures
 {
     public const string Version = "logmel24k-48-v1";
@@ -58,38 +60,6 @@ public static class AudioFeatures
             if (norm > 1e-9) for (var b = 0; b < Bands; b++) f[b] /= (float)norm;
         }
         return result;
-    }
-
-    public static double Similarity(float[][] reference, float[][] query, CancellationToken token = default)
-    {
-        if (reference.Length < 3 || query.Length < 3) return 0;
-        // 子序列对齐容忍点击前的缓冲与周围环境声，同时限制模板被压缩到极短片段。
-        var m = query.Length;
-        var previous = new double[m + 1];
-        var lengths = new int[m + 1];
-        for (var i = 1; i <= reference.Length; i++)
-        {
-            token.ThrowIfCancellationRequested();
-            var current = Enumerable.Repeat(double.PositiveInfinity, m + 1).ToArray();
-            var nextLengths = new int[m + 1];
-            for (var j = 1; j <= m; j++)
-            {
-                double dot = 0;
-                for (var b = 0; b < Bands; b++) dot += reference[i - 1][b] * query[j - 1][b];
-                var distance = 1 - Math.Clamp(dot, -1, 1);
-                var cost = previous[j - 1]; var len = lengths[j - 1];
-                // 非对角移动加罚，避免把某个单音帧无限拉长。
-                if (previous[j] + 0.12 < cost) { cost = previous[j] + 0.12; len = lengths[j]; }
-                if (current[j - 1] + 0.12 < cost) { cost = current[j - 1] + 0.12; len = nextLengths[j - 1]; }
-                current[j] = cost + distance; nextLengths[j] = len + 1;
-            }
-            previous = current; lengths = nextLengths;
-        }
-        double best = double.PositiveInfinity;
-        for (var j = 1; j <= m; j++)
-            if (lengths[j] >= reference.Length && lengths[j] <= reference.Length * 2.2)
-                best = Math.Min(best, previous[j] / lengths[j]);
-        return double.IsFinite(best) ? Math.Clamp(1 - best, 0, 1) : 0;
     }
 
     private static double[][] BuildFilters()

@@ -60,7 +60,7 @@ public sealed class SoundLibrary
     public string Version { get; set; } = "1.0.0";
     public string GameVersion { get; set; } = "S7";
     public string ValidationStatus { get; set; } = "uncalibrated";
-    public string PrimaryEngine { get; set; } = "dtw";
+    public string PrimaryEngine { get; set; } = RecognizerFactory.Engine;
     public string EngineIndexSha256 { get; set; } = "";
     public string Notes { get; set; } = "";
     public string[] CalibrationRecordingIds { get; set; } = [];

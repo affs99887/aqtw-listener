@@ -13,30 +13,43 @@ SoundLibrary Library() => new()
     Groups = [new() { Id = "shared", Name = "shared", ItemIds = ["red", "cheap", "cheap2", "cheap3"], Threshold = .85,
         Templates = [new() { Id = "a", Features = features, RecordingId = "ref" }, new() { Id = "b", Features = features, RecordingId = "ref" }] }]
 };
+// The matcher ignores bands below ~0.9 kHz, where Tone(800) lives, so recognition
+// fixtures use a pickup-like click. Every Library() variant shares these references.
+var click = Reference(4, 6000);
+var libraryRoot = ReferenceRoot(Library(), click);
+InMatchRecognizer Engine(SoundLibrary library) => new(library, libraryRoot);
 Test("共享音效候选按物品去重，4 件中 1 件大红为 25%", () =>
 {
-    var r = new Recognizer(Library()).Recognize(audio, 24000);
+    using var recognizer = Engine(Library()); var r = recognizer.Recognize(click, 48000);
     Check(r.CandidateCount == 4 && r.GoldCount == 1 && r.GoldCandidateRatio == .25, "multiple templates changed denominator");
 });
 Test("空候选不显示 0%", () =>
 {
-    var r = new Recognizer(Library()).Recognize(new float[24000], 24000);
+    using var recognizer = Engine(Library()); var r = recognizer.Recognize(new float[48000], 48000);
     Check(r.Status == RecognitionStatus.NoSound && r.GoldCandidateRatio is null && r.HighestValue is null, "silence verdict");
 });
 Test("未匹配的高价物品不进入最高价值结果", () =>
 {
     var l = Library(); l.Items.Add(new("irrelevant", "unmatched", true, 99999));
-    Check(new Recognizer(l).Recognize(audio, 24000).HighestValue?.Item.Id == "red", "unmatched price leaked");
+    using var recognizer = Engine(l);
+    Check(recognizer.Recognize(click, 48000).HighestValue?.Item.Id == "red", "unmatched price leaked");
 });
 Test("未知参考价不会伪造最高价值", () =>
 {
     var l = Library(); l.Items = l.Items.Select(i => i with { ReferenceValue = null }).ToList();
-    Check(new Recognizer(l).Recognize(audio, 24000).HighestValue is null, "unknown price ranked");
+    using var recognizer = Engine(l);
+    Check(recognizer.Recognize(click, 48000).HighestValue is null, "unknown price ranked");
 });
 Test("放下音效不能作为拾起模板", () =>
 {
     var l = Library(); l.Groups[0].Action = "putdown";
-    Check(new Recognizer(l).Recognize(audio, 24000).Status == RecognitionStatus.LibraryEmpty, "putdown recognized");
+    using var recognizer = Engine(l);
+    Check(recognizer.Recognize(click, 48000).Status == RecognitionStatus.LibraryEmpty, "putdown recognized");
+});
+Test("已停用的识别引擎给出明确错误", () =>
+{
+    var l = Library(); l.PrimaryEngine = "soundradar";
+    Throws<InvalidDataException>(() => RecognizerFactory.Create(l, libraryRoot));
 });
 Test("静音时间洞补零，不能复用旧声音", () =>
 {
@@ -84,20 +97,22 @@ Test("漏掉松开事件后能恢复下一次拖动", () =>
     Check(!mouse.Poll(false, 1.2), "release triggered");
     Check(mouse.HookDown(1.3), "latch stuck after missed release");
 });
-Test("音量变化保持频谱匹配", () =>
+Test("音量变化不改变匹配分数", () =>
 {
-    var quieter = AudioFeatures.Extract(audio.Select(v => v * .05f).ToArray(), 24000);
-    Check(AudioFeatures.Similarity(features, quieter) > .98, "gain invariance");
+    using var recognizer = Engine(Library());
+    var loud = recognizer.ScoreAudio(click, 48000).Single().Score;
+    var quiet = recognizer.ScoreAudio(click.Select(v => v * .05f).ToArray(), 48000).Single().Score;
+    Check(loud > .98 && Math.Abs(loud - quiet) < .01, $"gain changed the score: {loud:F3} vs {quiet:F3}");
 });
 Test("没有任何鼠标事件也能从声音窗口识别候选", () =>
 {
     var ring = new AudioTimeline(24000);
-    ring.Append(audio, 10);
+    ring.Append(WaveAudio.Resample(click, 48000, 24000), 10);
     var scanner = new AutomaticAudioScanner(); scanner.Reset(9.5);
     var window = scanner.TryTakeWindow(ring, 10.65, active: true, busy: false);
     Check(window is not null, "audio-only trigger lost");
-    using var recognizer = new Recognizer(Library());
-    var result = recognizer.Recognize(window!.Samples, window.SampleRate);
+    using var recognizer = Engine(Library());
+    var result = PickupRecognition.Analyze(recognizer, window!).Analysis.Result;
     Check(result.Status == RecognitionStatus.Matched && result.CandidateCount == 4, "audio-only recognition failed");
 });
 Test("自动扫描只响应新的短声音事件，忙碌时不堆积任务", () =>
@@ -188,9 +203,11 @@ Test("关闭或切出游戏不自动扫描，恢复后静音不能复用旧声�
     ring.Append(audio, 12);
     Check(scanner.TryTakeWindow(ring, 12.65, true, false) is not null, "new sound after resume lost");
 });
-Test("取消信号中断 DTW", () =>
+Test("取消信号中断识别", () =>
 {
-    using var c = new CancellationTokenSource(); c.Cancel(); Throws<OperationCanceledException>(() => AudioFeatures.Similarity(features, features, c.Token));
+    using var c = new CancellationTokenSource(); c.Cancel();
+    using var recognizer = Engine(Library());
+    Throws<OperationCanceledException>(() => recognizer.Recognize(click, 48000, cancellation: c.Token));
 });
 Test("重采样抑制超过目标奈奎斯特频率的成分", () =>
 {
@@ -210,10 +227,10 @@ Test("测试集拒绝参考来源和校准来源泄漏", () =>
     var manifest = Path.Combine(temp, "cases.json");
     var l = Library();
     JsonFile.Write(manifest, new EvaluationManifest { Cases = [new("a.wav", "ref", "red", false)] });
-    Throws<InvalidDataException>(() => Evaluation.Run(l, manifest));
+    Throws<InvalidDataException>(() => Evaluation.Run(l, manifest, libraryRoot));
     l.CalibrationRecordingIds = ["validation-source"];
     JsonFile.Write(manifest, new EvaluationManifest { Cases = [new("a.wav", "validation-source", "red", false)] });
-    Throws<InvalidDataException>(() => Evaluation.Run(l, manifest));
+    Throws<InvalidDataException>(() => Evaluation.Run(l, manifest, libraryRoot));
     File.Delete(wav); File.Delete(manifest); Directory.Delete(temp);
 });
 Test("校准不能复用 test 集", () =>
@@ -279,6 +296,21 @@ float[] Raid(float[] click, double at, double seconds = 1.2, int rate = 48000, d
         + .03 * Math.Sin(2 * Math.PI * 140 * i / rate) + .002 * (random.NextDouble() * 2 - 1))).ToArray();
     for (var i = 0; i < click.Length; i++) samples[(int)(at * rate) + i] += (float)(clickGain * click[i]);
     return samples;
+}
+// One reference WAV per template of every group, at slightly different gains.
+string ReferenceRoot(SoundLibrary library, float[] clip)
+{
+    var root = Path.Combine(Path.GetTempPath(), "aqtw-core-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(Path.Combine(root, "audio"));
+    var references = new ReferenceAudio();
+    foreach (var group in library.Groups)
+        for (var index = 0; index < group.Templates.Count; index++)
+        {
+            var file = $"audio/{group.Id}-{index}.wav";
+            WaveAudio.Write(Path.Combine(root, file), clip.Select(v => v * (1 - .1f * index)).ToArray(), 48000);
+            references.Samples.Add(new(group.Id, group.Templates[index].Id, file, ReferenceAudio.Hash(Path.Combine(root, file)), group.Templates[index].RecordingId));
+        }
+    JsonFile.Write(Path.Combine(root, "references.json"), references);
+    return root;
 }
 (SoundLibrary Library, string Root) InMatchLibrary()
 {
@@ -384,4 +416,5 @@ foreach (var (name, run) in tests)
     catch (Exception ex) { failed++; report.Add(new { name, passed = false, error = ex.Message }); Console.WriteLine("FAIL " + name + ": " + ex.Message); }
 }
 if (args.Length > 0) JsonFile.Write(args[0], new { total = tests.Count, passed = tests.Count - failed, failed, tests = report });
+Directory.Delete(libraryRoot, true);
 return failed == 0 ? 0 : 1;

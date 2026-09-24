@@ -9,14 +9,13 @@ internal static class PersonalLibraryTests
         yield return ("建库拒绝无效、重复和重叠录音，裁剪保留录音身份，草稿可恢复", DraftQuality);
         yield return ("真实引擎个人库：同音确认、三参考一试识别、启用、导入导出、回退", VersionLifecycle);
         yield return ("留出片段失败和取消建库不替换当前版本", FailedTrial);
-        yield return ("新音效组使用引擎默认阈值，原阈值保留，个人样本可禁用与删除", NewGroup);
+        yield return ("新音效组使用0.82阈值，原阈值保留，个人样本可禁用与删除", NewGroup);
     }
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
     private static void Reject(Action action)
     { try { action(); } catch (InvalidDataException) { return; } throw new Exception("invalid input accepted"); }
     private static string Base => Path.Combine(AppContext.BaseDirectory, "library");
-    private static string Engine => Path.Combine(AppContext.BaseDirectory, "engine", "Listener.Engine.exe");
-    private static PersonalLibraryStore Store() => new(Base, Path.Combine(Path.GetTempPath(), "aqtw-feature-tests", Guid.NewGuid().ToString("N")), Engine);
+    private static PersonalLibraryStore Store() => new(Base, Path.Combine(Path.GetTempPath(), "aqtw-feature-tests", Guid.NewGuid().ToString("N")));
     private static AudioClip Clip(ReferenceSample sample) => WaveAudio.Read(ReferenceAudio.VerifiedPath(Base, sample));
     private static AudioClip Variant(AudioClip clip, double gain) => new(clip.Samples.Select(s => (float)(s * gain)).ToArray(), clip.SampleRate);
     private static LearningDraft Draft(PersonalLibraryStore store, bool guided = false)
@@ -58,7 +57,7 @@ internal static class PersonalLibraryTests
         store.TrimSample(draft, first, .01, first.EndSeconds, false);
         var trimmed = draft.Samples.Single();
         Check(trimmed.OriginalSha256 == first.OriginalSha256 && trimmed.RecordingId == first.RecordingId, "trim changed independent recording identity");
-        var reopened = new PersonalLibraryStore(Base, store.Root, Engine).Drafts().Single();
+        var reopened = new PersonalLibraryStore(Base, store.Root).Drafts().Single();
         Check(reopened.Samples.Count == 1 && reopened.Samples[0].StartSeconds == .01, "draft did not persist");
         Check(store.ReadSource(trimmed).Samples.Length == source.Samples.Length, "source lost");
     }
@@ -80,13 +79,16 @@ internal static class PersonalLibraryTests
         Check(ReferenceAudio.Load(version.Root).Samples.All(s => !s.TemplateId.Contains(heldout.Id)), "heldout indexed");
         store.Activate(version);
         Check(store.ResolveActive().Library.Items.Any(i => i.Id == draft.Item.Id), "new item not activated");
-        Check(new PersonalLibraryStore(Base, store.Root, Engine).ResolveActive().Root == version.Root, "active version not persistent");
+        Check(new PersonalLibraryStore(Base, store.Root).ResolveActive().Root == version.Root, "active version not persistent");
         var file = Path.Combine(store.Root, "export.aqtwlib"); store.Export(file); store.Export(file);
         var importedStore = Store(); var profile = importedStore.Import(file);
         Check(profile.Items.Count == 1 && profile.Samples.Count == 4 && importedStore.ReadSource(profile.Samples[0]).Samples.Length > 0, "export/import lost assets");
         var imported = importedStore.Build(profile).GetAwaiter().GetResult(); Check(imported.Version is not null, "imported profile failed build");
         Check(store.Rollback().Root == Base && !store.Profile().Items.Any(), "rollback did not restore base");
         Check(store.Rollback().Root == version.Root, "undo rollback did not restore personal version");
+        var retired = JsonFile.Read<SoundLibrary>(Path.Combine(version.Root, "library.json")); retired.PrimaryEngine = "soundradar";
+        JsonFile.Write(Path.Combine(version.Root, "library.json"), retired);
+        Check(store.ResolveActive().Root == Base && store.RecoveryNotice.Contains("已停用"), "retired-engine version did not fall back to the base library");
         File.WriteAllText(Path.Combine(version.Root, "library.json"), "broken");
         Check(store.ResolveActive().Root == Base && store.RecoveryNotice.Length > 0, "corrupt version did not recover");
     }
@@ -116,7 +118,7 @@ internal static class PersonalLibraryTests
         var built = store.BuildDraft(draft).GetAwaiter().GetResult();
         Check(built.Version is not null, "independent group build failed: " + built.Message);
         var version = built.Version!;
-        Check(version.Library.Groups.Single(g => g.Id == draft.GroupId).Threshold == PersonalLibraryStore.DefaultGroupThreshold(version.Library) &&
+        Check(version.Library.Groups.Single(g => g.Id == draft.GroupId).Threshold == PersonalLibraryStore.NewGroupThreshold &&
             original.Library.Groups.All(old => version.Library.Groups.Single(g => g.Id == old.Id).Threshold == old.Threshold), "threshold changed");
         using (var recognizer = RecognizerFactory.Create(version.Library, version.Root))
         {

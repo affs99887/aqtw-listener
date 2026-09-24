@@ -347,7 +347,7 @@ internal static class Program
             {
                 using var f = new Fixture();
                 var root = Path.Combine(AppContext.BaseDirectory, "library");
-                var store = new PersonalLibraryStore(root, Path.Combine(Path.GetTempPath(), "aqtw-guided-tests", Guid.NewGuid().ToString("N")), Path.Combine(AppContext.BaseDirectory, "engine", "Listener.Engine.exe"));
+                var store = new PersonalLibraryStore(root, Path.Combine(Path.GetTempPath(), "aqtw-guided-tests", Guid.NewGuid().ToString("N")));
                 var draft = new LearningDraft { Item = new("user-guide", "test", true), GroupId = "user-guide", IsNewItem = true };
                 var tick = 0; var paused = false; var completed = false;
                 var learning = new GuidedLearning(f.Controller, store, (milliseconds, token) =>
