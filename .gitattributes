@@ -1,2 +1,4 @@
 # 保留随包附带的第三方许可文本，不对其应用空白风格检查。
 docs/licenses/* -whitespace
+# library.json 的 engineIndexSha256 是 CRLF 版 references.json 的哈希；任何系统检出都须保持 CRLF。
+data/library/references.json text eol=crlf
