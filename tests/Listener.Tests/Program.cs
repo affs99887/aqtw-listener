@@ -424,19 +424,23 @@ var baseRoot = Path.Combine(AppContext.BaseDirectory, "library");
 SoundLibrary BaseLibrary() => JsonFile.Read<SoundLibrary>(Path.Combine(baseRoot, "library.json"));
 float[] BaseReference(string group) => WaveAudio.Read(Path.Combine(baseRoot, "audio", group + ".wav")).Samples;
 string[] Names(RecognitionResult result) => result.Candidates.Select(c => c.Item.Name).Order().ToArray();
-// peer-047 was labelled a 红外线理疗灯 pickup, but it is the sound 琥珀天心-class items make when
-// put down or quick-transferred: raids scored 胶囊电视 and 阵列镜片 transfers 0.96 against it.
-Test("基础库：胶囊电视的拿起声与放下/转移声给出同一组琥珀天心类候选，不再只报红外线理疗灯", () =>
+// peer-047 and peer-051 were labelled 红外线理疗灯 / 天线 pickups, but SoundRadar's raw 琥珀天心-放下 and
+// 目标定位-放下 captures score 0.996 / 0.968 against them: they are those classes' putdown sounds.
+Test("基础库：琥珀天心类、定位组的拿起声与放下/转移声给出同一组候选，不再只报红外线理疗灯或天线", () =>
 {
     using var recognizer = new InMatchRecognizer(BaseLibrary(), baseRoot);
-    var pickup = recognizer.AnalyzeAt(Raid(BaseReference("peer-024"), .5, clickGain: .05), 48000, .5).Result;
-    var putdown = recognizer.AnalyzeAt(Raid(BaseReference("peer-047"), .5, clickGain: .05), 48000, .5).Result;
-    Check(pickup is { Status: RecognitionStatus.Matched, BestMatch.Score: >= .9 } && putdown is { Status: RecognitionStatus.Matched, BestMatch.Score: >= .9 },
-        $"class sounds unmatched: {pickup.BestMatch?.Score:F3} / {putdown.BestMatch?.Score:F3}");
-    Check(Names(pickup).SequenceEqual(Names(putdown)), $"pickup and putdown name different items: {string.Join("、", Names(pickup))} | {string.Join("、", Names(putdown))}");
-    Check(putdown.CandidateCount == 13 && Names(putdown).Contains("胶囊电视") && Names(putdown).Contains("红外线理疗灯"),
-        "putdown did not return the whole 琥珀天心 class");
-    Check(pickup.Candidates.Select(c => c.GroupId).Distinct().Count() == 12, "pickup lost the per-item references");
+    foreach (var (pickupGroup, putdownGroup, members, item, relabelled) in new[]
+             { ("peer-024", "peer-047", 13, "胶囊电视", "红外线理疗灯"), ("peer-000", "peer-051", 9, "激光指示模块", "天线") })
+    {
+        var pickup = recognizer.AnalyzeAt(Raid(BaseReference(pickupGroup), .5, clickGain: .05), 48000, .5).Result;
+        var putdown = recognizer.AnalyzeAt(Raid(BaseReference(putdownGroup), .5, clickGain: .05), 48000, .5).Result;
+        Check(pickup is { Status: RecognitionStatus.Matched, BestMatch.Score: >= .9 } && putdown is { Status: RecognitionStatus.Matched, BestMatch.Score: >= .9 },
+            $"{item}: class sounds unmatched: {pickup.BestMatch?.Score:F3} / {putdown.BestMatch?.Score:F3}");
+        Check(Names(pickup).SequenceEqual(Names(putdown)), $"pickup and putdown name different items: {string.Join("、", Names(pickup))} | {string.Join("、", Names(putdown))}");
+        Check(putdown.CandidateCount == members && Names(putdown).Contains(item) && Names(putdown).Contains(relabelled),
+            $"{relabelled}: putdown did not return the whole class");
+        Check(pickup.Candidates.Select(c => c.GroupId).Distinct().Count() == members - 1, $"{item}: pickup lost the per-item references");
+    }
 });
 Test("基础库：拖动胶囊电视后放下不改候选，单独快速转移也给出同类候选", () =>
 {

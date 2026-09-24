@@ -1,5 +1,5 @@
 {
-  "version": "0.4.3-amber-placement-20260924",
+  "version": "0.4.3-putdown-relabel-20260924",
   "source": "User-provided peer v0.67 packaged material library",
   "sourceExecutableSha256": "f421fc13e12dcb495ef143895e1398b9c44ac4c73ba3d94b74f3f17fb7cfec35",
   "sourceReferencesSha256": "d18ec01dd063745d5a7bed148ff438c9014bfbf079b9aad7a8ac812c4601fe3f",
@@ -7,7 +7,7 @@
   "licenseStatus": "No verifiable source repository or license supplied for these peer materials; original rights retained.",
   "conversion": "stored float32 * 32767, truncate to signed PCM16; 48 kHz mono, 0.45 seconds; no additional processing",
   "indexSha256": null,
-  "recognition": "v0.4.0: in-process in-match matcher (onset-anchored, pre-onset background subtraction, mel bands 16-55); group thresholds .82 with five short/noise-like references at .90, automatic single-event minimum .86; no putdown auxiliary matching. The Go SoundRadar index is no longer bundled. v0.4.3: peer-047 relinked from 红外线理疗灯 pickup to the 琥珀天心-class putdown/transfer sound (13 items); 红外线理疗灯 added to the 琥珀天心 pickup group.",
+  "recognition": "v0.4.0: in-process in-match matcher (onset-anchored, pre-onset background subtraction, mel bands 16-55); group thresholds .82 with five short/noise-like references at .90, automatic single-event minimum .86; no putdown auxiliary matching. The Go SoundRadar index is no longer bundled. v0.4.3: peer-047 and peer-051 relinked from the 红外线理疗灯 / 天线 pickups to the 琥珀天心-class (13 items) and 定位组 (9 items) putdown/transfer sounds; 红外线理疗灯 and 天线 added to the matching pickup groups.",
   "entries": [
     {
       "sourceReferenceId": "peer-000",
@@ -599,7 +599,11 @@
       "thumbnailSource": "soundradar-existing-catalog",
       "gridEvidenceImageSha256": "815ad329bc2eda1ceca8493792b648279b6788f165fc9c13e4abebcccb902bfa",
       "originalThumbnailSha256": "5c33ccbd54f4e38c612a4dbaedae45a9d2586390f6eeddc5888c10ab960d63ab",
-      "thumbnailEdit": "in-game label removed by inpainting (scripts/clean-thumbnails.py)"
+      "thumbnailEdit": "in-game label removed by inpainting (scripts/clean-thumbnails.py)",
+      "additionalItemIds": [
+        "267afca3-10"
+      ],
+      "additionalItemsSource": "SoundRadar eaa0348 同音·定位组 display hints (天线 = 267afca3-10); the peer 天线 reference is the class putdown sound (see peer-051)."
     },
     {
       "sourceReferenceId": "peer-031",
@@ -924,10 +928,11 @@
       "originalThumbnailSha256": "ebbcfffcbe8b9e3f695592cd400fd928e795952e2f9443a5a0d4439d6f76aa13",
       "thumbnailEdit": "in-game label and icon removed by inpainting (scripts/clean-thumbnails.py)",
       "relabel": {
-        "version": "0.4.3-amber-placement-20260924",
+        "version": "0.4.3-putdown-relabel-20260924",
         "from": "pickup of 红外线理疗灯 (e9f62d39-8)",
         "to": "putdown / quick-transfer sound of the 琥珀天心 class, linked to all 13 class items",
         "evidence": [
+          "SoundRadar 4f8289d raw capture 琥珀天心-放下 (items/ad6b7dfa/samples/0001.wav, 000002-20260919-163053.wav) scores 0.996 against this reference.",
           "Two clicks about 40 ms apart, the structure of the quick-transfer sound; unrelated to the class pickup (cosine 0.45 against SoundRadar 琥珀天心-拿起).",
           "Raid replay 2026-09-20: 胶囊电视 transferred to the recovery device scored 0.962, 阵列镜片 quick-transferred scored 0.960; 航天导航仪 (another class) transferred scored 0.697.",
           "Raid replay: accepted 量子F2000-cluster pickups were followed 0.3–0.6 s later by this sound (putdown).",
@@ -1010,7 +1015,17 @@
       "thumbnailSource": "soundradar-existing-catalog",
       "gridEvidenceImageSha256": "8568b5dab9568bc882d587b4bcb0bf2d82b052726f00fa90587a90ddde2063ae",
       "originalThumbnailSha256": "d960a50b4bfcba1807aa80e408206d74b829dbc9305b7f2fe9973d7a27688d94",
-      "thumbnailEdit": "in-game label and icon removed by inpainting (scripts/clean-thumbnails.py)"
+      "thumbnailEdit": "in-game label and icon removed by inpainting (scripts/clean-thumbnails.py)",
+      "relabel": {
+        "version": "0.4.3-putdown-relabel-20260924",
+        "from": "pickup of 天线 (267afca3-10)",
+        "to": "putdown / quick-transfer sound of the 定位组 class, linked to all 9 class items",
+        "evidence": [
+          "SoundRadar 4f8289d raw captures 目标定位-放下 (items/ec9b8a7f/samples/0001.wav and 0002.wav) both score 0.968 against this reference; the 目标定位-拿起 capture scores below 0.47.",
+          "Raid replay: accepted 激光指示模块-cluster pickups were followed by this sound (putdown).",
+          "SoundRadar eaa0348 lists 天线 (267afca3-10) in 同音·定位组, i.e. it shares the class pickup sound."
+        ]
+      }
     },
     {
       "sourceReferenceId": "peer-052",

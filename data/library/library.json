@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "featureVersion": "logmel24k-48-v1",
-  "version": "0.4.3-amber-placement-20260924",
+  "version": "0.4.3-putdown-relabel-20260924",
   "gameVersion": "peer-v0.67 reference library; unverified game version",
   "validationStatus": "replay-checked-5-raids",
   "primaryEngine": "inmatch",
   "engineIndexSha256": "56C9566471523B7BF3E47B1799E1D53CB2E6B97DEFC26C128BDC33C55BCE8B8F",
-  "notes": "62 条参考不变；识别使用局内匹配器（起点锚定、扣除前 300 ms 背景谱、只比对约 0.9–11 kHz 频带）。组门限 0.82，五条短促或类噪声参考 0.90，自动单次结果另需 0.86；门限按 9 月 20–22 日五场完整录像回放校准，不是独立准确率验收。peer-047 原标「红外线理疗灯」拿起，实为琥珀天心类物品放下或快速转移时的声音，改为关联该类 13 件；红外线理疗灯按 SoundRadar 同音类并入琥珀天心拿起组。一声可返回多件同音候选，差异率不是单件确定率。",
+  "notes": "62 条参考不变；识别使用局内匹配器（起点锚定、扣除前 300 ms 背景谱、只比对约 0.9–11 kHz 频带）。组门限 0.82，五条短促或类噪声参考 0.90，自动单次结果另需 0.86；门限按 9 月 20–22 日五场完整录像回放校准，不是独立准确率验收。peer-047（原标红外线理疗灯）与 peer-051（原标天线）实为琥珀天心类、定位组物品放下或快速转移时的声音，改为关联各自整类物品；红外线理疗灯、天线按 SoundRadar 同音类并入对应拿起组。一声可返回多件同音候选，差异率不是单件确定率。",
   "calibrationRecordingIds": [],
   "calibrationAudioHashes": [],
   "items": [
@@ -29913,10 +29913,11 @@
     },
     {
       "id": "peer-030",
-      "name": "目标定位模块",
+      "name": "目标定位模块 / 天线",
       "action": "pickup",
       "itemIds": [
-        "267afca3-0"
+        "267afca3-0",
+        "267afca3-10"
       ],
       "threshold": 0.82,
       "templates": [
@@ -47216,9 +47217,17 @@
     },
     {
       "id": "peer-051",
-      "name": "天线",
+      "name": "定位组 · 放下/转移声",
       "action": "pickup",
       "itemIds": [
+        "267afca3-0",
+        "267afca3-9",
+        "267afca3-6",
+        "267afca3-1",
+        "peer-060",
+        "peer-057",
+        "peer-044",
+        "peer-046",
         "267afca3-10"
       ],
       "threshold": 0.82,
