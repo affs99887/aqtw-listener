@@ -408,6 +408,60 @@ Test("拿起后一秒内的另一音效按放下声保留，不替换当前结�
     history.Remember(HistoryMatch(6, "click"), "点击", false, historyAt.AddSeconds(3.4), audioSeconds: 13.4);
     Check(history.Latest?.Result.BestMatch?.Item.Id == "click", "manual click was held back");
 });
+Test("放下声与拿起声候选相同时，再干净也不替换拿起结果的逐件分数", () =>
+{
+    RecognitionResult Result(long id, params (string Item, string Group, double Score)[] candidates) => new(id, RecognitionStatus.Matched, true,
+        candidates.Select(c => new Candidate(new(c.Item, c.Item, true), c.Score, c.Group)).ToArray(), 1, "match");
+    var history = new RecognitionHistory();
+    history.Remember(Result(1, ("a", "ga", .90), ("b", "gb", .89)), "自动", true, historyAt, audioSeconds: 10);
+    var pickup = history.Latest!;
+    history.Remember(Result(2, ("a", "place", .97), ("b", "place", .97)), "自动", true, historyAt.AddSeconds(.6), audioSeconds: 10.6);
+    Check(history.Latest?.Id == pickup.Id && history.Entries[0].FollowUp, "same-item putdown replaced the pickup's scores");
+    history.Remember(Result(3, ("c", "gc", .97)), "自动", true, historyAt.AddSeconds(.9), audioSeconds: 10.9);
+    Check(history.Latest?.Result.BestMatch?.Item.Id == "c", "clearly stronger different item was held back");
+});
+var baseRoot = Path.Combine(AppContext.BaseDirectory, "library");
+SoundLibrary BaseLibrary() => JsonFile.Read<SoundLibrary>(Path.Combine(baseRoot, "library.json"));
+float[] BaseReference(string group) => WaveAudio.Read(Path.Combine(baseRoot, "audio", group + ".wav")).Samples;
+string[] Names(RecognitionResult result) => result.Candidates.Select(c => c.Item.Name).Order().ToArray();
+// peer-047 was labelled a 红外线理疗灯 pickup, but it is the sound 琥珀天心-class items make when
+// put down or quick-transferred: raids scored 胶囊电视 and 阵列镜片 transfers 0.96 against it.
+Test("基础库：胶囊电视的拿起声与放下/转移声给出同一组琥珀天心类候选，不再只报红外线理疗灯", () =>
+{
+    using var recognizer = new InMatchRecognizer(BaseLibrary(), baseRoot);
+    var pickup = recognizer.AnalyzeAt(Raid(BaseReference("peer-024"), .5, clickGain: .05), 48000, .5).Result;
+    var putdown = recognizer.AnalyzeAt(Raid(BaseReference("peer-047"), .5, clickGain: .05), 48000, .5).Result;
+    Check(pickup is { Status: RecognitionStatus.Matched, BestMatch.Score: >= .9 } && putdown is { Status: RecognitionStatus.Matched, BestMatch.Score: >= .9 },
+        $"class sounds unmatched: {pickup.BestMatch?.Score:F3} / {putdown.BestMatch?.Score:F3}");
+    Check(Names(pickup).SequenceEqual(Names(putdown)), $"pickup and putdown name different items: {string.Join("、", Names(pickup))} | {string.Join("、", Names(putdown))}");
+    Check(putdown.CandidateCount == 13 && Names(putdown).Contains("胶囊电视") && Names(putdown).Contains("红外线理疗灯"),
+        "putdown did not return the whole 琥珀天心 class");
+    Check(pickup.Candidates.Select(c => c.GroupId).Distinct().Count() == 12, "pickup lost the per-item references");
+});
+Test("基础库：拖动胶囊电视后放下不改候选，单独快速转移也给出同类候选", () =>
+{
+    const int rate = 48000;
+    var random = new Random(5);
+    var samples = Enumerable.Range(0, rate * 6).Select(i => (float)(.004 * (random.NextDouble() * 2 - 1) + .02 * Math.Sin(2 * Math.PI * 110 * i / rate))).ToArray();
+    foreach (var (at, clip) in new[] { (1.0, BaseReference("peer-024")), (1.6, BaseReference("peer-047")), (4.0, BaseReference("peer-047")) })
+        for (var i = 0; i < clip.Length; i++) samples[(int)(at * rate) + i] += .3f * clip[i];
+    using var recognizer = new InMatchRecognizer(BaseLibrary(), baseRoot);
+    var scanner = new AutomaticAudioScanner(); scanner.Reset(0); var ring = new AudioTimeline(rate); var history = new RecognitionHistory();
+    var shown = new List<(double Onset, RecognitionEntry Latest)>(); var operation = 0L;
+    for (var first = 0; first < samples.Length; first += rate / 10)
+    {
+        ring.Append(samples.AsSpan(first, rate / 10).ToArray(), first / (double)rate);
+        var now = (first + rate / 10) / (double)rate;
+        if (scanner.TryTakeWindow(ring, now, true, false) is not { } window) continue;
+        var result = PickupRecognition.Analyze(recognizer, window, ++operation).Analysis.Result;
+        history.Remember(result, "自动", true, historyAt.AddSeconds(now), audioSeconds: window.OnsetSeconds);
+        shown.Add((window.OnsetSeconds, history.Latest!));
+    }
+    Check(shown.Count == 3, "expected pickup, putdown and transfer events: " + string.Join(",", shown.Select(s => s.Onset.ToString("F2"))));
+    Check(shown.All(s => Names(s.Latest.Result).Contains("胶囊电视") && s.Latest.Result.CandidateCount == 13), "a class sound showed other candidates");
+    Check(ReferenceEquals(shown[1].Latest, shown[0].Latest) && history.Entries.Any(e => e.FollowUp), "the putdown replaced the pickup result");
+    Check(shown[2].Latest.Result.Candidates.All(c => c.GroupId == "peer-047"), "a lone transfer did not use the putdown/transfer sound");
+});
 var report = new List<object>(); var failed = 0;
 foreach (var (name, run) in tests)
 {

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "featureVersion": "logmel24k-48-v1",
-  "version": "0.4.0-inmatch-20260924",
+  "version": "0.4.3-amber-placement-20260924",
   "gameVersion": "peer-v0.67 reference library; unverified game version",
   "validationStatus": "replay-checked-5-raids",
   "primaryEngine": "inmatch",
   "engineIndexSha256": "56C9566471523B7BF3E47B1799E1D53CB2E6B97DEFC26C128BDC33C55BCE8B8F",
-  "notes": "62 条拿起参考不变；识别改用局内匹配器（起点锚定、扣除前 300 ms 背景谱、只比对约 0.9–11 kHz 频带）。组门限 0.82，五条短促或类噪声参考 0.90，自动单次结果另需 0.86；门限按 9 月 20–22 日五场完整录像回放校准，不是独立准确率验收。一声可返回多件同音候选，匹配度不是单件确定率。",
+  "notes": "62 条参考不变；识别使用局内匹配器（起点锚定、扣除前 300 ms 背景谱、只比对约 0.9–11 kHz 频带）。组门限 0.82，五条短促或类噪声参考 0.90，自动单次结果另需 0.86；门限按 9 月 20–22 日五场完整录像回放校准，不是独立准确率验收。peer-047 原标「红外线理疗灯」拿起，实为琥珀天心类物品放下或快速转移时的声音，改为关联该类 13 件；红外线理疗灯按 SoundRadar 同音类并入琥珀天心拿起组。一声可返回多件同音候选，差异率不是单件确定率。",
   "calibrationRecordingIds": [],
   "calibrationAudioHashes": [],
   "items": [
@@ -17568,10 +17568,11 @@
     },
     {
       "id": "peer-016",
-      "name": "琥珀天心",
+      "name": "琥珀天心 / 红外线理疗灯",
       "action": "pickup",
       "itemIds": [
-        "e9f62d39-3"
+        "e9f62d39-3",
+        "e9f62d39-8"
       ],
       "threshold": 0.82,
       "templates": [
@@ -44369,10 +44370,22 @@
     },
     {
       "id": "peer-047",
-      "name": "红外线理疗灯",
+      "name": "琥珀天心类 · 放下/转移声",
       "action": "pickup",
       "itemIds": [
-        "e9f62d39-8"
+        "e9f62d39-3",
+        "e9f62d39-2",
+        "e9f62d39-0",
+        "e9f62d39-1",
+        "e9f62d39-4",
+        "e9f62d39-5",
+        "e9f62d39-6",
+        "e9f62d39-7",
+        "e9f62d39-8",
+        "e9f62d39-10",
+        "peer-012",
+        "peer-050",
+        "peer-055"
       ],
       "threshold": 0.9,
       "templates": [

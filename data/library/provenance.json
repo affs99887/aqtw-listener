@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0-inmatch-20260924",
+  "version": "0.4.3-amber-placement-20260924",
   "source": "User-provided peer v0.67 packaged material library",
   "sourceExecutableSha256": "f421fc13e12dcb495ef143895e1398b9c44ac4c73ba3d94b74f3f17fb7cfec35",
   "sourceReferencesSha256": "d18ec01dd063745d5a7bed148ff438c9014bfbf079b9aad7a8ac812c4601fe3f",
@@ -7,7 +7,7 @@
   "licenseStatus": "No verifiable source repository or license supplied for these peer materials; original rights retained.",
   "conversion": "stored float32 * 32767, truncate to signed PCM16; 48 kHz mono, 0.45 seconds; no additional processing",
   "indexSha256": null,
-  "recognition": "v0.4.0: in-process in-match matcher (onset-anchored, pre-onset background subtraction, mel bands 16-55); group thresholds .82 with five short/noise-like references at .90, automatic single-event minimum .86; no putdown auxiliary matching. The Go SoundRadar index is no longer bundled.",
+  "recognition": "v0.4.0: in-process in-match matcher (onset-anchored, pre-onset background subtraction, mel bands 16-55); group thresholds .82 with five short/noise-like references at .90, automatic single-event minimum .86; no putdown auxiliary matching. The Go SoundRadar index is no longer bundled. v0.4.3: peer-047 relinked from 红外线理疗灯 pickup to the 琥珀天心-class putdown/transfer sound (13 items); 红外线理疗灯 added to the 琥珀天心 pickup group.",
   "entries": [
     {
       "sourceReferenceId": "peer-000",
@@ -328,7 +328,11 @@
       "thumbnailSource": "soundradar-existing-catalog",
       "gridEvidenceImageSha256": "d60c63f859c14eaa037d9069dc407e62b35cc367be5e8f8bec3805b71aa33c42",
       "originalThumbnailSha256": "c8e274cdbf1d5680c6a7d04d400fbeb0cb2556c4c2e136eb03accf4ab12576bf",
-      "thumbnailEdit": "in-game label removed by inpainting (scripts/clean-thumbnails.py)"
+      "thumbnailEdit": "in-game label removed by inpainting (scripts/clean-thumbnails.py)",
+      "additionalItemIds": [
+        "e9f62d39-8"
+      ],
+      "additionalItemsSource": "SoundRadar eaa0348 同音·琥珀天心类 display hints (红外理疗灯 = e9f62d39-8); the peer 红外线理疗灯 reference is the class putdown sound (see peer-047)."
     },
     {
       "sourceReferenceId": "peer-017",
@@ -478,7 +482,12 @@
       "thumbnailSource": "soundradar-existing-catalog",
       "gridEvidenceImageSha256": "af64416ac3c244b20813a5436fbea7e111b4f5e1be8e276bd34be56648207a82",
       "originalThumbnailSha256": "1c3936c1964e42aa83db39453d620a6ecf0e3107fb64d0672626a1017ba6ab8a",
-      "thumbnailEdit": "in-game label removed by inpainting (scripts/clean-thumbnails.py)"
+      "thumbnailEdit": "in-game label removed by inpainting (scripts/clean-thumbnails.py)",
+      "duplicateOf": {
+        "sourceReferenceId": "peer-023",
+        "maxSampleDifference": 6,
+        "note": "Same recording as 三轴陀螺仪 (peer-023, ±6 of 32767 after alignment); not an independent 胶囊电视 recording. It carries the 琥珀天心-class pickup sound."
+      }
     },
     {
       "sourceReferenceId": "peer-025",
@@ -913,7 +922,19 @@
       "thumbnailSource": "soundradar-existing-catalog",
       "gridEvidenceImageSha256": "6a628538c28e241587305bbd4e113b712b410725288cc1ec16d1d45334507670",
       "originalThumbnailSha256": "ebbcfffcbe8b9e3f695592cd400fd928e795952e2f9443a5a0d4439d6f76aa13",
-      "thumbnailEdit": "in-game label and icon removed by inpainting (scripts/clean-thumbnails.py)"
+      "thumbnailEdit": "in-game label and icon removed by inpainting (scripts/clean-thumbnails.py)",
+      "relabel": {
+        "version": "0.4.3-amber-placement-20260924",
+        "from": "pickup of 红外线理疗灯 (e9f62d39-8)",
+        "to": "putdown / quick-transfer sound of the 琥珀天心 class, linked to all 13 class items",
+        "evidence": [
+          "Two clicks about 40 ms apart, the structure of the quick-transfer sound; unrelated to the class pickup (cosine 0.45 against SoundRadar 琥珀天心-拿起).",
+          "Raid replay 2026-09-20: 胶囊电视 transferred to the recovery device scored 0.962, 阵列镜片 quick-transferred scored 0.960; 航天导航仪 (another class) transferred scored 0.697.",
+          "Raid replay: accepted 量子F2000-cluster pickups were followed 0.3–0.6 s later by this sound (putdown).",
+          "User report 2026-09-24: picking up and moving a 胶囊电视 in the stash showed 红外线理疗灯 at 97% several times before the class candidates.",
+          "SoundRadar eaa0348 lists 红外理疗灯 (e9f62d39-8) in 同音·琥珀天心类, i.e. it shares the class pickup sound."
+        ]
+      }
     },
     {
       "sourceReferenceId": "peer-048",

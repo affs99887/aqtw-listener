@@ -14,7 +14,9 @@ public sealed class RecognitionHistory
     // item's pickup reference: replaying five raids showed 激光指示模块→天线,
     // 量子F2000→红外线理疗灯 and 专用电池组→水壶 pairs 0.3–0.6 s apart. Such a
     // follow-up stays in the list for review but does not replace the pickup on
-    // the overlay unless it is clearly stronger.
+    // the overlay unless it is clearly stronger. A class whose own putdown sound
+    // names the same items (琥珀天心类) keeps the pickup's per-item scores however
+    // clean the putdown is: it would show the same candidates.
     public const double FollowUpMinSeconds = .15, FollowUpMaxSeconds = 1.0, FollowUpMargin = .05;
     private readonly List<RecognitionEntry> entries = [];
     private long nextId;
@@ -56,11 +58,13 @@ public sealed class RecognitionHistory
         && shown.AudioSeconds is { } shownAt && audioSeconds is { } now
         && now - shownAt is >= FollowUpMinSeconds and <= FollowUpMaxSeconds
         && !SameCandidates(shown.Result, result)
-        && (result.BestMatch?.Score ?? 0) < (shown.Result.BestMatch?.Score ?? 0) + FollowUpMargin;
+        && (SameItems(shown.Result, result) || (result.BestMatch?.Score ?? 0) < (shown.Result.BestMatch?.Score ?? 0) + FollowUpMargin);
 
     private static bool SameCandidates(RecognitionResult first, RecognitionResult second) =>
         first.Candidates.Select(c => (c.Item.Id, c.GroupId)).ToHashSet()
             .SetEquals(second.Candidates.Select(c => (c.Item.Id, c.GroupId)));
+    private static bool SameItems(RecognitionResult first, RecognitionResult second) =>
+        first.Candidates.Select(c => c.Item.Id).ToHashSet().SetEquals(second.Candidates.Select(c => c.Item.Id));
 
     public void ClearCurrent() { Latest = null; Changed?.Invoke(); }
     public void ClearHistory() { entries.Clear(); Changed?.Invoke(); }
