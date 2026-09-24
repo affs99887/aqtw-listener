@@ -116,6 +116,15 @@ Test("按下后的声音归为拿起声，松开后的归为放下声，远离�
     Check(log.Classify(11.18) == SoundPhase.Pickup, "an onset placed just before the press timestamp lost its press");
     Check(log.Classify(10.6) == SoundPhase.Unknown && log.Classify(12) == SoundPhase.Unknown, "a sound far from any edge was attributed to it");
 });
+Test("声音归到的按键边沿带时间戳，同一次按下内的多段声音共用它", () =>
+{
+    var log = new MouseEdgeLog();
+    log.Press(10); log.Release(10.9);
+    Check(log.Latest(10.08) is { At: 10, Press: true } && log.Latest(10.3) is { At: 10, Press: true }, "two sounds inside one hold did not share the press");
+    Check(log.Latest(10.97) is { At: 10.9, Press: false }, "the sound after the release lost its edge");
+    Check(log.Latest(12) is null, "a sound far from any edge was given one");
+    Check(log.Recent().Select(e => (e.At, e.Press)).SequenceEqual([(10, true), (10.9, false)]), "recent edges are not in order");
+});
 Test("音量变化不改变匹配分数", () =>
 {
     using var recognizer = Engine(Library());
@@ -466,20 +475,24 @@ float[] BaseReference(string group) => WaveAudio.Read(Path.Combine(baseRoot, "au
 string[] Names(RecognitionResult result) => result.Candidates.Select(c => c.Item.Name).Order().ToArray();
 // peer-047 and peer-051 were labelled 红外线理疗灯 / 天线 pickups, but SoundRadar's raw 琥珀天心-放下 and
 // 目标定位-放下 captures score 0.996 / 0.968 against them: they are those classes' putdown sounds.
-Test("基础库：琥珀天心类、定位组的拿起声与放下/转移声给出同一组候选，不再只报红外线理疗灯或天线", () =>
+// Putting an item down is never recognised, so they are putdown-sound groups that veto a window.
+Test("基础库：琥珀天心类、定位组的拿起声给出整类候选，放下/转移声判为放下声且不给候选", () =>
 {
-    using var recognizer = new InMatchRecognizer(BaseLibrary(), baseRoot);
+    var library = BaseLibrary();
+    using var recognizer = new InMatchRecognizer(library, baseRoot);
     foreach (var (pickupGroup, putdownGroup, members, item, relabelled) in new[]
              { ("peer-024", "peer-047", 13, "胶囊电视", "红外线理疗灯"), ("peer-000", "peer-051", 9, "激光指示模块", "天线") })
     {
-        var pickup = recognizer.AnalyzeAt(Raid(BaseReference(pickupGroup), .5, clickGain: .05), 48000, .5).Result;
-        var putdown = recognizer.AnalyzeAt(Raid(BaseReference(putdownGroup), .5, clickGain: .05), 48000, .5).Result;
-        Check(pickup is { Status: RecognitionStatus.Matched, BestMatch.Score: >= .9 } && putdown is { Status: RecognitionStatus.Matched, BestMatch.Score: >= .9 },
-            $"{item}: class sounds unmatched: {pickup.BestMatch?.Score:F3} / {putdown.BestMatch?.Score:F3}");
-        Check(Names(pickup).SequenceEqual(Names(putdown)), $"pickup and putdown name different items: {string.Join("、", Names(pickup))} | {string.Join("、", Names(putdown))}");
-        Check(putdown.CandidateCount == members && Names(putdown).Contains(item) && Names(putdown).Contains(relabelled),
-            $"{relabelled}: putdown did not return the whole class");
-        Check(pickup.Candidates.Select(c => c.GroupId).Distinct().Count() == members - 1, $"{item}: pickup lost the per-item references");
+        Check(library.Groups.Single(g => g.Id == putdownGroup).Action == "putdown", putdownGroup + " is not a putdown-sound group");
+        var pickup = recognizer.AnalyzeAt(Raid(BaseReference(pickupGroup), .5, clickGain: .05), 48000, .5);
+        var putdown = recognizer.AnalyzeAt(Raid(BaseReference(putdownGroup), .5, clickGain: .05), 48000, .5);
+        Check(pickup.Result is { Status: RecognitionStatus.Matched, BestMatch.Score: >= .9 } && pickup.Putdown is null,
+            $"{item}: pickup unmatched or taken for a putdown: {pickup.Result.BestMatch?.Score:F3}");
+        Check(pickup.Result.CandidateCount == members && Names(pickup.Result).Contains(item) && Names(pickup.Result).Contains(relabelled) &&
+            pickup.Result.Candidates.Select(c => c.GroupId).Distinct().Count() == members - 1, $"{item}: pickup did not return the whole class per item");
+        Check(putdown.Putdown is { } veto && veto.GroupId == putdownGroup && veto.Score >= .9 && putdown.Result.Status == RecognitionStatus.Unknown &&
+            putdown.Result.CandidateCount == 0, $"{relabelled}: putdown sound was not vetoed: {putdown.Result.Status} {putdown.Putdown?.GroupId}");
+        Check(!putdown.Scores.Any(s => s.GroupId != putdownGroup && s.Score >= .8), $"{relabelled}: putdown sound resembles a pickup reference");
     }
 });
 Test("基础库「听样本」只放原始录音：不是处理过的识别参考，未归一化，匹配器把每段识别为所关联的音效组", () =>
@@ -500,13 +513,15 @@ Test("基础库「听样本」只放原始录音：不是处理过的识别参�
             $"{clip.Id}: play window outside the recording or too short");
         Check(window.Samples.Max(v => Math.Abs(v)) < .95, $"{clip.Id}: normalised to full scale");
         Check(clip.GroupIds.Length > 0 && clip.GroupIds.All(groups.Contains), $"{clip.Id}: unknown groups");
-        var matched = recognizer.Recognize(whole.Samples, whole.SampleRate).Candidates.Select(c => c.GroupId).ToHashSet();
+        var analysis = recognizer.Analyze(whole.Samples, whole.SampleRate);
+        var matched = clip.Action == "putdown" ? (analysis.Putdown is { } veto ? [veto.GroupId] : new HashSet<string>())
+            : analysis.Result.Candidates.Select(c => c.GroupId).ToHashSet();
         Check(matched.SetEquals(clip.GroupIds), $"{clip.Id} ({clip.Label}) is recognised as {string.Join(",", matched)}, not {string.Join(",", clip.GroupIds)}");
     }
     Check(new[] { "peer-047", "peer-051" }.All(group => playback.Clips.Any(c => c.Action == "putdown" && c.GroupIds.Contains(group))),
         "a relabelled putdown sound has no putdown recording to audition");
 });
-Test("基础库：拖动胶囊电视后放下不改候选，单独快速转移也给出同类候选", () =>
+Test("基础库：拖动胶囊电视后放下、单独快速转移都判为放下声，只有拿起声进入结果", () =>
 {
     const int rate = 48000;
     var random = new Random(5);
@@ -515,20 +530,37 @@ Test("基础库：拖动胶囊电视后放下不改候选，单独快速转移�
         for (var i = 0; i < clip.Length; i++) samples[(int)(at * rate) + i] += .3f * clip[i];
     using var recognizer = new InMatchRecognizer(BaseLibrary(), baseRoot);
     var scanner = new AutomaticAudioScanner(); scanner.Reset(0); var ring = new AudioTimeline(rate); var history = new RecognitionHistory();
-    var shown = new List<(double Onset, RecognitionEntry Latest)>(); var operation = 0L;
+    var events = new List<(double Onset, PickupAnalysis Pickup)>(); var operation = 0L;
     for (var first = 0; first < samples.Length; first += rate / 10)
     {
         ring.Append(samples.AsSpan(first, rate / 10).ToArray(), first / (double)rate);
         var now = (first + rate / 10) / (double)rate;
         if (scanner.TryTakeWindow(ring, now, true, false) is not { } window) continue;
-        var result = PickupRecognition.Analyze(recognizer, window, ++operation).Analysis.Result;
-        history.Remember(result, "自动", true, historyAt.AddSeconds(now), audioSeconds: window.OnsetSeconds);
-        shown.Add((window.OnsetSeconds, history.Latest!));
+        var pickup = PickupRecognition.Analyze(recognizer, window, ++operation);
+        events.Add((window.OnsetSeconds, pickup));
+        // The controller drops putdown sounds before they reach the history.
+        if (!pickup.IsPutdown) history.Remember(pickup.Analysis.Result, "自动", true, historyAt.AddSeconds(now), audioSeconds: window.OnsetSeconds);
     }
-    Check(shown.Count == 3, "expected pickup, putdown and transfer events: " + string.Join(",", shown.Select(s => s.Onset.ToString("F2"))));
-    Check(shown.All(s => Names(s.Latest.Result).Contains("胶囊电视") && s.Latest.Result.CandidateCount == 13), "a class sound showed other candidates");
-    Check(ReferenceEquals(shown[1].Latest, shown[0].Latest) && history.Entries.Any(e => e.FollowUp), "the putdown replaced the pickup result");
-    Check(shown[2].Latest.Result.Candidates.All(c => c.GroupId == "peer-047"), "a lone transfer did not use the putdown/transfer sound");
+    Check(events.Count == 3, "expected pickup, putdown and transfer events: " + string.Join(",", events.Select(s => s.Onset.ToString("F2"))));
+    Check(!events[0].Pickup.IsPutdown && Names(events[0].Pickup.Analysis.Result).Contains("胶囊电视") && events[0].Pickup.Analysis.Result.CandidateCount == 13,
+        "the pickup did not show the whole class");
+    Check(events.Skip(1).All(e => e.Pickup.IsPutdown && e.Pickup.Analysis.Putdown!.GroupId == "peer-047" && e.Pickup.Analysis.Result.CandidateCount == 0),
+        "a putdown or transfer sound was not judged a putdown");
+    Check(history.Entries.Count == 1 && history.Latest?.Result.CandidateCount == 13, "a putdown sound reached the history");
+});
+Test("拿起声领先库内其他类 0.20 以上时，0.80 以上即可自动接受；差距小的仍需 0.86", () =>
+{
+    var library = Library();
+    var stub = new ScriptedRecognizer(library);
+    var window = new AudioScanWindow(new float[24000], 24000, 1.0, .5);
+    stub.Next = (score: .84, separation: .27);
+    Check(PickupRecognition.Analyze(stub, window).Analysis.Result.Status == RecognitionStatus.Matched, "a clean 0.84 match was rejected");
+    stub.Next = (score: .84, separation: .10);
+    Check(PickupRecognition.Analyze(stub, window).Analysis.Result.Status == RecognitionStatus.Unknown, "an ambiguous 0.84 match was accepted");
+    stub.Next = (score: .79, separation: .40);
+    Check(PickupRecognition.Analyze(stub, window).Analysis.Result.Status == RecognitionStatus.Unknown, "a 0.79 match was accepted");
+    stub.Next = (score: .86, separation: 0);
+    Check(PickupRecognition.Analyze(stub, window).Analysis.Result.Status == RecognitionStatus.Matched, "a 0.86 match was rejected");
 });
 var report = new List<object>(); var failed = 0;
 foreach (var (name, run) in tests)
@@ -540,3 +572,21 @@ foreach (var (name, run) in tests)
 if (args.Length > 0) JsonFile.Write(args[0], new { total = tests.Count, passed = tests.Count - failed, failed, tests = report });
 Directory.Delete(libraryRoot, true);
 return failed == 0 ? 0 : 1;
+
+// Returns one matched candidate with a scripted score and lead over the rest of the catalogue.
+sealed class ScriptedRecognizer(SoundLibrary library) : IRecognizer
+{
+    public (double score, double separation) Next { get; set; }
+    public RecognitionResult Recognize(float[] samples, int sampleRate, long operationId = 0, bool final = true, CancellationToken cancellation = default)
+        => Analyze(samples, sampleRate, operationId, final, cancellation).Result;
+    public RecognitionAnalysis Analyze(float[] samples, int sampleRate, long operationId = 0, bool final = true, CancellationToken cancellation = default)
+    {
+        var group = library.Groups[0];
+        var candidate = new Candidate(library.Items.First(i => i.Id == group.ItemIds[0]), Next.score, group.Id);
+        return new(new(operationId, RecognitionStatus.Matched, final, [candidate], 0, "scripted"), [new(group.Id, Next.score)], null, Next.separation);
+    }
+    public RecognitionAnalysis AnalyzeAt(float[] samples, int sampleRate, double onsetSeconds, long operationId = 0, bool final = true, CancellationToken cancellation = default)
+        => Analyze(samples, sampleRate, operationId, final, cancellation);
+    public (SoundGroup Group, double Score)[] ScoreAudio(float[] samples, int sampleRate, CancellationToken cancellation = default) => [(library.Groups[0], Next.score)];
+    public void Dispose() { }
+}

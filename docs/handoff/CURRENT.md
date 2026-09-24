@@ -1,9 +1,19 @@
 # 当前接续状态 · 2026-09-24
 
-当前版本为 **v0.4.3（放下声更正、逐件差异率与原声试听）**，已合入 `main` 并打标签 `v0.4.3`。便携包 `AqtwListener-v0.4.3-win-x64.zip` 在 Linux 上交叉构建（自包含 win-x64，与 `publish.ps1` 相同的参数；PerMonitorV2 清单、图标和版本资源已嵌入，与 v0.4.2 官方包一致），解压后在 Wine 中通过界面检查与命令行识别。起因是用户反馈仓库中拖动胶囊电视多次报「红外线理疗灯 97%」、胶囊电视的「听样本」不像胶囊电视；用户确认原因是放下声被识别成红外线理疗灯，且样本声音经过处理。调查与数据见 [放下声更正](../PUTDOWN-RELABEL-20260924.md)：
+当前版本为 **v0.4.4（放下声不识别、拿起识别率）**，发布为 GitHub Release。用户在仓库用 v0.4.4 之前的便携版实测：放下胶囊电视、琥珀天心几乎每次触发一次识别；拿起这两件偶尔没有反应。9 月 24 日晚四场录像（`.tools/research/putdown-skip`，gitignored）里 33 分钟一局含两次行商访问，`trader_gt.py` 用行商界面中被拿起物品的红色高亮得到 45 次真实拖动的拿起/放下时刻（`docs/measurements/trader-drags-20260924-v0.4.4.json`）：
+
+- 放下声：`peer-047`、`peer-051` 改为 `action: "putdown"`（库版本 `0.4.4-putdown-veto-20260924`），`InMatchRecognizer` 为放下声组也建模板，`Putdown()` 在放下声组过自身门限且高于所有拿起组时返回该组，`RecognitionAnalysis.Putdown` 非空即为放下声，`CandidateSelection` 仍只取拿起组。`ListeningController.PollAutomaticRecognition` 三层跳过：`MouseEdgeLog.Latest` 归到松开边沿的声音不分析（起点加 `AudioCaptureHealth.TimelineLagSeconds` 对齐到达时钟）；`PickupAnalysis.IsPutdown` 的结果不发布；无鼠标信号时 `RecognitionHistory.WouldHold`（拿起后 0.15–1.0 s 的不同候选）的结果不发布。同一次按下（`publishedPress`）内的第二段声音也走 `WouldHold`。三种都只计入 `SkippedPutdowns` 与 `RecentSounds`。录像中 13 次放下声组事件全部判为放下；行商 45 次放下 0 次产生匹配（行商界面放下几乎无声）。
+- 拿起：`AutomaticAudioScanner.RefractorySeconds` 0.25 → 0.12（行商界面音先于物品声 0.12–0.19 s）；`PickupRecognition` 新增 `ConfidentScore` 0.80 + `ConfidentSeparation` 0.20（`RecognitionAnalysis.Separation` = 候选最高分 − 未入候选的最高拿起组分）；失败结果经 `pendingFailure` 延迟 `FailureDelaySeconds` 0.4 s 显示，期间匹配则取消，显示时附「最接近 X 差异率 Y%」。行商拖动识别 36/45 → 39/45，整局匹配 71 → 75 且无移除。剩余未识别：3 次被更响声音盖住或最高分仅 0.43–0.60，3 次接近门限（0.74、0.79、0.80）。
+- 诊断：主窗口诊断页显示「放下声不识别 N 次」「音频时间偏差」（WASAPI 时间戳与到达时间之差的 2 秒最小值）与最近 5 段声音；导出诊断含 `RecentSounds`、`RecentInput`。
+- 验证：核心测试 43/43，应用测试 54/54，`--ui-smoke` 通过，记录为 `docs/measurements/release-v0.4.4-*.json`。鼠标松开判定与时钟对齐未在游戏内实测。
+- 未做：其余类的放下声没有参考，仍靠鼠标或 1 秒时序规则；被盖住的拿起声、接近门限的低分匹配没有进一步处理。
+
+以下为 v0.4.3 时的状态记录。
+
+v0.4.3（放下声更正、逐件差异率与原声试听）已合入 `main` 并打标签 `v0.4.3`。便携包 `AqtwListener-v0.4.3-win-x64.zip` 在 Linux 上交叉构建（自包含 win-x64，与 `publish.ps1` 相同的参数；PerMonitorV2 清单、图标和版本资源已嵌入，与 v0.4.2 官方包一致），解压后在 Wine 中通过界面检查与命令行识别。起因是用户反馈仓库中拖动胶囊电视多次报「红外线理疗灯 97%」、胶囊电视的「听样本」不像胶囊电视；用户确认原因是放下声被识别成红外线理疗灯，且样本声音经过处理。调查与数据见 [放下声更正](../PUTDOWN-RELABEL-20260924.md)：
 
 - 库数据：`peer-047`（原标红外线理疗灯）、`peer-051`（原标天线）经 SoundRadar 原始放下录音核实为琥珀天心类、定位组的放下/转移声（0.996、0.968），改为关联整类 13／9 件；红外线理疗灯并入 `peer-016`，天线并入 `peer-030`。库版本 `0.4.3-putdown-relabel-20260924`，`references.json` 与门限未变。
-- 识别逻辑：`MouseEdgeLog` 把声音起点归到其前 0.35 s（容差 0.06 s）最近的鼠标按下/松开；`RecognitionHistory.Remember` 新增 `SoundPhase`：松开后的放下声总是扣留（`FollowUp`，历史标「放下声」），按下后的拿起声从不扣留，无鼠标信号时沿用 1 秒时序规则；候选物品相同的放下声不替换拿起结果。`NativeInput` 的钩子与按键检测都会报告松开。
+- 识别逻辑：`MouseEdgeLog` 把声音起点归到其前 0.35 s（容差 0.06 s）最近的鼠标按下/松开；`RecognitionHistory.Remember` 新增 `SoundPhase`：按住至少 `MouseEdgeLog.MinDragSeconds`（0.15 s）后松开的放下声由 `ListeningController` 直接跳过，不分析、不存片段、不记历史，只计入诊断的「跳过放下声」；更短按压后松开的放下声仍分析并总是扣留（`FollowUp`，历史标「放下声」），按下后的拿起声从不扣留，无鼠标信号时沿用 1 秒时序规则；候选物品相同的放下声不替换拿起结果。`NativeInput` 的钩子与按键检测都会报告松开。
 - 界面：卡片逐件显示「差异率」（`CandidatePanel.DifferenceText`，100% − 相似度，一位小数），汇总行不再显示匹配度；密集卡片把差异率放在缩略图底边。
 - 试听：`PlaybackAudio` + `data/library/playback.json`，17 段 SoundRadar 原始录音（`scripts/import-soundradar-playback.py` 逐字节导入）覆盖 50 件；识别参考不再用于试听。个人库建库时复制基础原声，并把学习样本的原始录音（`sourceFile`）登记为试听片段；旧个人库版本回退到基础库原声。其余 12 件没有原声，按钮禁用。
 - 验证：核心测试 41/41，应用测试 52/52，`--ui-smoke` 布局全部通过，记录为 `docs/measurements/release-v0.4.3-*.json`。WPF 测试在 Linux 的 Wine 9.0 + Xvfb 运行（自包含 win-x64 构建、`EnableWindowsTargeting`，Noto Sans CJK 替代雅黑，空 ALSA 设备），未在 Windows 本机和游戏内复测。

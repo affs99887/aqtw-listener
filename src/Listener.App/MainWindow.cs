@@ -167,9 +167,11 @@ internal sealed partial class MainWindow : Window
         var pickup = library.Groups.Where(g => g.Action == "pickup" && g.Templates.Count > 0).ToArray();
         var covered = pickup.SelectMany(g => g.ItemIds).Distinct().Count();
         var references = pickup.Sum(g => g.Templates.Count);
+        var putdowns = library.Groups.Where(g => g.Action == "putdown").Sum(g => g.Templates.Count);
         var engine = library.PrimaryEngine == RecognizerFactory.Engine ? "局内匹配器" : library.PrimaryEngine;
-        libraryInfo.Text = $"{covered} 件物品已接入 / {library.Items.Count} 件目录 · {references} 条参考\n{engine} · {library.Version}";
-        dashboardLibraryInfo.Text = $"{library.Items.Count} 件物品 · {references} 条参考";
+        libraryInfo.Text = $"{covered} 件物品已接入 / {library.Items.Count} 件目录 · {references} 条拿起参考" +
+            (putdowns > 0 ? $" · {putdowns} 条放下声" : "") + $"\n{engine} · {library.Version}";
+        dashboardLibraryInfo.Text = $"{library.Items.Count} 件物品 · {references} 条拿起参考";
         dashboardEngineInfo.Text = $"{engine} · {library.Version}";
     }
     private UIElement Build()
@@ -328,8 +330,10 @@ internal sealed partial class MainWindow : Window
             d.Audio.LastPacketAgeSeconds is null or > 2 ? "暂未收到游戏进程音频包，请在游戏内播放声音" :
             d.Audio.LastSoundAgeSeconds is < 2 ? "已收到声音" : "已收到音频包，当前静音";
         var inputState = input is null ? "输入未就绪" : $"鼠标事件 {input.HookPresses} / 备用触发 {input.PollTriggers}";
+        var lag = d.Audio.TimelineLagSeconds is { } seconds ? $" · 音频时间偏差 {seconds * 1000:+0;-0} ms" : "";
         diagnostics.Text = $"前台：{(d.ForegroundProcess.Length == 0 ? "无法读取" : d.ForegroundProcess)} · 目标：{d.TargetProcess}\n" +
-            $"{inputState} · 已接受 {d.TriggerCount} 次\n音频：{audio}\n声音分析 {d.AutomaticScans} 次 · {d.AutomaticStatus}\n最近识别：{d.LastRecognition}";
+            $"{inputState} · 已接受 {d.TriggerCount} 次\n音频：{audio}{lag}\n声音分析 {d.AutomaticScans} 次 · 放下声不识别 {d.SkippedPutdowns} 次 · {d.AutomaticStatus}\n最近识别：{d.LastRecognition}" +
+            (d.RecentSounds.Count > 0 ? "\n最近声音：\n" + string.Join("\n", d.RecentSounds.Reverse().Take(5)) : "");
         if (inputError.Length != 0) diagnostics.Text += "\n输入提示：" + inputError;
         else if (input?.HookStatus.StartsWith("鼠标事件注册失败", StringComparison.Ordinal) == true) diagnostics.Text += "\n" + input.HookStatus;
         if (d.ManualTestStatus.Length != 0) diagnostics.Text += "\n" + d.ManualTestStatus;
@@ -343,7 +347,7 @@ internal sealed partial class MainWindow : Window
             {
                 createdAt = DateTimeOffset.Now, listening = controller.Diagnostics(),
                 input = new { mode = input?.HookStatus, hookPresses = input?.HookPresses, fallbackTriggers = input?.PollTriggers, error = inputError },
-                note = "仅状态与计数，不包含录音。切回助手时暂停采音，最近识别结果和触发计数仍保留。"
+                note = "仅状态与计数，不包含录音。切回助手时暂停采音，最近识别结果、最近声音与鼠标边沿仍保留。"
             });
             MessageBox.Show(this, "诊断已保存，可将此文件提供给开发者：\n" + path, "导出诊断");
         }

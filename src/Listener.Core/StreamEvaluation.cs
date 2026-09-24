@@ -22,8 +22,9 @@ public static class StreamEvaluation
             if (window is null) continue;
             var pickup = PickupRecognition.Analyze(recognizer, window);
             events.Add(new(now, window.OnsetSeconds, pickup.Window.StartSeconds, pickup.Window.EndSeconds,
-                pickup.Analysis.Result.Status, pickup.Analysis.Scores.Take(3).ToArray(),
-                pickup.Analysis.Result.Candidates.Select(candidate => candidate.Item.Id).ToArray()));
+                pickup.Analysis.Result.Status, pickup.Analysis.Scores.Take(5).ToArray(),
+                pickup.Analysis.Result.Candidates.Select(candidate => candidate.Item.Id).ToArray(),
+                pickup.IsPutdown ? "putdown" : "pickup"));
         }
         return events;
     }

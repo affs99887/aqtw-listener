@@ -1,7 +1,11 @@
 namespace Listener.Core;
 
 public sealed record GroupScore(string GroupId, double Score);
-public sealed record RecognitionAnalysis(RecognitionResult Result, IReadOnlyList<GroupScore> Scores);
+// Putdown names the putdown-sound group this audio matched instead of any pickup:
+// the sound is an item being put down or transferred and must not be recognised.
+// Separation is the best candidate's lead over the strongest pickup group that did
+// not make the candidate list; a large lead marks a clean, unambiguous match.
+public sealed record RecognitionAnalysis(RecognitionResult Result, IReadOnlyList<GroupScore> Scores, GroupScore? Putdown = null, double Separation = 0);
 
 public sealed class AnalysisSnapshot
 {

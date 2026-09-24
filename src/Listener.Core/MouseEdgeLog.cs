@@ -6,7 +6,7 @@ public enum SoundPhase { Unknown, Pickup, Putdown }
 // it down; the game plays that action's sound a frame or two later. A sound is
 // attributed to the latest button edge shortly before its onset. Remote sessions
 // whose input never reaches this PC leave every sound Unknown, and timing decides.
-// Timestamps share AudioTimeline's clock. Call from one thread.
+// Timestamps share the capture's arrival clock. Call from one thread.
 public sealed class MouseEdgeLog
 {
     // Game frame plus audio pipeline delay; an input timestamp may also land just
@@ -20,7 +20,12 @@ public sealed class MouseEdgeLog
     {
         edges[next] = (at, press); next = (next + 1) % edges.Length; count = Math.Min(count + 1, edges.Length);
     }
-    public SoundPhase Classify(double onsetSeconds)
+    public SoundPhase Classify(double onsetSeconds) => Latest(onsetSeconds) switch
+    {
+        null => SoundPhase.Unknown, { Press: true } => SoundPhase.Pickup, _ => SoundPhase.Putdown
+    };
+    // The button edge a sound at this onset belongs to, if any.
+    public (double At, bool Press)? Latest(double onsetSeconds)
     {
         (double At, bool Press)? latest = null;
         for (var i = 0; i < count; i++)
@@ -29,6 +34,13 @@ public sealed class MouseEdgeLog
             if (edge.At > onsetSeconds + EarlySeconds || edge.At < onsetSeconds - MaxDelaySeconds) continue;
             if (latest is null || edge.At > latest.Value.At) latest = edge;
         }
-        return latest is null ? SoundPhase.Unknown : latest.Value.Press ? SoundPhase.Pickup : SoundPhase.Putdown;
+        return latest;
+    }
+    // Most recent edges, oldest first, for diagnostics.
+    public IReadOnlyList<(double At, bool Press)> Recent(int limit = 8)
+    {
+        var list = new List<(double, bool)>();
+        for (var i = 0; i < count; i++) list.Add(edges[(next - count + i + edges.Length * 2) % edges.Length]);
+        return list.TakeLast(limit).ToArray();
     }
 }

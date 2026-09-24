@@ -205,8 +205,10 @@ public sealed class InMatchRecognizer : IRecognizer
         if (!string.IsNullOrWhiteSpace(library.EngineIndexSha256) && (!File.Exists(manifest) ||
             !ReferenceAudio.Hash(manifest).Equals(library.EngineIndexSha256, StringComparison.OrdinalIgnoreCase)))
             throw new InvalidDataException("参考音频清单与物品目录不属于同一音效包，请整体替换 library 文件夹。");
+        // Putdown-sound groups are scored too: a window that matches one is an item
+        // being put down or transferred, which is never reported as a pickup.
         var list = new List<(SoundGroup, float[][])>();
-        foreach (var group in library.Groups.Where(g => g.Action == "pickup" && g.Templates.Count > 0))
+        foreach (var group in library.Groups.Where(g => g.Action is "pickup" or "putdown" && g.Templates.Count > 0))
         {
             var templates = new List<float[]>();
             foreach (var sample in references.Samples.Where(s => s.GroupId == group.Id))
@@ -262,15 +264,32 @@ public sealed class InMatchRecognizer : IRecognizer
     {
         var watch = Stopwatch.StartNew();
         GroupScore[] ranked = [];
-        RecognitionAnalysis Empty(RecognitionStatus s, string m) => new(new(operationId, s, final, [], watch.Elapsed.TotalMilliseconds, m), ranked);
-        if (groups.Length == 0) return Empty(RecognitionStatus.LibraryEmpty, "音效库没有拾起样本");
+        RecognitionAnalysis Empty(RecognitionStatus s, string m, GroupScore? putdown = null) =>
+            new(new(operationId, s, final, [], watch.Elapsed.TotalMilliseconds, m), ranked, putdown);
+        if (groups.All(g => g.Group.Action != "pickup")) return Empty(RecognitionStatus.LibraryEmpty, "音效库没有拾起样本");
         if (samples.Length < sampleRate * .03 || AudioFeatures.Rms(samples) < .00008) return Empty(RecognitionStatus.NoSound, "没有听到有效声音");
         if (samples.Count(v => Math.Abs(v) > .995) > samples.Length * .05) return Empty(RecognitionStatus.Interference, "声音削波严重，请降低音量");
         var scores = ScoreAudio(samples, sampleRate, onsetSeconds, cancellation);
         ranked = scores.OrderByDescending(s => s.Score).Select(s => new GroupScore(s.Group.Id, s.Score)).ToArray();
+        if (Putdown(scores) is { } putdown) return Empty(RecognitionStatus.Unknown, "放下声 · 不识别", putdown);
         var candidates = CandidateSelection.Select(library, scores);
-        return candidates.Length == 0 ? Empty(RecognitionStatus.Unknown, "识别失败 · 未匹配到已收录音效")
-            : new(new(operationId, RecognitionStatus.Matched, final, candidates, watch.Elapsed.TotalMilliseconds, final ? "识别完成" : "初步候选 · 正在继续听"), ranked);
+        if (candidates.Length == 0) return Empty(RecognitionStatus.Unknown, "识别失败 · 未匹配到已收录音效");
+        var chosen = candidates.Select(c => c.GroupId).ToHashSet();
+        var outside = scores.Where(s => s.Group.Action == "pickup" && !chosen.Contains(s.Group.Id)).Select(s => s.Score).DefaultIfEmpty(-1).Max();
+        return new(new(operationId, RecognitionStatus.Matched, final, candidates, watch.Elapsed.TotalMilliseconds, final ? "识别完成" : "初步候选 · 正在继续听"),
+            ranked, null, candidates.Max(c => c.Score) - outside);
+    }
+    // The sound is a putdown when a putdown-sound group clears its own threshold and
+    // no pickup group scores higher: the two kinds of sound do not resemble each other
+    // (SoundRadar's raw 琥珀天心 pickup scores 0.45 against that class's putdown).
+    public static GroupScore? Putdown(IEnumerable<(SoundGroup Group, double Score)> scores)
+    {
+        var list = scores.ToArray();
+        var best = list.Where(s => s.Group.Action == "putdown" && s.Score >= s.Group.Threshold)
+            .OrderByDescending(s => s.Score).FirstOrDefault();
+        if (best.Group is null) return null;
+        var pickup = list.Where(s => s.Group.Action == "pickup").Select(s => s.Score).DefaultIfEmpty(-1).Max();
+        return best.Score > pickup ? new GroupScore(best.Group.Id, best.Score) : null;
     }
     public void Dispose() { }
 }

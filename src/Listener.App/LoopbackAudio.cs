@@ -8,7 +8,11 @@ public sealed record OutputDevice(string Id, string Name)
     public override string ToString() => Name;
 }
 
-internal sealed record AudioCaptureHealth(long Packets, double? LastPacketAgeSeconds, double Rms, double? LastSoundAgeSeconds);
+// TimelineLagSeconds: how much later than its timeline stamp the most recent audio
+// arrived (minimum over the last two seconds). Adding it to a timeline time gives the
+// arrival-clock time that mouse timestamps use.
+internal sealed record AudioCaptureHealth(long Packets, double? LastPacketAgeSeconds, double Rms, double? LastSoundAgeSeconds,
+    double? TimelineLagSeconds = null);
 
 internal interface IPlaybackCapture : IAsyncDisposable
 {
@@ -35,11 +39,18 @@ internal sealed class LoopbackAudio : IPlaybackCapture
     private long packets;
     private double? lastPacketAt, lastSoundAt;
     private double rms;
+    private readonly (double Arrival, double Lag)[] lags = new (double, double)[64];
+    private int lagNext, lagCount;
     public long Packets { get { lock (healthSync) return packets; } }
     public AudioCaptureHealth Health()
     {
-        lock (healthSync) return new(packets, lastPacketAt is { } p ? NativeInput.Now - p : null,
-            rms, lastSoundAt is { } s ? NativeInput.Now - s : null);
+        lock (healthSync)
+        {
+            var now = NativeInput.Now; double? lag = null;
+            for (var i = 0; i < lagCount; i++)
+                if (now - lags[i].Arrival <= 2 && (lag is null || lags[i].Lag < lag)) lag = lags[i].Lag;
+            return new(packets, lastPacketAt is { } p ? now - p : null, rms, lastSoundAt is { } s ? now - s : null, lag);
+        }
     }
     public static List<OutputDevice> Devices()
     {
@@ -74,21 +85,25 @@ internal sealed class LoopbackAudio : IPlaybackCapture
                 throw new NotSupportedException("游戏进程音频格式不支持，请使用 16/24/32 位 PCM 或 32 位浮点。");
             Timeline = new AudioTimeline(format.SampleRate);
             var timeline = Timeline;
-            lock (healthSync) { packets = 0; lastPacketAt = lastSoundAt = null; rms = 0; }
+            lock (healthSync) { packets = 0; lastPacketAt = lastSoundAt = null; rms = 0; lagNext = lagCount = 0; }
             capture.DataAvailable += (bytes, flags, position, qpc) =>
             {
                 try
                 {
+                    var arrival = NativeInput.Now;
                     var audio = flags.HasFlag(AudioClientBufferFlags.Silent)
                         ? new float[bytes.Length / format.BlockAlign]
                         : WaveAudio.Decode(bytes, format.Channels, format.BitsPerSample, isFloat);
+                    var duration = (double)audio.Length / format.SampleRate;
                     var start = flags.HasFlag(AudioClientBufferFlags.TimestampError) || qpc <= 0
-                        ? NativeInput.Now - (double)audio.Length / format.SampleRate : qpc / 10000000.0;
+                        ? arrival - duration : qpc / 10000000.0;
                     timeline.Append(audio, start);
                     lock (healthSync)
                     {
-                        packets++; lastPacketAt = NativeInput.Now; rms = AudioFeatures.Rms(audio);
+                        packets++; lastPacketAt = arrival; rms = AudioFeatures.Rms(audio);
                         if (rms >= .00008) lastSoundAt = lastPacketAt;
+                        lags[lagNext] = (arrival, arrival - (start + duration));
+                        lagNext = (lagNext + 1) % lags.Length; lagCount = Math.Min(lagCount + 1, lags.Length);
                     }
                 }
                 catch (Exception ex) { Failed?.Invoke(ex.Message); }

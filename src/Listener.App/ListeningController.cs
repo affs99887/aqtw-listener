@@ -6,7 +6,8 @@ internal sealed record ListeningDiagnostics(bool Enabled, string TargetProcess, 
     string State, bool Capturing, string CaptureSource, uint CapturedProcessId, string PreviewDeviceId, AudioCaptureHealth Audio,
     long TriggerCount, string LastTriggerSource, DateTimeOffset? LastTriggerAt,
     string LastIgnoredReason, string LastRecognition, string ManualTestStatus,
-    bool AutomaticRecognition, long AutomaticScans, string AutomaticStatus, double AutomaticWindowRms);
+    bool AutomaticRecognition, long AutomaticScans, string AutomaticStatus, double AutomaticWindowRms, long SkippedPutdowns,
+    IReadOnlyList<string> RecentSounds, IReadOnlyList<string> RecentInput);
 internal enum AssistantMode { Listening, Interaction, Learning }
 internal sealed record RecognitionActivity(long OperationId, bool Busy, string Message,
     RecognitionStatus Status = RecognitionStatus.Listening);
@@ -25,7 +26,7 @@ internal sealed class ListeningController : IAsyncDisposable
     private readonly MouseEdgeLog mouse = new();
     private CancellationTokenSource? operation;
     private Task? recognitionTask;
-    private long automaticScans;
+    private long automaticScans, skippedPutdowns;
     private string automaticStatus = "等待声音";
     private bool transitioning;
     private bool resumeCooling;
@@ -59,7 +60,8 @@ internal sealed class ListeningController : IAsyncDisposable
         lastTriggerSource, lastTriggerAt, lastIgnoredReason, lastRecognition, ManualTestStatus,
         settings.AutomaticRecognition, automaticScans,
         !settings.AutomaticRecognition ? "已关闭（仅鼠标触发）" : !Enabled ? "等待开启监听" :
-            !capture.Running ? "等待切回游戏" : automaticStatus, scanner.LastWindowRms);
+            !capture.Running ? "等待切回游戏" : automaticStatus, scanner.LastWindowRms, skippedPutdowns, recentSounds.ToArray(),
+        mouse.Recent().Select(edge => $"{(edge.Press ? "按下" : "松开")} {edge.At:F2} s").ToArray());
     public ListeningController(Settings settings, SoundLibrary library, Dispatcher dispatcher, string? root = null)
         : this(settings, RecognizerFactory.Create(library, root), new LoopbackAudio(), dispatcher,
             NativeInput.ForegroundProcessIdentity, () => NativeInput.Now)
@@ -86,6 +88,26 @@ internal sealed class ListeningController : IAsyncDisposable
     internal Task PendingRecognition => recognitionTask ?? Task.CompletedTask;
     private void SetActivity(long id, bool busy, string message, RecognitionStatus status = RecognitionStatus.Listening)
     { CurrentActivity = new(id, busy, message, status); Activity?.Invoke(CurrentActivity); }
+    // "燃料桶 差异率 16%": the strongest pickup group of an analysis, for status text and diagnostics.
+    private string Nearest(RecognitionAnalysis analysis)
+    {
+        var putdownGroups = Library.Groups.Where(g => g.Action == "putdown").Select(g => g.Id).ToHashSet();
+        var top = analysis.Scores.FirstOrDefault(s => !putdownGroups.Contains(s.GroupId));
+        return top is null ? "" : $"{GroupName(top.GroupId)} 差异率 {Math.Clamp(1 - top.Score, 0, 1):P0}";
+    }
+    private string GroupName(string groupId)
+    {
+        var group = Library.Groups.FirstOrDefault(g => g.Id == groupId);
+        if (group is null) return groupId;
+        var names = group.ItemIds.Select(id => Library.Items.FirstOrDefault(i => i.Id == id)?.Name ?? id).ToArray();
+        return names.Length switch { 0 => group.Name, 1 => names[0], _ => $"{names[0]} 等 {names.Length} 件" };
+    }
+    private readonly Queue<string> recentSounds = new();
+    private void Note(double onsetSeconds, string outcome)
+    {
+        recentSounds.Enqueue($"{DateTime.Now:HH:mm:ss} · 起点 {onsetSeconds:F2} s · {outcome}");
+        while (recentSounds.Count > 12) recentSounds.Dequeue();
+    }
     private async Task ShowAutomaticLoading(long id, CancellationToken token)
     {
         try { await Task.Delay(150, token); if (epoch.IsCurrent(id) && recognitionTask is { IsCompleted: false } &&
@@ -128,29 +150,29 @@ internal sealed class ListeningController : IAsyncDisposable
     private RecognitionResult? RetainedResult => History.Latest is { } entry
         ? entry.Result with { Message = $"{entry.LastSeen:HH:mm:ss} · 已保留 · {entry.Source}" } : null;
     private void PublishResult(RecognitionResult result, string source, bool automatic = false, AnalysisSnapshot? snapshot = null, double? onset = null,
-        SoundPhase phase = SoundPhase.Unknown)
+        SoundPhase phase = SoundPhase.Unknown, string detail = "")
     {
         if (History.Remember(result, source, automatic, DateTimeOffset.Now, snapshot?.Id, Library.Version, LibraryRoot, onset, phase)) Result?.Invoke(RetainedResult);
         else if (History.Latest is null) Result?.Invoke(result);
         var message = result.Status switch {
             RecognitionStatus.Analyzing => "识别中…",
-            RecognitionStatus.Matched when automatic && phase == SoundPhase.Putdown => "松开鼠标后的放下声 · 未替换当前结果",
             RecognitionStatus.Matched => result.IsFinal ? "识别完成" : "初步匹配 · 继续识别…",
             RecognitionStatus.Unknown => "识别失败 · 未匹配到已收录音效", RecognitionStatus.NoSound => "识别失败 · 未采到有效声音",
             RecognitionStatus.Interference => "识别失败 · 声音干扰过强",
             RecognitionStatus.LibraryEmpty => "识别失败 · 音效库无可用样本",
             RecognitionStatus.Error => "识别失败 · " + result.Message,
             _ => result.Message };
+        if (detail.Length > 0) message += " · " + detail;
         if (History.Latest is not null && result.Status != RecognitionStatus.Matched) message += " · 下方为上次匹配结果";
         SetActivity(result.OperationId, !result.IsFinal, message, result.Status);
     }
     private void PublishAnalysis(RecognitionAnalysis analysis, float[] samples, int rate, string source, bool automatic = false, double? start = null, double? end = null, double? onset = null,
-        SoundPhase phase = SoundPhase.Unknown)
+        SoundPhase phase = SoundPhase.Unknown, string detail = "")
     {
         AnalysisSnapshot? snapshot = null;
         if (analysis.Result.Status is RecognitionStatus.Matched or RecognitionStatus.Unknown or RecognitionStatus.Interference)
             snapshot = Audio.Add(new(samples, rate), analysis, source, Library, LibraryRoot, CaptureSession, start, end);
-        PublishResult(analysis.Result, source, automatic, snapshot, onset, phase);
+        PublishResult(analysis.Result, source, automatic, snapshot, onset, phase, detail);
         Audio.Retain(History.Entries.Select(e => e.SnapshotId).Append(History.Latest?.SnapshotId));
         if (snapshot is not null) SnapshotAdded?.Invoke();
     }
@@ -179,7 +201,7 @@ internal sealed class ListeningController : IAsyncDisposable
     private void Invalidate()
     {
         epoch.Next(); operation?.Cancel(); operation?.Dispose(); operation = null;
-        scanner.Reset(clock());
+        scanner.Reset(clock()); pendingFailure = null;
         automaticStatus = "等待声音";
         if (lastRecognition == "正在听这件货物…") lastRecognition = "本次识别已取消（切出游戏或关闭监听）";
         lastClick = double.NegativeInfinity; Result?.Invoke(RetainedResult);
@@ -283,21 +305,49 @@ internal sealed class ListeningController : IAsyncDisposable
             }
         }, token);
     }
+    // A failed automatic analysis waits this long before it is shown: at the trader a
+    // faint interface click often precedes the item's own sound by up to 0.2 s, and
+    // the item's match then cancels the click's failure instead of flashing it first.
+    public const double FailureDelaySeconds = .4;
+    private sealed record PendingFailure(RecognitionAnalysis Analysis, PickupAnalysis Pickup, SoundPhase Phase, double DueAt, string Detail);
+    private PendingFailure? pendingFailure;
+    private double publishedPress = double.NaN;
     private void PollAutomaticRecognition()
     {
         if (Mode != AssistantMode.Listening || !settings.AutomaticRecognition || !Enabled || !Foreground || !capture.Running) return;
         var now = clock();
-        var window = scanner.TryTakeWindow(capture.Timeline, now, active: true,
-            busy: recognitionTask is { IsCompleted: false });
+        var busy = recognitionTask is { IsCompleted: false };
+        if (pendingFailure is { } failure && !busy && now >= failure.DueAt)
+        {
+            pendingFailure = null;
+            PublishAnalysis(failure.Analysis, failure.Pickup.Window.Samples, failure.Pickup.Window.SampleRate, "声音自动识别", automatic: true,
+                start: failure.Pickup.Window.StartSeconds, end: failure.Pickup.Window.EndSeconds, onset: failure.Pickup.Window.OnsetSeconds, phase: failure.Phase,
+                detail: failure.Detail);
+        }
+        var window = scanner.TryTakeWindow(capture.Timeline, now, active: true, busy: busy);
         if (window is null)
         {
-            if (recognitionTask is not { IsCompleted: false })
+            if (!busy && pendingFailure is null)
                 automaticStatus = scanner.LastWindowRms < .00008 ? "等待游戏声音" : "已收到游戏声音 · 等待拿起声";
             return;
         }
+        // Putting an item down is never recognised. With mouse input, a sound right
+        // after the button was released is the putdown and is not even analysed;
+        // the timeline stamp is moved onto the arrival clock the mouse log uses.
+        var edge = mouse.Latest(window.OnsetSeconds + (capture.Health().TimelineLagSeconds ?? 0));
+        var phase = edge switch { null => SoundPhase.Unknown, { Press: true } => SoundPhase.Pickup, _ => SoundPhase.Putdown };
+        if (phase == SoundPhase.Putdown)
+        {
+            skippedPutdowns++; automaticStatus = "松开鼠标后的放下声 · 不识别";
+            Note(window.OnsetSeconds, "松开后的放下声，未分析");
+            return;
+        }
+        // A second event inside the sound of an already shown pickup belongs to the
+        // same press; only a new press makes a different match replace the result.
+        var newPress = phase == SoundPhase.Pickup && edge!.Value.At != publishedPress;
         operation?.Dispose(); operation = new();
         var token = operation.Token; var id = epoch.Next();
-        var phase = mouse.Classify(window.OnsetSeconds);
+        var before = CurrentActivity;
         automaticScans++; automaticStatus = "正在分析声音";
         _ = ShowAutomaticLoading(id, token);
         recognitionTask = Task.Run(async () =>
@@ -311,23 +361,36 @@ internal sealed class ListeningController : IAsyncDisposable
                 await dispatcher.InvokeAsync(() =>
                 {
                     if (!epoch.IsCurrent(id) || token.IsCancellationRequested || !settings.AutomaticRecognition || !Enabled || !Foreground) return;
-                    if (result.Status == RecognitionStatus.Matched && phase == SoundPhase.Putdown)
+                    var nearest = Nearest(analysis);
+                    void Dismiss() { if (CurrentActivity.OperationId == id) SetActivity(before.OperationId, false, before.Message, before.Status); }
+                    // Without mouse input the sound itself decides: a putdown-sound
+                    // group, or another catalogue sound within a second of the shown
+                    // pickup, is that item being put down. Nothing is shown or kept.
+                    if (pickup.IsPutdown || !newPress && History.WouldHold(result, Library.Version, window.OnsetSeconds))
                     {
-                        automaticStatus = "已听到放下声 · 继续听音";
-                        lastRecognition = "声音自动识别 · 松开鼠标后的放下声，未替换当前结果";
+                        var reason = pickup.IsPutdown ? $"放下声（{GroupName(analysis.Putdown!.GroupId)}）" : $"拿起后 1 秒内的其他音效（{nearest}）";
+                        skippedPutdowns++; automaticStatus = reason + " · 不识别"; lastRecognition = "声音自动识别 · " + automaticStatus;
+                        Note(window.OnsetSeconds, reason + "，未显示"); Dismiss();
+                        return;
                     }
-                    else if (result.Status == RecognitionStatus.Matched)
+                    if (result.Status == RecognitionStatus.Matched)
                     {
+                        pendingFailure = null;
+                        if (edge is { Press: true } pressed) publishedPress = pressed.At;
                         automaticStatus = "已匹配 · 继续听音";
                         lastRecognition = "声音自动识别 · 最近匹配";
+                        Note(window.OnsetSeconds, $"匹配 {nearest}" + (phase == SoundPhase.Pickup ? "，按下后" : ""));
+                        PublishAnalysis(analysis with { Result = result with { Message = lastRecognition } }, pickup.Window.Samples, window.SampleRate, "声音自动识别", automatic: true,
+                            start: pickup.Window.StartSeconds, end: pickup.Window.EndSeconds, onset: window.OnsetSeconds, phase: phase);
+                        return;
                     }
-                    else
-                    {
-                        automaticStatus = result.Status == RecognitionStatus.Unknown ? "已分析，暂未匹配" : result.Message;
-                        lastRecognition = "声音自动识别 · " + automaticStatus;
-                    }
-                    PublishAnalysis(analysis with { Result = result with { Message = lastRecognition } }, pickup.Window.Samples, window.SampleRate, "声音自动识别", automatic: true,
-                        start: pickup.Window.StartSeconds, end: pickup.Window.EndSeconds, onset: window.OnsetSeconds, phase: phase);
+                    automaticStatus = result.Status == RecognitionStatus.Unknown ? "已分析，暂未匹配" : result.Message;
+                    if (result.Status == RecognitionStatus.Unknown && nearest.Length > 0) automaticStatus += " · 最接近 " + nearest;
+                    lastRecognition = "声音自动识别 · " + automaticStatus;
+                    Note(window.OnsetSeconds, (result.Status == RecognitionStatus.Unknown ? "未匹配" : result.Message) + (nearest.Length > 0 ? $"，最接近 {nearest}" : ""));
+                    pendingFailure = new(analysis with { Result = result with { Message = lastRecognition } }, pickup, phase, clock() + FailureDelaySeconds,
+                        result.Status == RecognitionStatus.Unknown && nearest.Length > 0 ? "最接近 " + nearest : "");
+                    Dismiss();
                 });
             }
             catch (OperationCanceledException) { }

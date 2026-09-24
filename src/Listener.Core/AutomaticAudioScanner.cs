@@ -33,7 +33,10 @@ public sealed class AutomaticAudioScanner
     // Audio that must exist after the onset before the window is analysed: the
     // longest catalogue sound is ~0.33 s and the matcher searches up to +128 ms.
     public const double TailSeconds = .36;
-    public const double RefractorySeconds = .25;
+    // At the trader a faint interface click can precede the item's own sound by
+    // 0.12–0.19 s; the item sound must still open its own event, so the refractory
+    // only has to outlast the two-click putdown sounds (40 ms apart).
+    public const double RefractorySeconds = .12;
     private double nextScanAt;
     private double lastOnsetAt = double.NegativeInfinity;
     public double LastWindowRms { get; private set; }

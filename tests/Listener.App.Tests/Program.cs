@@ -84,6 +84,8 @@ internal static class Program
                     now += .65; controller.Reconcile().GetAwaiter().GetResult();
                     var pending = controller.PendingRecognition; PumpUntil(() => pending.IsCompleted); pending.GetAwaiter().GetResult();
                     Check(controller.Diagnostics().TriggerCount == 0 && controller.Diagnostics().AutomaticScans == 1, "real matcher trigger missing");
+                    // A failed verdict is shown after the failure delay, so the poll must run once more.
+                    now += ListeningController.FailureDelaySeconds + .05; controller.Reconcile().GetAwaiter().GetResult();
                     Check(result?.Status is RecognitionStatus.Matched or RecognitionStatus.Unknown, "real matcher did not return a sound verdict");
                 }
                 finally { controller.DisposeAsync().AsTask().GetAwaiter().GetResult(); }
@@ -135,22 +137,65 @@ internal static class Program
                     "input kept postponing the automatic scan");
                 Check(f.Recognizer.Calls == 1 && f.Results.Last()!.IsFinal, "pickup waited for a later action");
             }),
-            ("按下鼠标后的拿起声发布结果，松开鼠标后的放下声只记历史不替换", () =>
+            ("按下鼠标后的拿起声发布结果，松开鼠标后的放下声不分析、不存录音、不记历史", () =>
             {
                 using var f = new Fixture(); f.Controller.Toggle().GetAwaiter().GetResult();
                 f.Controller.Click(10, "鼠标事件"); f.Capture.Timeline.Append(Fixture.Sound(), 10.05); f.Tick(10.7); f.Finish();
                 Check(f.Controller.History.Latest?.Result.BestMatch?.Item.Id == "test", "the pickup after a press was not published");
+                var message = f.Controller.CurrentActivity.Message;
                 // Held for 1.5 s, past the timing window: only the release marks the next sound as a putdown.
-                f.Recognizer.ItemId = "drop";
+                f.Recognizer.ItemId = "drop"; var calls = f.Recognizer.Calls; var clips = f.Controller.Audio.Recent.Count;
                 f.Controller.Release(11.5, "鼠标事件"); f.Capture.Timeline.Append(Fixture.Sound(), 11.55); f.Tick(12.2); f.Finish();
-                Check(f.Controller.History.Latest?.Result.BestMatch?.Item.Id == "test" &&
-                    f.Controller.History.Entries[0] is { FollowUp: true, Phase: SoundPhase.Putdown } &&
-                    f.Results.Last()?.BestMatch?.Item.Id == "test" && f.Controller.CurrentActivity.Message.Contains("放下声"),
-                    "the putdown after a release replaced the pickup");
+                var diagnostics = f.Controller.Diagnostics();
+                Check(f.Recognizer.Calls == calls && diagnostics.SkippedPutdowns == 1 && diagnostics.AutomaticScans == 1 &&
+                    f.Controller.History.Entries.Count == 1 && f.Controller.History.Latest?.Result.BestMatch?.Item.Id == "test" &&
+                    f.Controller.Audio.Recent.Count == clips && f.Results.Last()?.BestMatch?.Item.Id == "test" &&
+                    f.Controller.CurrentActivity.Message == message && diagnostics.RecentSounds.Last().Contains("放下声"),
+                    "the putdown after a release was analysed, stored, shown or replaced the pickup");
+                // A second event inside the same press (a two-part sound) must not swap in a weaker match.
                 f.Recognizer.ItemId = "next";
-                f.Controller.Click(13, "鼠标事件"); f.Capture.Timeline.Append(Fixture.Sound(), 13.05); f.Tick(13.7); f.Finish();
+                f.Controller.Click(14, "鼠标事件"); f.Capture.Timeline.Append(Fixture.Sound(), 14.05); f.Tick(14.7); f.Finish();
                 Check(f.Controller.History.Latest?.Result.BestMatch?.Item.Id == "next" && f.Controller.History.Latest.Phase == SoundPhase.Pickup,
                     "the next pickup was held back");
+                f.Recognizer.ItemId = "tail"; f.Recognizer.Score = .87;
+                f.Capture.Timeline.Append(Fixture.Sound(), 14.25); f.Tick(14.9); f.Finish();
+                Check(f.Controller.History.Latest?.Result.BestMatch?.Item.Id == "next" && f.Controller.History.Entries.Count == 2,
+                    "a weaker second event of the same press replaced the pickup");
+            }),
+            ("放下声组匹配的声音不识别：不显示、不记历史、不存录音，状态不变", () =>
+            {
+                using var f = new Fixture(); f.StartSound(); f.Finish();
+                var message = f.Controller.CurrentActivity.Message; var clips = f.Controller.Audio.Recent.Count;
+                f.Recognizer.Putdown = new("drop-group", .95); f.Recognizer.Status = RecognitionStatus.Unknown;
+                f.Capture.Timeline.Append(Fixture.Sound(), f.Now + 1.4); f.Tick(f.Now + 2.05); f.Finish();
+                var d = f.Controller.Diagnostics();
+                Check(d.SkippedPutdowns == 1 && d.AutomaticStatus.Contains("放下声") && d.RecentSounds.Last().Contains("放下声"),
+                    "the putdown sound was not counted: " + d.AutomaticStatus);
+                f.Tick(f.Now + 1);
+                Check(f.Controller.History.Entries.Count == 1 && f.Controller.Audio.Recent.Count == clips &&
+                    f.Controller.CurrentActivity.Message == message && f.Results.Last()?.BestMatch?.Item.Id == "test",
+                    "a putdown-sound match was shown, stored or changed the status: " + f.Controller.CurrentActivity.Message);
+            }),
+            ("拿起失败延迟显示，随后 0.4 秒内的匹配取消失败提示", () =>
+            {
+                using var f = new Fixture(); f.Controller.Toggle().GetAwaiter().GetResult();
+                // The interface click at the trader (a 50 ms burst) fails first; the item's own sound follows 0.15 s later.
+                f.Recognizer.Status = RecognitionStatus.Unknown;
+                f.Capture.Timeline.Append(Fixture.Sound().Take(1200).ToArray(), 10); f.Tick(10.65); f.Finish();
+                Check(!f.Results.Any(r => r?.Status == RecognitionStatus.Unknown) && f.Controller.CurrentActivity.Status != RecognitionStatus.Unknown,
+                    "the failure was shown at once");
+                f.Recognizer.Status = RecognitionStatus.Matched;
+                f.Capture.Timeline.Append(Fixture.Sound(), 10.15); f.Tick(10.83); f.Finish(); f.Tick(11.5);
+                Check(!f.Results.Any(r => r?.Status == RecognitionStatus.Unknown) && f.Results.Last()?.Status == RecognitionStatus.Matched &&
+                    f.Controller.CurrentActivity.Status == RecognitionStatus.Matched && f.Controller.Audio.Recent.Count == 1,
+                    "the click's failure was shown or stored although the item matched right after");
+                // A failure with nothing after it is still reported, after the delay.
+                f.Recognizer.Status = RecognitionStatus.Unknown;
+                f.Capture.Timeline.Append(Fixture.Sound(), 13); f.Tick(13.65); f.Finish();
+                Check(f.Controller.CurrentActivity.Status != RecognitionStatus.Unknown, "the failure was shown before the delay");
+                f.Tick(13.65 + ListeningController.FailureDelaySeconds + .05);
+                Check(f.Controller.CurrentActivity.Status == RecognitionStatus.Unknown && f.Controller.CurrentActivity.Message.Contains("最接近"),
+                    "the lone failure was never shown or lacks the nearest class: " + f.Controller.CurrentActivity.Message);
             }),
             ("后续未匹配声音保留已发布的拿起候选与录音", () =>
             {
@@ -182,6 +227,11 @@ internal static class Program
                         .FirstOrDefault(found => found is not null)!;
                     var analysis = PickupRecognition.Analyze(recognizer, window).Analysis;
                     var confirmed = analysis.Result;
+                    if (library.Groups.Single(g => g.Id == reference.GroupId).Action == "putdown")
+                    {
+                        if (analysis.Putdown?.GroupId != reference.GroupId) failures.Add(reference.GroupId, reference.File + " putdown sound not vetoed");
+                        continue;
+                    }
                     if (confirmed.Status != RecognitionStatus.Matched ||
                         !confirmed.Candidates.Any(candidate => candidate.GroupId == reference.GroupId))
                         failures.Add(reference.GroupId, reference.File + " status=" + confirmed.Status + " candidates=" +
@@ -203,10 +253,18 @@ internal static class Program
                 foreach (var reference in references)
                 {
                     var clip = WaveAudio.Read(ReferenceAudio.VerifiedPath(root, reference));
-                    var result = recognizer.Recognize(clip.Samples, clip.SampleRate);
+                    var analysis = recognizer.Analyze(clip.Samples, clip.SampleRate);
+                    var result = analysis.Result;
+                    if (library.Groups.Single(g => g.Id == reference.GroupId).Action == "putdown")
+                    {
+                        // A putdown-sound reference is judged a putdown, never a candidate.
+                        Check(analysis.Putdown?.GroupId == reference.GroupId && result.CandidateCount == 0,
+                            "a putdown-sound reference was not vetoed: " + reference.File);
+                        continue;
+                    }
                     var sameAudioGroups = references.Where(r => r.Sha256 == reference.Sha256)
                         .Select(r => r.GroupId).Append(reference.GroupId).ToHashSet();
-                    Check(result.Status == RecognitionStatus.Matched &&
+                    Check(result.Status == RecognitionStatus.Matched && analysis.Putdown is null &&
                         sameAudioGroups.IsSubsetOf(result.Candidates.Select(c => c.GroupId).ToHashSet()),
                         "a self-match or same-waveform candidate is missing: " + reference.File);
                     foreach (var item in result.Candidates.Select(c => c.Item))
@@ -296,15 +354,15 @@ internal static class Program
                 Check(f.Results.Last()?.BestMatch?.Item.Id == "next", "next match not displayed");
                 Check(f.Controller.History.Entries.Count == 2 && f.Controller.History.Entries[1].Result.BestMatch?.Item.Id == "test", "previous match missing");
             }),
-            ("拿起后一秒内的另一音效按放下声保留在历史，不替换浮窗", () =>
+            ("无鼠标信号时，拿起后一秒内的另一音效按放下声忽略：不替换浮窗、不记历史、不存录音", () =>
             {
                 using var f = new Fixture(); f.StartSound(); f.Finish();
-                var pickup = f.Controller.History.Latest!;
+                var pickup = f.Controller.History.Latest!; var clips = f.Controller.Audio.Recent.Count;
                 // The putdown sound 0.6 s after the pickup resembles another catalogue item.
                 f.Recognizer.ItemId = "twin"; f.Capture.Timeline.Append(Fixture.Sound(), 10.6); f.Tick(11.3); f.Finish();
                 Check(f.Results.Last()?.BestMatch?.Item.Id == "test" && f.Controller.History.Latest?.Id == pickup.Id, "putdown twin replaced the pickup on the overlay");
-                Check(f.Controller.History.Entries.Count == 2 && f.Controller.History.Entries[0].FollowUp &&
-                    f.Controller.History.Entries[0].Result.BestMatch?.Item.Id == "twin", "follow-up sound was not kept for review");
+                Check(f.Controller.History.Entries.Count == 1 && f.Controller.Audio.Recent.Count == clips &&
+                    f.Controller.Diagnostics().SkippedPutdowns == 1, "the follow-up sound was kept as a recognition");
                 // The next item, dragged later, still replaces the result.
                 f.Recognizer.ItemId = "later"; f.Capture.Timeline.Append(Fixture.Sound(), 12); f.Tick(12.65); f.Finish();
                 Check(f.Results.Last()?.BestMatch?.Item.Id == "later" && !f.Controller.History.Latest!.FollowUp, "later pickup was held back");
@@ -339,7 +397,9 @@ internal static class Program
                 PumpUntil(() => f.Controller.CurrentActivity.Busy);
                 Check(f.Results.Last()?.CandidateCount == 1, "loading blanked candidates");
                 f.Recognizer.Release.Set(); f.Finish();
-                Check(!f.Controller.CurrentActivity.Busy && f.Controller.CurrentActivity.Message.Contains("上次匹配"), "miss did not finish activity");
+                Check(!f.Controller.CurrentActivity.Busy, "miss did not finish activity");
+                f.Tick(f.Now + ListeningController.FailureDelaySeconds + .05);
+                Check(!f.Controller.CurrentActivity.Busy && f.Controller.CurrentActivity.Message.Contains("上次匹配"), "delayed miss was not shown with the old result");
             }),
             ("操作期间不采音或识别，退出冷却完整300毫秒并保留监听开关", () =>
             {
@@ -1053,6 +1113,9 @@ internal static class Program
         public int Calls;
         public RecognitionStatus Status = RecognitionStatus.Matched;
         public string ItemId = "test";
+        public double Score = .99;
+        // When set, every analysis is judged a putdown sound of this group.
+        public GroupScore? Putdown;
         public readonly ManualResetEventSlim Entered = new(false), Release = new(true);
         public RecognitionResult Recognize(float[] samples, int sampleRate, long operationId = 0, bool final = true, CancellationToken cancellation = default)
         {
@@ -1060,8 +1123,12 @@ internal static class Program
             // Deliberately finish a canceled request, as the persistent engine can do.
             if (!Release.Wait(TimeSpan.FromSeconds(4))) throw new TimeoutException("test recognizer blocked");
             return new(operationId, Status, final,
-                Status == RecognitionStatus.Matched ? [new(new(ItemId, ItemId, false, null), .99, "test")] : [], 1, Status.ToString());
+                Status == RecognitionStatus.Matched ? [new(new(ItemId, ItemId, false, null), Score, "test")] : [], 1, Status.ToString());
         }
+        public RecognitionAnalysis Analyze(float[] samples, int sampleRate, long operationId = 0, bool final = true, CancellationToken cancellation = default)
+            => new(Recognize(samples, sampleRate, operationId, final, cancellation), [new("test", Score)], Putdown);
+        public RecognitionAnalysis AnalyzeAt(float[] samples, int sampleRate, double onsetSeconds, long operationId = 0, bool final = true, CancellationToken cancellation = default)
+            => Analyze(samples, sampleRate, operationId, final, cancellation);
         public (SoundGroup Group, double Score)[] ScoreAudio(float[] samples, int sampleRate, CancellationToken cancellation = default) => [];
         public void Dispose() { }
     }

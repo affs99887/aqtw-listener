@@ -62,6 +62,12 @@ public sealed class RecognitionHistory
         Changed?.Invoke(); return true;
     }
 
+    // True when Remember would keep this automatic match off the overlay as a
+    // follow-up of the shown pickup; the controller then drops it before publishing.
+    public bool WouldHold(RecognitionResult result, string libraryVersion, double? audioSeconds) =>
+        result.Status == RecognitionStatus.Matched && result.CandidateCount > 0
+        && Latest is { } shown && !SameCandidates(shown.Result, result) && IsFollowUp(shown, result, libraryVersion, audioSeconds);
+
     private static bool IsFollowUp(RecognitionEntry shown, RecognitionResult result, string libraryVersion, double? audioSeconds) =>
         shown is { Automatic: true, FollowUp: false } && shown.LibraryVersion == libraryVersion
         && shown.AudioSeconds is { } shownAt && audioSeconds is { } now

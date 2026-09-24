@@ -1,6 +1,9 @@
 namespace Listener.Core;
 
-public sealed record PickupAnalysis(RecognitionAnalysis Analysis, AudioScanWindow Window);
+public sealed record PickupAnalysis(RecognitionAnalysis Analysis, AudioScanWindow Window)
+{
+    public bool IsPutdown => Analysis.Putdown is not null;
+}
 
 public static class PickupRecognition
 {
@@ -10,6 +13,11 @@ public static class PickupRecognition
     // 0.85–0.90, so an unattended single-event verdict needs a little more than
     // the catalogue floor; matching never becomes a mandatory two-action pair.
     public const double MinimumAutomaticScore = .86;
+    // A trader visit on 2026-09-24 scored one 燃料桶 pickup 0.84 with every other
+    // class below 0.57. Such a clean match is accepted from ConfidentScore up when
+    // the candidates lead the rest of the catalogue by ConfidentSeparation; the
+    // diffuse false alarms score several unrelated classes within a few points.
+    public const double ConfidentScore = .80, ConfidentSeparation = .20;
     public static PickupAnalysis Analyze(IRecognizer recognizer, AudioScanWindow window,
         long operationId = 0, CancellationToken cancellation = default)
     {
@@ -19,7 +27,8 @@ public static class PickupRecognition
         // cannot veto the pickup or force the user to wait for a second action.
         var pickup = window.Focus();
         var analysis = recognizer.AnalyzeAt(pickup.Samples, pickup.SampleRate, window.OnsetSeconds - pickup.StartSeconds, operationId, true, cancellation);
-        if (analysis.Result is { Status: RecognitionStatus.Matched, BestMatch.Score: < MinimumAutomaticScore })
+        if (analysis.Result is { Status: RecognitionStatus.Matched, BestMatch.Score: var score } &&
+            score < MinimumAutomaticScore && !(score >= ConfidentScore && analysis.Separation >= ConfidentSeparation))
             analysis = analysis with { Result = analysis.Result with
             {
                 Status = RecognitionStatus.Unknown, Candidates = [], Message = "拿起声证据偏弱 · 继续监听"
