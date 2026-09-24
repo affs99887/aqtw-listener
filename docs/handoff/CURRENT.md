@@ -1,6 +1,17 @@
 # 当前接续状态 · 2026-09-24
 
-当前版本为 **v0.4.2 便携版（监听浮窗改版与游戏风格界面）**，发布为 GitHub Release。识别逻辑与 v0.4.0 相同，改动在界面，并包含下文的 `remove-legacy-engines`：
+当前版本为 **v0.4.3（放下声更正、逐件差异率与原声试听）**，源码已改，尚未打便携包或发布 Release。起因是用户反馈仓库中拖动胶囊电视多次报「红外线理疗灯 97%」、胶囊电视的「听样本」不像胶囊电视；用户确认原因是放下声被识别成红外线理疗灯，且样本声音经过处理。调查与数据见 [放下声更正](../PUTDOWN-RELABEL-20260924.md)：
+
+- 库数据：`peer-047`（原标红外线理疗灯）、`peer-051`（原标天线）经 SoundRadar 原始放下录音核实为琥珀天心类、定位组的放下/转移声（0.996、0.968），改为关联整类 13／9 件；红外线理疗灯并入 `peer-016`，天线并入 `peer-030`。库版本 `0.4.3-putdown-relabel-20260924`，`references.json` 与门限未变。
+- 识别逻辑：`MouseEdgeLog` 把声音起点归到其前 0.35 s（容差 0.06 s）最近的鼠标按下/松开；`RecognitionHistory.Remember` 新增 `SoundPhase`：松开后的放下声总是扣留（`FollowUp`，历史标「放下声」），按下后的拿起声从不扣留，无鼠标信号时沿用 1 秒时序规则；候选物品相同的放下声不替换拿起结果。`NativeInput` 的钩子与按键检测都会报告松开。
+- 界面：卡片逐件显示「差异率」（`CandidatePanel.DifferenceText`，100% − 相似度，一位小数），汇总行不再显示匹配度；密集卡片把差异率放在缩略图底边。
+- 试听：`PlaybackAudio` + `data/library/playback.json`，17 段 SoundRadar 原始录音（`scripts/import-soundradar-playback.py` 逐字节导入）覆盖 50 件；识别参考不再用于试听。个人库建库时复制基础原声，并把学习样本的原始录音（`sourceFile`）登记为试听片段；旧个人库版本回退到基础库原声。其余 12 件没有原声，按钮禁用。
+- 验证：核心测试 41/41，应用测试 52/52，`--ui-smoke` 布局全部通过，记录为 `docs/measurements/release-v0.4.3-*.json`。WPF 测试在 Linux 的 Wine 9.0 + Xvfb 运行（自包含 win-x64 构建、`EnableWindowsTargeting`，Noto Sans CJK 替代雅黑，空 ALSA 设备），未在 Windows 本机和游戏内复测。
+- `.gitattributes` 固定 `references.json` 以 CRLF 检出，否则 LF 检出时 `engineIndexSha256` 不符、基础库拒绝加载。
+
+以下为 v0.4.2 时的状态记录。
+
+v0.4.2 便携版（监听浮窗改版与游戏风格界面），发布为 GitHub Release。识别逻辑与 v0.4.0 相同，改动在界面，并包含下文的 `remove-legacy-engines`：
 
 - 信息层级：每个格数组以最大的数字显示大红概率并按比例着色（`Theme.RedShare`）；同音候选的匹配度只在汇总行显示一次，低于最高分的卡片单独标出；汇总与操作合成一行，免责说明移入 ⓘ 提示，去掉底栏。
 - 时效：实时结果显示识别时间，新结果到达时汇总行闪亮约 1 秒，超过 `CandidatePanel.StaleSeconds`（10 秒）候选变暗。

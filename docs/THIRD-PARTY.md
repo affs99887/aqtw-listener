@@ -3,6 +3,7 @@
 ## SoundRadar
 
 - 仓库：[blood77458/soundradar](https://github.com/blood77458/soundradar)。演示来源：[BLOOD味道的视频](https://www.bilibili.com/video/BV1HNeY6mEhH/)，视频说明提到素材贡献者六豪物语、QJHWC。
+- `data/library/playback`：17 段原始游戏录音，逐字节取自上游 `soundradar/data/library.srz` 的 `eaa0348fa60e8b8477e82b72591f74f40f9574bf` 与 `4f8289d5bb32813cd7c15922df1a2a769128740a` 两个版本，仅供「听样本」按时间窗口播放。成员路径、哈希与关联音效组见 `data/library/playback.json`，导入脚本为 `scripts/import-soundradar-playback.py`。
 - `data/library/images`：34 件既有目录物品保留来自上游 `soundradar/data/library.srz` 的图片。该资料固定于 `eaa0348fa60e8b8477e82b72591f74f40f9574bf`，并对照 `4f8289d5bb32813cd7c15922df1a2a769128740a` 的原始文件复核；格数沿用 `displayHints` 等已核实资料。旧版资料见 [素材复核](COVERAGE-REVIEW.md)。
 - 早期版本曾以固定提交 `d94dc00e871eed3498e5e6be53edf1ad85cb383c` 的 Go 特征提取、降噪和量化索引代码作为识别引擎。现在识别由本项目的局内匹配器完成，这部分 Go 代码、构建脚本及其依赖许可已从仓库和便携包移除，可在 git 历史中查阅。
 - 所核对的提交未找到 `LICENSE` 文件，不能把它描述为已经授予某种标准开源许可。来源和作者信息保留；仓库根目录的 Apache-2.0 许可证不覆盖这些第三方内容的原始权利和许可。
