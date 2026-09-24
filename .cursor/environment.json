@@ -1,0 +1,8 @@
+{
+  "name": "AQTW Listener (.NET 10)",
+  "user": "ubuntu",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "install": "bash .cursor/install.sh"
+}
