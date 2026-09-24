@@ -82,7 +82,7 @@ internal sealed class HistoryWindow : Window
             content.Children.Add(Theme.Label(SizeSummary(entry.Result) + (entry.Matches > 1 ? $" · 合并 {entry.Matches} 次" : ""), 11,
                 entry.Result.GoldCount > 0 ? Theme.Collectible : Theme.Muted));
             var best = entry.Result.BestMatch;
-            content.Children.Add(Theme.Label((best is null ? "" : $"匹配度 {Math.Clamp(best.Score, 0, 1):P0} · ") +
+            content.Children.Add(Theme.Label((best is null ? "" : $"最低{CandidatePanel.DifferenceText(best.Score)} · ") +
                 string.Join("、", entry.Result.Candidates.Take(3).Select(c => c.Item.Name)) +
                 (entry.Result.CandidateCount > 3 ? "等" : ""), 11, Theme.Muted));
             foreach (var label in content.Children.OfType<TextBlock>().Concat(heading.Children.OfType<TextBlock>()))

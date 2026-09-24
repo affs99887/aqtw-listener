@@ -618,17 +618,19 @@ internal sealed partial class MainWindow : Window
         var thirteenCards = Descendants<Border>(thirteenPanel).Where(card => card.Tag is Candidate).ToArray();
         var thirteenHeadings = Descendants<TextBlock>(thirteenPanel)
             .Where(label => new[] { "2 格", "3 格", "4 格", "6 格" }.Contains(label.Text)).ToArray();
-        // All thirteen share one sound: the summary row carries the score once and no card repeats it.
+        // Every card carries its own 差异率, fully inside the card; the summary row carries none.
         var thirteenNamesFit = thirteenCards.Length == 13 && thirteenCards.All(card =>
         {
             var name = Descendants<TextBlock>(card).FirstOrDefault(label => label.Text == ((Candidate)card.Tag).Item.Name);
-            if (name is null) return false;
+            var difference = Descendants<TextBlock>(card).Where(label => label.Text.StartsWith("差异率", StringComparison.Ordinal)).ToArray();
+            if (name is null || difference.Length != 1) return false;
             var bounds = card.TransformToAncestor(overlay).TransformBounds(new Rect(card.RenderSize));
+            var differenceBounds = difference[0].TransformToAncestor(card).TransformBounds(new Rect(difference[0].RenderSize));
             return name.TextTrimming == TextTrimming.None && name.FontSize >= 13 &&
                 name.DesiredSize.Height <= name.ActualHeight + 1 &&
-                !Descendants<TextBlock>(card).Any(label => label.Text.Contains("匹配", StringComparison.Ordinal)) &&
+                difference[0].Text == "差异率 1.0%" && differenceBounds.Bottom <= card.ActualHeight + 1 &&
                 bounds.Right <= overlay.ActualWidth + 1 && bounds.Bottom <= overlay.ActualHeight + 1;
-        }) && Descendants<TextBlock>(thirteenPanel).Count(label => label.Text == "匹配度 99%") == 1;
+        }) && !Descendants<TextBlock>(thirteenPanel).Any(label => label.Text.Contains("匹配", StringComparison.Ordinal));
         var listeningThirteen = overlay.ActualWidth <= 930 && !thirteenPanel.NeedsScroll && thirteenNamesFit &&
             thirteenHeadings.Length == 4 &&
             Descendants<TextBlock>(thirteenPanel).Count(label => System.Windows.Automation.AutomationProperties.GetName(label)
@@ -711,7 +713,8 @@ internal sealed partial class MainWindow : Window
         var liveThirteen = ReferenceEquals(Descendants<CandidatePanel>(overlay).FirstOrDefault(panel => panel.IsVisible), livePanel) &&
             overlay.Interactive && !livePanel.NeedsScroll && liveCards.Length == liveResult.CandidateCount &&
             liveResult.Candidates.All(candidate => liveLabels.Any(label => label.Text == candidate.Item.Name)) &&
-            liveLabels.Count(label => label.Text == "匹配度 99%") == 1 &&
+            liveLabels.Count(label => label.Text == "差异率 1.0%") == liveResult.CandidateCount &&
+            !liveLabels.Any(label => label.Text.Contains("匹配", StringComparison.Ordinal)) &&
             Descendants<Button>(livePanel).Count(button => button.Tag is Candidate && button.IsEnabled) == liveResult.CandidateCount &&
             (liveStyles & 0x20) == 0 && (liveStyles & 0x08000000) != 0;
         var liveFresh = liveLabels.Any(label => label.Text == "刚刚" && label.IsVisible) &&

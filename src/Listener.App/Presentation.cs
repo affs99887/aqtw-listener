@@ -57,7 +57,6 @@ internal sealed class CandidatePanel : Border
     private readonly ContentControl toolbarHost = new();
     private Border? summaryBar;
     private DateTimeOffset? resultAt;
-    private double topScore;
     private readonly CandidateLayout layout;
     private readonly Dictionary<string, BitmapImage> images = new();
     private readonly Dictionary<TextBlock, double> textSizes = new();
@@ -67,7 +66,7 @@ internal sealed class CandidatePanel : Border
     private RecognitionResult? lastResult;
     private IReadOnlyList<Candidate> primary = [], near = [];
     private HashSet<string> nearIds = [];
-    private bool lastDemo, lastListening;
+    private bool lastDemo, lastListening, catalogView;
     private Action<Candidate>? playReference;
     private Func<Candidate, bool>? referenceAvailable;
     private Func<Candidate, ContextMenu?>? referenceChoices;
@@ -86,7 +85,9 @@ internal sealed class CandidatePanel : Border
     private double FontScale => double.IsFinite(settings.FontScale) ? Math.Clamp(settings.FontScale, .9, 1.15) : 1;
     private double PreferredThumbnail => design ? CandidateCount > 6 ? 96 : 112
         : double.IsFinite(settings.ThumbnailSize) ? Math.Clamp(settings.ThumbnailSize, 60, 120) : 88;
-    private static string MatchPercent(double score) => double.IsFinite(score) ? Math.Clamp(score, 0, 1).ToString("P0") : "—";
+    // 100% minus the similarity to the reference that candidate matched: lower is closer.
+    internal static string DifferenceText(double score) => "差异率 " + (double.IsFinite(score)
+        ? (100 * (1 - Math.Clamp(score, 0, 1))).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + "%" : "—");
     private string CandidateStatus(Candidate candidate) => lastDemo ? "" : nearIds.Contains(candidate.Item.Id)
         ? "相近参考" : candidate.Tag == RecognitionTag.Exact ? "精确识别" :
         candidate.Score < .86 ? "疑似" : "";
@@ -101,9 +102,8 @@ internal sealed class CandidatePanel : Border
             HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top,
             Padding = new Thickness(4, 1, 4, 1), Margin = new Thickness(2), IsHitTestVisible = false };
     }
-    private const string MatchHelp = "匹配度是录音与参考音效的相似分数；同一音效组的物品共享分数，不是单件物品的确定率。";
-    private const string Disclaimer = "大红概率按同格候选计算，不是游戏的真实出货概率。\n" + MatchHelp +
-        "\n与最高分相同的卡片不重复标出匹配度。";
+    private const string DifferenceHelp = "差异率 = 100% − 本次声音与该物品参考音效的相似度，越低越接近；共用同一条参考的物品数值相同。不是单件物品的确定率。";
+    private const string Disclaimer = "大红概率按同格候选计算，不是游戏的真实出货概率。\n" + DifferenceHelp;
     // Live results fade after this long so an earlier pickup is not read as the current one.
     public const double StaleSeconds = 10;
     private bool ShowNames => settings.ShowNames || interactive;
@@ -207,7 +207,7 @@ internal sealed class CandidatePanel : Border
             label.TextWrapping = TextWrapping.NoWrap; summary.Children.Add(label);
         }
         designCount.FontWeight = FontWeights.SemiBold; count.FontWeight = FontWeights.SemiBold;
-        count.ToolTip = MatchHelp; age.ToolTip = $"识别到这件货物的时间；超过 {StaleSeconds:0} 秒后候选变暗，避免误当成当前货物";
+        age.ToolTip = $"识别到这件货物的时间；超过 {StaleSeconds:0} 秒后候选变暗，避免误当成当前货物";
         var info = Theme.Glyph("\uE946", 13); info.Foreground = Theme.Muted; info.ToolTip = Disclaimer;
         info.Margin = new Thickness(0, 1, 0, 0); ToolTipService.SetInitialShowDelay(info, 0);
         AutomationProperties.SetName(info, Disclaimer); summary.Children.Add(info);
@@ -296,13 +296,14 @@ internal sealed class CandidatePanel : Border
     public void ShowResult(RecognitionResult? result, bool demo = false, bool listening = false)
     {
         lastResult = result; lastDemo = demo; lastListening = listening;
-        var catalog = demo && result is { CandidateCount: > 0 } && result.Candidates.All(candidate => candidate.GroupId == "catalog");
+        var catalog = catalogView = demo && result is { CandidateCount: > 0 } && result.Candidates.All(candidate => candidate.GroupId == "catalog");
         ratioLabel.Text = catalog ? "目录物品数量" : "候选数量";
         primary = result?.Candidates.GroupBy(c => c.Item.Id).Select(g => g.OrderByDescending(c => c.Score).First()).ToArray() ?? [];
-        topScore = primary.Count > 0 ? primary.Max(candidate => candidate.Score) : 0;
         note.Text = "大红概率按同格候选计算，非真实出货概率。";
         value.Text = ""; phase.Text = ""; value.Visibility = Visibility.Collapsed;
-        count.Foreground = design && primary.Count > 0 ? Theme.Gold : design ? Theme.Muted : Theme.Text;
+        // The live summary row carries status text only; each card shows its own 差异率.
+        count.Foreground = design ? Theme.Muted : Theme.Text;
+        count.Visibility = design && primary.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
         if (primary.Count == 0)
         {
             ratio.Text = "0"; count.Text = "等待识别"; total.Text = "";
@@ -314,11 +315,9 @@ internal sealed class CandidatePanel : Border
         {
             ratio.Text = primary.Count.ToString();
             designCount.Text = catalog ? $"{primary.Count} 件目录物品" : $"{primary.Count} 件候选";
-            count.Text = design ? $"匹配度 {MatchPercent(topScore)}"
-                : catalog ? $"{primary.Count} 件目录物品" : $"{primary.Count} 件候选";
+            count.Text = design ? "" : catalog ? $"{primary.Count} 件目录物品" : $"{primary.Count} 件候选";
             headline.Text = design ? "按格数查看大红概率"
                 : catalog ? "新增目录物品需补拾取音效后才能参与识别" : demo ? "布局演示 · 非识别结果" : result!.Message;
-            if (design) headline.ToolTip = MatchHelp;
             total.Text = "大红概率按各格候选计算";
             phase.Text = demo ? "示例用于检查格数分组和缩略图展示" : $"{(result!.IsFinal ? "稳定结果" : "初步结果")}  ·  {result.ElapsedMilliseconds:0} ms  ·  操作 #{result.OperationId}";
             var highest = result!.HighestValue;
@@ -626,6 +625,14 @@ internal sealed class CandidatePanel : Border
         }
         else picture.Children.Add(Theme.Label("暂无图片", 9 * FontScale, Theme.Muted));
         if (TagBadge(candidate) is { } badge) picture.Children.Add(badge);
+        // Dense cards have no spare text line: the 差异率 rides on the picture's bottom edge.
+        if (!prominent && !catalogView)
+        {
+            var strip = Theme.Label(DifferenceText(candidate.Score), 9 * FontScale, Theme.Text);
+            strip.Margin = new Thickness(0); strip.TextWrapping = TextWrapping.NoWrap; strip.TextAlignment = TextAlignment.Center;
+            picture.Children.Add(new Border { Child = strip, Background = Theme.Brush("#CC111212"), VerticalAlignment = VerticalAlignment.Bottom,
+                Padding = new Thickness(2, 0, 2, 1), Margin = new Thickness(2), ToolTip = DifferenceHelp });
+        }
         grid.Children.Add(picture);
         var details = new StackPanel { Margin = new Thickness(wide ? 11 : 3, 0, 2, 0),
             VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = wide ? HorizontalAlignment.Left : HorizontalAlignment.Stretch,
@@ -637,27 +644,27 @@ internal sealed class CandidatePanel : Border
         name.TextTrimming = TextTrimming.None; name.ToolTip = item.Name;
         details.Children.Add(name);
         details.Children.Add(new Border { Height = 2 });
-        // Items sharing one sound share one score; the summary row shows it once
-        // and a card repeats a score only when it is lower than that.
-        var ownScore = MatchPercent(candidate.Score) != MatchPercent(topScore) || nearIds.Contains(item.Id);
         if (prominent)
         {
-            if (ownScore)
+            // One row with the grid size keeps the card's original line count; it wraps only when narrow.
+            var meta = new WrapPanel();
+            if (!catalogView)
             {
-                var match = Theme.Label($"匹配度 {MatchPercent(candidate.Score)}", (wide ? rowSize == 1 ? 14 : 12 : 11) * FontScale, Theme.Muted);
-                match.FontWeight = FontWeights.SemiBold; match.Margin = new Thickness(0); match.TextWrapping = TextWrapping.Wrap;
-                match.TextTrimming = TextTrimming.None; match.ToolTip = MatchHelp; details.Children.Add(match);
+                var difference = Theme.Label(DifferenceText(candidate.Score), (wide ? rowSize == 1 ? 14 : 12 : 11) * FontScale, Theme.Muted);
+                difference.FontWeight = FontWeights.SemiBold; difference.Margin = new Thickness(0, 0, 10, 0); difference.TextWrapping = TextWrapping.Wrap;
+                difference.TextTrimming = TextTrimming.None; difference.VerticalAlignment = VerticalAlignment.Center;
+                difference.ToolTip = DifferenceHelp; meta.Children.Add(difference);
             }
             var dimensions = Theme.Label(item.GridLabel, 10 * FontScale, Theme.Muted);
-            dimensions.Margin = new Thickness(0); details.Children.Add(dimensions);
+            dimensions.Margin = new Thickness(0); dimensions.VerticalAlignment = VerticalAlignment.Center; meta.Children.Add(dimensions);
+            details.Children.Add(meta);
         }
         else
         {
-            var parts = new[] { CandidateStatus(candidate), ownScore ? $"匹配度 {MatchPercent(candidate.Score)}" : "", item.GridLabel }
-                .Where(part => part.Length > 0);
+            var parts = new[] { CandidateStatus(candidate), item.GridLabel }.Where(part => part.Length > 0);
             var meta = Theme.Label(string.Join(" · ", parts), 9 * FontScale, Theme.Accent);
             meta.Margin = new Thickness(0); meta.TextWrapping = TextWrapping.Wrap; meta.TextTrimming = TextTrimming.None;
-            meta.ToolTip = MatchHelp; details.Children.Add(meta);
+            details.Children.Add(meta);
         }
         if (previewButtons)
         {
@@ -710,10 +717,10 @@ internal sealed class CandidatePanel : Border
         stack.Children.Add(picture);
         var dimensions = Theme.Label($"◇ {item.GridLabel}", 10 * FontScale, Theme.Muted);
         dimensions.Margin = new Thickness(0);
-        var match = Theme.Label($"匹配度 {MatchPercent(candidate.Score)}", 12 * FontScale, Theme.Gold);
+        var match = Theme.Label(DifferenceText(candidate.Score), 12 * FontScale, Theme.Gold);
         match.FontWeight = FontWeights.SemiBold;
         match.Margin = new Thickness(0); match.TextWrapping = TextWrapping.NoWrap;
-        match.ToolTip = MatchHelp;
+        match.ToolTip = DifferenceHelp;
         dimensions.Margin = new Thickness(2, 0, 2, 1);
         match.Margin = new Thickness(2, 0, 2, 3);
         stack.Children.Add(dimensions); stack.Children.Add(match);
@@ -739,10 +746,10 @@ internal sealed class CandidatePanel : Border
             picture.Margin = new Thickness(0, 0, 4, 0); dense.Children.Add(picture);
             var details = new StackPanel();
             heading.Margin = new Thickness(0, 0, 0, 1); details.Children.Add(heading);
-            var compactMeta = Theme.Label($"匹配度 {MatchPercent(candidate.Score)} · {item.GridLabel}",
+            var compactMeta = Theme.Label($"{DifferenceText(candidate.Score)} · {item.GridLabel}",
                 9 * FontScale, Theme.Accent);
             compactMeta.Margin = new Thickness(0, 0, 0, 2); compactMeta.TextWrapping = TextWrapping.NoWrap;
-            compactMeta.TextTrimming = TextTrimming.CharacterEllipsis; compactMeta.ToolTip = MatchHelp;
+            compactMeta.TextTrimming = TextTrimming.CharacterEllipsis; compactMeta.ToolTip = DifferenceHelp;
             details.Children.Add(compactMeta);
             play.Content = "▶ 试听"; play.Height = 26; play.FontSize = 10 * FontScale;
             details.Children.Add(play);
@@ -803,7 +810,18 @@ internal sealed class CandidatePanel : Border
         stack.Children.Add(tile);
         var metadata = new DockPanel { Margin = new Thickness(0, 3, 0, previewButtons ? 4 : 0) };
         var dimensions = Theme.Label(item.GridLabel, 10 * FontScale, Theme.Muted);
-        dimensions.Margin = new Thickness(0); metadata.Children.Add(dimensions); stack.Children.Add(metadata);
+        dimensions.Margin = new Thickness(0); dimensions.TextWrapping = TextWrapping.NoWrap;
+        DockPanel.SetDock(dimensions, Dock.Left); metadata.Children.Add(dimensions);
+        // Below 48 DIP the grid row moves into a picture-wide column with no room left.
+        if (!catalogView && !(previewButtons && thumbnail <= 48))
+        {
+            // Shares the grid row so dense layouts keep their card height.
+            var difference = Theme.Label(DifferenceText(candidate.Score), 10 * FontScale, Theme.Muted);
+            difference.Margin = new Thickness(6, 0, 0, 0); difference.TextWrapping = TextWrapping.NoWrap;
+            difference.TextTrimming = TextTrimming.CharacterEllipsis; difference.TextAlignment = TextAlignment.Right;
+            difference.ToolTip = DifferenceHelp; metadata.Children.Add(difference);
+        }
+        stack.Children.Add(metadata);
         if (previewButtons)
         {
             var play = Theme.Button("▶ 听样本", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
@@ -836,6 +854,7 @@ internal sealed class CandidatePanel : Border
             BorderBrush = highest ? Theme.Gold : best && !lastDemo ? Theme.Accent : Theme.Line,
             BorderThickness = new Thickness(1), Margin = new Thickness(0, 0, 4, 4), Tag = candidate,
             ToolTip = $"{item.Name}\n{item.GridLabel} · {(item.IsGold ? "大红" : "非大红")}\n" +
+                (catalogView ? "" : DifferenceText(candidate.Score) + "\n") +
                 (item.ReferenceValue.HasValue ? $"联络人回收参考价：{item.ReferenceValue:N0}" : "联络人回收参考价待核实") +
                 (highest ? "\n本次候选中已知参考价最高" : "") + (nearIds.Contains(item.Id) ? "\n相近参考音效，不计入候选占比" : "") };
         AutomationProperties.SetName(border, item.Name);

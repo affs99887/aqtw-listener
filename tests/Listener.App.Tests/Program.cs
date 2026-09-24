@@ -519,6 +519,8 @@ internal static class Program
                     var result = CatalogResult(library, count);
                     var panel = new CandidatePanel(root, new Settings { FontScale = scale, ShowNames = true },
                         interactive: true, compact: true);
+                    // Measure text with the overlay's font; the default font has shorter lines.
+                    System.Windows.Documents.TextElement.SetFontFamily(panel, new System.Windows.Media.FontFamily("Microsoft YaHei UI"));
                     panel.SetAudioPreview(_ => { }, _ => true); panel.ShowResult(result);
                     var height = Math.Min(1000, viewportHeight - 24) - 48 * scale - 26;
                     Layout(panel, width, height); CheckCandidateCoverage(panel, result);
@@ -532,10 +534,10 @@ internal static class Program
                         var bounds = card.TransformToAncestor(panel).TransformBounds(new System.Windows.Rect(card.RenderSize));
                         return bounds.Right <= panel.ActualWidth + 1 && bounds.Bottom <= panel.ActualHeight + 1;
                     }), $"{width}×{viewportHeight}, 字号{scale}: a candidate lies outside the listening surface");
-                    var scoreLabels = Descendants<System.Windows.Controls.TextBlock>(panel)
-                        .Where(label => label.Text.Contains("匹配", StringComparison.Ordinal)).ToArray();
-                    Check(scoreLabels.Length == 1 && scoreLabels[0].Text == "匹配度 90%",
-                        "the shared score is not shown exactly once in the summary row");
+                    Check(cards.All(card => ShowsDifference(card, "差异率 10.0%")) && NoSummaryScore(panel),
+                        $"{width}×{viewportHeight}, 字号{scale}: a card lacks its own 差异率 or a shared score remains");
+                    var clipped = cards.Where(card => !ContentInside(card)).Select(card => ((Candidate)card.Tag).Item.Name).ToArray();
+                    Check(clipped.Length == 0, $"{width}×{viewportHeight}, 字号{scale}: card text or button is clipped: " + string.Join("、", clipped));
                 }
             }),
             ("十三候选以较窄宽度向下排布且完整显示名称", () =>
@@ -549,6 +551,7 @@ internal static class Program
                 {
                     var panel = new CandidatePanel(root, new Settings { FontScale = font, ShowNames = true },
                         interactive: true, compact: true);
+                    System.Windows.Documents.TextElement.SetFontFamily(panel, new System.Windows.Media.FontFamily("Microsoft YaHei UI"));
                     panel.SetAudioPreview(_ => { }, _ => true); panel.ShowResult(result);
                     var width = panel.GetPreferredWidth(1600, 720);
                     var height = 720 - 24 - 48 * font - 40;
@@ -572,9 +575,7 @@ internal static class Program
                     Check(!Descendants<System.Windows.Controls.TextBlock>(panel).Any(label =>
                             label.Text is "同音候选" or "疑似"),
                         "unrequested or uncertain badge remains on a high sound match");
-                    // All thirteen share one sound: the summary row shows the score once.
-                    Check(Descendants<System.Windows.Controls.TextBlock>(panel).Count(label => label.Text == "匹配度 99%") == 1,
-                        "the shared score is not shown exactly once in the summary row");
+                    Check(NoSummaryScore(panel), "a shared score remains in the summary row");
                     foreach (var card in cards)
                     {
                         var candidate = (Candidate)card.Tag;
@@ -582,10 +583,9 @@ internal static class Program
                             .Single(label => label.Text == candidate.Item.Name);
                         var bounds = card.TransformToAncestor(panel).TransformBounds(new System.Windows.Rect(card.RenderSize));
                         Check(name.TextTrimming == System.Windows.TextTrimming.None && name.FontSize >= 13 * font &&
-                            name.DesiredSize.Height <= name.ActualHeight + 1 &&
-                            !Descendants<System.Windows.Controls.TextBlock>(card).Any(label => label.Text.Contains("匹配", StringComparison.Ordinal)) &&
+                            name.DesiredSize.Height <= name.ActualHeight + 1 && ShowsDifference(card, "差异率 1.0%") && ContentInside(card) &&
                             bounds.Right <= panel.ActualWidth + 1 && bounds.Bottom <= panel.ActualHeight + 1,
-                            "narrow card clips its name or repeats the shared score: " + candidate.Item.Name);
+                            "narrow card clips its name or its own 差异率: " + candidate.Item.Name);
                     }
                 }
             }),
@@ -631,16 +631,15 @@ internal static class Program
                         !Descendants<System.Windows.Controls.Border>(panel).Any(border =>
                             border.Height == 5 && ReferenceEquals(border.Background, Theme.Gold)),
                         "uneven groups mix hierarchy, waste space or retain the ratio bar: " + panel.LayoutInfo);
-                    Check(Descendants<System.Windows.Controls.TextBlock>(panel).Count(label => label.Text == "匹配度 96%") == 1,
-                        "the shared score is not shown exactly once in the summary row");
+                    Check(NoSummaryScore(panel), "a shared score remains in the summary row");
                     foreach (var card in cards)
                     {
                         var candidate = (Candidate)card.Tag;
                         var name = Descendants<System.Windows.Controls.TextBlock>(card)
                             .Single(label => label.Text == candidate.Item.Name);
                         Check(name.DesiredSize.Height <= name.ActualHeight + 1 &&
-                            name.TextTrimming == System.Windows.TextTrimming.None,
-                            "packed candidate clips its name: " + candidate.Item.Name);
+                            name.TextTrimming == System.Windows.TextTrimming.None && ShowsDifference(card, "差异率 4.0%"),
+                            "packed candidate clips its name or its own 差异率: " + candidate.Item.Name);
                     }
                     if (font != 1.0) continue;
                     var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(900,
@@ -696,7 +695,7 @@ internal static class Program
                         var playBounds = play.TransformToAncestor(card)
                             .TransformBounds(new System.Windows.Rect(play.RenderSize));
                         Check(name.TextTrimming == System.Windows.TextTrimming.None &&
-                            name.DesiredSize.Height <= name.ActualHeight + 1 &&
+                            name.DesiredSize.Height <= name.ActualHeight + 1 && ShowsDifference(card, "差异率 4.0%") &&
                             image.Parent is System.Windows.Controls.Grid { ActualWidth: >= 80, ActualHeight: >= 80 } && play.ActualWidth > 60 &&
                             playBounds.Right <= card.ActualWidth + 1 && playBounds.Bottom <= card.ActualHeight + 1 &&
                             (candidate.Item.Cells is not (2 or 3) || play.ActualWidth <= 158),
@@ -727,7 +726,7 @@ internal static class Program
                     var text = Descendants<System.Windows.Controls.TextBlock>(panel).ToArray();
                     Check(!panel.NeedsScroll && ShareLabels(panel).Length == 4 &&
                         result.Candidates.All(candidate => text.Any(label => label.Text == candidate.Item.Name)) &&
-                        text.Count(label => label.Text == "匹配度 90%") == 1,
+                        text.Count(label => label.Text == "差异率 10.0%") == result.CandidateCount && NoSummaryScore(panel),
                         "live overlay lost the operation view's readable names, scores or grouping");
                 }
                 Check(!Descendants<System.Windows.Controls.Button>(live).Any(button => button.Tag is Candidate) &&
@@ -760,22 +759,26 @@ internal static class Program
                 panel.ShowResult(new(0, RecognitionStatus.Unknown, true, [], 0, "test")); Layout(panel, 470, 680);
                 Check(panel.RenderedIds.Count == 0 && panel.VisibleIds.Count == 0, "empty result left stale candidates");
             }),
-            ("同一音效的候选只在汇总行显示一次匹配度，低分候选单独标出", () =>
+            ("每件候选显示自己的差异率，汇总行不再显示统一匹配度", () =>
             {
                 var root = Path.Combine(AppContext.BaseDirectory, "library");
                 var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
                 var items = library.Items.Where(item => item.Cells == 4).Take(3).ToArray();
                 var result = new RecognitionResult(1, RecognitionStatus.Matched, true,
-                    [new(items[0], .96, "a"), new(items[1], .96, "a"), new(items[2], .88, "b")], 1, "test");
+                    [new(items[0], .96, "a"), new(items[1], .955, "a"), new(items[2], .88, "b")], 1, "test");
                 var panel = new CandidatePanel(root, new Settings { ShowNames = true }, interactive: true, compact: true);
                 panel.SetAudioPreview(_ => { }, _ => true); panel.ShowResult(result); Layout(panel, 900, 620);
-                System.Windows.Controls.TextBlock? Score(ItemDefinition item) => Descendants<System.Windows.Controls.TextBlock>(
-                        Descendants<System.Windows.Controls.Border>(panel).Single(card => (card.Tag as Candidate)?.Item.Id == item.Id))
-                    .SingleOrDefault(label => label.Text.Contains("匹配", StringComparison.Ordinal));
-                Check(Descendants<System.Windows.Controls.TextBlock>(panel).Count(label => label.Text == "匹配度 96%") == 1 &&
-                    Score(items[0]) is null && Score(items[1]) is null &&
-                    Score(items[2]) is { Text: "匹配度 88%" } lower && ReferenceEquals(lower.Foreground, Theme.Muted),
-                    "a shared score was repeated on its cards or a lower score was hidden");
+                System.Windows.Controls.Border Card(ItemDefinition item) =>
+                    Descendants<System.Windows.Controls.Border>(panel).Single(card => (card.Tag as Candidate)?.Item.Id == item.Id);
+                var lower = Descendants<System.Windows.Controls.TextBlock>(Card(items[2])).SingleOrDefault(label => label.Text == "差异率 12.0%");
+                Check(ShowsDifference(Card(items[0]), "差异率 4.0%") && ShowsDifference(Card(items[1]), "差异率 4.5%") &&
+                    ShowsDifference(Card(items[2]), "差异率 12.0%") && lower is not null && ReferenceEquals(lower.Foreground, Theme.Muted) &&
+                    NoSummaryScore(panel),
+                    "a card lacks its own 差异率 or the summary row still carries one score for all candidates");
+                panel.ShowResult(new(2, RecognitionStatus.Matched, true, library.Items.Take(3).Select(item => new Candidate(item, 0, "catalog")).ToArray(), 0, ""), demo: true);
+                Layout(panel, 900, 620);
+                Check(!Descendants<System.Windows.Controls.TextBlock>(panel).Any(label => label.Text.Contains("差异率", StringComparison.Ordinal)),
+                    "catalog pages show a 差异率 for items that were never heard");
             }),
             ("大红概率是分组内最大的数字，并按比例着色", () =>
             {
@@ -923,6 +926,25 @@ internal static class Program
             .Select(border => ((Candidate)border.Tag).Item.Id).ToArray();
         Check(cards.Length == expected.Count && expected.SetEquals(cards), "actual card tree does not contain the complete result");
     }
+    // A card's own 差异率 label, wholly inside the card.
+    private static bool ShowsDifference(System.Windows.Controls.Border card, string expected)
+    {
+        var labels = Descendants<System.Windows.Controls.TextBlock>(card).Where(label => label.Text.Contains("差异率", StringComparison.Ordinal)).ToArray();
+        if (labels.Length != 1 || !labels[0].Text.Contains(expected, StringComparison.Ordinal)) return false;
+        var bounds = labels[0].TransformToAncestor(card).TransformBounds(new System.Windows.Rect(labels[0].RenderSize));
+        return bounds.Top >= -1 && bounds.Bottom <= card.ActualHeight + 1 && bounds.Right <= card.ActualWidth + 1;
+    }
+    // Nothing in a fixed-height card may be pushed outside it and clipped.
+    private static bool ContentInside(System.Windows.Controls.Border card) =>
+        Descendants<System.Windows.FrameworkElement>(card).Where(element => element is System.Windows.Controls.TextBlock or System.Windows.Controls.Button &&
+                element.Visibility == System.Windows.Visibility.Visible)
+            .All(element =>
+            {
+                var bounds = element.TransformToAncestor(card).TransformBounds(new System.Windows.Rect(element.RenderSize));
+                return bounds.Top >= -1 && bounds.Bottom <= card.ActualHeight + 1 && bounds.Left >= -1 && bounds.Right <= card.ActualWidth + 1;
+            });
+    private static bool NoSummaryScore(System.Windows.DependencyObject panel) =>
+        !Descendants<System.Windows.Controls.TextBlock>(panel).Any(label => label.Text.Contains("匹配", StringComparison.Ordinal));
     // Each size group's red-item share, found by its accessible name ("大红概率 50%").
     private static System.Windows.Controls.TextBlock[] ShareLabels(System.Windows.DependencyObject root) =>
         Descendants<System.Windows.Controls.TextBlock>(root).Where(label =>
