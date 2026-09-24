@@ -75,7 +75,12 @@ internal sealed partial class MainWindow : Window
         };
         controller.State += s =>
         {
-            status.Text = s; overlay.SetHeaderStatus(s); RefreshListeningPresentation();
+            status.Text = s; RefreshListeningPresentation();
+            var failed = s.StartsWith("采音失败", StringComparison.Ordinal) || s.StartsWith("无法采音", StringComparison.Ordinal);
+            overlay.SetHeaderStatus(s, failed ? StatusTone.Failed
+                : controller.Mode != AssistantMode.Listening ? StatusTone.Paused
+                : !controller.Enabled ? StatusTone.Off
+                : controller.Diagnostics().Capturing ? StatusTone.Listening : StatusTone.Paused);
             RefreshOverlayVisibility();
         };
         controller.Result += workspace.UpdateListeningResult;
@@ -159,9 +164,13 @@ internal sealed partial class MainWindow : Window
     }
     private void UpdateLibraryInfo()
     {
-        var covered = library.Groups.Where(g => g.Action == "pickup" && g.Templates.Count > 0).SelectMany(g => g.ItemIds).Distinct().Count();
-        libraryInfo.Text = $"{covered} 件候选已接入 / {library.Items.Count} 件目录\n{library.Version}";
-        dashboardLibraryInfo.Text = $"{covered} 件候选";
+        var pickup = library.Groups.Where(g => g.Action == "pickup" && g.Templates.Count > 0).ToArray();
+        var covered = pickup.SelectMany(g => g.ItemIds).Distinct().Count();
+        var references = pickup.Sum(g => g.Templates.Count);
+        var engine = library.PrimaryEngine == RecognizerFactory.Engine ? "局内匹配器" : library.PrimaryEngine;
+        libraryInfo.Text = $"{covered} 件物品已接入 / {library.Items.Count} 件目录 · {references} 条参考\n{engine} · {library.Version}";
+        dashboardLibraryInfo.Text = $"{library.Items.Count} 件物品 · {references} 条参考";
+        dashboardEngineInfo.Text = $"{engine} · {library.Version}";
     }
     private UIElement Build()
     {
@@ -235,7 +244,7 @@ internal sealed partial class MainWindow : Window
         {
             section.Button.Background = label == name ? Theme.Selected : Brushes.Transparent;
             section.Button.Foreground = label == name ? Theme.Accent : Theme.Muted;
-            section.Button.BorderBrush = label == name ? Theme.Brush("#63746B") : Brushes.Transparent;
+            section.Button.BorderBrush = label == name ? Theme.Accent : Brushes.Transparent;
         }
         pageHeading.Text = SectionTitle(name);
         pageDescription.Text = SectionDescription(name);
@@ -501,6 +510,23 @@ internal sealed partial class MainWindow : Window
         RenderSmoke(fullHistoryView, "history-full-smoke.png");
         var allHistoryReachable = historyIds.Count == 100 && historyIds.Distinct().Count() == 100;
         fullHistoryView.Close();
+        var followHistory = new RecognitionHistory();
+        followHistory.Remember(one with { OperationId = 2001, Candidates = PreviewScenarios.Thirteen(library, .96) }, "声音自动识别", true,
+            DateTimeOffset.Now, audioSeconds: 100);
+        followHistory.Remember(one with { OperationId = 2002 }, "声音自动识别", true, DateTimeOffset.Now.AddSeconds(.5), audioSeconds: 100.5);
+        var followView = new HistoryWindow(followHistory, libraryRoot, settings) { Owner = this };
+        followView.Show(); await Task.Delay(150);
+        var followUpMarked = followHistory.Entries[0].FollowUp && followHistory.Latest?.Id == followHistory.Entries[1].Id &&
+            Descendants<TextBlock>(followView).Any(label => label.Text == "疑似放下声");
+        RenderSmoke(followView, "history-followup-smoke.png"); followView.Close();
+        var sampleMenu = new ContextMenu();
+        foreach (var number in Enumerable.Range(1, 3))
+            sampleMenu.Items.Add(new MenuItem { Header = $"参考 {number} · 激光指示模块", IsCheckable = true, IsChecked = number == 1 });
+        var titleMenu = new ContextMenu();
+        foreach (var header in new[] { "恢复顶部居中", "识别历史" }) titleMenu.Items.Add(new MenuItem { Header = header });
+        RenderSmoke(sampleMenu, "menu-samples-smoke.png"); RenderSmoke(titleMenu, "menu-title-smoke.png");
+        var menusStyled = new[] { sampleMenu, titleMenu }.All(menu =>
+            Descendants<Border>(menu).Count(border => border.Name == "Surface") == menu.Items.Count);
         var reference = ReferenceAudio.Load(libraryRoot).Samples[0];
         var sound = WaveAudio.Read(ReferenceAudio.VerifiedPath(libraryRoot, reference));
         using var smokeRecognizer = RecognizerFactory.Create(library, libraryRoot);
@@ -520,13 +546,17 @@ internal sealed partial class MainWindow : Window
             RenderSmoke(overlay, "operation-" + name + "-smoke.png");
         }
         void ClickWorkspace(string label) => Descendants<Button>(workspace).Single(b => Equals(b.Content, label)).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        bool StopEnabled() => Descendants<Button>(workspace).Single(b => Equals(b.Content, "■ 停止")).IsEnabled;
         await CheckWorkspace("sound");
-        ClickWorkspace("▶ 回放当前声音"); var replayStarted = workspace.IsPlaying;
+        var stopIdle = !StopEnabled();
+        ClickWorkspace("▶ 回放"); var replayStarted = workspace.IsPlaying;
         var capturePausedDuringReplay = !controller.Diagnostics().Capturing;
+        var stopWhilePlaying = StopEnabled();
         ClickWorkspace("■ 停止"); var replayStopped = !workspace.IsPlaying;
         var referenceButton = Descendants<Button>(workspace).First(b => b.Tag is Candidate && b.IsEnabled);
         referenceButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); var referenceStarted = workspace.IsPlaying;
         ClickWorkspace("■ 停止"); var referenceStopped = !workspace.IsPlaying;
+        var stopFollowsPlayback = stopIdle && stopWhilePlaying && !StopEnabled();
         foreach (var (label, name) in new[] { ("候选详情", "candidates"), ("个人库", "personal"), ("补库 / 学习", "learn"), ("录入新物品", "new-item") })
         { ClickWorkspace(label); await CheckWorkspace(name); }
         var nameField = Descendants<TextBox>(workspace).Single(t => t.IsVisible); nameField.Text = "字号保留测试";
@@ -564,11 +594,18 @@ internal sealed partial class MainWindow : Window
                 var rect = b.TransformToAncestor(panel).TransformBounds(new Rect(b.RenderSize));
                 return rect.Top >= 0 && rect.Bottom <= panel.ActualHeight + 1 && rect.Right <= panel.ActualWidth + 1;
             });
-            comparisonFits &= !panel.NeedsScroll && sampleButtonsFit && toolbarButtonsFit &&
+            var namesOneLine = Descendants<Border>(panel).Where(card => card.Tag is Candidate).All(card =>
+            {
+                var name = Descendants<TextBlock>(card).First(label => label.Text == ((Candidate)card.Tag).Item.Name);
+                var line = new TextBlock { Text = name.Text, FontSize = name.FontSize, FontWeight = name.FontWeight, FontFamily = name.FontFamily };
+                line.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                return name.ActualHeight <= line.DesiredSize.Height + 1;
+            });
+            comparisonFits &= !panel.NeedsScroll && sampleButtonsFit && toolbarButtonsFit && namesOneLine &&
                 (scenario != "six" || panel.ThumbnailSize >= 104);
             fontChecks[scenario + "-" + label] = new { scale = settings.FontScale, overlay.ActualWidth, overlay.ActualHeight,
                 noWindowScale = overlay.LayoutTransform.Value.IsIdentity,
-                candidates = panel.RenderedIds.Count, panel.NeedsScroll, panel.ThumbnailSize, panel.ContentHeight, sampleButtonsFit, toolbarButtonsFit };
+                candidates = panel.RenderedIds.Count, panel.NeedsScroll, panel.ThumbnailSize, panel.ContentHeight, sampleButtonsFit, toolbarButtonsFit, namesOneLine };
             RenderSmoke(overlay, $"comparison-{scenario}-{label}-smoke.png");
         }
         overlay.SetFontScale(1); await Task.Delay(100); overlay.UpdateLayout();
@@ -581,26 +618,24 @@ internal sealed partial class MainWindow : Window
         var thirteenCards = Descendants<Border>(thirteenPanel).Where(card => card.Tag is Candidate).ToArray();
         var thirteenHeadings = Descendants<TextBlock>(thirteenPanel)
             .Where(label => new[] { "2 格", "3 格", "4 格", "6 格" }.Contains(label.Text)).ToArray();
+        // All thirteen share one sound: the summary row carries the score once and no card repeats it.
         var thirteenNamesFit = thirteenCards.Length == 13 && thirteenCards.All(card =>
         {
             var name = Descendants<TextBlock>(card).FirstOrDefault(label => label.Text == ((Candidate)card.Tag).Item.Name);
-            var score = Descendants<TextBlock>(card).FirstOrDefault(label => label.Text.Contains("匹配", StringComparison.Ordinal));
-            if (name is null || score is null) return false;
+            if (name is null) return false;
             var bounds = card.TransformToAncestor(overlay).TransformBounds(new Rect(card.RenderSize));
-            return name.TextTrimming == TextTrimming.None && score.Text == "匹配度 99%" &&
-                score.TextTrimming == TextTrimming.None &&
-                name.FontSize >= 13 && score.FontSize >= 12 &&
-                name.DesiredSize.Height <= name.ActualHeight + 1 && score.DesiredSize.Height <= score.ActualHeight + 1 &&
+            return name.TextTrimming == TextTrimming.None && name.FontSize >= 13 &&
+                name.DesiredSize.Height <= name.ActualHeight + 1 &&
+                !Descendants<TextBlock>(card).Any(label => label.Text.Contains("匹配", StringComparison.Ordinal)) &&
                 bounds.Right <= overlay.ActualWidth + 1 && bounds.Bottom <= overlay.ActualHeight + 1;
-        });
+        }) && Descendants<TextBlock>(thirteenPanel).Count(label => label.Text == "匹配度 99%") == 1;
         var listeningThirteen = overlay.ActualWidth <= 930 && !thirteenPanel.NeedsScroll && thirteenNamesFit &&
             thirteenHeadings.Length == 4 &&
-            Descendants<TextBlock>(thirteenPanel).Count(label =>
-                label.Text.StartsWith("大红概率 ", StringComparison.Ordinal)) == 4 &&
+            Descendants<TextBlock>(thirteenPanel).Count(label => System.Windows.Automation.AutomationProperties.GetName(label)
+                .StartsWith("大红概率 ", StringComparison.Ordinal)) == 4 &&
             !Descendants<TextBlock>(thirteenPanel).Any(label => label.Text is "同音候选" or "疑似");
         var thirteenMissingLabels = thirteenCards.Where(card =>
-            !Descendants<TextBlock>(card).Any(label => label.Text == ((Candidate)card.Tag).Item.Name) ||
-            !Descendants<TextBlock>(card).Any(label => label.Text.Contains("匹配", StringComparison.Ordinal)))
+            !Descendants<TextBlock>(card).Any(label => label.Text == ((Candidate)card.Tag).Item.Name))
             .Select(card => ((Candidate)card.Tag).Item.Name).ToArray();
         var listeningThirteenDetails = new { overlay.ActualWidth, overlay.ActualHeight,
             thirteenPanel.ThumbnailSize, groups = thirteenHeadings.Select(label => label.Text).ToArray(),
@@ -660,24 +695,47 @@ internal sealed partial class MainWindow : Window
             listeningSurface.ThumbnailSize >= 104;
         RenderSmoke(overlay, "listening-design-smoke.png");
         await ExitInteraction();
-        controller.History.Remember(thirteenResult, "布局模拟", false, DateTimeOffset.Now,
+        // The live view as it looks in a raid: a pickup heard a moment ago, listening on.
+        var liveResult = new RecognitionResult(1005, RecognitionStatus.Matched, true,
+            PreviewScenarios.Thirteen(library), 0, "十三件布局检查");
+        controller.History.Remember(liveResult, "布局模拟", true, DateTimeOffset.Now,
             thirteenSnapshot.Id, library.Version, libraryRoot);
-        workspace.UpdateListeningResult(thirteenResult);
+        workspace.UpdateListeningResult(liveResult);
         workspace.UpdateListeningActivity(new(1003, false, "监听中 · 继续听音"));
+        overlay.SetHeaderStatus("监听中 · 继续听音", StatusTone.Listening);
         overlay.Show(); await Task.Delay(100); overlay.UpdateLayout();
         var livePanel = Descendants<CandidatePanel>(workspace).First();
         var liveCards = Descendants<Border>(livePanel).Where(card => card.Tag is Candidate).ToArray();
         var liveLabels = Descendants<TextBlock>(livePanel).ToArray();
         var liveStyles = NativeInput.OverlayStyles(overlay);
         var liveThirteen = ReferenceEquals(Descendants<CandidatePanel>(overlay).FirstOrDefault(panel => panel.IsVisible), livePanel) &&
-            overlay.Interactive && !livePanel.NeedsScroll && liveCards.Length == thirteenResult.CandidateCount &&
-            thirteenResult.Candidates.All(candidate => liveLabels.Any(label => label.Text == candidate.Item.Name)) &&
-            liveLabels.Count(label => label.Text == "匹配度 99%") == thirteenResult.CandidateCount &&
-            Descendants<Button>(livePanel).Count(button => button.Tag is Candidate && button.IsEnabled) == thirteenResult.CandidateCount &&
+            overlay.Interactive && !livePanel.NeedsScroll && liveCards.Length == liveResult.CandidateCount &&
+            liveResult.Candidates.All(candidate => liveLabels.Any(label => label.Text == candidate.Item.Name)) &&
+            liveLabels.Count(label => label.Text == "匹配度 99%") == 1 &&
+            Descendants<Button>(livePanel).Count(button => button.Tag is Candidate && button.IsEnabled) == liveResult.CandidateCount &&
             (liveStyles & 0x20) == 0 && (liveStyles & 0x08000000) != 0;
+        var liveFresh = liveLabels.Any(label => label.Text == "刚刚" && label.IsVisible) &&
+            Descendants<CandidateLayout>(livePanel).Single().Opacity == 1;
+        RenderSmoke(overlay, "listening-arrival-smoke.png");
+        await Task.Delay(1100); overlay.UpdateLayout();
         RenderSmoke(overlay, "listening-live-thirteen-smoke.png");
+        // Ten seconds later with nothing new recognised, the same result fades.
+        var staleResult = liveResult with { OperationId = 1006 };
+        controller.History.Remember(staleResult, "布局模拟", true, DateTimeOffset.Now.AddSeconds(-14),
+            thirteenSnapshot.Id, library.Version, libraryRoot);
+        workspace.UpdateListeningResult(staleResult);
+        overlay.SetHeaderStatus("监听中 · 继续听音", StatusTone.Listening);
+        await Task.Delay(100); overlay.UpdateLayout();
+        var stalePanel = Descendants<CandidatePanel>(workspace).First();
+        var liveStale = Descendants<TextBlock>(stalePanel).Any(label => label.Text.EndsWith("秒前", StringComparison.Ordinal) && label.IsVisible) &&
+            Descendants<CandidateLayout>(stalePanel).Single().Opacity < 1;
+        RenderSmoke(overlay, "listening-stale-smoke.png");
+        controller.History.Remember(liveResult with { OperationId = 1007 }, "布局模拟", true, DateTimeOffset.Now,
+            thirteenSnapshot.Id, library.Version, libraryRoot);
+        workspace.UpdateListeningResult(liveResult); await Task.Delay(100); overlay.UpdateLayout();
+        livePanel = Descendants<CandidatePanel>(workspace).First();
         if (Environment.GetCommandLineArgs().Contains("--ui-hold-live")) return;
-        var liveReplay = Descendants<Button>(livePanel).First(button => Equals(button.Content, "▶ 回放当前声音"));
+        var liveReplay = Descendants<Button>(livePanel).First(button => Equals(button.Content, "▶ 回放"));
         liveReplay.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
         await Task.Delay(300);
         var liveReplayPausesSampling = controller.Mode == AssistantMode.Interaction && workspace.IsPlaying;
@@ -694,6 +752,7 @@ internal sealed partial class MainWindow : Window
             shrunkAgain && historyOnScreen && centered && topAnchored && staysInGame && !overflowNeedsScroll;
         var passed = adaptivePassed && comparisonFits && listeningDesignVisible && waitingViewVisible && liveThirteen && liveReplayPausesSampling && listeningThirteen && groupedFifteen && listeningOnePage && commonGroupFits && bottomRowRightGap <= 32 && largestGroupFits && editorFontPreservesText && operationFit.Values.All(fit => fit) && samePin && unlocked &&
             nearControlRemoved && replayStarted && replayStopped && referenceStarted && referenceStopped && capturePausedDuringReplay &&
+            stopFollowsPlayback && liveFresh && liveStale && followUpMarked && menusStyled &&
             (liveStyles & (0x20 | 0x08000000)) == 0x08000000 && preserved &&
             (interactiveStyles & (0x20 | 0x08000000)) == 0 && (restoredStyles & (0x20 | 0x08000000)) == 0x08000000;
         JsonFile.Write(Path.Combine(AppContext.BaseDirectory, "ui-smoke.json"), new
@@ -705,6 +764,7 @@ internal sealed partial class MainWindow : Window
             foregroundPreserved = preserved,
             operation = new { operationFit, unlocked, samePin, fontChecks, comparisonFits, listeningDesignVisible, waitingViewVisible, liveThirteen, liveReplayPausesSampling, listeningThirteen, listeningThirteenDetails, groupedFifteen, groupedFifteenDetails, listeningOnePage, listeningOnePageDetails, nearControlRemoved, editorFontPreservesText,
                 replayStarted, replayStopped, referenceStarted, referenceStopped, capturePausedDuringReplay,
+                stopFollowsPlayback, liveFresh, liveStale, followUpMarked, menusStyled,
                 enabledInteraction = (interactiveStyles & (0x20 | 0x08000000)) == 0,
                 restoredListeningControls = (restoredStyles & (0x20 | 0x08000000)) == 0x08000000,
                 recognitionRemainedOff = !controller.Enabled },
@@ -731,11 +791,16 @@ internal sealed partial class MainWindow : Window
             foreach (var descendant in Descendants<T>(child)) yield return descendant;
         }
     }
-    private static void RenderSmoke(Window window, string name)
+    private static void RenderSmoke(FrameworkElement element, string name)
     {
-        window.UpdateLayout();
-        var bmp = new RenderTargetBitmap((int)Math.Ceiling(window.ActualWidth), (int)Math.Ceiling(window.ActualHeight), 96, 96, PixelFormats.Pbgra32);
-        bmp.Render(window); var png = new PngBitmapEncoder(); png.Frames.Add(BitmapFrame.Create(bmp));
+        if (element is not Window)
+        {
+            element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            element.Arrange(new Rect(element.DesiredSize));
+        }
+        element.UpdateLayout();
+        var bmp = new RenderTargetBitmap((int)Math.Ceiling(element.ActualWidth), (int)Math.Ceiling(element.ActualHeight), 96, 96, PixelFormats.Pbgra32);
+        bmp.Render(element); var png = new PngBitmapEncoder(); png.Frames.Add(BitmapFrame.Create(bmp));
         using var stream = File.Create(Path.Combine(AppContext.BaseDirectory, name)); png.Save(stream);
     }
     private async Task PerformanceSmoke()

@@ -46,9 +46,7 @@ internal static class Program
                     1, "test"));
                 Layout(design, 900, 720);
                 Check(!Descendants<System.Windows.Controls.TextBlock>(design).Any(label =>
-                        label.Text is "同音候选" or "疑似") &&
-                    Descendants<System.Windows.Controls.TextBlock>(design).Count(label =>
-                        label.Text.StartsWith("大红概率 ", StringComparison.Ordinal)) == 4,
+                        label.Text is "同音候选" or "疑似") && ShareLabels(design).Length == 4,
                     "the shared-sound badge remains or size groups lack red-item percentages");
             }),
             ("基础图鉴只包含已关联音效的物品", () =>
@@ -509,7 +507,7 @@ internal static class Program
                     }
                 }
             }),
-            ("新目录多候选在对应空间预算内一页展示，保留图片和匹配度", () =>
+            ("新目录多候选在对应空间预算内一页展示，保留图片，共享分数只在汇总行显示一次", () =>
             {
                 var root = Path.Combine(AppContext.BaseDirectory, "library");
                 var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
@@ -535,8 +533,9 @@ internal static class Program
                         return bounds.Right <= panel.ActualWidth + 1 && bounds.Bottom <= panel.ActualHeight + 1;
                     }), $"{width}×{viewportHeight}, 字号{scale}: a candidate lies outside the listening surface");
                     var scoreLabels = Descendants<System.Windows.Controls.TextBlock>(panel)
-                        .Count(label => label.Text.Contains("匹配", StringComparison.Ordinal));
-                    Check(scoreLabels >= count, "a candidate lacks its visible match score");
+                        .Where(label => label.Text.Contains("匹配", StringComparison.Ordinal)).ToArray();
+                    Check(scoreLabels.Length == 1 && scoreLabels[0].Text == "匹配度 90%",
+                        "the shared score is not shown exactly once in the summary row");
                 }
             }),
             ("十三候选以较窄宽度向下排布且完整显示名称", () =>
@@ -560,8 +559,7 @@ internal static class Program
                         .Where(border => border.Tag is Candidate).ToArray();
                     var groupHeadings = Descendants<System.Windows.Controls.TextBlock>(panel)
                         .Where(label => new[] { "2 格", "3 格", "4 格", "6 格" }.Contains(label.Text)).ToArray();
-                    var probabilityLabels = Descendants<System.Windows.Controls.TextBlock>(panel)
-                        .Where(label => label.Text.StartsWith("大红概率 ", StringComparison.Ordinal)).ToArray();
+                    var probabilityLabels = ShareLabels(panel);
                     Check(cards.Length == 13 && groupHeadings.Length == 4 &&
                         groupHeadings.Select(label => label.Text).SequenceEqual(new[] {
                             "2 格", "3 格", "4 格", "6 格" }) &&
@@ -574,21 +572,20 @@ internal static class Program
                     Check(!Descendants<System.Windows.Controls.TextBlock>(panel).Any(label =>
                             label.Text is "同音候选" or "疑似"),
                         "unrequested or uncertain badge remains on a high sound match");
+                    // All thirteen share one sound: the summary row shows the score once.
+                    Check(Descendants<System.Windows.Controls.TextBlock>(panel).Count(label => label.Text == "匹配度 99%") == 1,
+                        "the shared score is not shown exactly once in the summary row");
                     foreach (var card in cards)
                     {
                         var candidate = (Candidate)card.Tag;
                         var name = Descendants<System.Windows.Controls.TextBlock>(card)
                             .Single(label => label.Text == candidate.Item.Name);
-                        var score = Descendants<System.Windows.Controls.TextBlock>(card)
-                            .Single(label => label.Text.Contains("匹配", StringComparison.Ordinal));
                         var bounds = card.TransformToAncestor(panel).TransformBounds(new System.Windows.Rect(card.RenderSize));
-                        Check(name.TextTrimming == System.Windows.TextTrimming.None &&
-                            score.Text == "匹配度 99%" && score.TextTrimming == System.Windows.TextTrimming.None &&
-                            name.FontSize >= 13 * font && score.FontSize >= 12 * font &&
+                        Check(name.TextTrimming == System.Windows.TextTrimming.None && name.FontSize >= 13 * font &&
                             name.DesiredSize.Height <= name.ActualHeight + 1 &&
-                            score.DesiredSize.Height <= score.ActualHeight + 1 &&
+                            !Descendants<System.Windows.Controls.TextBlock>(card).Any(label => label.Text.Contains("匹配", StringComparison.Ordinal)) &&
                             bounds.Right <= panel.ActualWidth + 1 && bounds.Bottom <= panel.ActualHeight + 1,
-                            "narrow card clips its name or score: " + candidate.Item.Name);
+                            "narrow card clips its name or repeats the shared score: " + candidate.Item.Name);
                     }
                 }
             }),
@@ -625,9 +622,7 @@ internal static class Program
                         var sizeGroup = candidates.Where(candidate => candidate.Item.Cells == cells).ToArray();
                         return $"大红概率 {sizeGroup.Count(candidate => candidate.Item.IsGold) / (double)sizeGroup.Length:P0}";
                     }).ToArray();
-                    var shownRatios = Descendants<System.Windows.Controls.TextBlock>(panel)
-                        .Where(label => label.Text.StartsWith("大红概率 ", StringComparison.Ordinal))
-                        .Select(label => label.Text).ToArray();
+                    var shownRatios = ShareLabels(panel).Select(ShareText).ToArray();
                     Check(rows == 5 && headings.SequenceEqual(new[] { "2 格", "4 格", "6 格" }) &&
                         shownRatios.SequenceEqual(expectedRatios) &&
                         bandBounds[0].Max(bounds => bounds.Bottom) <= bandBounds[1].Min(bounds => bounds.Top) + 1 &&
@@ -636,18 +631,16 @@ internal static class Program
                         !Descendants<System.Windows.Controls.Border>(panel).Any(border =>
                             border.Height == 5 && ReferenceEquals(border.Background, Theme.Gold)),
                         "uneven groups mix hierarchy, waste space or retain the ratio bar: " + panel.LayoutInfo);
+                    Check(Descendants<System.Windows.Controls.TextBlock>(panel).Count(label => label.Text == "匹配度 96%") == 1,
+                        "the shared score is not shown exactly once in the summary row");
                     foreach (var card in cards)
                     {
                         var candidate = (Candidate)card.Tag;
                         var name = Descendants<System.Windows.Controls.TextBlock>(card)
                             .Single(label => label.Text == candidate.Item.Name);
-                        var match = Descendants<System.Windows.Controls.TextBlock>(card)
-                            .Single(label => label.Text == "匹配度 96%");
                         Check(name.DesiredSize.Height <= name.ActualHeight + 1 &&
-                            match.DesiredSize.Height <= match.ActualHeight + 1 &&
-                            name.TextTrimming == System.Windows.TextTrimming.None &&
-                            match.TextTrimming == System.Windows.TextTrimming.None,
-                            "packed candidate clips its name or match: " + candidate.Item.Name);
+                            name.TextTrimming == System.Windows.TextTrimming.None,
+                            "packed candidate clips its name: " + candidate.Item.Name);
                     }
                     if (font != 1.0) continue;
                     var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(900,
@@ -697,8 +690,6 @@ internal static class Program
                         var candidate = (Candidate)card.Tag;
                         var name = Descendants<System.Windows.Controls.TextBlock>(card)
                             .Single(label => label.Text == candidate.Item.Name);
-                        var match = Descendants<System.Windows.Controls.TextBlock>(card)
-                            .Single(label => label.Text == "匹配度 96%");
                         var play = Descendants<System.Windows.Controls.Button>(card)
                             .Single(button => button.Tag is Candidate);
                         var image = Descendants<System.Windows.Controls.Image>(card).Single();
@@ -706,7 +697,6 @@ internal static class Program
                             .TransformBounds(new System.Windows.Rect(play.RenderSize));
                         Check(name.TextTrimming == System.Windows.TextTrimming.None &&
                             name.DesiredSize.Height <= name.ActualHeight + 1 &&
-                            match.DesiredSize.Height <= match.ActualHeight + 1 &&
                             image.Parent is System.Windows.Controls.Grid { ActualWidth: >= 80, ActualHeight: >= 80 } && play.ActualWidth > 60 &&
                             playBounds.Right <= card.ActualWidth + 1 && playBounds.Bottom <= card.ActualHeight + 1 &&
                             (candidate.Item.Cells is not (2 or 3) || play.ActualWidth <= 158),
@@ -735,10 +725,9 @@ internal static class Program
                     panel.ShowResult(result); Layout(panel, 900, 712);
                     CheckCandidateCoverage(panel, result);
                     var text = Descendants<System.Windows.Controls.TextBlock>(panel).ToArray();
-                    Check(!panel.NeedsScroll && text.Count(label =>
-                            label.Text.StartsWith("大红概率 ", StringComparison.Ordinal)) == 4 &&
+                    Check(!panel.NeedsScroll && ShareLabels(panel).Length == 4 &&
                         result.Candidates.All(candidate => text.Any(label => label.Text == candidate.Item.Name)) &&
-                        text.Count(label => label.Text == "匹配度 90%") == result.CandidateCount,
+                        text.Count(label => label.Text == "匹配度 90%") == 1,
                         "live overlay lost the operation view's readable names, scores or grouping");
                 }
                 Check(!Descendants<System.Windows.Controls.Button>(live).Any(button => button.Tag is Candidate) &&
@@ -756,7 +745,7 @@ internal static class Program
                 panel.SetNearCandidates([gold, nearby, nearby]); Layout(panel, 780, 460);
                 Check(panel.RenderedIds.Count == 3 && panel.RenderedIds.Distinct().Count() == 3, "references duplicated or replaced real candidates");
                 Check(panel.Summary.Contains("2 件候选") &&
-                    Descendants<System.Windows.Controls.TextBlock>(panel).Count(label => label.Text == "大红概率 50%") == 1,
+                    ShareLabels(panel).Count(label => ShareText(label) == "大红概率 50%") == 1,
                     "near or duplicate items changed the size group's red-item denominator");
                 panel.SetNearCandidates([]); Layout(panel, 780, 460);
                 Check(panel.RenderedIds.Count == 2 && !panel.RenderedIds.Contains("nearby"), "collapsing references removed candidates or left reference cards");
@@ -770,6 +759,129 @@ internal static class Program
                 var changed = CatalogResult(library, 2); panel.ShowResult(changed); Layout(panel, 470, 680); CheckCandidateCoverage(panel, changed);
                 panel.ShowResult(new(0, RecognitionStatus.Unknown, true, [], 0, "test")); Layout(panel, 470, 680);
                 Check(panel.RenderedIds.Count == 0 && panel.VisibleIds.Count == 0, "empty result left stale candidates");
+            }),
+            ("同一音效的候选只在汇总行显示一次匹配度，低分候选单独标出", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                var items = library.Items.Where(item => item.Cells == 4).Take(3).ToArray();
+                var result = new RecognitionResult(1, RecognitionStatus.Matched, true,
+                    [new(items[0], .96, "a"), new(items[1], .96, "a"), new(items[2], .88, "b")], 1, "test");
+                var panel = new CandidatePanel(root, new Settings { ShowNames = true }, interactive: true, compact: true);
+                panel.SetAudioPreview(_ => { }, _ => true); panel.ShowResult(result); Layout(panel, 900, 620);
+                System.Windows.Controls.TextBlock? Score(ItemDefinition item) => Descendants<System.Windows.Controls.TextBlock>(
+                        Descendants<System.Windows.Controls.Border>(panel).Single(card => (card.Tag as Candidate)?.Item.Id == item.Id))
+                    .SingleOrDefault(label => label.Text.Contains("匹配", StringComparison.Ordinal));
+                Check(Descendants<System.Windows.Controls.TextBlock>(panel).Count(label => label.Text == "匹配度 96%") == 1 &&
+                    Score(items[0]) is null && Score(items[1]) is null &&
+                    Score(items[2]) is { Text: "匹配度 88%" } lower && ReferenceEquals(lower.Foreground, Theme.Muted),
+                    "a shared score was repeated on its cards or a lower score was hidden");
+            }),
+            ("大红概率是分组内最大的数字，并按比例着色", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                foreach (var font in new[] { .9, 1.0, 1.15 })
+                {
+                    var panel = new CandidatePanel(root, new Settings { FontScale = font, ShowNames = true }, interactive: true, compact: true);
+                    System.Windows.Documents.TextElement.SetFontFamily(panel, new System.Windows.Media.FontFamily("Microsoft YaHei UI"));
+                    panel.SetAudioPreview(_ => { }, _ => true);
+                    panel.ShowResult(new(1, RecognitionStatus.Matched, true, PreviewScenarios.Thirteen(library), 1, "test"));
+                    Layout(panel, 900, 720 - 24 - 48 * font);
+                    var shares = ShareLabels(panel).ToDictionary(ShareText, label => (System.Windows.Documents.Run)label.Inlines.FirstInline);
+                    var largestName = Descendants<System.Windows.Controls.Border>(panel).Where(card => card.Tag is Candidate)
+                        .SelectMany(card => Descendants<System.Windows.Controls.TextBlock>(card)).Max(label => label.FontSize);
+                    // An unconstrained copy of the text must fit where the label was arranged.
+                    bool Fits(System.Windows.Controls.TextBlock label)
+                    {
+                        var copy = new System.Windows.Controls.TextBlock { FontFamily = label.FontFamily };
+                        foreach (var run in label.Inlines.OfType<System.Windows.Documents.Run>())
+                            copy.Inlines.Add(new System.Windows.Documents.Run(run.Text) { FontSize = run.FontSize, FontWeight = run.FontWeight });
+                        copy.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+                        return copy.DesiredSize.Width <= label.ActualWidth + .5 && copy.DesiredSize.Height <= label.ActualHeight + 1;
+                    }
+                    Check(shares.Count == 4 &&
+                        ReferenceEquals(shares["大红概率 0%"].Foreground, Theme.Faint) &&
+                        ReferenceEquals(shares["大红概率 20%"].Foreground, Theme.Collectible) &&
+                        ReferenceEquals(shares["大红概率 50%"].Foreground, Theme.Hot) &&
+                        ReferenceEquals(shares["大红概率 100%"].Foreground, Theme.Hot) &&
+                        shares.Values.All(run => run.FontSize > largestName) && ShareLabels(panel).All(Fits),
+                        "red-item shares are not the most prominent, clip, or ignore their value at font " + font);
+                }
+            }),
+            ("两件一行时试听按钮在名称下方，名称保持一行", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                var candidates = new[] { "热成像模块", "金豹雕像", "古董茶壶", "激光指示模块", "金狮雕像", "花瓶" }
+                    .Select(name => new Candidate(library.Items.Single(item => item.Name == name), .9, "g")).ToArray();
+                foreach (var font in new[] { .9, 1.0, 1.15 })
+                {
+                    var panel = new CandidatePanel(root, new Settings { FontScale = font, ShowNames = true }, interactive: true, compact: true);
+                    System.Windows.Documents.TextElement.SetFontFamily(panel, new System.Windows.Media.FontFamily("Microsoft YaHei UI"));
+                    panel.SetAudioPreview(_ => { }, _ => true);
+                    panel.ShowResult(new(1, RecognitionStatus.Matched, true, candidates, 1, "test"));
+                    Layout(panel, panel.GetPreferredWidth(1600, 720), 720 - 24 - 48 * font);
+                    foreach (var card in Descendants<System.Windows.Controls.Border>(panel).Where(card => card.Tag is Candidate))
+                    {
+                        var item = ((Candidate)card.Tag).Item;
+                        var name = Descendants<System.Windows.Controls.TextBlock>(card).Single(label => label.Text == item.Name);
+                        var play = Descendants<System.Windows.Controls.Button>(card).Single(button => button.Tag is Candidate);
+                        var line = new System.Windows.Controls.TextBlock { Text = name.Text, FontSize = name.FontSize,
+                            FontWeight = name.FontWeight, FontFamily = name.FontFamily };
+                        line.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+                        var nameBounds = name.TransformToAncestor(card).TransformBounds(new System.Windows.Rect(name.RenderSize));
+                        var playBounds = play.TransformToAncestor(card).TransformBounds(new System.Windows.Rect(play.RenderSize));
+                        Check(name.ActualHeight <= line.DesiredSize.Height + 1 && playBounds.Top >= nameBounds.Bottom &&
+                            playBounds.Width <= 120 * font && playBounds.Bottom <= card.ActualHeight + 1,
+                            $"paired card wraps its name or misplaces its button at font {font}: {item.Name}");
+                    }
+                }
+            }),
+            ("实时结果显示识别时间，超过 10 秒后候选变暗", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                var panel = new CandidatePanel(root, new Settings { ShowNames = true }, interactive: true, compact: true);
+                panel.ShowResult(new(1, RecognitionStatus.Matched, true, PreviewScenarios.Thirteen(library), 1, "test"), listening: true);
+                panel.SetFreshness(DateTimeOffset.Now); Layout(panel, 900, 700);
+                var cards = Descendants<CandidateLayout>(panel).Single();
+                bool Shows(string text) => Descendants<System.Windows.Controls.TextBlock>(panel)
+                    .Any(label => label.Text == text && label.Visibility == System.Windows.Visibility.Visible);
+                Check(Shows("刚刚") && cards.Opacity == 1, "a fresh result is not marked as just heard");
+                panel.SetFreshness(DateTimeOffset.Now.AddSeconds(-25)); Layout(panel, 900, 700);
+                Check(Shows("25 秒前") && cards.Opacity < 1, "an old result did not fade");
+                panel.SetFreshness(null); Layout(panel, 900, 700);
+                Check(!Shows("25 秒前") && !Shows("刚刚") && cards.Opacity == 1, "a reviewed recording kept the live age");
+            }),
+            ("历史列表标出疑似放下声，并按格数汇总大红", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                var fourGold = library.Items.First(item => item.Cells == 4 && item.IsGold);
+                var fourPlain = library.Items.First(item => item.Cells == 4 && !item.IsGold);
+                var sixGold = library.Items.First(item => item.Cells == 6 && item.IsGold);
+                var pickup = new RecognitionResult(1, RecognitionStatus.Matched, true,
+                    [new(fourGold, .96, "a"), new(fourPlain, .96, "a"), new(sixGold, .96, "a")], 1, "pickup");
+                var twin = new RecognitionResult(2, RecognitionStatus.Matched, true, [new(fourPlain, .9, "b")], 1, "putdown");
+                Check(HistoryWindow.SizeSummary(pickup) == "4 格 大红 1/2 · 6 格 大红 1/1", "size summary changed: " + HistoryWindow.SizeSummary(pickup));
+                var history = new RecognitionHistory();
+                history.Remember(pickup, "声音自动识别", true, DateTimeOffset.Now, audioSeconds: 10);
+                history.Remember(twin, "声音自动识别", true, DateTimeOffset.Now.AddSeconds(.4), audioSeconds: 10.4);
+                var window = new HistoryWindow(history, root, new Settings());
+                try
+                {
+                    var content = (System.Windows.FrameworkElement)window.Content;
+                    content.Measure(new System.Windows.Size(1060, 700)); content.Arrange(new System.Windows.Rect(0, 0, 1060, 700)); content.UpdateLayout();
+                    var rows = Descendants<System.Windows.Controls.ListBox>(content).Single().Items.Cast<System.Windows.Controls.ListBoxItem>().ToArray();
+                    bool Marked(System.Windows.Controls.ListBoxItem row) => Descendants<System.Windows.Controls.TextBlock>((System.Windows.DependencyObject)row.Content)
+                        .Any(label => label.Text == "疑似放下声");
+                    Check(history.Entries[0].FollowUp && rows.Length == 2 && Marked(rows[0]) && rows[0].Opacity < 1 && !Marked(rows[1]),
+                        "the putdown twin is not marked in the history list");
+                    Check(Descendants<System.Windows.Controls.TextBlock>(content).Any(label => label.Text.StartsWith("疑似放下声：", StringComparison.Ordinal)),
+                        "the selected follow-up lacks its explanation");
+                }
+                finally { window.Close(); }
             }),
             ("历史记录以单一列表展示最近100条，更新保留选中项", () =>
             {
@@ -811,6 +923,12 @@ internal static class Program
             .Select(border => ((Candidate)border.Tag).Item.Id).ToArray();
         Check(cards.Length == expected.Count && expected.SetEquals(cards), "actual card tree does not contain the complete result");
     }
+    // Each size group's red-item share, found by its accessible name ("大红概率 50%").
+    private static System.Windows.Controls.TextBlock[] ShareLabels(System.Windows.DependencyObject root) =>
+        Descendants<System.Windows.Controls.TextBlock>(root).Where(label =>
+            System.Windows.Automation.AutomationProperties.GetName(label).StartsWith("大红概率 ", StringComparison.Ordinal)).ToArray();
+    private static string ShareText(System.Windows.Controls.TextBlock label) =>
+        System.Windows.Automation.AutomationProperties.GetName(label);
     private static (CandidatePanel Panel, SoundLibrary Library) CreatePanel(double thumbnail = 88)
     {
         var root = Path.Combine(AppContext.BaseDirectory, "library");

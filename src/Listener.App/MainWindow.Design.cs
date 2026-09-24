@@ -8,6 +8,7 @@ internal sealed partial class MainWindow
     private readonly TextBlock pageHeading = Theme.Label("监听控制", 26);
     private readonly TextBlock pageDescription = Theme.Label("听见线索，看清所有可能。", 12, Theme.Muted);
     private readonly TextBlock dashboardLibraryInfo = Theme.Label("", 19);
+    private readonly TextBlock dashboardEngineInfo = Theme.Label("", 11, Theme.Muted);
     private readonly TextBlock gameInfo = Theme.Label("切回游戏后开始采音", 11, Theme.Muted);
     private readonly TextBlock shortcutHint = Theme.Label("", 12, Theme.Muted);
     private Button? toggleListening;
@@ -16,7 +17,7 @@ internal sealed partial class MainWindow
     {
         WindowStyle = WindowStyle.None;
         WindowChrome.SetWindowChrome(this, new WindowChrome
-        { CaptionHeight = 43, ResizeBorderThickness = new Thickness(6), CornerRadius = new CornerRadius(1), GlassFrameThickness = new Thickness(0), UseAeroCaptionButtons = false });
+        { CaptionHeight = 43, ResizeBorderThickness = new Thickness(6), CornerRadius = new CornerRadius(0), GlassFrameThickness = new Thickness(0), UseAeroCaptionButtons = false });
         var shell = new DockPanel();
         var frame = new Border { Background = Theme.Background, BorderBrush = Theme.Line, BorderThickness = new Thickness(1), Child = shell };
         var caption = new DockPanel { Height = 43, Background = Theme.Panel };
@@ -110,7 +111,7 @@ internal sealed partial class MainWindow
         facts.ColumnDefinitions.Add(new ColumnDefinition()); facts.ColumnDefinitions.Add(new ColumnDefinition());
         var game = new StackPanel(); game.Children.Add(Theme.Label("游戏进程", 10, Theme.Muted)); game.Children.Add(Theme.Label("UAGame", 19)); game.Children.Add(gameInfo);
         var gameCard = Theme.Box(game, 14); gameCard.Margin = new Thickness(0, 0, 6, 0); facts.Children.Add(gameCard);
-        var catalog = new StackPanel(); catalog.Children.Add(Theme.Label("音效库", 10, Theme.Muted)); catalog.Children.Add(dashboardLibraryInfo); catalog.Children.Add(Theme.Label("本地参考 · 同音关系待实机验证", 11, Theme.Muted));
+        var catalog = new StackPanel(); catalog.Children.Add(Theme.Label("音效库", 10, Theme.Muted)); catalog.Children.Add(dashboardLibraryInfo); catalog.Children.Add(dashboardEngineInfo);
         var libraryCard = Theme.Box(catalog, 14); libraryCard.Margin = new Thickness(6, 0, 0, 0); Grid.SetColumn(libraryCard, 1); facts.Children.Add(libraryCard); page.Children.Add(facts);
         page.Children.Add(Theme.Label("常用操作", 13));
         var actions = new Grid { Margin = new Thickness(0, 0, 0, 12) };

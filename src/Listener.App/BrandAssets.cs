@@ -26,18 +26,18 @@ internal static class BrandAssets
     {
         Renderer = new Forms.ToolStripProfessionalRenderer(new TrayColors()),
         Font = new Drawing.Font("Microsoft YaHei UI", 9f),
-        ForeColor = Drawing.Color.FromArgb(228, 232, 229), BackColor = Drawing.Color.FromArgb(26, 30, 32),
+        ForeColor = Drawing.Color.FromArgb(230, 236, 231), BackColor = Drawing.Color.FromArgb(29, 29, 29),
         ShowImageMargin = false, Padding = new Forms.Padding(4),
     };
     private sealed class TrayColors : Forms.ProfessionalColorTable
     {
         public TrayColors() { UseSystemColors = false; }
-        public override Drawing.Color ToolStripDropDownBackground => Drawing.Color.FromArgb(26, 30, 32);
-        public override Drawing.Color MenuBorder => Drawing.Color.FromArgb(59, 66, 69);
-        public override Drawing.Color MenuItemSelected => Drawing.Color.FromArgb(47, 56, 56);
-        public override Drawing.Color MenuItemBorder => Drawing.Color.FromArgb(110, 129, 120);
-        public override Drawing.Color SeparatorDark => Drawing.Color.FromArgb(59, 66, 69);
-        public override Drawing.Color SeparatorLight => Drawing.Color.FromArgb(26, 30, 32);
+        public override Drawing.Color ToolStripDropDownBackground => Drawing.Color.FromArgb(29, 29, 29);
+        public override Drawing.Color MenuBorder => Drawing.Color.FromArgb(53, 62, 62);
+        public override Drawing.Color MenuItemSelected => Drawing.Color.FromArgb(42, 48, 48);
+        public override Drawing.Color MenuItemBorder => Drawing.Color.FromArgb(127, 151, 149);
+        public override Drawing.Color SeparatorDark => Drawing.Color.FromArgb(53, 62, 62);
+        public override Drawing.Color SeparatorLight => Drawing.Color.FromArgb(29, 29, 29);
     }
     public static void StyleWindow(Window window)
     {
@@ -47,8 +47,8 @@ internal static class BrandAssets
         {
             var handle = new WindowInteropHelper(window).Handle;
             var dark = 1; DwmSetWindowAttribute(handle, 20, ref dark, sizeof(int));
-            var background = 0x00141210; DwmSetWindowAttribute(handle, 35, ref background, sizeof(int));
-            var text = 0x00E5E8E4; DwmSetWindowAttribute(handle, 36, ref text, sizeof(int));
+            var background = 0x00121211; DwmSetWindowAttribute(handle, 35, ref background, sizeof(int));
+            var text = 0x00E7ECE6; DwmSetWindowAttribute(handle, 36, ref text, sizeof(int));
         };
     }
     [DllImport("dwmapi.dll")]

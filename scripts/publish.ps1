@@ -1,4 +1,4 @@
-param([string]$Output = '')
+﻿param([string]$Output = '')
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 Set-Location $root

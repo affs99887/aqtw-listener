@@ -21,7 +21,10 @@ internal sealed class OverlayWorkspace : Border, IDisposable
     private readonly TextBlock notice = Theme.Label("", 11, Theme.Accent);
     private readonly List<Button> navigation = [];
     private readonly FitContent fittedPage;
+    private readonly System.Windows.Threading.DispatcherTimer freshness;
     private CandidatePanel? soundPanel;
+    private Button? stopButton;
+    private long? shownEntry;
     private AnalysisSnapshot? selected;
     private RecognitionResult? liveResult;
     private LearningDraft? draft;
@@ -52,7 +55,11 @@ internal sealed class OverlayWorkspace : Border, IDisposable
         notice.Margin = new Thickness(7, 0, 2, 0); nav.Children.Add(notice);
         DockPanel.SetDock(nav, Dock.Top); body.Children.Add(nav);
         fittedPage = new FitContent { ContentView = page }; body.Children.Add(fittedPage);
+        freshness = new(TimeSpan.FromSeconds(1), System.Windows.Threading.DispatcherPriority.Background,
+            (_, _) => soundPanel?.RefreshFreshness(), Dispatcher);
+        freshness.Stop();
         player.Status += Message;
+        player.Status += _ => UpdatePlaybackControls();
         learning.Progress += text => { Message(text); SetPage(TextPage(draft?.Item.Name ?? "学习采样", text, "Ctrl+Alt+C 暂停并操作浮窗")); };
         ShowSound();
     }
@@ -81,13 +88,23 @@ internal sealed class OverlayWorkspace : Border, IDisposable
     private void Message(string text)
     {
         notice.Text = text; notice.ToolTip = text;
-        overlay.SetHeaderStatus(player.IsPlaying ? "试听中 · 采音已暂停" :
-            controller.Mode == AssistantMode.Listening ? "监听中 · 等待声音" : "采音已暂停 · 可试听");
+        var listening = controller.Mode == AssistantMode.Listening;
+        overlay.SetHeaderStatus(player.IsPlaying ? "试听中 · 采音已暂停" : listening ? "监听中 · 等待声音" : "采音已暂停 · 可试听",
+            player.IsPlaying || !listening ? StatusTone.Paused : controller.Enabled ? StatusTone.Listening : StatusTone.Off);
+    }
+    private void UpdatePlaybackControls()
+    {
+        if (stopButton is not null) stopButton.IsEnabled = player.IsPlaying;
+    }
+    private async void PauseForOperation()
+    {
+        try { await enterInteraction(); }
+        catch (Exception ex) { Message(ex.Message); }
     }
     private double FontScale => double.IsFinite(settings.FontScale) ? Math.Clamp(settings.FontScale, .9, 1.15) : 1;
     private void SetPage(UIElement view, bool sound = false)
     {
-        if (!sound) soundPanel = null;
+        if (!sound) { soundPanel = null; freshness.Stop(); }
         nav.Visibility = sound ? Visibility.Collapsed : Visibility.Visible;
         Padding = sound ? new Thickness(0) : new Thickness(8);
         fittedPage.AdaptiveContent = sound; page.Content = view;
@@ -164,8 +181,12 @@ internal sealed class OverlayWorkspace : Border, IDisposable
     public void UpdateListeningActivity(RecognitionActivity activity)
     {
         soundPanel?.SetActivity(activity);
+        // An unmatched footstep or UI click is routine while listening; only a
+        // broken analysis earns the alert colour.
         if (controller.Mode == AssistantMode.Listening && !player.IsPlaying)
-            overlay.SetHeaderStatus(activity.Message);
+            overlay.SetHeaderStatus(activity.Message, activity.Busy ? StatusTone.Busy
+                : activity.Status is RecognitionStatus.Error or RecognitionStatus.Interference or RecognitionStatus.LibraryEmpty ? StatusTone.Failed
+                : controller.Enabled ? StatusTone.Listening : StatusTone.Off);
     }
     public void OpenLearning() => ShowLearning();
     public void PauseLearning() { learning.Pause(); player.Stop(); }
@@ -215,11 +236,11 @@ internal sealed class OverlayWorkspace : Border, IDisposable
         {
             var samples = references.GetValueOrDefault(candidate.GroupId) ?? [];
             if (samples.Length <= 1) return null;
-            var menu = new ContextMenu { Background = Theme.Panel, Foreground = Theme.Text, BorderBrush = Theme.Line };
+            var menu = new ContextMenu();
             foreach (var number in Enumerable.Range(0, samples.Length))
             {
                 var option = new MenuItem { Header = $"参考 {number + 1} · {candidate.Item.Name}", IsCheckable = true,
-                    IsChecked = number == chosenVersions.GetValueOrDefault(candidate.GroupId), Background = Theme.Panel, Foreground = Theme.Text };
+                    IsChecked = number == chosenVersions.GetValueOrDefault(candidate.GroupId) };
                 option.Click += (_, _) => PreviewReference(candidate, number); menu.Items.Add(option);
             }
             menu.Opened += (_, _) =>
@@ -230,60 +251,59 @@ internal sealed class OverlayWorkspace : Border, IDisposable
             };
             return menu;
         });
-        var replay = Button("▶ 回放当前声音", () => PlayFromButton(selected!.Audio!));
-        var save = Button("保存 WAV", SaveClip);
+        var listening = controller.Mode == AssistantMode.Listening;
+        var replay = Button("▶ 回放", () => PlayFromButton(selected!.Audio!));
+        var stop = Button("■ 停止", () =>
+        {
+            player.Stop(); UpdatePlaybackControls();
+            Message(controller.Mode == AssistantMode.Listening ? "播放已停止 · 继续听音" : "播放已停止 · 采音仍暂停");
+        });
+        var save = Button("保存", SaveClip);
         replay.IsEnabled = save.IsEnabled = selected?.Audio is { Samples.Length: > 0 };
         replay.ToolTip = replay.IsEnabled ? "回放本次采集的声音；试听期间暂停采音" : "尚无可回放的录音，或该片段已过期";
         save.ToolTip = save.IsEnabled ? "将当前录音保存为 WAV 文件" : "没有可保存的录音";
-        ToolTipService.SetShowOnDisabled(replay, true); ToolTipService.SetShowOnDisabled(save, true);
+        stop.ToolTip = "停止回放或试听";
         replay.BorderBrush = Theme.Accent;
-        var stop = Button("■ 停止", () => { player.Stop(); Message(controller.Mode == AssistantMode.Listening
-            ? "播放已停止 · 继续听音" : "播放已停止 · 采音仍暂停"); });
-        var back = Button("返回监听", () => { player.Stop(); overlay.ReturnToListening(); });
-        back.IsEnabled = controller.Mode != AssistantMode.Listening;
-        if (!back.IsEnabled) back.Content = "监听中";
-        back.ToolTip = back.IsEnabled ? "停止试听并继续采音" : "当前正在持续监听";
-        var actions = new[] { (Button: replay, Weight: 290d), (Button: stop, Weight: 235d),
-            (Button: save, Weight: 235d), (Button: back, Weight: 270d) };
-        var toolbar = new Grid { Margin = new Thickness(10, 3, 4, 3), HorizontalAlignment = HorizontalAlignment.Stretch };
-        panel.SizeChanged += (_, _) => toolbar.Width = Math.Max(1, panel.ActualWidth - 14);
-        for (var index = 0; index < actions.Length; index++)
-        {
-            var (button, weight) = actions[index];
-            toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(weight, GridUnitType.Star) });
-            button.Height = 34; button.Padding = new Thickness(0);
-            button.Margin = new Thickness(0, 0, 6, 0); button.FontSize = 11 * FontScale;
-            Grid.SetColumn(button, index); toolbar.Children.Add(button);
-        }
-        panel.SetToolbar(toolbar);
-        panel.ShowResult(controller.Mode == AssistantMode.Listening ? liveResult : selected?.Analysis.Result,
-            listening: controller.Mode == AssistantMode.Listening && controller.Enabled);
-        panel.SetActivity(controller.CurrentActivity);
-
-        var body = new DockPanel();
-        var options = new DockPanel { Height = panel.CandidateCount > 20 ? 26 : 40,
-            Background = Theme.Panel, LastChildFill = true };
+        stopButton = stop; UpdatePlaybackControls();
         Button? clips = null;
-        clips = Button(selected is null ? "暂无录音" : $"{selected.At:HH:mm:ss} 的录音 ▾", () =>
+        clips = Button(selected is null ? "暂无录音" : $"{selected.At:HH:mm:ss} ▾", () =>
         {
-            var menu = new ContextMenu { Background = Theme.Panel, Foreground = Theme.Text, BorderBrush = Theme.Line };
+            var menu = new ContextMenu();
             foreach (var snapshot in snapshots)
             {
-                var option = new MenuItem { Header = snapshot.ToString(), IsCheckable = true, IsChecked = snapshot.Id == selected?.Id,
-                    Background = Theme.Panel, Foreground = Theme.Text };
+                var option = new MenuItem { Header = snapshot.ToString(), IsCheckable = true, IsChecked = snapshot.Id == selected?.Id };
                 option.Click += (_, _) => Select(snapshot); menu.Items.Add(option);
             }
             clips!.ContextMenu = menu; menu.PlacementTarget = clips; menu.IsOpen = true;
         });
-        clips.FontSize = 10 * FontScale; clips.Margin = new Thickness(4, 0, 8, 0);
-        clips.Background = Brushes.Transparent; clips.BorderThickness = new Thickness(0);
         clips.ToolTip = "选择本次会话中的声音片段"; clips.IsEnabled = snapshots.Length > 0;
-        DockPanel.SetDock(clips, Dock.Right); options.Children.Add(clips);
-        var nearNote = Theme.Label("大红概率按同格候选计算，非真实出货概率；匹配度仅针对音效。", 10 * FontScale, Theme.Muted);
-        nearNote.Margin = new Thickness(12, 0, 0, 0); nearNote.VerticalAlignment = VerticalAlignment.Center;
-        nearNote.TextWrapping = TextWrapping.NoWrap; nearNote.TextTrimming = TextTrimming.CharacterEllipsis; options.Children.Add(nearNote);
-        DockPanel.SetDock(options, Dock.Bottom); body.Children.Add(options); body.Children.Add(panel);
-        soundPanel = panel; SetPage(body, sound: true); panel.LayoutChanged += () => LayoutChanged?.Invoke();
+        // One button pauses and resumes, so the layout is the same in both modes.
+        var mode = Button(listening ? "暂停监听" : "返回监听", () =>
+        {
+            if (controller.Mode == AssistantMode.Listening) PauseForOperation();
+            else { player.Stop(); overlay.ReturnToListening(); }
+        });
+        mode.ToolTip = listening ? $"暂停采音，回放、试听或补库（{settings.InteractionHotkey}）" : "停止试听并继续采音";
+        var toolbar = new StackPanel { Orientation = Orientation.Horizontal };
+        foreach (var button in new[] { replay, stop, save, clips, mode })
+        {
+            button.Height = 28 * FontScale; button.Padding = new Thickness(9, 0, 9, 0); button.Margin = new Thickness(0, 0, 4, 0);
+            button.MinWidth = 44 * FontScale; button.FontSize = 11 * FontScale;
+            ToolTipService.SetShowOnDisabled(button, true); toolbar.Children.Add(button);
+        }
+        panel.SetToolbar(toolbar);
+        panel.ShowResult(listening ? liveResult : selected?.Analysis.Result, listening: listening && controller.Enabled);
+        panel.SetActivity(controller.CurrentActivity);
+        if (listening)
+        {
+            var entry = controller.History.Latest;
+            panel.SetFreshness(entry?.LastSeen);
+            if (entry is not null && entry.Id != shownEntry && DateTimeOffset.Now - entry.LastSeen < TimeSpan.FromSeconds(3)) panel.Flash();
+            shownEntry = entry?.Id;
+            if (entry is null) freshness.Stop(); else freshness.Start();
+        }
+        else freshness.Stop();
+        soundPanel = panel; SetPage(panel, sound: true); panel.LayoutChanged += () => LayoutChanged?.Invoke();
         Message(controller.Mode == AssistantMode.Listening
             ? selected is null ? controller.Enabled ? "监听中 · 等待声音" : "监听已关闭"
                 : $"监听中 · {selected.At:HH:mm:ss} · 结果已保留，继续听音"
@@ -499,7 +519,7 @@ internal sealed class OverlayWorkspace : Border, IDisposable
         var built = await store.Build(profile, token); token.ThrowIfCancellationRequested();
         if (built.Version is not null) { await activate(built.Version, false, token); ShowPersonal(); } Message(built.Message);
     }
-    public void Dispose() { disposed = true; Stop(); player.Dispose(); operation?.Dispose(); }
+    public void Dispose() { disposed = true; freshness.Stop(); Stop(); player.Dispose(); operation?.Dispose(); }
     private sealed record SampleChoice(PersonalSample Sample, string Label) { public override string ToString() => Label; }
     private sealed record ItemChoice(PersonalItem Item, string Label) { public override string ToString() => Label; }
 }

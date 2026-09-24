@@ -20,6 +20,8 @@ internal sealed class OverlayWindow : Window
     private readonly List<(Button Button, double Scale)> fontButtons = [];
     private readonly TextBlock title = Theme.Label("行商听音助手", 13);
     private readonly TextBlock headerStatus = Theme.Label("监听中 · 等待声音", 10, Theme.Muted);
+    private readonly System.Windows.Shapes.Ellipse statusDot = new() { Width = 8, Height = 8, Fill = Theme.Faint,
+        Margin = new Thickness(0, 0, 8, 0), VerticalAlignment = VerticalAlignment.Center };
     private UIElement? workspace;
     private readonly ContentControl tiny = new();
     private readonly TextBlock tinySummary = Theme.Label("", 10);
@@ -71,12 +73,13 @@ internal sealed class OverlayWindow : Window
             Margin = new Thickness(10, 0, 7, 0) };
         var divider = new Border { Width = 1, Height = 18, Background = Theme.Line,
             Margin = new Thickness(12, 0, 14, 0), VerticalAlignment = VerticalAlignment.Center };
-        var dot = new System.Windows.Shapes.Ellipse { Width = 7, Height = 7, Fill = Theme.Accent,
-            Margin = new Thickness(0, 0, 8, 0), VerticalAlignment = VerticalAlignment.Center };
-        headerStatus.Margin = new Thickness(0); headerStatus.VerticalAlignment = VerticalAlignment.Center;
+        headerStatus.Margin = new Thickness(0, 0, 10, 0); headerStatus.VerticalAlignment = VerticalAlignment.Center;
         headerStatus.TextWrapping = TextWrapping.NoWrap; headerStatus.TextTrimming = TextTrimming.CharacterEllipsis;
-        var heading = new StackPanel { Orientation = Orientation.Horizontal,
-            Children = { mark, title, divider, dot, headerStatus } };
+        // A dock, not a stack: the status must receive a finite width to trim.
+        var heading = new DockPanel { LastChildFill = true };
+        foreach (var part in new FrameworkElement[] { mark, title, divider, statusDot })
+        { DockPanel.SetDock(part, Dock.Left); heading.Children.Add(part); }
+        heading.Children.Add(headerStatus);
         var handle = new Border { Background = Brushes.Transparent, Child = heading };
         handle.ToolTip = "图钉变暗后可拖动标题；右键恢复顶部居中";
         var menu = new ContextMenu(); var center = new MenuItem { Header = "恢复顶部居中" };
@@ -129,7 +132,12 @@ internal sealed class OverlayWindow : Window
         }
     }
     public void ReturnToListening() => ExitRequested?.Invoke();
-    public void SetHeaderStatus(string text) => headerStatus.Text = text;
+    public void SetHeaderStatus(string text, StatusTone tone)
+    {
+        headerStatus.Text = text; headerStatus.ToolTip = text;
+        HeaderTone = tone; statusDot.Fill = Theme.Tone(tone);
+    }
+    internal StatusTone HeaderTone { get; private set; }
     public void SetWorkspace(UIElement view)
     { workspace = view; workspaceActive = true; content.Content = view; chrome.Visibility = Visibility.Visible; RefreshPlacement(); }
     public void SetListeningView()

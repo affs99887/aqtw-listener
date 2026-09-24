@@ -3,21 +3,32 @@ using System.Windows.Media.Imaging;
 
 namespace Listener.App;
 
+internal enum StatusTone { Off, Listening, Busy, Paused, Failed }
+
 internal static class Theme
 {
-    public static readonly Brush Background = Brush("#101116"), Panel = Brush("#1A1B21"), Muted = Brush("#A3A8B1"),
-        Text = Brush("#E9EAF0"), Accent = Brush("#C2CDD8"), Gold = Brush("#E7C780"), Line = Brush("#3B3D46"),
-        Raised = Brush("#252831"), Selected = Brush("#30343D"), Collectible = Brush("#D17C79");
+    // Keep in step with Theme.xaml and the game's own menus: neutral near-black
+    // panels, very dark buttons with a thin teal-grey outline, off-white text.
+    public static readonly Brush Background = Brush("#111212"), Panel = Brush("#1B1C1C"), Muted = Brush("#9AA3A1"),
+        Text = Brush("#E6ECE7"), Accent = Brush("#C9D6D3"), Gold = Brush("#E7C780"), Line = Brush("#353E3E"),
+        Raised = Brush("#222525"), Selected = Brush("#2C3434"), Collectible = Brush("#D17C79"),
+        Live = Brush("#5CC98A"), Busy = Brush("#7FB4E8"), Alert = Brush("#E57373"), Faint = Brush("#7A8382"), Hot = Brush("#F0645B");
     public static SolidColorBrush Brush(string hex) { var b = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)); b.Freeze(); return b; }
+    // A size group without red items recedes; a mostly-red group is the brightest thing on the overlay.
+    public static Brush RedShare(double share) => share <= 0 ? Faint : share < .5 ? Collectible : Hot;
+    public static Brush Tone(StatusTone tone) => tone switch
+    {
+        StatusTone.Listening => Live, StatusTone.Busy => Busy, StatusTone.Paused => Gold, StatusTone.Failed => Alert, _ => Faint
+    };
     public static TextBlock Label(string text, double size = 13, Brush? color = null) => new()
     { Text = text, FontSize = size, Foreground = color ?? Text, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 7) };
     public static Border Box(UIElement child, double padding = 16) => new()
-    { Child = child, Padding = new Thickness(padding), Background = Panel, CornerRadius = new CornerRadius(1), BorderBrush = Line, BorderThickness = new Thickness(1) };
+    { Child = child, Padding = new Thickness(padding), Background = Panel, BorderBrush = Line, BorderThickness = new Thickness(1) };
     public static Button Button(string text, RoutedEventHandler click, bool primary = false)
     {
         var button = new Button { Content = text, Padding = new Thickness(14, 10, 14, 10), Margin = new Thickness(0, 4, 8, 4),
             Background = primary ? Accent : Raised, Foreground = primary ? Background : Text, BorderThickness = new Thickness(1), BorderBrush = primary ? Accent : Line,
-            FontWeight = FontWeights.SemiBold, Cursor = System.Windows.Input.Cursors.Hand };
+            FontWeight = primary ? FontWeights.SemiBold : FontWeights.Normal, Cursor = System.Windows.Input.Cursors.Hand };
         button.Click += click; return button;
     }
     public static TextBlock Glyph(string glyph, double size = 18) => new()
@@ -41,15 +52,18 @@ internal sealed class CandidatePanel : Border
     private readonly TextBlock note = Theme.Label("大红概率按同格候选计算，不代表真实出货概率。", 10, Theme.Muted);
     private readonly TextBlock interactionHint = Theme.Label("", 10, Theme.Muted);
     private readonly TextBlock designCount = Theme.Label("0 件候选", 31);
+    private readonly TextBlock age = Theme.Label("", 12, Theme.Live);
     private readonly TextBlock title = Theme.Label("行商听音", 18);
     private readonly ContentControl toolbarHost = new();
-    private Grid? listeningSummary;
+    private Border? summaryBar;
+    private DateTimeOffset? resultAt;
+    private double topScore;
     private readonly CandidateLayout layout;
     private readonly Dictionary<string, BitmapImage> images = new();
     private readonly Dictionary<TextBlock, double> textSizes = new();
     private string libraryRoot;
     private readonly Settings settings;
-    private readonly bool compact, minimal, interactive, design;
+    private readonly bool compact, minimal, interactive, design, previewButtons;
     private RecognitionResult? lastResult;
     private IReadOnlyList<Candidate> primary = [], near = [];
     private HashSet<string> nearIds = [];
@@ -83,30 +97,35 @@ internal sealed class CandidatePanel : Border
         var exact = candidate.Tag == RecognitionTag.Exact && !nearIds.Contains(candidate.Item.Id);
         var text = Theme.Label(label, 9 * FontScale, exact ? Theme.Background : Theme.Text);
         text.Margin = new Thickness(0); text.FontWeight = FontWeights.Bold;
-        return new Border { Child = text, Background = exact ? Theme.Gold : Theme.Brush("#4B5967"),
+        return new Border { Child = text, Background = exact ? Theme.Gold : Theme.Brush("#3E4B4A"),
             HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top,
             Padding = new Thickness(4, 1, 4, 1), Margin = new Thickness(2), IsHitTestVisible = false };
     }
     private const string MatchHelp = "匹配度是录音与参考音效的相似分数；同一音效组的物品共享分数，不是单件物品的确定率。";
+    private const string Disclaimer = "大红概率按同格候选计算，不是游戏的真实出货概率。\n" + MatchHelp +
+        "\n与最高分相同的卡片不重复标出匹配度。";
+    // Live results fade after this long so an earlier pickup is not read as the current one.
+    public const double StaleSeconds = 10;
     private bool ShowNames => settings.ShowNames || interactive;
     private double OuterPadding => design ? 0 : compact ? 7 : 16;
 
-    public CandidatePanel(string libraryRoot, Settings settings, bool interactive = true, bool compact = false, bool minimal = false)
+    public CandidatePanel(string libraryRoot, Settings settings, bool interactive = true, bool compact = false, bool minimal = false, bool preview = true)
     {
         this.libraryRoot = libraryRoot; this.settings = settings; this.compact = compact; this.minimal = minimal; this.interactive = interactive;
+        previewButtons = interactive && preview;
         // The live, click-through overlay and the paused operation view share
         // one candidate layout. Only the latter exposes playback controls.
         design = compact && !minimal;
         layout = new(BuildGroups, () => PreferredThumbnail, () => design ? 80 : 56);
         layout.Changed += () => LayoutChanged?.Invoke();
         Background = Theme.Background; BorderBrush = Theme.Line; BorderThickness = design ? new Thickness(0) : new Thickness(1);
-        CornerRadius = new CornerRadius(1); Padding = new Thickness(OuterPadding);
+        Padding = new Thickness(OuterPadding);
         var body = new DockPanel(); Child = body;
         if (design)
         {
             BuildListeningChrome(body);
-            foreach (var (label, size) in new[] { (ratioLabel, 11d), (ratio, 40d), (count, 16d),
-                (headline, 11d), (designCount, 18d), (note, 10d), (activityLabel, 12d) }) textSizes[label] = size;
+            foreach (var (label, size) in new[] { (ratioLabel, 11d), (ratio, 40d), (count, 14d),
+                (headline, 11d), (designCount, 16d), (note, 10d), (activityLabel, 12d), (age, 12d) }) textSizes[label] = size;
             RefreshAppearance();
             return;
         }
@@ -173,43 +192,42 @@ internal sealed class CandidatePanel : Border
 
     private void BuildListeningChrome(DockPanel body)
     {
-        var summary = new Grid { Height = 42, Background = Theme.Background };
-        listeningSummary = summary;
-        summary.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(180) });
-        summary.ColumnDefinitions.Add(new ColumnDefinition());
-        summary.SizeChanged += (_, _) =>
+        // Every fixed band above the candidates covers the game, so the result
+        // summary and the actions share one row.
+        var row = new DockPanel { LastChildFill = true };
+        summaryBar = new Border { Child = row, Height = 40, Background = Theme.Panel, BorderBrush = Theme.Line,
+            BorderThickness = new Thickness(0, 0, 0, 1) };
+        toolbarHost.VerticalAlignment = VerticalAlignment.Center;
+        DockPanel.SetDock(toolbarHost, Dock.Right); row.Children.Add(toolbarHost);
+        var summary = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(14, 0, 8, 0), ClipToBounds = true };
+        foreach (var label in new[] { designCount, count, age })
         {
-            var width = summary.ActualWidth;
-            summary.ColumnDefinitions[0].Width = new GridLength(Math.Clamp(width * .25, 135, 210));
-        };
-        designCount.FontWeight = FontWeights.SemiBold;
-        designCount.Margin = new Thickness(18, 0, 0, 0);
-        designCount.VerticalAlignment = VerticalAlignment.Center;
-        summary.Children.Add(designCount);
-        var context = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(10, 0, 0, 0) };
-        count.FontWeight = FontWeights.SemiBold; count.Margin = new Thickness(0);
-        headline.Margin = new Thickness(0); context.Children.Add(count); context.Children.Add(headline);
-        Grid.SetColumn(context, 1); summary.Children.Add(context);
-        DockPanel.SetDock(summary, Dock.Top); body.Children.Add(summary);
-        DockPanel.SetDock(toolbarHost, Dock.Top); body.Children.Add(toolbarHost);
-        toolbarHost.Height = 52; toolbarHost.Background = Theme.Panel;
+            label.Margin = new Thickness(0, 0, 10, 0); label.VerticalAlignment = VerticalAlignment.Center;
+            label.TextWrapping = TextWrapping.NoWrap; summary.Children.Add(label);
+        }
+        designCount.FontWeight = FontWeights.SemiBold; count.FontWeight = FontWeights.SemiBold;
+        count.ToolTip = MatchHelp; age.ToolTip = $"识别到这件货物的时间；超过 {StaleSeconds:0} 秒后候选变暗，避免误当成当前货物";
+        var info = Theme.Glyph("\uE946", 13); info.Foreground = Theme.Muted; info.ToolTip = Disclaimer;
+        info.Margin = new Thickness(0, 1, 0, 0); ToolTipService.SetInitialShowDelay(info, 0);
+        AutomationProperties.SetName(info, Disclaimer); summary.Children.Add(info);
+        row.Children.Add(summary);
+        DockPanel.SetDock(summaryBar, Dock.Top); body.Children.Add(summaryBar);
         if (!interactive)
         {
             activityLabel.Margin = new Thickness(0);
             activityLabel.FontWeight = FontWeights.SemiBold;
             activityLabel.VerticalAlignment = VerticalAlignment.Center;
             var hint = Theme.Label($"{settings.InteractionHotkey} 打开回放和试听", 11 * FontScale, Theme.Muted);
-            hint.Margin = new Thickness(0);
+            hint.Margin = new Thickness(12, 0, 0, 0);
             hint.VerticalAlignment = VerticalAlignment.Center;
-            var row = new DockPanel { Margin = new Thickness(14, 0, 14, 0) };
-            DockPanel.SetDock(hint, Dock.Right);
-            row.Children.Add(hint);
+            var activity = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 14, 0) };
             progress.IsIndeterminate = true;
             progress.VerticalAlignment = VerticalAlignment.Center;
-            DockPanel.SetDock(progress, Dock.Right);
-            row.Children.Add(progress);
-            row.Children.Add(activityLabel);
-            toolbarHost.Content = row;
+            progress.Margin = new Thickness(0, 0, 10, 0); progress.Width = 70;
+            activityLabel.TextWrapping = TextWrapping.NoWrap;
+            activity.Children.Add(progress); activity.Children.Add(activityLabel); activity.Children.Add(hint);
+            toolbarHost.Content = activity;
         }
         body.Children.Add(layout);
     }
@@ -222,13 +240,14 @@ internal sealed class CandidatePanel : Border
         {
             headline.Text = activity.Message;
             headline.ToolTip = activity.Message;
+            if (design) count.Text = activity.Message;
         }
         var failed = activity.Status is RecognitionStatus.Unknown or RecognitionStatus.NoSound or
             RecognitionStatus.Interference or RecognitionStatus.LibraryEmpty or RecognitionStatus.Error;
         activityLabel.Text = failed && !activity.Message.StartsWith("识别失败", StringComparison.Ordinal)
             ? "识别失败 · " + activity.Message : activity.Message;
         activityLabel.Foreground = failed ? Theme.Brush("#FF8B8B") : activity.Busy ? Theme.Accent : Theme.Text;
-        activityBanner.Background = failed ? Theme.Brush("#42262B") : activity.Busy ? Theme.Brush("#263747") : Theme.Panel;
+        activityBanner.Background = failed ? Theme.Brush("#42262B") : activity.Busy ? Theme.Brush("#22302F") : Theme.Panel;
         activityBanner.BorderBrush = failed ? Theme.Brush("#BE6565") : activity.Busy ? Theme.Accent : Theme.Line;
         progress.Visibility = activity.Busy ? Visibility.Visible : Visibility.Collapsed;
     }
@@ -236,8 +255,36 @@ internal sealed class CandidatePanel : Border
     public void SetToolbar(UIElement? toolbar)
     {
         toolbarHost.Content = toolbar;
-        toolbarHost.Margin = design ? new Thickness(0) : toolbar is null ? new Thickness(0) : new Thickness(0, 0, 0, 6);
+        toolbarHost.Margin = design ? new Thickness(0, 0, 6, 0) : toolbar is null ? new Thickness(0) : new Thickness(0, 0, 0, 6);
         LayoutChanged?.Invoke();
+    }
+    // Live results only: show how long ago the pickup was heard, and fade the
+    // candidates once that is long enough to be an earlier item's result.
+    public void SetFreshness(DateTimeOffset? heardAt) { resultAt = heardAt; RefreshFreshness(); }
+    public void RefreshFreshness()
+    {
+        if (!design) return;
+        if (resultAt is not { } at || primary.Count == 0)
+        {
+            age.Visibility = Visibility.Collapsed; layout.Opacity = 1; return;
+        }
+        var seconds = Math.Max(0, (DateTimeOffset.Now - at).TotalSeconds);
+        var stale = seconds >= StaleSeconds;
+        age.Text = seconds < 3 ? "刚刚" : seconds < 60 ? $"{Math.Floor(seconds):0} 秒前"
+            : seconds < 3600 ? $"{Math.Floor(seconds / 60):0} 分钟前" : $"{at.ToLocalTime():HH:mm} 识别";
+        age.Foreground = stale ? Theme.Muted : Theme.Live;
+        age.Visibility = Visibility.Visible;
+        layout.Opacity = stale ? .55 : 1;
+    }
+    // A new pickup replaced the shown result: pulse the summary row once.
+    public void Flash()
+    {
+        if (summaryBar is null) return;
+        var pulse = new SolidColorBrush(Color.FromRgb(0x2F, 0x55, 0x49));
+        summaryBar.Background = pulse;
+        pulse.BeginAnimation(SolidColorBrush.ColorProperty, new System.Windows.Media.Animation.ColorAnimation(
+            ((SolidColorBrush)Theme.Panel).Color, TimeSpan.FromMilliseconds(900))
+        { EasingFunction = new System.Windows.Media.Animation.QuadraticEase() });
     }
     public void SetAudioPreview(Action<Candidate> play, Func<Candidate, bool> available)
     { playReference = play; referenceAvailable = available; layout.Refresh(); }
@@ -252,19 +299,22 @@ internal sealed class CandidatePanel : Border
         var catalog = demo && result is { CandidateCount: > 0 } && result.Candidates.All(candidate => candidate.GroupId == "catalog");
         ratioLabel.Text = catalog ? "目录物品数量" : "候选数量";
         primary = result?.Candidates.GroupBy(c => c.Item.Id).Select(g => g.OrderByDescending(c => c.Score).First()).ToArray() ?? [];
+        topScore = primary.Count > 0 ? primary.Max(candidate => candidate.Score) : 0;
         note.Text = "大红概率按同格候选计算，非真实出货概率。";
         value.Text = ""; phase.Text = ""; value.Visibility = Visibility.Collapsed;
+        count.Foreground = design && primary.Count > 0 ? Theme.Gold : design ? Theme.Muted : Theme.Text;
         if (primary.Count == 0)
         {
             ratio.Text = "0"; count.Text = "等待识别"; total.Text = "";
             designCount.Text = "暂无候选";
             headline.Text = result?.Message ?? (listening ? "正在监听物品声音" : "开启监听后，拖动一件行商货物");
+            if (design) count.Text = headline.Text;
         }
         else
         {
             ratio.Text = primary.Count.ToString();
             designCount.Text = catalog ? $"{primary.Count} 件目录物品" : $"{primary.Count} 件候选";
-            count.Text = design ? $"最高匹配度 {MatchPercent(primary.Max(candidate => candidate.Score))}"
+            count.Text = design ? $"匹配度 {MatchPercent(topScore)}"
                 : catalog ? $"{primary.Count} 件目录物品" : $"{primary.Count} 件候选";
             headline.Text = design ? "按格数查看大红概率"
                 : catalog ? "新增目录物品需补拾取音效后才能参与识别" : demo ? "布局演示 · 非识别结果" : result!.Message;
@@ -286,9 +336,8 @@ internal sealed class CandidatePanel : Border
         nearIds = references.Select(c => c.Item.Id).ToHashSet();
         if (design)
         {
-            var dense = CandidateCount > 20;
-            listeningSummary!.Height = 42;
-            toolbarHost.Height = dense ? 40 : CandidateCount > 6 ? 44 : 52;
+            summaryBar!.Height = Math.Round((CandidateCount > 20 ? 36 : 40) * FontScale);
+            RefreshFreshness();
         }
         layout.SetItems(primary.OrderBy(c => c.Item.Cells).ThenByDescending(c => c.Item.IsGold)
             .ThenByDescending(c => c.Item.ReferenceValue).Concat(references.OrderBy(c => c.Item.Cells)).ToArray());
@@ -437,23 +486,31 @@ internal sealed class CandidatePanel : Border
             cardRows.Children.Add(row);
         }
         var title = Theme.Label(group.Key.Reference ? $"参考 · {group.Key.Cells} 格" :
-            group.Key.Cells == 0 ? "格数待核实" : $"{group.Key.Cells} 格", 14 * FontScale);
-        title.Margin = new Thickness(0, 0, 0, 2); title.FontWeight = FontWeights.Bold;
-        title.TextTrimming = TextTrimming.None;
-        var amount = Theme.Label($"{ordered.Length} 件候选", 10 * FontScale, Theme.Muted);
-        amount.Margin = new Thickness(0, 0, 0, 2); amount.TextTrimming = TextTrimming.None;
-        var heading = new StackPanel { Margin = new Thickness(8, 5, 4, 0) };
-        heading.Children.Add(title); heading.Children.Add(amount);
+            group.Key.Cells == 0 ? "格数待核实" : $"{group.Key.Cells} 格", 15 * FontScale);
+        title.Margin = new Thickness(0); title.FontWeight = FontWeights.Bold;
+        title.TextTrimming = TextTrimming.None; title.VerticalAlignment = VerticalAlignment.Bottom;
+        var amount = Theme.Label($"{ordered.Length} 件", 11 * FontScale, Theme.Muted);
+        amount.Margin = new Thickness(6, 0, 0, 1); amount.TextTrimming = TextTrimming.None;
+        amount.VerticalAlignment = VerticalAlignment.Bottom;
+        var titleRow = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 3) };
+        titleRow.Children.Add(title); titleRow.Children.Add(amount);
+        var heading = new StackPanel { Margin = new Thickness(8, 6, 4, 0) };
+        heading.Children.Add(titleRow);
         if (!group.Key.Reference)
         {
+            // The grid size is visible on the trader's screen; this share is what
+            // the player reads to decide, so it is the largest number in the row.
             var redCount = ordered.Count(candidate => candidate.Item.IsGold);
-            var probability = Theme.Label($"大红概率 {redCount / (double)ordered.Length:P0}",
-                12 * FontScale, Theme.Collectible);
-            probability.Margin = new Thickness(0); probability.FontWeight = FontWeights.SemiBold;
-            probability.ToolTip = "按该格候选中的大红件数计算；不是游戏的真实出货概率。";
+            var share = redCount / (double)ordered.Length;
+            var help = $"{redCount}/{ordered.Length} 件为大红；按该格候选计算，不是游戏的真实出货概率。";
+            var caption = Theme.Label($"大红概率 {redCount}/{ordered.Length}", 10 * FontScale, Theme.Muted);
+            caption.Margin = new Thickness(0); caption.ToolTip = help; heading.Children.Add(caption);
+            var probability = new TextBlock { TextWrapping = TextWrapping.NoWrap, TextTrimming = TextTrimming.None,
+                Margin = new Thickness(0, -2, 0, 0), ToolTip = help };
+            probability.Inlines.Add(new System.Windows.Documents.Run($"{share:P0}")
+                { FontSize = 24 * FontScale, FontWeight = FontWeights.Bold, Foreground = Theme.RedShare(share) });
+            AutomationProperties.SetName(probability, $"大红概率 {share:P0}");
             heading.Children.Add(probability);
-            var fraction = Theme.Label($"{redCount}/{ordered.Length} 件大红", 10 * FontScale, Theme.Muted);
-            fraction.Margin = new Thickness(0); heading.Children.Add(fraction);
         }
         var label = new Border { Width = labelWidth, Child = heading, Background = Theme.Raised,
             BorderBrush = Theme.Line, BorderThickness = new Thickness(0, 0, 1, 0) };
@@ -544,11 +601,13 @@ internal sealed class CandidatePanel : Border
         var item = candidate.Item;
         var prominent = design && CandidateCount <= 20;
         var wide = prominent && rowSize is 1 or 2;
+        // Only a lone card has room for a button column beside the name; in
+        // pairs the button goes under the name so the name stays on one line.
+        var sideButton = wide && rowSize == 1 && previewButtons;
         var grid = new Grid { Height = height - 2 };
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(thumbnail + 2) });
         grid.ColumnDefinitions.Add(new ColumnDefinition());
-        if (wide && interactive)
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(rowSize == 1 ? 156 : 126) });
+        if (sideButton) grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(96 * FontScale) });
         var picture = new Grid { Width = thumbnail, Height = thumbnail, Background = Theme.Background };
         if (item.Thumbnail is not null)
         {
@@ -571,39 +630,47 @@ internal sealed class CandidatePanel : Border
         var details = new StackPanel { Margin = new Thickness(wide ? 11 : 3, 0, 2, 0),
             VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = wide ? HorizontalAlignment.Left : HorizontalAlignment.Stretch,
             MaxWidth = wide ? rowSize == 1 ? 360 : 225 : double.PositiveInfinity };
-        var heading = new DockPanel();
-        var dot = new System.Windows.Shapes.Ellipse { Fill = item.IsGold ? Theme.Gold : Theme.Muted,
-            Width = 6, Height = 6, VerticalAlignment = VerticalAlignment.Center };
-        DockPanel.SetDock(dot, Dock.Right); heading.Children.Add(dot);
+        // Red names mark red items; the card needs no second marker for that.
         var name = Theme.Label(item.Name, (wide ? rowSize == 1 ? 18 : 15 : prominent ? 13 : 11) * FontScale,
             item.IsGold ? Theme.Collectible : Theme.Text);
         name.FontWeight = FontWeights.SemiBold; name.Margin = new Thickness(0); name.TextWrapping = TextWrapping.Wrap;
         name.TextTrimming = TextTrimming.None; name.ToolTip = item.Name;
-        heading.Children.Add(name); details.Children.Add(heading);
-        var match = Theme.Label(prominent ? $"匹配度 {MatchPercent(candidate.Score)}"
-            : $"{CandidateStatus(candidate)} · 匹配{MatchPercent(candidate.Score)} · {item.GridLabel}",
-            (wide ? rowSize == 1 ? 15 : 13 : prominent ? 12 : 9) * FontScale,
-            prominent ? Theme.Gold : Theme.Accent);
-        match.FontWeight = FontWeights.SemiBold;
-        match.Margin = new Thickness(0); match.TextWrapping = TextWrapping.Wrap;
-        match.TextTrimming = TextTrimming.None; match.ToolTip = MatchHelp;
-        details.Children.Add(match);
+        details.Children.Add(name);
+        details.Children.Add(new Border { Height = 2 });
+        // Items sharing one sound share one score; the summary row shows it once
+        // and a card repeats a score only when it is lower than that.
+        var ownScore = MatchPercent(candidate.Score) != MatchPercent(topScore) || nearIds.Contains(item.Id);
         if (prominent)
         {
+            if (ownScore)
+            {
+                var match = Theme.Label($"匹配度 {MatchPercent(candidate.Score)}", (wide ? rowSize == 1 ? 14 : 12 : 11) * FontScale, Theme.Muted);
+                match.FontWeight = FontWeights.SemiBold; match.Margin = new Thickness(0); match.TextWrapping = TextWrapping.Wrap;
+                match.TextTrimming = TextTrimming.None; match.ToolTip = MatchHelp; details.Children.Add(match);
+            }
             var dimensions = Theme.Label(item.GridLabel, 10 * FontScale, Theme.Muted);
             dimensions.Margin = new Thickness(0); details.Children.Add(dimensions);
         }
-        if (interactive)
+        else
+        {
+            var parts = new[] { CandidateStatus(candidate), ownScore ? $"匹配度 {MatchPercent(candidate.Score)}" : "", item.GridLabel }
+                .Where(part => part.Length > 0);
+            var meta = Theme.Label(string.Join(" · ", parts), 9 * FontScale, Theme.Accent);
+            meta.Margin = new Thickness(0); meta.TextWrapping = TextWrapping.Wrap; meta.TextTrimming = TextTrimming.None;
+            meta.ToolTip = MatchHelp; details.Children.Add(meta);
+        }
+        if (previewButtons)
         {
             var play = Theme.Button("▶ 听样本", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
-            play.Height = wide ? 30 : 20; play.Padding = new Thickness(0);
-            play.Margin = wide ? new Thickness(0, 0, 8, 0) : new Thickness(0);
+            play.Height = sideButton ? 30 : wide ? 26 : 20; play.Padding = new Thickness(0);
+            play.Margin = sideButton ? new Thickness(0, 0, 8, 0) : wide ? new Thickness(0, 6, 0, 0) : new Thickness(0);
+            if (wide && !sideButton) { play.Width = 96 * FontScale; play.HorizontalAlignment = HorizontalAlignment.Left; }
             play.FontSize = (wide ? 10 : 9) * FontScale;
             play.Tag = candidate; play.IsEnabled = referenceAvailable?.Invoke(candidate) ?? (playReference is not null || ReferenceRequested is not null);
             play.ToolTip = play.IsEnabled ? $"试听 {item.Name} 对应的参考音效" : "当前音效库没有可试听的音频样本";
             play.ContextMenu = referenceChoices?.Invoke(candidate); ToolTipService.SetShowOnDisabled(play, true);
             AutomationProperties.SetName(play, $"试听{item.Name}的参考音效");
-            if (wide) { Grid.SetColumn(play, 2); grid.Children.Add(play); }
+            if (sideButton) { Grid.SetColumn(play, 2); grid.Children.Add(play); }
             else details.Children.Add(play);
         }
         Grid.SetColumn(details, 1); grid.Children.Add(details);
@@ -734,15 +801,12 @@ internal sealed class CandidatePanel : Border
         else tile.Children.Add(Theme.Label("暂无图片", 10 * FontScale, Theme.Muted));
         if (TagBadge(candidate) is { } tileBadge) tile.Children.Add(tileBadge);
         stack.Children.Add(tile);
-        var metadata = new DockPanel { Margin = new Thickness(0, 3, 0, interactive ? 4 : 0) };
-        var dot = new System.Windows.Shapes.Ellipse { Fill = item.IsGold ? Theme.Gold : Theme.Muted,
-            Width = 5, Height = 5, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(5, 0, 2, 0) };
-        DockPanel.SetDock(dot, Dock.Right); metadata.Children.Add(dot);
+        var metadata = new DockPanel { Margin = new Thickness(0, 3, 0, previewButtons ? 4 : 0) };
         var dimensions = Theme.Label(item.GridLabel, 10 * FontScale, Theme.Muted);
         dimensions.Margin = new Thickness(0); metadata.Children.Add(dimensions); stack.Children.Add(metadata);
-        if (interactive)
+        if (previewButtons)
         {
-            var play = Theme.Button("▶  听参考", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
+            var play = Theme.Button("▶ 听样本", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
             play.Padding = new Thickness(2, 3, 2, 3); play.Margin = new Thickness(0); play.FontSize = 10 * FontScale;
             play.Tag = candidate; play.IsEnabled = referenceAvailable?.Invoke(candidate) ?? (playReference is not null || ReferenceRequested is not null);
             play.ToolTip = play.IsEnabled ? $"试听 {item.Name} 对应的参考音效" : "当前音效库没有可试听的音频样本";
@@ -770,7 +834,7 @@ internal sealed class CandidatePanel : Border
         }
         var border = new Border { Child = stack, Width = width, Background = Theme.Panel,
             BorderBrush = highest ? Theme.Gold : best && !lastDemo ? Theme.Accent : Theme.Line,
-            BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(1), Margin = new Thickness(0, 0, 4, 4), Tag = candidate,
+            BorderThickness = new Thickness(1), Margin = new Thickness(0, 0, 4, 4), Tag = candidate,
             ToolTip = $"{item.Name}\n{item.GridLabel} · {(item.IsGold ? "大红" : "非大红")}\n" +
                 (item.ReferenceValue.HasValue ? $"联络人回收参考价：{item.ReferenceValue:N0}" : "联络人回收参考价待核实") +
                 (highest ? "\n本次候选中已知参考价最高" : "") + (nearIds.Contains(item.Id) ? "\n相近参考音效，不计入候选占比" : "") };

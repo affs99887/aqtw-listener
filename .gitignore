@@ -6,6 +6,7 @@ portable/
 .vs/
 *.user
 local-data/
+__pycache__/
 
 # 本机 IDE 配置及可重建的识别引擎
 .idea/
