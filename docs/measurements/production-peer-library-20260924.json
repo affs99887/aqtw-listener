@@ -1,0 +1,155 @@
+{
+  "version": "0.3.3",
+  "scope": "Same frozen recordings; engineering equivalence, not a new accuracy estimate",
+  "duration": 8156.6,
+  "analyses": 9972,
+  "candidateOutputs": 385,
+  "changedEvents": 0,
+  "indexSha256": "b154e7b5a09acfaa14b5fc3a7aca607c377c432fbd8ff615875405d9ea89742a",
+  "librarySha256": "81e6cd2f5d91b16450b060d04ede359c42effc5ffc6cf05a9cf1ddc3cc65394b",
+  "cliSha256": "4e064c7020b741d80c7a517435f3e984b834f247f305dcb750f37ce123a9a3ef",
+  "coreSha256": "6604326a818cc287815878212a25da88d5348babed618ba73e00ed5cf0fee334",
+  "jobs": [
+    {
+      "id": "record20260920-213509",
+      "duration": 1967.6,
+      "analyses": 2725,
+      "candidateOutputs": 121,
+      "largestCandidateSet": 6,
+      "allFieldsEqualAfterCatalogIdMapping": true,
+      "audioSha256": "21538409e27186f8ee260d6571394b0a2e4faa87d16a6cfeb1f66cc083f39b29",
+      "baselineEventsSha256": "193df494b1fddbf9521d0eee661f5c41b0cec19aaa0d514fa97279f6a56bf23c",
+      "eventsSha256": "00c3987846e8ec60bf1d0622111a0e61449fc1c4e40b87e90ef4dd7cd83a1a3b",
+      "elapsedSeconds": 61.5
+    },
+    {
+      "id": "record20260921-205434",
+      "duration": 1000.5,
+      "analyses": 1321,
+      "candidateOutputs": 34,
+      "largestCandidateSet": 4,
+      "allFieldsEqualAfterCatalogIdMapping": true,
+      "audioSha256": "360f4e4971924a22edbd11c5dcf5965614f8dfabea412d54457e8102eb8945e2",
+      "baselineEventsSha256": "2db4350f349fbee7da3ca4668b75f575b89eec5f227de263ab254068969ddf1a",
+      "eventsSha256": "d22c13d318d30b8ec7f40020671162d583e8a6908b147074a34d8da98c971309",
+      "elapsedSeconds": 29.58
+    },
+    {
+      "id": "record20260922-214737",
+      "duration": 1096.7,
+      "analyses": 1495,
+      "candidateOutputs": 41,
+      "largestCandidateSet": 5,
+      "allFieldsEqualAfterCatalogIdMapping": true,
+      "audioSha256": "b8225ab1cdbf7382b07c2575ebc60c8306734f505da06420c931009e75ab0e33",
+      "baselineEventsSha256": "90882ce2555dfcb406bfb10786466867062a2f7261ef5419ef91dca76db33ecb",
+      "eventsSha256": "4cbb8c16d4882cf4797dbddd5018c6a32d11c24351ab4c1a6c1d9e4f3b40ce80",
+      "elapsedSeconds": 34.44
+    },
+    {
+      "id": "record20260922-205653",
+      "duration": 1442.4,
+      "analyses": 1574,
+      "candidateOutputs": 51,
+      "largestCandidateSet": 5,
+      "allFieldsEqualAfterCatalogIdMapping": true,
+      "audioSha256": "b7f583871548c9850f5d3cd923c4ce7299f741d96acbc7a85a6777137339718c",
+      "baselineEventsSha256": "a60214e4b9d1497bc7d9b3885a30fe84a9a50146db25eedc445d8a9391d7cec4",
+      "eventsSha256": "5d33cfe849984b32981d8e207c5ef44f2f167d91e2a7b0428234be29384033b0",
+      "elapsedSeconds": 36.25
+    },
+    {
+      "id": "record20260920-205237",
+      "duration": 2039.4,
+      "analyses": 2458,
+      "candidateOutputs": 65,
+      "largestCandidateSet": 5,
+      "allFieldsEqualAfterCatalogIdMapping": true,
+      "audioSha256": "4117f4aa3a173845f4a31d21473926563929a05b137f3f8203a16b3b8e185ee2",
+      "baselineEventsSha256": "73a1f48b85cdaf5144c036c028897cc5dce87b72ef75d66eab621d93664cffad",
+      "eventsSha256": "8f10a398bb7939fa5e21c94ee1dac7c81282b40d5bf2a4a0f02d6fe921ba6ab8",
+      "elapsedSeconds": 55.77
+    },
+    {
+      "id": "204258-trader",
+      "duration": 210,
+      "analyses": 87,
+      "candidateOutputs": 36,
+      "largestCandidateSet": 6,
+      "allFieldsEqualAfterCatalogIdMapping": true,
+      "audioSha256": "9c8a25dca8fe2a9d5b523e288c53b1821becb669208fb28850637025f350a2d5",
+      "baselineEventsSha256": "6766c2b9e21b542b7f915cbebcae8c77a42296bfb43d8497cbfc6ebd4e34db5b",
+      "eventsSha256": "5661e4b8af64baa8a6bf88ace28d26a41e86f118f8b29948f3766a1941e3d39b",
+      "elapsedSeconds": 2.23
+    },
+    {
+      "id": "211647-trader",
+      "duration": 190,
+      "analyses": 76,
+      "candidateOutputs": 34,
+      "largestCandidateSet": 4,
+      "allFieldsEqualAfterCatalogIdMapping": true,
+      "audioSha256": "5c416c96af038e2a89603dddcce52976e3b32fee2a270089474a71a7246583c0",
+      "baselineEventsSha256": "4e2770a1b54feec2adb2b890d7f0ead757cd4451a05dccb90639bfc99fc763bc",
+      "eventsSha256": "654527f762483a3d5df1347cf2e28bd6def1974802f880b862c24cb45bcbcfa1",
+      "elapsedSeconds": 1.86
+    },
+    {
+      "id": "204258-backpack",
+      "duration": 70,
+      "analyses": 50,
+      "candidateOutputs": 0,
+      "largestCandidateSet": 0,
+      "allFieldsEqualAfterCatalogIdMapping": true,
+      "audioSha256": "02f1f3aef3b112ae104b0e61647cee693d5a24dd91ee5b672283da4bd870d66d",
+      "baselineEventsSha256": "0c36d4f992198141ffaceaa923926d4cf80de7657bf88489710a3d60b3e4ca39",
+      "eventsSha256": "0c36d4f992198141ffaceaa923926d4cf80de7657bf88489710a3d60b3e4ca39",
+      "elapsedSeconds": 1.47
+    },
+    {
+      "id": "204258-movement",
+      "duration": 60,
+      "analyses": 94,
+      "candidateOutputs": 2,
+      "largestCandidateSet": 4,
+      "allFieldsEqualAfterCatalogIdMapping": true,
+      "audioSha256": "376307874af0427d3d68028c3f48e9933a5ed500f7bfc31a028d01675e4d423e",
+      "baselineEventsSha256": "e4b92cb104651a18030d3d2e40f85c786ca85d484badfb045d3890c471784772",
+      "eventsSha256": "3535b91ce2a01b86b63bd4c585171dd3a608f3477ed2c4dd8b6ecea962fc4541",
+      "elapsedSeconds": 2.23
+    },
+    {
+      "id": "211647-movement",
+      "duration": 80,
+      "analyses": 92,
+      "candidateOutputs": 1,
+      "largestCandidateSet": 4,
+      "allFieldsEqualAfterCatalogIdMapping": true,
+      "audioSha256": "08f45296e9020de49f44a654aff7a6f8b606db9e518d01d9dd599bf3946bb150",
+      "baselineEventsSha256": "4d2fb8a722e393f4af00819805516cce8142dc37879380183251a61fdd8b9a48",
+      "eventsSha256": "f3a8199138f8429b93ff8001fb052f31474507f833eae62e00443398d05ce123",
+      "elapsedSeconds": 2.48
+    }
+  ],
+  "coreTests": {
+    "total": 28,
+    "passed": 28,
+    "failed": 0
+  },
+  "appTests": {
+    "total": 45,
+    "passed": 45,
+    "failed": 0
+  },
+  "uiSmoke": {
+    "passed": true,
+    "images": 62,
+    "replay": true,
+    "referencePreview": true,
+    "samplingPausedDuringPlayback": true,
+    "allCatalogCardsFit": true,
+    "normalCandidateNamesFit": true,
+    "samePin": true,
+    "note": "仅桌面浮窗属性与渲染检查，未在游戏中测试输入或独占全屏覆盖"
+  }
+}

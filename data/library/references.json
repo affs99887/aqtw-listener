@@ -1,102 +1,438 @@
 {
   "samples": [
     {
-      "groupId": "537b0217",
-      "templateId": "537b0217-1",
-      "file": "audio/537b0217-1.wav",
-      "sha256": "b31207675f1270055e627314c9c14366a595da4c42218fb942a56aca76a14043",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-000",
+      "templateId": "peer-000-1",
+      "file": "audio/peer-000.wav",
+      "sha256": "db443fcf0933f71b650d0b2f82d1c373f635634b611532de8f31de7cdd409b64",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "983e0b90",
-      "templateId": "983e0b90-1",
-      "file": "audio/983e0b90-1.wav",
-      "sha256": "a6360cd3cf2192e8aff1dc53f4e6ff4177056decd0a20c2cc867241645798a57",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-001",
+      "templateId": "peer-001-1",
+      "file": "audio/peer-001.wav",
+      "sha256": "b3bdea12adbb4e8bb3be1e53c4c6def350756adaf83609bfeb6a9eaefaf15453",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "56dfb35b",
-      "templateId": "56dfb35b-1",
-      "file": "audio/56dfb35b-1.wav",
-      "sha256": "d09dc9e609c81253a0a32ce8143e4b51dafbcd2686a7e99d36d46c2b9da69a22",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-002",
+      "templateId": "peer-002-1",
+      "file": "audio/peer-002.wav",
+      "sha256": "f8262eb214da02e291f55003e4ac7be371838d534fa02e042426d43fdad01a97",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "388e122c",
-      "templateId": "388e122c-1",
-      "file": "audio/388e122c-1.wav",
-      "sha256": "91c981430c80c9cf1cf3db602ac340006bf32b804b2a8ed1fd3a99f33e57c122",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-003",
+      "templateId": "peer-003-1",
+      "file": "audio/peer-003.wav",
+      "sha256": "59fcf99d9522ff697b04dcae5164c9556dea2d94d5e88ca7a5bd82f5f8254c37",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "cb1c0d1d",
-      "templateId": "cb1c0d1d-1",
-      "file": "audio/cb1c0d1d-1.wav",
-      "sha256": "444d1f81e79356639ef57169fd8f014d431d622a2918f12bbc0a584ef74c2e68",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-004",
+      "templateId": "peer-004-1",
+      "file": "audio/peer-004.wav",
+      "sha256": "716ca5ce4ceb849818dabe0f044c832b429ae263e38d6720f3bfd0fd56cc7559",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "cb1c0d1d",
-      "templateId": "cb1c0d1d-2",
-      "file": "audio/cb1c0d1d-2.wav",
-      "sha256": "05bae7a5067a3d138fabfd51479eca541a2ca5029ba8fc15c137744fc2d1b747",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-005",
+      "templateId": "peer-005-1",
+      "file": "audio/peer-005.wav",
+      "sha256": "68fac1d0051e19743cdf8658a5e7685ea454042a76490997cc3e5cb7ce8ab158",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "cb1c0d1d",
-      "templateId": "cb1c0d1d-3",
-      "file": "audio/cb1c0d1d-3.wav",
-      "sha256": "55cf3a37d1ed0289baa395f8e91f63a59afcc241847d4d470edf2a3e3ce7ab4f",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-006",
+      "templateId": "peer-006-1",
+      "file": "audio/peer-006.wav",
+      "sha256": "0c2e2ae939a668b7e33b8734af552471947c1e993a04b62a9a37d51ced70aefa",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "cb1c0d1d",
-      "templateId": "cb1c0d1d-4",
-      "file": "audio/cb1c0d1d-4.wav",
-      "sha256": "8337fde6f9d4f216852b8a1a532d17e281bdc0deda86357b6a089ea549fcc1d2",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-007",
+      "templateId": "peer-007-1",
+      "file": "audio/peer-007.wav",
+      "sha256": "092ac338b6c0ed5d49a9825268888c3ed57789bb96b8e2f8fb2592a92fe53f18",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "9e7e9e83",
-      "templateId": "9e7e9e83-1",
-      "file": "audio/9e7e9e83-1.wav",
-      "sha256": "ff429e761882816f453dc88cf57c4d11eb76d14764545f78276e131e84a68f73",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-008",
+      "templateId": "peer-008-1",
+      "file": "audio/peer-008.wav",
+      "sha256": "ab94fb19da9313e031d6ebfe0a2ee7a458a832d9866a6072187e69b0dcc07a64",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "267afca3",
-      "templateId": "267afca3-1",
-      "file": "audio/267afca3-1.wav",
-      "sha256": "1227b7929939a5d203959504787caf3c0ba6ecacb0829033de239c7c27a20196",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-009",
+      "templateId": "peer-009-1",
+      "file": "audio/peer-009.wav",
+      "sha256": "51bd7fee8ad0c800f2d4e3294bf256c69eec856237d6bedcbb4f7e3f13a177b3",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "e9f62d39",
-      "templateId": "e9f62d39-1",
-      "file": "audio/e9f62d39-1.wav",
-      "sha256": "91af3f1c01afaf610966ccfb9322705c384b3a3e3e9be5f8f29892c9284b592d",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-010",
+      "templateId": "peer-010-1",
+      "file": "audio/peer-010.wav",
+      "sha256": "95ce7c93e5d18a4c45ee6001a0795e068146a12f56eddb3aefbfdbc2689154c3",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "361affd2",
-      "templateId": "361affd2-1",
-      "file": "audio/361affd2-1.wav",
-      "sha256": "f68901df12f459f8e0bfb6161317613b0fd6774c09c366c8b7e3148949bf5068",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-011",
+      "templateId": "peer-011-1",
+      "file": "audio/peer-011.wav",
+      "sha256": "bd2d73cdef48d7c44deaf80177fb96588141bf0a6b2154bfe415ee58ac252923",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "361affd2",
-      "templateId": "361affd2-2",
-      "file": "audio/361affd2-2.wav",
-      "sha256": "9f926f04bdf3944ed2c2e2ba07225a0093d2316bf2400ef12114c131ee6f55bf",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-012",
+      "templateId": "peer-012-1",
+      "file": "audio/peer-012.wav",
+      "sha256": "1fa71bd9c1a11e30970f28e3f7fb30a41e4ffc87210cdd33e36abaffcbc00c44",
+      "recordingId": "peer-v0.67-packaged-references"
     },
     {
-      "groupId": "361affd2",
-      "templateId": "361affd2-3",
-      "file": "audio/361affd2-3.wav",
-      "sha256": "5da6521bd53eb53e8a4424d3ce80bc705b2bba4c00990ae48d00a9c7d6f73f2b",
-      "recordingId": "soundradar-community-20260919-20"
+      "groupId": "peer-013",
+      "templateId": "peer-013-1",
+      "file": "audio/peer-013.wav",
+      "sha256": "5dc2dce6eb74fdec021a7d9cadd2ec78f4c1c9b813dff6864ad20ba4101589bb",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-014",
+      "templateId": "peer-014-1",
+      "file": "audio/peer-014.wav",
+      "sha256": "5bae219e8b716c788a0868d68c8602fbc0bdf935156ca438006a8e6f6da9eb7d",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-015",
+      "templateId": "peer-015-1",
+      "file": "audio/peer-015.wav",
+      "sha256": "5bae219e8b716c788a0868d68c8602fbc0bdf935156ca438006a8e6f6da9eb7d",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-016",
+      "templateId": "peer-016-1",
+      "file": "audio/peer-016.wav",
+      "sha256": "80c0fa09af1de9d7c7e1e8e005c4f7f260b0a03fa0d559a8dca44a389392bbd8",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-017",
+      "templateId": "peer-017-1",
+      "file": "audio/peer-017.wav",
+      "sha256": "a71112a1cc13766189a537cfbef5c5c2f12cd28e283ee63e99fa0559de085e68",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-018",
+      "templateId": "peer-018-1",
+      "file": "audio/peer-018.wav",
+      "sha256": "635681c475ef687f5f363c35c146ce41573ec6e28cee4973f02d237bd56ffa42",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-019",
+      "templateId": "peer-019-1",
+      "file": "audio/peer-019.wav",
+      "sha256": "f7b79a972c9e4ecb166b57baf21c91cc6f61f7c1c824bf7f7f053756519d4429",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-020",
+      "templateId": "peer-020-1",
+      "file": "audio/peer-020.wav",
+      "sha256": "6082c377a1fe3421d5b6ea3c95e169ed65f7529b384b1337abc77f6f6b025b09",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-021",
+      "templateId": "peer-021-1",
+      "file": "audio/peer-021.wav",
+      "sha256": "0d534e654feee517c2e22bb9e30bf981f46c08af08a912049af3b8b28f7526af",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-022",
+      "templateId": "peer-022-1",
+      "file": "audio/peer-022.wav",
+      "sha256": "0c2e2ae939a668b7e33b8734af552471947c1e993a04b62a9a37d51ced70aefa",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-023",
+      "templateId": "peer-023-1",
+      "file": "audio/peer-023.wav",
+      "sha256": "00b1864f9896547b34d62e45f2eb76651a64ced17e835c2f59786ae628c0e72e",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-024",
+      "templateId": "peer-024-1",
+      "file": "audio/peer-024.wav",
+      "sha256": "6db58e3a0e3cca01fd4b4c7eaa61b5f3919362551b56eb7e37e728c4c7c3d9de",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-025",
+      "templateId": "peer-025-1",
+      "file": "audio/peer-025.wav",
+      "sha256": "47b56268ec58b694e7a14968caafbddee8f1884e891828eb29671da0a4ede7d9",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-026",
+      "templateId": "peer-026-1",
+      "file": "audio/peer-026.wav",
+      "sha256": "bdc1755e1a51b77a3821444b120370f8b72fc3d388687cedd9cd9f9be99d3c7a",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-027",
+      "templateId": "peer-027-1",
+      "file": "audio/peer-027.wav",
+      "sha256": "ea7a31b0925db11e0006f1a6f8c905baf00312b10ac4f9067582c20911caeecf",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-028",
+      "templateId": "peer-028-1",
+      "file": "audio/peer-028.wav",
+      "sha256": "fff42990b5c6ac308c4d5a2c5c59df18aceffa8c97f5b0a04cc3485e9322ca56",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-029",
+      "templateId": "peer-029-1",
+      "file": "audio/peer-029.wav",
+      "sha256": "1134a4ceeb917726c95b4352ff9f231f7c8df7484e0195af32e3df1f9e1882d8",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-030",
+      "templateId": "peer-030-1",
+      "file": "audio/peer-030.wav",
+      "sha256": "9a2df7def52f8b84f5cddd95098fe21f6f0a25203476aaaaa1f3f601527f9e6c",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-031",
+      "templateId": "peer-031-1",
+      "file": "audio/peer-031.wav",
+      "sha256": "96f405c29877b19d734cad3f8dc1788f6da0ce36848d27b115ca5c8a7eb15b7f",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-032",
+      "templateId": "peer-032-1",
+      "file": "audio/peer-032.wav",
+      "sha256": "0f8f3841d7477c0832ac559968872747508772876cb28f11cdc47b2ce68ee4a4",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-033",
+      "templateId": "peer-033-1",
+      "file": "audio/peer-033.wav",
+      "sha256": "5dc2dce6eb74fdec021a7d9cadd2ec78f4c1c9b813dff6864ad20ba4101589bb",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-034",
+      "templateId": "peer-034-1",
+      "file": "audio/peer-034.wav",
+      "sha256": "5dc2dce6eb74fdec021a7d9cadd2ec78f4c1c9b813dff6864ad20ba4101589bb",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-035",
+      "templateId": "peer-035-1",
+      "file": "audio/peer-035.wav",
+      "sha256": "578c3ee5c8a0b0ea40cba0aab36e8bb1e7da846201cfb262e7ca9fa726efdc79",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-036",
+      "templateId": "peer-036-1",
+      "file": "audio/peer-036.wav",
+      "sha256": "69ff95311d63943d0f6a47c5742d1e4617fd5ecba695521120d7947e0343ae8e",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-037",
+      "templateId": "peer-037-1",
+      "file": "audio/peer-037.wav",
+      "sha256": "fe56c0bbe6216f96c165800c47401d0b716ad593ebc547b0f3515c8cad469137",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-038",
+      "templateId": "peer-038-1",
+      "file": "audio/peer-038.wav",
+      "sha256": "db16cf0c8125e366846b0e33d3a3e12230c15ee76b7b7354ae188810129643a1",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-039",
+      "templateId": "peer-039-1",
+      "file": "audio/peer-039.wav",
+      "sha256": "48119c5ba65b09211d4e4a017155438076f549b55fad11e201b07be90a2ba70c",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-040",
+      "templateId": "peer-040-1",
+      "file": "audio/peer-040.wav",
+      "sha256": "122d71170851ed7ea641a8a80542a572ad761403cd87e7b0002b273728dfd9bc",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-041",
+      "templateId": "peer-041-1",
+      "file": "audio/peer-041.wav",
+      "sha256": "b360b2c9645b8474f2d18272a53a2e7379e4a8b4390ee532ecfd5ed5e57831ac",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-042",
+      "templateId": "peer-042-1",
+      "file": "audio/peer-042.wav",
+      "sha256": "8697436504be31e03436ff9f875701b06c17940666edca41bbc9d40934e14ec9",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-043",
+      "templateId": "peer-043-1",
+      "file": "audio/peer-043.wav",
+      "sha256": "051dccc185cdaefbf983fd5fac463179269b60cd95e7d101884ea8e406581dab",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-044",
+      "templateId": "peer-044-1",
+      "file": "audio/peer-044.wav",
+      "sha256": "f0038c4f662c8638a6c6bc67876ddd529b2c17bfa2ca7e244147547b105243f7",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-045",
+      "templateId": "peer-045-1",
+      "file": "audio/peer-045.wav",
+      "sha256": "7a72876fd52de187150a5ed9e66e22585a08976d96177d0fef19bedf2ad211fd",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-046",
+      "templateId": "peer-046-1",
+      "file": "audio/peer-046.wav",
+      "sha256": "5ee8046e7a735ab0386415474646c01e28838b870618adfcd9d73a7486325458",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-047",
+      "templateId": "peer-047-1",
+      "file": "audio/peer-047.wav",
+      "sha256": "55922e4717e71dd3ab8711ae75f688fe75ace3799cb9a04eaec77596449eba1b",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-048",
+      "templateId": "peer-048-1",
+      "file": "audio/peer-048.wav",
+      "sha256": "bec2b0c79535c1a0bbb4897e3c6bbaf72f772411323b1fd09f4712827f970f9d",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-049",
+      "templateId": "peer-049-1",
+      "file": "audio/peer-049.wav",
+      "sha256": "fd16e3aec42ecc2b850acd284b3cd9e9fd670e0324a39b1b36fb6496f0662dd0",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-050",
+      "templateId": "peer-050-1",
+      "file": "audio/peer-050.wav",
+      "sha256": "e6f4ff50528f4fabad2722303b51abff157b343eed1a48d2eac106becb2ce6f0",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-051",
+      "templateId": "peer-051-1",
+      "file": "audio/peer-051.wav",
+      "sha256": "60e11656dd415013e024f09b05a898963598001de111d480bff8260571ad3c56",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-052",
+      "templateId": "peer-052-1",
+      "file": "audio/peer-052.wav",
+      "sha256": "d66bea8424b00f51fdc2c18a0d0158e711a1757df6c39c15c22c07798c474f4f",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-053",
+      "templateId": "peer-053-1",
+      "file": "audio/peer-053.wav",
+      "sha256": "67f0d8c58ef35ead47e3479b2e3b729b143b0d751b6dfa30a14e003b0b3c551c",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-054",
+      "templateId": "peer-054-1",
+      "file": "audio/peer-054.wav",
+      "sha256": "3a47c0464251a7ed85d6f5e67f34858165af43aa52f0f4d0af8f63feae8afa3e",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-055",
+      "templateId": "peer-055-1",
+      "file": "audio/peer-055.wav",
+      "sha256": "7dded24a70bdaf774e7ef25c26b1fcf661b2b2fdab1a19c5a57465d908916d01",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-056",
+      "templateId": "peer-056-1",
+      "file": "audio/peer-056.wav",
+      "sha256": "8ecc435fea127c28ef0ca2e573f6aa40bd0e84ed131f8acffaeefcdd6ab53881",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-057",
+      "templateId": "peer-057-1",
+      "file": "audio/peer-057.wav",
+      "sha256": "636076e3cad516a394fa36e820e2c0c8206149ffe7deff2bbc337da174639b7a",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-058",
+      "templateId": "peer-058-1",
+      "file": "audio/peer-058.wav",
+      "sha256": "73248881df1c3eaf36ed8c70e8081b5f998fc1bdeb42911f37a34c4f4c5017b7",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-059",
+      "templateId": "peer-059-1",
+      "file": "audio/peer-059.wav",
+      "sha256": "ebe7d5cfcdfb31bf2fce452988dff573cbab6b049a6e28460fca3206a67b086c",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-060",
+      "templateId": "peer-060-1",
+      "file": "audio/peer-060.wav",
+      "sha256": "8295d9d4ae4dfe9aac67fb703193450dd1e06943b0f0627363bc8885132ab24c",
+      "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-061",
+      "templateId": "peer-061-1",
+      "file": "audio/peer-061.wav",
+      "sha256": "511f6d45881c57cfee973e30a0a682ddeeb948f0f5a51881bd7a6929047b7ebd",
+      "recordingId": "peer-v0.67-packaged-references"
     }
   ]
 }

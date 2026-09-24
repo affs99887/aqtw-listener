@@ -1,0 +1,3567 @@
+{
+  "kind": "frozen-peer-pickup-library-putdown-on-off-gameplay-ablation",
+  "date": "2026-09-24",
+  "successDefinition": "Any accepted non-empty candidate set is a matching success. Multiple same-sound items are allowed; no unique-item identification is required.",
+  "experiment": {
+    "kind": "putdown-library-on-off-ablation",
+    "pickupLibrary": "peer-62-frozen",
+    "baselineArtifacts": {
+      "Listener.Cli.dll": "b97302947c22f9e7ab2a0e213dee9b95065b1ca7afb21951b0fc395638da5c20",
+      "Listener.Core.dll": "13c1b7318122582017c9d0757be4352d9bc5c74f4d20f9f429046dfc8b0e08f9",
+      "engine/Listener.Engine.exe": "cebf604951194aa3b73331d60666ade87c3d7f58a913cfc1c56f36baacadde42",
+      "library/library.json": "267d0d333175bd60db57709e2c3bd55e4f257393c4d60a391e994da2a0a24a0f",
+      "library/radar-index.bin": "bcdb31a7402559a2b8f204430bca1dda8501011dfd96d05d29f8c248abe1363d"
+    },
+    "pickupFiles": {
+      "import.json": "14412caad7b9bc26a23f7f18b001d2d0a6912cbc32ae60969da156a5ced64160",
+      "library.json": "f19b702f89a4360f68be88367d74b317a122fb15f547797f8d42e695a63c7360",
+      "radar-index.bin": "b154e7b5a09acfaa14b5fc3a7aca607c377c432fbd8ff615875405d9ea89742a",
+      "references.srz": "e6d741e355e5f386dbb12d25c84eda3bd1a7c7c5a3693a82d5b552e15fd1e7fe",
+      "self-check.json": "bbf484e723e8a1ba0aac67ce907351cd60eac6f6111c1c1671d7eccf21dbb59e",
+      "audio/control-silence.wav": "0a8f76d89c709043814cb74f331a4578d17ff61256303bd0019a263d053f86e8",
+      "audio/control-white-noise.wav": "bbad7d80d14afa2ad25c8694f44cce6bf519fb543b5269714512a1cda236f11c",
+      "audio/peer-000.wav": "db443fcf0933f71b650d0b2f82d1c373f635634b611532de8f31de7cdd409b64",
+      "audio/peer-001.wav": "b3bdea12adbb4e8bb3be1e53c4c6def350756adaf83609bfeb6a9eaefaf15453",
+      "audio/peer-002.wav": "f8262eb214da02e291f55003e4ac7be371838d534fa02e042426d43fdad01a97",
+      "audio/peer-003.wav": "59fcf99d9522ff697b04dcae5164c9556dea2d94d5e88ca7a5bd82f5f8254c37",
+      "audio/peer-004.wav": "716ca5ce4ceb849818dabe0f044c832b429ae263e38d6720f3bfd0fd56cc7559",
+      "audio/peer-005.wav": "68fac1d0051e19743cdf8658a5e7685ea454042a76490997cc3e5cb7ce8ab158",
+      "audio/peer-006.wav": "0c2e2ae939a668b7e33b8734af552471947c1e993a04b62a9a37d51ced70aefa",
+      "audio/peer-007.wav": "092ac338b6c0ed5d49a9825268888c3ed57789bb96b8e2f8fb2592a92fe53f18",
+      "audio/peer-008.wav": "ab94fb19da9313e031d6ebfe0a2ee7a458a832d9866a6072187e69b0dcc07a64",
+      "audio/peer-009.wav": "51bd7fee8ad0c800f2d4e3294bf256c69eec856237d6bedcbb4f7e3f13a177b3",
+      "audio/peer-010.wav": "95ce7c93e5d18a4c45ee6001a0795e068146a12f56eddb3aefbfdbc2689154c3",
+      "audio/peer-011.wav": "bd2d73cdef48d7c44deaf80177fb96588141bf0a6b2154bfe415ee58ac252923",
+      "audio/peer-012.wav": "1fa71bd9c1a11e30970f28e3f7fb30a41e4ffc87210cdd33e36abaffcbc00c44",
+      "audio/peer-013.wav": "5dc2dce6eb74fdec021a7d9cadd2ec78f4c1c9b813dff6864ad20ba4101589bb",
+      "audio/peer-014.wav": "5bae219e8b716c788a0868d68c8602fbc0bdf935156ca438006a8e6f6da9eb7d",
+      "audio/peer-015.wav": "5bae219e8b716c788a0868d68c8602fbc0bdf935156ca438006a8e6f6da9eb7d",
+      "audio/peer-016.wav": "80c0fa09af1de9d7c7e1e8e005c4f7f260b0a03fa0d559a8dca44a389392bbd8",
+      "audio/peer-017.wav": "a71112a1cc13766189a537cfbef5c5c2f12cd28e283ee63e99fa0559de085e68",
+      "audio/peer-018.wav": "635681c475ef687f5f363c35c146ce41573ec6e28cee4973f02d237bd56ffa42",
+      "audio/peer-019.wav": "f7b79a972c9e4ecb166b57baf21c91cc6f61f7c1c824bf7f7f053756519d4429",
+      "audio/peer-020.wav": "6082c377a1fe3421d5b6ea3c95e169ed65f7529b384b1337abc77f6f6b025b09",
+      "audio/peer-021.wav": "0d534e654feee517c2e22bb9e30bf981f46c08af08a912049af3b8b28f7526af",
+      "audio/peer-022.wav": "0c2e2ae939a668b7e33b8734af552471947c1e993a04b62a9a37d51ced70aefa",
+      "audio/peer-023.wav": "00b1864f9896547b34d62e45f2eb76651a64ced17e835c2f59786ae628c0e72e",
+      "audio/peer-024.wav": "6db58e3a0e3cca01fd4b4c7eaa61b5f3919362551b56eb7e37e728c4c7c3d9de",
+      "audio/peer-025.wav": "47b56268ec58b694e7a14968caafbddee8f1884e891828eb29671da0a4ede7d9",
+      "audio/peer-026.wav": "bdc1755e1a51b77a3821444b120370f8b72fc3d388687cedd9cd9f9be99d3c7a",
+      "audio/peer-027.wav": "ea7a31b0925db11e0006f1a6f8c905baf00312b10ac4f9067582c20911caeecf",
+      "audio/peer-028.wav": "fff42990b5c6ac308c4d5a2c5c59df18aceffa8c97f5b0a04cc3485e9322ca56",
+      "audio/peer-029.wav": "1134a4ceeb917726c95b4352ff9f231f7c8df7484e0195af32e3df1f9e1882d8",
+      "audio/peer-030.wav": "9a2df7def52f8b84f5cddd95098fe21f6f0a25203476aaaaa1f3f601527f9e6c",
+      "audio/peer-031.wav": "96f405c29877b19d734cad3f8dc1788f6da0ce36848d27b115ca5c8a7eb15b7f",
+      "audio/peer-032.wav": "0f8f3841d7477c0832ac559968872747508772876cb28f11cdc47b2ce68ee4a4",
+      "audio/peer-033.wav": "5dc2dce6eb74fdec021a7d9cadd2ec78f4c1c9b813dff6864ad20ba4101589bb",
+      "audio/peer-034.wav": "5dc2dce6eb74fdec021a7d9cadd2ec78f4c1c9b813dff6864ad20ba4101589bb",
+      "audio/peer-035.wav": "578c3ee5c8a0b0ea40cba0aab36e8bb1e7da846201cfb262e7ca9fa726efdc79",
+      "audio/peer-036.wav": "69ff95311d63943d0f6a47c5742d1e4617fd5ecba695521120d7947e0343ae8e",
+      "audio/peer-037.wav": "fe56c0bbe6216f96c165800c47401d0b716ad593ebc547b0f3515c8cad469137",
+      "audio/peer-038.wav": "db16cf0c8125e366846b0e33d3a3e12230c15ee76b7b7354ae188810129643a1",
+      "audio/peer-039.wav": "48119c5ba65b09211d4e4a017155438076f549b55fad11e201b07be90a2ba70c",
+      "audio/peer-040.wav": "122d71170851ed7ea641a8a80542a572ad761403cd87e7b0002b273728dfd9bc",
+      "audio/peer-041.wav": "b360b2c9645b8474f2d18272a53a2e7379e4a8b4390ee532ecfd5ed5e57831ac",
+      "audio/peer-042.wav": "8697436504be31e03436ff9f875701b06c17940666edca41bbc9d40934e14ec9",
+      "audio/peer-043.wav": "051dccc185cdaefbf983fd5fac463179269b60cd95e7d101884ea8e406581dab",
+      "audio/peer-044.wav": "f0038c4f662c8638a6c6bc67876ddd529b2c17bfa2ca7e244147547b105243f7",
+      "audio/peer-045.wav": "7a72876fd52de187150a5ed9e66e22585a08976d96177d0fef19bedf2ad211fd",
+      "audio/peer-046.wav": "5ee8046e7a735ab0386415474646c01e28838b870618adfcd9d73a7486325458",
+      "audio/peer-047.wav": "55922e4717e71dd3ab8711ae75f688fe75ace3799cb9a04eaec77596449eba1b",
+      "audio/peer-048.wav": "bec2b0c79535c1a0bbb4897e3c6bbaf72f772411323b1fd09f4712827f970f9d",
+      "audio/peer-049.wav": "fd16e3aec42ecc2b850acd284b3cd9e9fd670e0324a39b1b36fb6496f0662dd0",
+      "audio/peer-050.wav": "e6f4ff50528f4fabad2722303b51abff157b343eed1a48d2eac106becb2ce6f0",
+      "audio/peer-051.wav": "60e11656dd415013e024f09b05a898963598001de111d480bff8260571ad3c56",
+      "audio/peer-052.wav": "d66bea8424b00f51fdc2c18a0d0158e711a1757df6c39c15c22c07798c474f4f",
+      "audio/peer-053.wav": "67f0d8c58ef35ead47e3479b2e3b729b143b0d751b6dfa30a14e003b0b3c551c",
+      "audio/peer-054.wav": "3a47c0464251a7ed85d6f5e67f34858165af43aa52f0f4d0af8f63feae8afa3e",
+      "audio/peer-055.wav": "7dded24a70bdaf774e7ef25c26b1fcf661b2b2fdab1a19c5a57465d908916d01",
+      "audio/peer-056.wav": "8ecc435fea127c28ef0ca2e573f6aa40bd0e84ed131f8acffaeefcdd6ab53881",
+      "audio/peer-057.wav": "636076e3cad516a394fa36e820e2c0c8206149ffe7deff2bbc337da174639b7a",
+      "audio/peer-058.wav": "73248881df1c3eaf36ed8c70e8081b5f998fc1bdeb42911f37a34c4f4c5017b7",
+      "audio/peer-059.wav": "ebe7d5cfcdfb31bf2fce452988dff573cbab6b049a6e28460fca3206a67b086c",
+      "audio/peer-060.wav": "8295d9d4ae4dfe9aac67fb703193450dd1e06943b0f0627363bc8885132ab24c",
+      "audio/peer-061.wav": "511f6d45881c57cfee973e30a0a682ddeeb948f0f5a51881bd7a6929047b7ebd"
+    },
+    "putdownFiles": {
+      "library.json": "dd00abb98079b79ba8440e67e8a90d20e43f6bee7bfcce8bcbc6030d44c003eb",
+      "provenance.json": "d54525144e33ee3714586ad18e5f32e1edb2e765cf1bf6edb06542d58070ef5b",
+      "radar-index.bin": "8cabc4a60a6224dcb4f8bf0c8cf06d359da3c70b0e92646f9c7518cefde6c78b",
+      "audio/267afca3-1.wav": "c74560344662898a524fc8e7c2a88ebd2f6f2cf93f8716231af91b3efecc1d72",
+      "audio/267afca3-2.wav": "c74560344662898a524fc8e7c2a88ebd2f6f2cf93f8716231af91b3efecc1d72",
+      "audio/56dfb35b-1.wav": "542d3fcef11c0a376267d984afa979dd03e07c150f71924cb7c3a416ccc94ee7",
+      "audio/cb1c0d1d-1.wav": "59d95be50def7a43cf13d60451e8ddf0f7152220e1c2526794c90196266ef329",
+      "audio/e9f62d39-1.wav": "7ea621df8a1321e93a9f16da90f6525564368b1121d6af3ef80958f7438ebdc0"
+    },
+    "offHasNoPutdownDirectory": true,
+    "onArm": "sha256-verified previous full replay plus fresh short replay",
+    "offArm": "new full replay of all ten identical WAV inputs",
+    "freshOnCheck": {
+      "job": "204258-backpack",
+      "analyses": 50,
+      "identicalToCached": true,
+      "eventsSha256": "0c36d4f992198141ffaceaa923926d4cf80de7657bf88489710a3d60b3e4ca39"
+    }
+  },
+  "frozenLabelsSha256": "e1160b6cbfda9c23477d958acc8e0088aba30cca10a3e33ce6fe2f80584c74ee",
+  "totals": {
+    "on": {
+      "fullAnalyses": 9573,
+      "fullCandidateSetOutputs": 312,
+      "developmentAnalyses": 399,
+      "developmentCandidateSetOutputs": 73,
+      "putdownBranchEvents": 0,
+      "knownOperations": 8,
+      "knownTriggered": 5,
+      "knownCandidateSets": 0,
+      "knownDrags": 2,
+      "knownDragCandidateSets": 0,
+      "knownTransfers": 6,
+      "knownTransferCandidateSets": 0,
+      "hiddenPickups": 10,
+      "hiddenTriggered": 7,
+      "hiddenCandidateSets": 4,
+      "hiddenCandidateSetsBeforeRelease": 2,
+      "confirmedFullFalseOutputs": 19,
+      "confirmedDevelopmentFalseOutputs": 3
+    },
+    "off": {
+      "fullAnalyses": 9573,
+      "fullCandidateSetOutputs": 312,
+      "developmentAnalyses": 399,
+      "developmentCandidateSetOutputs": 73,
+      "putdownBranchEvents": 0,
+      "knownOperations": 8,
+      "knownTriggered": 5,
+      "knownCandidateSets": 0,
+      "knownDrags": 2,
+      "knownDragCandidateSets": 0,
+      "knownTransfers": 6,
+      "knownTransferCandidateSets": 0,
+      "hiddenPickups": 10,
+      "hiddenTriggered": 7,
+      "hiddenCandidateSets": 4,
+      "hiddenCandidateSetsBeforeRelease": 2,
+      "confirmedFullFalseOutputs": 19,
+      "confirmedDevelopmentFalseOutputs": 3
+    },
+    "fullSeconds": 7546.6,
+    "developmentSeconds": 610,
+    "totalAnalyses": 9972,
+    "changedEvents": 0,
+    "byteIdenticalEventReports": 10
+  },
+  "overallAccuracy": null,
+  "productionFilesUnchanged": true,
+  "allEventFieldsEqual": true,
+  "controls": {
+    "kind": "reference-only-switch-control-not-gameplay-accuracy",
+    "references": [
+      {
+        "file": "putdown/audio/267afca3-1.wav",
+        "onset": 2.0,
+        "sha256": "c74560344662898a524fc8e7c2a88ebd2f6f2cf93f8716231af91b3efecc1d72"
+      },
+      {
+        "file": "putdown/audio/267afca3-2.wav",
+        "onset": 4.5,
+        "sha256": "c74560344662898a524fc8e7c2a88ebd2f6f2cf93f8716231af91b3efecc1d72"
+      },
+      {
+        "file": "putdown/audio/56dfb35b-1.wav",
+        "onset": 7.0,
+        "sha256": "542d3fcef11c0a376267d984afa979dd03e07c150f71924cb7c3a416ccc94ee7"
+      },
+      {
+        "file": "putdown/audio/cb1c0d1d-1.wav",
+        "onset": 9.5,
+        "sha256": "59d95be50def7a43cf13d60451e8ddf0f7152220e1c2526794c90196266ef329"
+      },
+      {
+        "file": "putdown/audio/e9f62d39-1.wav",
+        "onset": 12.0,
+        "sha256": "7ea621df8a1321e93a9f16da90f6525564368b1121d6af3ef80958f7438ebdc0"
+      }
+    ],
+    "audioSha256": "cc484a1bf7fe407bb7df0b0680cbf39ca02f5b4677f8be962cf5b7082580fda7",
+    "analyses": 5,
+    "onPutdownEvents": 2,
+    "offPutdownEvents": 0,
+    "onMatched": 3,
+    "offMatched": 3,
+    "changedEvents": [
+      {
+        "index": 2,
+        "on": {
+          "analyzedAt": 7.6,
+          "onset": 7.109999999999999,
+          "clipStart": 7.0299999999999985,
+          "clipEnd": 7.469999999999999,
+          "status": "listening",
+          "scores": [
+            {
+              "groupId": "56dfb35b",
+              "score": 0.9616240847139681
+            }
+          ],
+          "candidateIds": [],
+          "action": "putdown"
+        },
+        "off": {
+          "analyzedAt": 7.6,
+          "onset": 7.109999999999999,
+          "clipStart": 7.0299999999999985,
+          "clipEnd": 7.469999999999999,
+          "status": "unknown",
+          "scores": [
+            {
+              "groupId": "peer-049",
+              "score": 0.5474563591352928
+            },
+            {
+              "groupId": "peer-009",
+              "score": 0.5394460886133325
+            },
+            {
+              "groupId": "peer-010",
+              "score": 0.5391688531812963
+            }
+          ],
+          "candidateIds": [],
+          "action": "pickup"
+        }
+      },
+      {
+        "index": 3,
+        "on": {
+          "analyzedAt": 10,
+          "onset": 9.59,
+          "clipStart": 9.51,
+          "clipEnd": 9.92,
+          "status": "listening",
+          "scores": [
+            {
+              "groupId": "cb1c0d1d",
+              "score": 0.9981275570338252
+            }
+          ],
+          "candidateIds": [],
+          "action": "putdown"
+        },
+        "off": {
+          "analyzedAt": 10,
+          "onset": 9.59,
+          "clipStart": 9.51,
+          "clipEnd": 9.92,
+          "status": "unknown",
+          "scores": [
+            {
+              "groupId": "peer-001",
+              "score": 0.7627496589352986
+            },
+            {
+              "groupId": "peer-002",
+              "score": 0.7623451045612188
+            },
+            {
+              "groupId": "peer-018",
+              "score": 0.7618728233603571
+            }
+          ],
+          "candidateIds": [],
+          "action": "pickup"
+        }
+      }
+    ]
+  },
+  "jobs": [
+    {
+      "id": "record20260920-213509",
+      "recording": "record20260920-213509",
+      "start": 0,
+      "duration": 1967.6,
+      "cohort": "frozen-full-recording",
+      "analyses": 2725,
+      "onMatches": 121,
+      "offMatches": 121,
+      "onPutdownEvents": 0,
+      "offPutdownEvents": 0,
+      "identicalTriggerTimes": true,
+      "allEventFieldsEqual": true,
+      "changedEvents": 0,
+      "audioSha256": "21538409e27186f8ee260d6571394b0a2e4faa87d16a6cfeb1f66cc083f39b29",
+      "onEventsSha256": "193df494b1fddbf9521d0eee661f5c41b0cec19aaa0d514fa97279f6a56bf23c",
+      "offEventsSha256": "193df494b1fddbf9521d0eee661f5c41b0cec19aaa0d514fa97279f6a56bf23c",
+      "offReplayWallSeconds": 60.981,
+      "differingEventIndices": []
+    },
+    {
+      "id": "record20260921-205434",
+      "recording": "record20260921-205434",
+      "start": 0,
+      "duration": 1000.5,
+      "cohort": "frozen-full-recording",
+      "analyses": 1321,
+      "onMatches": 34,
+      "offMatches": 34,
+      "onPutdownEvents": 0,
+      "offPutdownEvents": 0,
+      "identicalTriggerTimes": true,
+      "allEventFieldsEqual": true,
+      "changedEvents": 0,
+      "audioSha256": "360f4e4971924a22edbd11c5dcf5965614f8dfabea412d54457e8102eb8945e2",
+      "onEventsSha256": "2db4350f349fbee7da3ca4668b75f575b89eec5f227de263ab254068969ddf1a",
+      "offEventsSha256": "2db4350f349fbee7da3ca4668b75f575b89eec5f227de263ab254068969ddf1a",
+      "offReplayWallSeconds": 29.631,
+      "differingEventIndices": []
+    },
+    {
+      "id": "record20260922-214737",
+      "recording": "record20260922-214737",
+      "start": 0,
+      "duration": 1096.7,
+      "cohort": "frozen-full-recording",
+      "analyses": 1495,
+      "onMatches": 41,
+      "offMatches": 41,
+      "onPutdownEvents": 0,
+      "offPutdownEvents": 0,
+      "identicalTriggerTimes": true,
+      "allEventFieldsEqual": true,
+      "changedEvents": 0,
+      "audioSha256": "b8225ab1cdbf7382b07c2575ebc60c8306734f505da06420c931009e75ab0e33",
+      "onEventsSha256": "90882ce2555dfcb406bfb10786466867062a2f7261ef5419ef91dca76db33ecb",
+      "offEventsSha256": "90882ce2555dfcb406bfb10786466867062a2f7261ef5419ef91dca76db33ecb",
+      "offReplayWallSeconds": 34.107,
+      "differingEventIndices": []
+    },
+    {
+      "id": "record20260922-205653",
+      "recording": "record20260922-205653",
+      "start": 0,
+      "duration": 1442.4,
+      "cohort": "frozen-full-recording",
+      "analyses": 1574,
+      "onMatches": 51,
+      "offMatches": 51,
+      "onPutdownEvents": 0,
+      "offPutdownEvents": 0,
+      "identicalTriggerTimes": true,
+      "allEventFieldsEqual": true,
+      "changedEvents": 0,
+      "audioSha256": "b7f583871548c9850f5d3cd923c4ce7299f741d96acbc7a85a6777137339718c",
+      "onEventsSha256": "a60214e4b9d1497bc7d9b3885a30fe84a9a50146db25eedc445d8a9391d7cec4",
+      "offEventsSha256": "a60214e4b9d1497bc7d9b3885a30fe84a9a50146db25eedc445d8a9391d7cec4",
+      "offReplayWallSeconds": 35.871,
+      "differingEventIndices": []
+    },
+    {
+      "id": "record20260920-205237",
+      "recording": "record20260920-205237",
+      "start": 0,
+      "duration": 2039.4,
+      "cohort": "frozen-full-recording",
+      "analyses": 2458,
+      "onMatches": 65,
+      "offMatches": 65,
+      "onPutdownEvents": 0,
+      "offPutdownEvents": 0,
+      "identicalTriggerTimes": true,
+      "allEventFieldsEqual": true,
+      "changedEvents": 0,
+      "audioSha256": "4117f4aa3a173845f4a31d21473926563929a05b137f3f8203a16b3b8e185ee2",
+      "onEventsSha256": "73a1f48b85cdaf5144c036c028897cc5dce87b72ef75d66eab621d93664cffad",
+      "offEventsSha256": "73a1f48b85cdaf5144c036c028897cc5dce87b72ef75d66eab621d93664cffad",
+      "offReplayWallSeconds": 55.857,
+      "differingEventIndices": []
+    },
+    {
+      "id": "204258-trader",
+      "recording": "record20260923-204258",
+      "start": 600,
+      "duration": 210,
+      "cohort": "previous-development",
+      "analyses": 87,
+      "onMatches": 36,
+      "offMatches": 36,
+      "onPutdownEvents": 0,
+      "offPutdownEvents": 0,
+      "identicalTriggerTimes": true,
+      "allEventFieldsEqual": true,
+      "changedEvents": 0,
+      "audioSha256": "9c8a25dca8fe2a9d5b523e288c53b1821becb669208fb28850637025f350a2d5",
+      "onEventsSha256": "6766c2b9e21b542b7f915cbebcae8c77a42296bfb43d8497cbfc6ebd4e34db5b",
+      "offEventsSha256": "6766c2b9e21b542b7f915cbebcae8c77a42296bfb43d8497cbfc6ebd4e34db5b",
+      "offReplayWallSeconds": 2.236,
+      "differingEventIndices": []
+    },
+    {
+      "id": "211647-trader",
+      "recording": "record20260923-211647",
+      "start": 570,
+      "duration": 190,
+      "cohort": "previous-development",
+      "analyses": 76,
+      "onMatches": 34,
+      "offMatches": 34,
+      "onPutdownEvents": 0,
+      "offPutdownEvents": 0,
+      "identicalTriggerTimes": true,
+      "allEventFieldsEqual": true,
+      "changedEvents": 0,
+      "audioSha256": "5c416c96af038e2a89603dddcce52976e3b32fee2a270089474a71a7246583c0",
+      "onEventsSha256": "4e2770a1b54feec2adb2b890d7f0ead757cd4451a05dccb90639bfc99fc763bc",
+      "offEventsSha256": "4e2770a1b54feec2adb2b890d7f0ead757cd4451a05dccb90639bfc99fc763bc",
+      "offReplayWallSeconds": 1.837,
+      "differingEventIndices": []
+    },
+    {
+      "id": "204258-backpack",
+      "recording": "record20260923-204258",
+      "start": 1100,
+      "duration": 70,
+      "cohort": "previous-development",
+      "analyses": 50,
+      "onMatches": 0,
+      "offMatches": 0,
+      "onPutdownEvents": 0,
+      "offPutdownEvents": 0,
+      "identicalTriggerTimes": true,
+      "allEventFieldsEqual": true,
+      "changedEvents": 0,
+      "audioSha256": "02f1f3aef3b112ae104b0e61647cee693d5a24dd91ee5b672283da4bd870d66d",
+      "onEventsSha256": "0c36d4f992198141ffaceaa923926d4cf80de7657bf88489710a3d60b3e4ca39",
+      "offEventsSha256": "0c36d4f992198141ffaceaa923926d4cf80de7657bf88489710a3d60b3e4ca39",
+      "offReplayWallSeconds": 1.447,
+      "differingEventIndices": []
+    },
+    {
+      "id": "204258-movement",
+      "recording": "record20260923-204258",
+      "start": 350,
+      "duration": 60,
+      "cohort": "previous-development",
+      "analyses": 94,
+      "onMatches": 2,
+      "offMatches": 2,
+      "onPutdownEvents": 0,
+      "offPutdownEvents": 0,
+      "identicalTriggerTimes": true,
+      "allEventFieldsEqual": true,
+      "changedEvents": 0,
+      "audioSha256": "376307874af0427d3d68028c3f48e9933a5ed500f7bfc31a028d01675e4d423e",
+      "onEventsSha256": "e4b92cb104651a18030d3d2e40f85c786ca85d484badfb045d3890c471784772",
+      "offEventsSha256": "e4b92cb104651a18030d3d2e40f85c786ca85d484badfb045d3890c471784772",
+      "offReplayWallSeconds": 2.238,
+      "differingEventIndices": []
+    },
+    {
+      "id": "211647-movement",
+      "recording": "record20260923-211647",
+      "start": 980,
+      "duration": 80,
+      "cohort": "previous-development",
+      "analyses": 92,
+      "onMatches": 1,
+      "offMatches": 1,
+      "onPutdownEvents": 0,
+      "offPutdownEvents": 0,
+      "identicalTriggerTimes": true,
+      "allEventFieldsEqual": true,
+      "changedEvents": 0,
+      "audioSha256": "08f45296e9020de49f44a654aff7a6f8b606db9e518d01d9dd599bf3946bb150",
+      "onEventsSha256": "4d2fb8a722e393f4af00819805516cce8142dc37879380183251a61fdd8b9a48",
+      "offEventsSha256": "4d2fb8a722e393f4af00819805516cce8142dc37879380183251a61fdd8b9a48",
+      "offReplayWallSeconds": 2.463,
+      "differingEventIndices": []
+    }
+  ],
+  "knownOperations": [
+    {
+      "id": "tv-loot",
+      "item": "e9f62d39-2",
+      "name": "胶囊电视",
+      "onset": [
+        64.3,
+        64.4
+      ],
+      "action": "transfer",
+      "evidence": "tv-detail/frame-00064.400.jpg",
+      "recording": "record20260920-213509",
+      "on": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": null,
+        "candidateSetBeforeRelease": null,
+        "events": [
+          {
+            "analyzedAt": 64.8,
+            "onset": 64.25,
+            "clipStart": 64.17,
+            "clipEnd": 64.61,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-058",
+                "score": 0.6276216546721292
+              },
+              {
+                "groupId": "peer-059",
+                "score": 0.6276216546721292
+              },
+              {
+                "groupId": "peer-056",
+                "score": 0.6273325492426435
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      },
+      "off": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": null,
+        "candidateSetBeforeRelease": null,
+        "events": [
+          {
+            "analyzedAt": 64.8,
+            "onset": 64.25,
+            "clipStart": 64.17,
+            "clipEnd": 64.61,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-058",
+                "score": 0.6276216546721292
+              },
+              {
+                "groupId": "peer-059",
+                "score": 0.6276216546721292
+              },
+              {
+                "groupId": "peer-056",
+                "score": 0.6273325492426435
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tv-recovery",
+      "item": "e9f62d39-2",
+      "name": "胶囊电视",
+      "onset": [
+        550.15,
+        550.2
+      ],
+      "action": "transfer",
+      "evidence": "tv-transfer/frame-00550.200.jpg",
+      "recording": "record20260920-213509",
+      "on": {
+        "analysisTriggered": false,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": null,
+        "candidateSetBeforeRelease": null,
+        "events": []
+      },
+      "off": {
+        "analysisTriggered": false,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": null,
+        "candidateSetBeforeRelease": null,
+        "events": []
+      }
+    },
+    {
+      "id": "egg-loot",
+      "item": "e9f62d39-6",
+      "name": "赫美拉彩蛋",
+      "onset": [
+        65.6,
+        65.65
+      ],
+      "action": "transfer",
+      "evidence": "egg-detail/frame-00065.650.jpg",
+      "recording": "record20260921-205434",
+      "on": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": null,
+        "candidateSetBeforeRelease": null,
+        "events": [
+          {
+            "analyzedAt": 66,
+            "onset": 65.61,
+            "clipStart": 65.53,
+            "clipEnd": 65.92,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-043",
+                "score": 0.6383127912518387
+              },
+              {
+                "groupId": "peer-054",
+                "score": 0.6297002190557629
+              },
+              {
+                "groupId": "peer-056",
+                "score": 0.6229671385167721
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      },
+      "off": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": null,
+        "candidateSetBeforeRelease": null,
+        "events": [
+          {
+            "analyzedAt": 66,
+            "onset": 65.61,
+            "clipStart": 65.53,
+            "clipEnd": 65.92,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-043",
+                "score": 0.6383127912518387
+              },
+              {
+                "groupId": "peer-054",
+                "score": 0.6297002190557629
+              },
+              {
+                "groupId": "peer-056",
+                "score": 0.6229671385167721
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      }
+    },
+    {
+      "id": "egg-drag",
+      "item": "e9f62d39-6",
+      "name": "赫美拉彩蛋",
+      "onset": [
+        67.05,
+        67.1
+      ],
+      "drop": [
+        67.6,
+        67.65
+      ],
+      "action": "drag",
+      "evidence": "egg-detail/frame-00067.100.jpg",
+      "recording": "record20260921-205434",
+      "on": {
+        "analysisTriggered": false,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": []
+      },
+      "off": {
+        "analysisTriggered": false,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": []
+      }
+    },
+    {
+      "id": "dawn-loot",
+      "item": "361affd2-2",
+      "name": "黎明",
+      "onset": [
+        78.4,
+        78.45
+      ],
+      "action": "transfer",
+      "evidence": "dawn-detail/frame-00078.450.jpg",
+      "recording": "record20260922-214737",
+      "on": {
+        "analysisTriggered": false,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": null,
+        "candidateSetBeforeRelease": null,
+        "events": []
+      },
+      "off": {
+        "analysisTriggered": false,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": null,
+        "candidateSetBeforeRelease": null,
+        "events": []
+      }
+    },
+    {
+      "id": "dawn-drag",
+      "item": "361affd2-2",
+      "name": "黎明",
+      "onset": [
+        80.45,
+        80.5
+      ],
+      "drop": [
+        80.9,
+        80.95
+      ],
+      "action": "drag",
+      "evidence": "dawn-detail/frame-00080.500.jpg",
+      "recording": "record20260922-214737",
+      "on": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": [
+          {
+            "analyzedAt": 81,
+            "onset": 80.45,
+            "clipStart": 80.37,
+            "clipEnd": 80.81,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-054",
+                "score": 0.7790385773225511
+              },
+              {
+                "groupId": "peer-043",
+                "score": 0.7759226160308234
+              },
+              {
+                "groupId": "peer-056",
+                "score": 0.7151084151704534
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      },
+      "off": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": [
+          {
+            "analyzedAt": 81,
+            "onset": 80.45,
+            "clipStart": 80.37,
+            "clipEnd": 80.81,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-054",
+                "score": 0.7790385773225511
+              },
+              {
+                "groupId": "peer-043",
+                "score": 0.7759226160308234
+              },
+              {
+                "groupId": "peer-056",
+                "score": 0.7151084151704534
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lens-loot",
+      "item": "e9f62d39-7",
+      "name": "阵列镜片",
+      "onset": [
+        2004.7,
+        2004.8
+      ],
+      "action": "transfer",
+      "evidence": "loot-detail/frame-02004.800.jpg",
+      "recording": "record20260920-205237",
+      "on": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": null,
+        "candidateSetBeforeRelease": null,
+        "events": [
+          {
+            "analyzedAt": 2005,
+            "onset": 2004.53,
+            "clipStart": 2004.4499999999998,
+            "clipEnd": 2004.8899999999999,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-018",
+                "score": 0.547877569404888
+              },
+              {
+                "groupId": "peer-042",
+                "score": 0.5475805937674092
+              },
+              {
+                "groupId": "peer-001",
+                "score": 0.5473898816131328
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      },
+      "off": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": null,
+        "candidateSetBeforeRelease": null,
+        "events": [
+          {
+            "analyzedAt": 2005,
+            "onset": 2004.53,
+            "clipStart": 2004.4499999999998,
+            "clipEnd": 2004.8899999999999,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-018",
+                "score": 0.547877569404888
+              },
+              {
+                "groupId": "peer-042",
+                "score": 0.5475805937674092
+              },
+              {
+                "groupId": "peer-001",
+                "score": 0.5473898816131328
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      }
+    },
+    {
+      "id": "nav-loot",
+      "item": "361affd2-3",
+      "name": "航天导航仪",
+      "onset": [
+        2010.4,
+        2010.5
+      ],
+      "action": "transfer",
+      "evidence": "loot-detail/frame-02010.500.jpg",
+      "recording": "record20260920-205237",
+      "on": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": null,
+        "candidateSetBeforeRelease": null,
+        "events": [
+          {
+            "analyzedAt": 2011,
+            "onset": 2010.45,
+            "clipStart": 2010.37,
+            "clipEnd": 2010.81,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-018",
+                "score": 0.5921173452609717
+              },
+              {
+                "groupId": "peer-001",
+                "score": 0.5919928153164614
+              },
+              {
+                "groupId": "peer-042",
+                "score": 0.591277277070632
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      },
+      "off": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": null,
+        "candidateSetBeforeRelease": null,
+        "events": [
+          {
+            "analyzedAt": 2011,
+            "onset": 2010.45,
+            "clipStart": 2010.37,
+            "clipEnd": 2010.81,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-018",
+                "score": 0.5921173452609717
+              },
+              {
+                "groupId": "peer-001",
+                "score": 0.5919928153164614
+              },
+              {
+                "groupId": "peer-042",
+                "score": 0.591277277070632
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      }
+    }
+  ],
+  "hiddenPickups": [
+    {
+      "id": "trader-00",
+      "onset": [
+        1111.95,
+        1112.0
+      ],
+      "drop": [
+        1112.4,
+        1112.45
+      ],
+      "visualReviewed": true,
+      "evidence": "trader-drag-review/00-startIndex.jpg",
+      "recording": "record20260922-205653",
+      "on": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": [
+          {
+            "analyzedAt": 1112.6,
+            "onset": 1112.1899999999998,
+            "clipStart": 1112.11,
+            "clipEnd": 1112.52,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-008",
+                "score": 0.7127831523650622
+              },
+              {
+                "groupId": "peer-025",
+                "score": 0.7111624733865558
+              },
+              {
+                "groupId": "peer-027",
+                "score": 0.7111579661111215
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      },
+      "off": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": [
+          {
+            "analyzedAt": 1112.6,
+            "onset": 1112.1899999999998,
+            "clipStart": 1112.11,
+            "clipEnd": 1112.52,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-008",
+                "score": 0.7127831523650622
+              },
+              {
+                "groupId": "peer-025",
+                "score": 0.7111624733865558
+              },
+              {
+                "groupId": "peer-027",
+                "score": 0.7111579661111215
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trader-01",
+      "onset": [
+        1114.2,
+        1114.25
+      ],
+      "drop": [
+        1114.75,
+        1114.8
+      ],
+      "visualReviewed": true,
+      "evidence": "trader-drag-review/01-startIndex.jpg",
+      "recording": "record20260922-205653",
+      "on": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": [
+          {
+            "analyzedAt": 1115,
+            "onset": 1114.45,
+            "clipStart": 1114.37,
+            "clipEnd": 1114.81,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-025",
+                "score": 0.7477127641600941
+              },
+              {
+                "groupId": "peer-027",
+                "score": 0.7476831028356382
+              },
+              {
+                "groupId": "peer-008",
+                "score": 0.7476462568452881
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      },
+      "off": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": [
+          {
+            "analyzedAt": 1115,
+            "onset": 1114.45,
+            "clipStart": 1114.37,
+            "clipEnd": 1114.81,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-025",
+                "score": 0.7477127641600941
+              },
+              {
+                "groupId": "peer-027",
+                "score": 0.7476831028356382
+              },
+              {
+                "groupId": "peer-008",
+                "score": 0.7476462568452881
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trader-02",
+      "onset": [
+        1124.65,
+        1124.7
+      ],
+      "drop": [
+        1125.25,
+        1125.3
+      ],
+      "visualReviewed": true,
+      "evidence": "trader-drag-review/02-startIndex.jpg",
+      "recording": "record20260922-205653",
+      "on": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": [
+          {
+            "analyzedAt": 1125.4,
+            "onset": 1124.8500000000001,
+            "clipStart": 1124.77,
+            "clipEnd": 1125.21,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-003",
+                "score": 0.7364202032220281
+              },
+              {
+                "groupId": "peer-041",
+                "score": 0.6873604055545187
+              },
+              {
+                "groupId": "peer-018",
+                "score": 0.6303831355506976
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      },
+      "off": {
+        "analysisTriggered": true,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": [
+          {
+            "analyzedAt": 1125.4,
+            "onset": 1124.8500000000001,
+            "clipStart": 1124.77,
+            "clipEnd": 1125.21,
+            "status": "unknown",
+            "scores": [
+              {
+                "groupId": "peer-003",
+                "score": 0.7364202032220281
+              },
+              {
+                "groupId": "peer-041",
+                "score": 0.6873604055545187
+              },
+              {
+                "groupId": "peer-018",
+                "score": 0.6303831355506976
+              }
+            ],
+            "candidateIds": [],
+            "action": "pickup"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trader-03",
+      "onset": [
+        1126.95,
+        1127.0
+      ],
+      "drop": [
+        1127.5,
+        1127.55
+      ],
+      "visualReviewed": true,
+      "evidence": "trader-drag-review/03-startIndex.jpg",
+      "recording": "record20260922-205653",
+      "on": {
+        "analysisTriggered": false,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": []
+      },
+      "off": {
+        "analysisTriggered": false,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": []
+      }
+    },
+    {
+      "id": "trader-04",
+      "onset": [
+        1129.85,
+        1129.9
+      ],
+      "drop": [
+        1130.35,
+        1130.4
+      ],
+      "visualReviewed": true,
+      "evidence": "trader-drag-review/04-startIndex.jpg",
+      "recording": "record20260922-205653",
+      "on": {
+        "analysisTriggered": false,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": []
+      },
+      "off": {
+        "analysisTriggered": false,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": []
+      }
+    },
+    {
+      "id": "trader-05",
+      "onset": [
+        1132.25,
+        1132.3
+      ],
+      "drop": [
+        1132.9,
+        1132.95
+      ],
+      "visualReviewed": true,
+      "evidence": "trader-drag-review/05-startIndex.jpg",
+      "recording": "record20260922-205653",
+      "on": {
+        "analysisTriggered": true,
+        "candidateSetProduced": true,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": [
+          {
+            "analyzedAt": 1133,
+            "onset": 1132.55,
+            "clipStart": 1132.47,
+            "clipEnd": 1132.91,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "peer-041",
+                "score": 0.7838395822467061
+              },
+              {
+                "groupId": "peer-001",
+                "score": 0.6569278973447135
+              },
+              {
+                "groupId": "peer-002",
+                "score": 0.6563850973901307
+              }
+            ],
+            "candidateIds": [
+              "peer-041"
+            ],
+            "action": "pickup"
+          }
+        ]
+      },
+      "off": {
+        "analysisTriggered": true,
+        "candidateSetProduced": true,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": [
+          {
+            "analyzedAt": 1133,
+            "onset": 1132.55,
+            "clipStart": 1132.47,
+            "clipEnd": 1132.91,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "peer-041",
+                "score": 0.7838395822467061
+              },
+              {
+                "groupId": "peer-001",
+                "score": 0.6569278973447135
+              },
+              {
+                "groupId": "peer-002",
+                "score": 0.6563850973901307
+              }
+            ],
+            "candidateIds": [
+              "peer-041"
+            ],
+            "action": "pickup"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trader-06",
+      "onset": [
+        1134.15,
+        1134.2
+      ],
+      "drop": [
+        1135.0,
+        1135.05
+      ],
+      "visualReviewed": true,
+      "evidence": "trader-drag-review/06-startIndex.jpg",
+      "recording": "record20260922-205653",
+      "on": {
+        "analysisTriggered": false,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": []
+      },
+      "off": {
+        "analysisTriggered": false,
+        "candidateSetProduced": false,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": []
+      }
+    },
+    {
+      "id": "trader-07",
+      "onset": [
+        1136.5,
+        1136.55
+      ],
+      "drop": [
+        1137.45,
+        1137.5
+      ],
+      "visualReviewed": true,
+      "evidence": "trader-drag-review/07-startIndex.jpg",
+      "recording": "record20260922-205653",
+      "on": {
+        "analysisTriggered": true,
+        "candidateSetProduced": true,
+        "analysisBeforeRelease": true,
+        "candidateSetBeforeRelease": true,
+        "events": [
+          {
+            "analyzedAt": 1137.2,
+            "onset": 1136.75,
+            "clipStart": 1136.67,
+            "clipEnd": 1137.1100000000001,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "peer-043",
+                "score": 0.8679683398508492
+              },
+              {
+                "groupId": "peer-054",
+                "score": 0.7494438807632668
+              },
+              {
+                "groupId": "peer-005",
+                "score": 0.6508820813580919
+              }
+            ],
+            "candidateIds": [
+              "peer-043"
+            ],
+            "action": "pickup"
+          }
+        ]
+      },
+      "off": {
+        "analysisTriggered": true,
+        "candidateSetProduced": true,
+        "analysisBeforeRelease": true,
+        "candidateSetBeforeRelease": true,
+        "events": [
+          {
+            "analyzedAt": 1137.2,
+            "onset": 1136.75,
+            "clipStart": 1136.67,
+            "clipEnd": 1137.1100000000001,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "peer-043",
+                "score": 0.8679683398508492
+              },
+              {
+                "groupId": "peer-054",
+                "score": 0.7494438807632668
+              },
+              {
+                "groupId": "peer-005",
+                "score": 0.6508820813580919
+              }
+            ],
+            "candidateIds": [
+              "peer-043"
+            ],
+            "action": "pickup"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trader-08",
+      "onset": [
+        1139.75,
+        1139.8
+      ],
+      "drop": [
+        1140.35,
+        1140.4
+      ],
+      "visualReviewed": true,
+      "evidence": "trader-drag-review/08-startIndex.jpg",
+      "recording": "record20260922-205653",
+      "on": {
+        "analysisTriggered": true,
+        "candidateSetProduced": true,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": [
+          {
+            "analyzedAt": 1140.4,
+            "onset": 1139.99,
+            "clipStart": 1139.91,
+            "clipEnd": 1140.3200000000002,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "peer-043",
+                "score": 0.9084460719838428
+              },
+              {
+                "groupId": "peer-054",
+                "score": 0.8123807178658292
+              },
+              {
+                "groupId": "peer-041",
+                "score": 0.6699678530129715
+              }
+            ],
+            "candidateIds": [
+              "peer-043",
+              "peer-054"
+            ],
+            "action": "pickup"
+          }
+        ]
+      },
+      "off": {
+        "analysisTriggered": true,
+        "candidateSetProduced": true,
+        "analysisBeforeRelease": false,
+        "candidateSetBeforeRelease": false,
+        "events": [
+          {
+            "analyzedAt": 1140.4,
+            "onset": 1139.99,
+            "clipStart": 1139.91,
+            "clipEnd": 1140.3200000000002,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "peer-043",
+                "score": 0.9084460719838428
+              },
+              {
+                "groupId": "peer-054",
+                "score": 0.8123807178658292
+              },
+              {
+                "groupId": "peer-041",
+                "score": 0.6699678530129715
+              }
+            ],
+            "candidateIds": [
+              "peer-043",
+              "peer-054"
+            ],
+            "action": "pickup"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trader-09",
+      "onset": [
+        1144.55,
+        1144.6
+      ],
+      "drop": [
+        1145.4,
+        1145.45
+      ],
+      "visualReviewed": true,
+      "evidence": "trader-drag-review/09-startIndex.jpg",
+      "recording": "record20260922-205653",
+      "on": {
+        "analysisTriggered": true,
+        "candidateSetProduced": true,
+        "analysisBeforeRelease": true,
+        "candidateSetBeforeRelease": true,
+        "events": [
+          {
+            "analyzedAt": 1145.2,
+            "onset": 1144.79,
+            "clipStart": 1144.71,
+            "clipEnd": 1145.1200000000001,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "peer-043",
+                "score": 0.8795493806980396
+              },
+              {
+                "groupId": "peer-054",
+                "score": 0.7630309952893916
+              },
+              {
+                "groupId": "peer-041",
+                "score": 0.6605564907095034
+              }
+            ],
+            "candidateIds": [
+              "peer-043",
+              "peer-054"
+            ],
+            "action": "pickup"
+          }
+        ]
+      },
+      "off": {
+        "analysisTriggered": true,
+        "candidateSetProduced": true,
+        "analysisBeforeRelease": true,
+        "candidateSetBeforeRelease": true,
+        "events": [
+          {
+            "analyzedAt": 1145.2,
+            "onset": 1144.79,
+            "clipStart": 1144.71,
+            "clipEnd": 1145.1200000000001,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "peer-043",
+                "score": 0.8795493806980396
+              },
+              {
+                "groupId": "peer-054",
+                "score": 0.7630309952893916
+              },
+              {
+                "groupId": "peer-041",
+                "score": 0.6605564907095034
+              }
+            ],
+            "candidateIds": [
+              "peer-043",
+              "peer-054"
+            ],
+            "action": "pickup"
+          }
+        ]
+      }
+    }
+  ],
+  "reviewedFalseScenes": [
+    {
+      "job": "record20260920-213509",
+      "recording": "record20260920-213509",
+      "onset": 449.35,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称使用医疗用品，未操作目标物品",
+      "originalEvidence": "predictions/00-+0.35.jpg",
+      "origin": "old-baseline-false-scene",
+      "onMatched": false,
+      "offMatched": false,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 449.8,
+        "onset": 449.35,
+        "clipStart": 449.27000000000004,
+        "clipEnd": 449.71000000000004,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.6883274435045441
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.6877819552392875
+          },
+          {
+            "groupId": "peer-042",
+            "score": 0.687403829136533
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 449.8,
+        "onset": 449.35,
+        "clipStart": 449.27000000000004,
+        "clipEnd": 449.71000000000004,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.6883274435045441
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.6877819552392875
+          },
+          {
+            "groupId": "peer-042",
+            "score": 0.687403829136533
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-213509",
+      "recording": "record20260920-213509",
+      "onset": 958.65,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称移动，未操作目标物品",
+      "originalEvidence": "predictions/01-+0.35.jpg",
+      "origin": "old-baseline-false-scene",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 959.2,
+        "onset": 958.65,
+        "clipStart": 958.5699999999999,
+        "clipEnd": 959.01,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-042",
+            "score": 0.8224271330153948
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.8218004327831433
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.8214270052501448
+          }
+        ],
+        "candidateIds": [
+          "peer-042",
+          "peer-001",
+          "peer-018",
+          "peer-002"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 959.2,
+        "onset": 958.65,
+        "clipStart": 958.5699999999999,
+        "clipEnd": 959.01,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-042",
+            "score": 0.8224271330153948
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.8218004327831433
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.8214270052501448
+          }
+        ],
+        "candidateIds": [
+          "peer-042",
+          "peer-001",
+          "peer-018",
+          "peer-002"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-213509",
+      "recording": "record20260920-213509",
+      "onset": 1562.21,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持刀移动，未操作目标物品",
+      "originalEvidence": "predictions/04-+0.35.jpg",
+      "origin": "old-baseline-false-scene",
+      "onMatched": false,
+      "offMatched": false,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 1562.6,
+        "onset": 1562.2099999999998,
+        "clipStart": 1562.1299999999999,
+        "clipEnd": 1562.52,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.773560828230775
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.773284165985472
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.7726410193276739
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 1562.6,
+        "onset": 1562.2099999999998,
+        "clipStart": 1562.1299999999999,
+        "clipEnd": 1562.52,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.773560828230775
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.773284165985472
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.7726410193276739
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-213509",
+      "recording": "record20260920-213509",
+      "onset": 1818.75,
+      "cohort": "frozen-full-recording",
+      "scene": "进入行商对话，尚未进入货物界面",
+      "originalEvidence": "predictions/05-+0.35.jpg",
+      "origin": "old-baseline-false-scene",
+      "onMatched": false,
+      "offMatched": false,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 1819.2,
+        "onset": 1818.75,
+        "clipStart": 1818.67,
+        "clipEnd": 1819.1100000000001,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-018",
+            "score": 0.751766248100125
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.7516828494437047
+          },
+          {
+            "groupId": "peer-042",
+            "score": 0.7514838659665591
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 1819.2,
+        "onset": 1818.75,
+        "clipStart": 1818.67,
+        "clipEnd": 1819.1100000000001,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-018",
+            "score": 0.751766248100125
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.7516828494437047
+          },
+          {
+            "groupId": "peer-042",
+            "score": 0.7514838659665591
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-213509",
+      "recording": "record20260920-213509",
+      "onset": 2.95,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持刀跟随队友上台阶，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/00--0.30.jpg",
+          "sha256": "4b11960bcca8ef607c19904dbd2fdc25d924cad2e3d0c768ee6dd6d6a349ca4c"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/00-+0.35.jpg",
+          "sha256": "c1843868eddc9fda5b7172b0ca96b920c8e034acf417d487541387538dac7169"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 3.4,
+        "onset": 2.95,
+        "clipStart": 2.8699999999999997,
+        "clipEnd": 3.3099999999999996,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7876310026572789
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7873075474623029
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7873075474623029
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 3.4,
+        "onset": 2.95,
+        "clipStart": 2.8699999999999997,
+        "clipEnd": 3.3099999999999996,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7876310026572789
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7873075474623029
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7873075474623029
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-213509",
+      "recording": "record20260920-213509",
+      "onset": 6.65,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持刀经过门口移动，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/01--0.30.jpg",
+          "sha256": "df3ecd76d6228d8d9e8591ee0134924b5ef8aeaa5213c632c3be7dbec047d3e6"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/01-+0.35.jpg",
+          "sha256": "713f028c2bd333b6852db315ece3986b10629e1b909c28338db2ff878dd1ce78"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 7.2,
+        "onset": 6.65,
+        "clipStart": 6.57,
+        "clipEnd": 7.010000000000001,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.8237156164173455
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.8233719325606955
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.8233719325606955
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 7.2,
+        "onset": 6.65,
+        "clipStart": 6.57,
+        "clipEnd": 7.010000000000001,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.8237156164173455
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.8233719325606955
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.8233719325606955
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-213509",
+      "recording": "record20260920-213509",
+      "onset": 10.39,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持刀下楼梯，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/02--0.30.jpg",
+          "sha256": "c404b632d587f4e4fc7818bb003525e9be22415cea48edbc01ee38dab7088481"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/02-+0.35.jpg",
+          "sha256": "249109536acc9853926239a92194aff22ad7f271cfa7233a89b7af234acfe19f"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 10.8,
+        "onset": 10.39,
+        "clipStart": 10.31,
+        "clipEnd": 10.72,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7872193355122484
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7866841379263093
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7866841379263093
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 10.8,
+        "onset": 10.39,
+        "clipStart": 10.31,
+        "clipEnd": 10.72,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7872193355122484
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7866841379263093
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7866841379263093
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260921-205434",
+      "recording": "record20260921-205434",
+      "onset": 9.15,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持枪进入大厅，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/03--0.30.jpg",
+          "sha256": "38a835769677a21a872231532fcd97130a72cc9e8f2a2a82e4fa9bfd46929e61"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/03-+0.35.jpg",
+          "sha256": "322ee3353ba3f267e0110eacfd6a7d599800b28ab3cdf11e62896a2f6d790d19"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 9.8,
+        "onset": 9.15,
+        "clipStart": 9.07,
+        "clipEnd": 9.51,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7982979862594355
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7980835766355064
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7980835766355064
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 9.8,
+        "onset": 9.15,
+        "clipStart": 9.07,
+        "clipEnd": 9.51,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7982979862594355
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7980835766355064
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7980835766355064
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260921-205434",
+      "recording": "record20260921-205434",
+      "onset": 12.45,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持刀在大厅移动，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/04--0.30.jpg",
+          "sha256": "1ed26f4695f5bec69b0a24bce9c6bef907d667e04d261023e13b47d2ca75c277"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/04-+0.35.jpg",
+          "sha256": "a629437c653b051e68f6832b4a1ab84730b570649ea500f94fbbd068d44e1a4a"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 13,
+        "onset": 12.45,
+        "clipStart": 12.37,
+        "clipEnd": 12.809999999999999,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.8010166806615431
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7992321272373584
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7992321272373584
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 13,
+        "onset": 12.45,
+        "clipStart": 12.37,
+        "clipEnd": 12.809999999999999,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.8010166806615431
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7992321272373584
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7992321272373584
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260921-205434",
+      "recording": "record20260921-205434",
+      "onset": 42.870000000000005,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持枪处于操作台附近，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/05--0.30.jpg",
+          "sha256": "1f5bf9c1407bab208e3feffb24460fe800bc69214602f8a957dbc9534f19679a"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/05-+0.35.jpg",
+          "sha256": "b69c9d6616c2a8d0050adc70af20406a1c51d8c6fdc545c4699431d1ee36acee"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 43.4,
+        "onset": 42.870000000000005,
+        "clipStart": 42.790000000000006,
+        "clipEnd": 43.230000000000004,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7944669271780174
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7928718768776685
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7928718768776685
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 43.4,
+        "onset": 42.870000000000005,
+        "clipStart": 42.790000000000006,
+        "clipEnd": 43.230000000000004,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7944669271780174
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7928718768776685
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7928718768776685
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260922-214737",
+      "recording": "record20260922-214737",
+      "onset": 4.71,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持刀跟随队友沿走廊移动，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/06--0.30.jpg",
+          "sha256": "4777d802a596f0cb2282ee6195ac529dbce012389ac43b37c5f6d43276a236ea"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/06-+0.35.jpg",
+          "sha256": "487d6c2d95d59073eff88bc91bad32beb71eb93dbc7454a216695b48bf91f5d0"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 5.2,
+        "onset": 4.71,
+        "clipStart": 4.63,
+        "clipEnd": 5.07,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7971817386950037
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7955071839618422
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7955071839618422
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 5.2,
+        "onset": 4.71,
+        "clipStart": 4.63,
+        "clipEnd": 5.07,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7971817386950037
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7955071839618422
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7955071839618422
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260922-214737",
+      "recording": "record20260922-214737",
+      "onset": 21.370000000000005,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称上楼并操作枪械，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/07--0.30.jpg",
+          "sha256": "4c1d271fb97562962d7a10bb6985c30775c67a5ffc439a34a597a1b4cd989b67"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/07-+0.35.jpg",
+          "sha256": "e64a5393929184758b3fe5bbe6342ed05feb68908cc59dd8c95c8e096c90e26e"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 22,
+        "onset": 21.370000000000005,
+        "clipStart": 21.290000000000003,
+        "clipEnd": 21.730000000000004,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7820442938712133
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.781651070106712
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.781651070106712
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 22,
+        "onset": 21.370000000000005,
+        "clipStart": 21.290000000000003,
+        "clipEnd": 21.730000000000004,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7820442938712133
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.781651070106712
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.781651070106712
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260922-214737",
+      "recording": "record20260922-214737",
+      "onset": 24.270000000000003,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称在楼梯持枪检查弹匣后继续上楼，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/08--0.30.jpg",
+          "sha256": "e1d40943f916220e86e538f745efcf37380b7b3ca706e573fd08b36cb885bf44"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/08-+0.35.jpg",
+          "sha256": "ea538a2d829ba4257574ed16a23587252a01ae35a9567df50af33d68a4968971"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 25,
+        "onset": 24.270000000000003,
+        "clipStart": 24.19,
+        "clipEnd": 24.630000000000003,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7880350714128816
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7872160363918513
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7872160363918513
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059",
+          "peer-054",
+          "peer-043"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 25,
+        "onset": 24.270000000000003,
+        "clipStart": 24.19,
+        "clipEnd": 24.630000000000003,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7880350714128816
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7872160363918513
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7872160363918513
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059",
+          "peer-054",
+          "peer-043"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260922-205653",
+      "recording": "record20260922-205653",
+      "onset": 99.39,
+      "cohort": "frozen-full-recording",
+      "scene": "打开文档箱并开始搜索，尚未出现可操作物品",
+      "originalEvidence": "predictions/00-+0.35.jpg",
+      "origin": "old-baseline-false-scene",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 99.8,
+        "onset": 99.38999999999999,
+        "clipStart": 99.31,
+        "clipEnd": 99.72,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.8074749220803307
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.8067654440741833
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.8065612395607122
+          }
+        ],
+        "candidateIds": [
+          "peer-001",
+          "peer-018",
+          "peer-002",
+          "peer-042"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 99.8,
+        "onset": 99.38999999999999,
+        "clipStart": 99.31,
+        "clipEnd": 99.72,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.8074749220803307
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.8067654440741833
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.8065612395607122
+          }
+        ],
+        "candidateIds": [
+          "peer-001",
+          "peer-018",
+          "peer-002",
+          "peer-042"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260922-205653",
+      "recording": "record20260922-205653",
+      "onset": 1247.67,
+      "cohort": "frozen-full-recording",
+      "scene": "结束行商对话，未操作目标物品",
+      "originalEvidence": "predictions/04-+0.35.jpg",
+      "origin": "old-baseline-false-scene",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 1248.2,
+        "onset": 1247.67,
+        "clipStart": 1247.59,
+        "clipEnd": 1248.03,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.8098871983362697
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.8094401075446823
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.8089153337469838
+          }
+        ],
+        "candidateIds": [
+          "peer-001",
+          "peer-018",
+          "peer-002",
+          "peer-042"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 1248.2,
+        "onset": 1247.67,
+        "clipStart": 1247.59,
+        "clipEnd": 1248.03,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.8098871983362697
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.8094401075446823
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.8089153337469838
+          }
+        ],
+        "candidateIds": [
+          "peer-001",
+          "peer-018",
+          "peer-002",
+          "peer-042"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260922-205653",
+      "recording": "record20260922-205653",
+      "onset": 2.95,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持刀跟随队友进入大厅，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/09--0.30.jpg",
+          "sha256": "45149271557d217d4278a34d5290e7a9b6d28b5bd7b22e7883c8d545eb0dde41"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/09-+0.35.jpg",
+          "sha256": "1b576d3681365ee0a8b1a9413a3fabe954de4048f326469fc8e7c032b40c5abc"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 3.4,
+        "onset": 2.95,
+        "clipStart": 2.8699999999999997,
+        "clipEnd": 3.3099999999999996,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7808955208148197
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7805013116870202
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7805013116870202
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 3.4,
+        "onset": 2.95,
+        "clipStart": 2.8699999999999997,
+        "clipEnd": 3.3099999999999996,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7808955208148197
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7805013116870202
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7805013116870202
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260922-205653",
+      "recording": "record20260922-205653",
+      "onset": 5.470000000000001,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持刀经过大厅门口，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/10--0.30.jpg",
+          "sha256": "76b0a4ebccb40fb5da7ec330cb1f75405496efe24f2f56f6091b8960123e7b59"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/10-+0.35.jpg",
+          "sha256": "f8869a81dcf5ab6eb4ca955d4cd17d81b5e6389e80b9d40f7263872fafdc9cf4"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 6.2,
+        "onset": 5.470000000000001,
+        "clipStart": 5.390000000000001,
+        "clipEnd": 5.830000000000001,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-054",
+            "score": 0.787323149476031
+          },
+          {
+            "groupId": "peer-043",
+            "score": 0.7772892320204471
+          },
+          {
+            "groupId": "peer-041",
+            "score": 0.6488617930566841
+          }
+        ],
+        "candidateIds": [
+          "peer-054",
+          "peer-043"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 6.2,
+        "onset": 5.470000000000001,
+        "clipStart": 5.390000000000001,
+        "clipEnd": 5.830000000000001,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-054",
+            "score": 0.787323149476031
+          },
+          {
+            "groupId": "peer-043",
+            "score": 0.7772892320204471
+          },
+          {
+            "groupId": "peer-041",
+            "score": 0.6488617930566841
+          }
+        ],
+        "candidateIds": [
+          "peer-054",
+          "peer-043"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260922-205653",
+      "recording": "record20260922-205653",
+      "onset": 13.57,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持刀在楼梯与堆放箱体旁移动，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/11--0.30.jpg",
+          "sha256": "ba2d9b305d9ecece087b7893e8902cda53b7c6ab1177b65da264dead7b143599"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/11-+0.35.jpg",
+          "sha256": "99d041c2578be66e89c15c0cfbd009218cea98206d47559dd735322200d24559"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 14,
+        "onset": 13.57,
+        "clipStart": 13.49,
+        "clipEnd": 13.92,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.8225229867149585
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.820346064560981
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.820346064560981
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 14,
+        "onset": 13.57,
+        "clipStart": 13.49,
+        "clipEnd": 13.92,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.8225229867149585
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.820346064560981
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.820346064560981
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-205237",
+      "recording": "record20260920-205237",
+      "onset": 891.67,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称武器/姿态动作，未操作目标物品",
+      "originalEvidence": "predictions/00-+0.35.jpg",
+      "origin": "old-baseline-false-scene",
+      "onMatched": false,
+      "offMatched": false,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 892.2,
+        "onset": 891.6700000000001,
+        "clipStart": 891.5899999999999,
+        "clipEnd": 892.03,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-018",
+            "score": 0.7738827708081257
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.7735361069012202
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.772643147647106
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 892.2,
+        "onset": 891.6700000000001,
+        "clipStart": 891.5899999999999,
+        "clipEnd": 892.03,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-018",
+            "score": 0.7738827708081257
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.7735361069012202
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.772643147647106
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-205237",
+      "recording": "record20260920-205237",
+      "onset": 1005.11,
+      "cohort": "frozen-full-recording",
+      "scene": "武器详情和背包界面，连续画面未见目标物品操作",
+      "originalEvidence": "predictions/01-+0.35.jpg",
+      "origin": "old-baseline-false-scene",
+      "onMatched": false,
+      "offMatched": false,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 1005.6,
+        "onset": 1005.11,
+        "clipStart": 1005.03,
+        "clipEnd": 1005.47,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.7338507477997687
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.7336415238992253
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.732987494716456
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 1005.6,
+        "onset": 1005.11,
+        "clipStart": 1005.03,
+        "clipEnd": 1005.47,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.7338507477997687
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.7336415238992253
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.732987494716456
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-205237",
+      "recording": "record20260920-205237",
+      "onset": 1323.73,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持枪瞄准，未操作目标物品",
+      "originalEvidence": "predictions/02-+0.35.jpg",
+      "origin": "old-baseline-false-scene",
+      "onMatched": false,
+      "offMatched": false,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 1324.2,
+        "onset": 1323.73,
+        "clipStart": 1323.6499999999999,
+        "clipEnd": 1324.09,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-042",
+            "score": 0.7699272039067417
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.7688573817045983
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.7688353379330529
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 1324.2,
+        "onset": 1323.73,
+        "clipStart": 1323.6499999999999,
+        "clipEnd": 1324.09,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-042",
+            "score": 0.7699272039067417
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.7688573817045983
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.7688353379330529
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-205237",
+      "recording": "record20260920-205237",
+      "onset": 2011.75,
+      "cohort": "frozen-full-recording",
+      "scene": "拿起库外金魔方，错误输出雕塑组；不属于已标注导航仪拿起",
+      "originalEvidence": "predictions/11-+0.35.jpg",
+      "origin": "old-baseline-false-scene",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 2012.2,
+        "onset": 2011.75,
+        "clipStart": 2011.67,
+        "clipEnd": 2012.1100000000001,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-008",
+            "score": 0.7830024643949741
+          },
+          {
+            "groupId": "peer-027",
+            "score": 0.7828330959518635
+          },
+          {
+            "groupId": "peer-025",
+            "score": 0.7828269774074763
+          }
+        ],
+        "candidateIds": [
+          "peer-008",
+          "peer-027",
+          "peer-025",
+          "peer-020",
+          "peer-011"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 2012.2,
+        "onset": 2011.75,
+        "clipStart": 2011.67,
+        "clipEnd": 2012.1100000000001,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-008",
+            "score": 0.7830024643949741
+          },
+          {
+            "groupId": "peer-027",
+            "score": 0.7828330959518635
+          },
+          {
+            "groupId": "peer-025",
+            "score": 0.7828269774074763
+          }
+        ],
+        "candidateIds": [
+          "peer-008",
+          "peer-027",
+          "peer-025",
+          "peer-020",
+          "peer-011"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-205237",
+      "recording": "record20260920-205237",
+      "onset": 13.75,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称在楼梯前操作枪械/弹匣，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/12--0.30.jpg",
+          "sha256": "e400cee3fe7bf8a607d9230379fd8fae7454c78fa528831b97e8dc4d4042b8e5"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/12-+0.35.jpg",
+          "sha256": "3a1031a3538bbb489d89e12752e5c5933709dfbc361a51b039f2c43b531d36e6"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 14.4,
+        "onset": 13.75,
+        "clipStart": 13.67,
+        "clipEnd": 14.11,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7823875347291844
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7813429954529817
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7813429954529817
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 14.4,
+        "onset": 13.75,
+        "clipStart": 13.67,
+        "clipEnd": 14.11,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.7823875347291844
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.7813429954529817
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.7813429954529817
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-205237",
+      "recording": "record20260920-205237",
+      "onset": 19.630000000000003,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持刀穿过破墙进入房间，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/13--0.30.jpg",
+          "sha256": "249638fcddd5f972a5010876d7fc0250f3d0311657902903baa16c4f51496c54"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/13-+0.35.jpg",
+          "sha256": "9ec851cda3c9c5783080ec44c21e88c0f7831db4a88d3fdb4c53cbb225fd4b21"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 20.2,
+        "onset": 19.630000000000003,
+        "clipStart": 19.55,
+        "clipEnd": 19.990000000000002,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.8131558240188882
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.812163499095195
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.812163499095195
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 20.2,
+        "onset": 19.630000000000003,
+        "clipStart": 19.55,
+        "clipEnd": 19.990000000000002,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.8131558240188882
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.812163499095195
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.812163499095195
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "record20260920-205237",
+      "recording": "record20260920-205237",
+      "onset": 35.93,
+      "cohort": "frozen-full-recording",
+      "scene": "第一人称持刀接近关闭的门，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/14--0.30.jpg",
+          "sha256": "586b79358e9471f08ca41e067aa64a4e0d377410b3d44da8b4b4043619a3148a"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/14-+0.35.jpg",
+          "sha256": "cdf4989c5d235789cc7c7e834e485d7f1d5fad5eccd6161125eadfecea5aed96"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 36.4,
+        "onset": 35.93,
+        "clipStart": 35.85,
+        "clipEnd": 36.29,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.8198535004951865
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.8197561139427538
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.8197561139427538
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 36.4,
+        "onset": 35.93,
+        "clipStart": 35.85,
+        "clipEnd": 36.29,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.8198535004951865
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.8197561139427538
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.8197561139427538
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "204258-movement",
+      "recording": "record20260923-204258",
+      "onset": 365.17,
+      "cohort": "previous-development",
+      "scene": "第一人称持枪沿大厅移动，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/15--0.30.jpg",
+          "sha256": "db85cddf61d04ac605831ce56076641920873122241fbae12a77e922359a633b"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/15-+0.35.jpg",
+          "sha256": "c9f676582a38f2706e16924ff1d7c7a8b2c5d44dc0f535dbf3e7e8254abe04a2"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 15.8,
+        "onset": 15.17,
+        "clipStart": 15.090000000000002,
+        "clipEnd": 15.530000000000001,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-042",
+            "score": 0.7907283908375529
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.7902176035042247
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.7901415357991073
+          }
+        ],
+        "candidateIds": [
+          "peer-042",
+          "peer-001",
+          "peer-018",
+          "peer-002"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 15.8,
+        "onset": 15.17,
+        "clipStart": 15.090000000000002,
+        "clipEnd": 15.530000000000001,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-042",
+            "score": 0.7907283908375529
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.7902176035042247
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.7901415357991073
+          }
+        ],
+        "candidateIds": [
+          "peer-042",
+          "peer-001",
+          "peer-018",
+          "peer-002"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "204258-movement",
+      "recording": "record20260923-204258",
+      "onset": 380.27,
+      "cohort": "previous-development",
+      "scene": "第一人称持枪经过接待台与箱体，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/16--0.30.jpg",
+          "sha256": "0e075aacdcb665010ace7937963aede27a081a7997b113abc073d61a55f0ea84"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/16-+0.35.jpg",
+          "sha256": "7c975ffc592237b5116c2e67c603d45b0f308794ddffdee9adc78432bb20ab4f"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 30.8,
+        "onset": 30.270000000000003,
+        "clipStart": 30.19,
+        "clipEnd": 30.630000000000003,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.8179718748289593
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.8177872282995376
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.8177872282995376
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 30.8,
+        "onset": 30.270000000000003,
+        "clipStart": 30.19,
+        "clipEnd": 30.630000000000003,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-056",
+            "score": 0.8179718748289593
+          },
+          {
+            "groupId": "peer-058",
+            "score": 0.8177872282995376
+          },
+          {
+            "groupId": "peer-059",
+            "score": 0.8177872282995376
+          }
+        ],
+        "candidateIds": [
+          "peer-056",
+          "peer-058",
+          "peer-059"
+        ],
+        "action": "pickup"
+      }
+    },
+    {
+      "job": "211647-movement",
+      "recording": "record20260923-211647",
+      "onset": 1054.41,
+      "cohort": "previous-development",
+      "scene": "第一人称处于原报告已确认的包扎片段，未操作候选物品",
+      "evidence": [
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/17--0.30.jpg",
+          "sha256": "4d1e89e63c98a4911ea3ef8cdc1675b09e295603f1973be968e99e95b9e781c7"
+        },
+        {
+          "path": ".tools/research/ours-peer-library-20260924/review/17-+0.35.jpg",
+          "sha256": "1861556543b194f55006563e5d0e31a7b326063ef9fc8860eda384e564eff889"
+        }
+      ],
+      "origin": "peer-library-visual-review",
+      "onMatched": true,
+      "offMatched": true,
+      "eventsEqual": true,
+      "onEvent": {
+        "analyzedAt": 74.8,
+        "onset": 74.41,
+        "clipStart": 74.33,
+        "clipEnd": 74.72,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.7907504365612947
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.7901655793894311
+          },
+          {
+            "groupId": "peer-042",
+            "score": 0.7899314260526964
+          }
+        ],
+        "candidateIds": [
+          "peer-001",
+          "peer-018",
+          "peer-042",
+          "peer-002"
+        ],
+        "action": "pickup"
+      },
+      "offEvent": {
+        "analyzedAt": 74.8,
+        "onset": 74.41,
+        "clipStart": 74.33,
+        "clipEnd": 74.72,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.7907504365612947
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.7901655793894311
+          },
+          {
+            "groupId": "peer-042",
+            "score": 0.7899314260526964
+          }
+        ],
+        "candidateIds": [
+          "peer-001",
+          "peer-018",
+          "peer-042",
+          "peer-002"
+        ],
+        "action": "pickup"
+      }
+    }
+  ],
+  "limitations": [
+    "The fixed pickup library is the peer 62-reference experimental library, not the production pickup library.",
+    "The on arm reuses hash-verified full replay outputs from the preceding experiment; one short on replay was freshly rerun and identical.",
+    "The off arm freshly replays all 8156.6 seconds of exactly the same decoded mono 24 kHz WAV inputs.",
+    "Success means accepted candidate-set output, not unique-item guessing. Hidden trader sound-family correctness is unverified.",
+    "Only explicit known operations and previously visually reviewed negatives are scored; no overall accuracy estimate.",
+    "No putdown branch activation in a recording means no decision change; it does not prove the auxiliary score always fails its raw threshold.",
+    "Synthetic timing of explicit reference controls proves loading/branch activation, not real-world recognition quality.",
+    "The CLI replay uses audio timestamps and does not simulate GUI scheduling, CPU-busy skipped scans or actual display latency.",
+    "Peer pickup groups and original putdown groups have different identifiers; this ablation is not an end-to-end GUI same-group confirmation test.",
+    "No conclusion that the auxiliary library can never help on other recordings, thresholds or reference libraries."
+  ]
+}

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -343,9 +343,8 @@ internal sealed partial class MainWindow : Window
     }
     private void PrepareOverlaySmoke()
     {
-        var group = library.Groups.Single(g => g.Id == "361affd2");
         var result = new RecognitionResult(0, RecognitionStatus.Matched, true,
-            group.ItemIds.Select(id => new Candidate(library.Items.Single(i => i.Id == id), .91, group.Id)).ToArray(), 0, "");
+            PreviewScenarios.Thirteen(library, .91), 0, "");
         overlay.Panel.ShowResult(result, true);
     }
     private void ShowCatalog()
@@ -484,9 +483,7 @@ internal sealed partial class MainWindow : Window
         var shrunkAgain = Math.Abs(overlay.ActualHeight - smallHeight) < 1;
         var smokeHistory = new RecognitionHistory();
         smokeHistory.Remember(one, "布局测试（模拟结果）", false, DateTimeOffset.Now);
-        var group = library.Groups.Single(g => g.Id == "e9f62d39");
-        smokeHistory.Remember(one with { OperationId = 1000, Candidates = group.ItemIds.Select(id =>
-            new Candidate(library.Items.Single(i => i.Id == id), .9, group.Id)).ToArray() }, "布局测试（模拟结果）", false, DateTimeOffset.Now);
+        smokeHistory.Remember(one with { OperationId = 1000, Candidates = PreviewScenarios.Thirteen(library, .9) }, "布局测试（模拟结果）", false, DateTimeOffset.Now);
         var historyView = new HistoryWindow(smokeHistory, libraryRoot, settings) { Owner = this };
         historyView.Show(); await Task.Delay(150); RenderSmoke(historyView, "history-smoke.png");
         var historyLargeHeight = historyView.ActualHeight;
@@ -545,7 +542,7 @@ internal sealed partial class MainWindow : Window
         overlay.ToggleLock(); var unlocked = !settings.PositionLocked;
         var samePin = ReferenceEquals(pinVisual, pinButton.Content); overlay.ToggleLock();
         workspace.Select(snapshot);
-        var demoNames = new[] { "热成像模块", "数据线", "古董茶壶", "密码机", "金狮雕像", "石膏像" };
+        var demoNames = new[] { "热成像模块", "金豹雕像", "古董茶壶", "激光指示模块", "金狮雕像", "花瓶" };
         var demoCandidates = demoNames.Select(name => library.Items.Single(i => i.Name == name))
             .Select(item => new Candidate(item, .9, library.Groups.First(g => g.ItemIds.Contains(item.Id)).Id)).ToArray();
         var demoResult = new RecognitionResult(1001, RecognitionStatus.Matched, true, demoCandidates, 0, "布局演示 · 非识别结果");
@@ -576,10 +573,8 @@ internal sealed partial class MainWindow : Window
             RenderSmoke(overlay, $"comparison-{scenario}-{label}-smoke.png");
         }
         overlay.SetFontScale(1); await Task.Delay(100); overlay.UpdateLayout();
-        var thirteenGroup = library.Groups.Single(group => group.Id == "361affd2");
         var thirteenResult = new RecognitionResult(1003, RecognitionStatus.Matched, true,
-            thirteenGroup.ItemIds.Select(id => new Candidate(library.Items.Single(item => item.Id == id), .99,
-                thirteenGroup.Id)).ToArray(), 0, "十三件布局检查");
+            PreviewScenarios.Thirteen(library), 0, "十三件布局检查");
         var thirteenSnapshot = controller.Audio.Add(sound, new(thirteenResult, analysis.Scores),
             "十三件布局检查", library, libraryRoot);
         workspace.Select(thirteenSnapshot); await Task.Delay(120); overlay.UpdateLayout();

@@ -1,0 +1,473 @@
+{
+  "version": "v0.3.2",
+  "method": "Visual annotation before inspecting predictions; onset is a video-time interval, not an audio-derived label.",
+  "recordings": [
+    {
+      "id": "record20260920-213509",
+      "duration": 1967.6,
+      "known": [
+        {
+          "id": "tv-loot",
+          "item": "e9f62d39-2",
+          "name": "胶囊电视",
+          "onset": [
+            64.3,
+            64.4
+          ],
+          "action": "transfer",
+          "evidence": "tv-detail/frame-00064.400.jpg"
+        },
+        {
+          "id": "tv-recovery",
+          "item": "e9f62d39-2",
+          "name": "胶囊电视",
+          "onset": [
+            550.15,
+            550.2
+          ],
+          "action": "transfer",
+          "evidence": "tv-transfer/frame-00550.200.jpg"
+        }
+      ],
+      "audioSha256": "21538409e27186f8ee260d6571394b0a2e4faa87d16a6cfeb1f66cc083f39b29",
+      "eventsSha256": "93afefb2d5b5ff4ba21de0983c2ced2556ba546e5771e9174cfe59e32bd533c1",
+      "predictionReviews": [
+        {
+          "index": 0,
+          "onset": 449.35,
+          "verdict": "false",
+          "scene": "第一人称使用医疗用品，未操作目标物品",
+          "evidence": "predictions/00-+0.35.jpg"
+        },
+        {
+          "index": 1,
+          "onset": 958.65,
+          "verdict": "false",
+          "scene": "第一人称移动，未操作目标物品",
+          "evidence": "predictions/01-+0.35.jpg"
+        },
+        {
+          "index": 2,
+          "onset": 1224.75,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/02-+0.35.jpg"
+        },
+        {
+          "index": 3,
+          "onset": 1258.63,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/03-+0.35.jpg"
+        },
+        {
+          "index": 4,
+          "onset": 1562.21,
+          "verdict": "false",
+          "scene": "第一人称持刀移动，未操作目标物品",
+          "evidence": "predictions/04-+0.35.jpg"
+        },
+        {
+          "index": 5,
+          "onset": 1818.75,
+          "verdict": "false",
+          "scene": "进入行商对话，尚未进入货物界面",
+          "evidence": "predictions/05-+0.35.jpg"
+        }
+      ]
+    },
+    {
+      "id": "record20260921-205434",
+      "duration": 1000.5,
+      "known": [
+        {
+          "id": "egg-loot",
+          "item": "e9f62d39-6",
+          "name": "赫美拉彩蛋",
+          "onset": [
+            65.6,
+            65.65
+          ],
+          "action": "transfer",
+          "evidence": "egg-detail/frame-00065.650.jpg"
+        },
+        {
+          "id": "egg-drag",
+          "item": "e9f62d39-6",
+          "name": "赫美拉彩蛋",
+          "onset": [
+            67.05,
+            67.1
+          ],
+          "drop": [
+            67.6,
+            67.65
+          ],
+          "action": "drag",
+          "evidence": "egg-detail/frame-00067.100.jpg"
+        }
+      ],
+      "audioSha256": "360f4e4971924a22edbd11c5dcf5965614f8dfabea412d54457e8102eb8945e2",
+      "eventsSha256": "6509f16a1ea06f507e473928f11142f0a60a5e85e618ed2e9009f5dea963f396",
+      "predictionReviews": []
+    },
+    {
+      "id": "record20260922-214737",
+      "duration": 1096.7,
+      "known": [
+        {
+          "id": "dawn-loot",
+          "item": "361affd2-2",
+          "name": "黎明",
+          "onset": [
+            78.4,
+            78.45
+          ],
+          "action": "transfer",
+          "evidence": "dawn-detail/frame-00078.450.jpg"
+        },
+        {
+          "id": "dawn-drag",
+          "item": "361affd2-2",
+          "name": "黎明",
+          "onset": [
+            80.45,
+            80.5
+          ],
+          "drop": [
+            80.9,
+            80.95
+          ],
+          "action": "drag",
+          "evidence": "dawn-detail/frame-00080.500.jpg"
+        }
+      ],
+      "audioSha256": "b8225ab1cdbf7382b07c2575ebc60c8306734f505da06420c931009e75ab0e33",
+      "eventsSha256": "6494aa92dbb2deaadefcbdc55b3d2948c446783a543ccc525989cf2c3d430a14",
+      "predictionReviews": []
+    },
+    {
+      "id": "record20260922-205653",
+      "duration": 1442.4,
+      "known": [],
+      "hiddenPickups": [
+        {
+          "id": "trader-00",
+          "onset": [
+            1111.95,
+            1112.0
+          ],
+          "drop": [
+            1112.4,
+            1112.45
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/00-startIndex.jpg"
+        },
+        {
+          "id": "trader-01",
+          "onset": [
+            1114.2,
+            1114.25
+          ],
+          "drop": [
+            1114.75,
+            1114.8
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/01-startIndex.jpg"
+        },
+        {
+          "id": "trader-02",
+          "onset": [
+            1124.65,
+            1124.7
+          ],
+          "drop": [
+            1125.25,
+            1125.3
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/02-startIndex.jpg"
+        },
+        {
+          "id": "trader-03",
+          "onset": [
+            1126.95,
+            1127.0
+          ],
+          "drop": [
+            1127.5,
+            1127.55
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/03-startIndex.jpg"
+        },
+        {
+          "id": "trader-04",
+          "onset": [
+            1129.85,
+            1129.9
+          ],
+          "drop": [
+            1130.35,
+            1130.4
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/04-startIndex.jpg"
+        },
+        {
+          "id": "trader-05",
+          "onset": [
+            1132.25,
+            1132.3
+          ],
+          "drop": [
+            1132.9,
+            1132.95
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/05-startIndex.jpg"
+        },
+        {
+          "id": "trader-06",
+          "onset": [
+            1134.15,
+            1134.2
+          ],
+          "drop": [
+            1135.0,
+            1135.05
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/06-startIndex.jpg"
+        },
+        {
+          "id": "trader-07",
+          "onset": [
+            1136.5,
+            1136.55
+          ],
+          "drop": [
+            1137.45,
+            1137.5
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/07-startIndex.jpg"
+        },
+        {
+          "id": "trader-08",
+          "onset": [
+            1139.75,
+            1139.8
+          ],
+          "drop": [
+            1140.35,
+            1140.4
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/08-startIndex.jpg"
+        },
+        {
+          "id": "trader-09",
+          "onset": [
+            1144.55,
+            1144.6
+          ],
+          "drop": [
+            1145.4,
+            1145.45
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/09-startIndex.jpg"
+        }
+      ],
+      "audioSha256": "b7f583871548c9850f5d3cd923c4ce7299f741d96acbc7a85a6777137339718c",
+      "eventsSha256": "4b7cf70fcd6609133ca037c724bf6904b4821012d030d7703e0657c2f3dd2acc",
+      "predictionReviews": [
+        {
+          "index": 0,
+          "onset": 99.39,
+          "verdict": "false",
+          "scene": "打开文档箱并开始搜索，尚未出现可操作物品",
+          "evidence": "predictions/00-+0.35.jpg"
+        },
+        {
+          "index": 1,
+          "onset": 1180.05,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/01-+0.35.jpg"
+        },
+        {
+          "index": 2,
+          "onset": 1201.13,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/02-+0.35.jpg"
+        },
+        {
+          "index": 3,
+          "onset": 1233.47,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/03-+0.35.jpg"
+        },
+        {
+          "index": 4,
+          "onset": 1247.67,
+          "verdict": "false",
+          "scene": "结束行商对话，未操作目标物品",
+          "evidence": "predictions/04-+0.35.jpg"
+        }
+      ]
+    },
+    {
+      "id": "record20260920-205237",
+      "duration": 2039.4,
+      "known": [
+        {
+          "id": "lens-loot",
+          "item": "e9f62d39-7",
+          "name": "阵列镜片",
+          "onset": [
+            2004.7,
+            2004.8
+          ],
+          "action": "transfer",
+          "evidence": "loot-detail/frame-02004.800.jpg"
+        },
+        {
+          "id": "nav-loot",
+          "item": "361affd2-3",
+          "name": "航天导航仪",
+          "onset": [
+            2010.4,
+            2010.5
+          ],
+          "action": "transfer",
+          "evidence": "loot-detail/frame-02010.500.jpg"
+        }
+      ],
+      "audioSha256": "4117f4aa3a173845f4a31d21473926563929a05b137f3f8203a16b3b8e185ee2",
+      "eventsSha256": "cba0cd3b0e28f8076c8716a47916c1a95f35707220cd4b648cdbffe095dba22b",
+      "predictionReviews": [
+        {
+          "index": 0,
+          "onset": 891.67,
+          "verdict": "false",
+          "scene": "第一人称武器/姿态动作，未操作目标物品",
+          "evidence": "predictions/00-+0.35.jpg"
+        },
+        {
+          "index": 1,
+          "onset": 1005.11,
+          "verdict": "false",
+          "scene": "武器详情和背包界面，连续画面未见目标物品操作",
+          "evidence": "predictions/01-+0.35.jpg"
+        },
+        {
+          "index": 2,
+          "onset": 1323.73,
+          "verdict": "false",
+          "scene": "第一人称持枪瞄准，未操作目标物品",
+          "evidence": "predictions/02-+0.35.jpg"
+        },
+        {
+          "index": 3,
+          "onset": 1557.27,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/03-+0.35.jpg"
+        },
+        {
+          "index": 4,
+          "onset": 1557.81,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/04-+0.35.jpg"
+        },
+        {
+          "index": 5,
+          "onset": 1558.33,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/05-+0.35.jpg"
+        },
+        {
+          "index": 6,
+          "onset": 1560.07,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/06-+0.35.jpg"
+        },
+        {
+          "index": 7,
+          "onset": 1560.59,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/07-+0.35.jpg"
+        },
+        {
+          "index": 8,
+          "onset": 1725.57,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/08-+0.35.jpg"
+        },
+        {
+          "index": 9,
+          "onset": 1735.87,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/09-+0.35.jpg"
+        },
+        {
+          "index": 10,
+          "onset": 1737.39,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/10-+0.35.jpg"
+        },
+        {
+          "index": 11,
+          "onset": 2011.75,
+          "verdict": "false",
+          "scene": "拿起库外金魔方，错误输出雕塑组；不属于已标注导航仪拿起",
+          "evidence": "predictions/11-+0.35.jpg"
+        }
+      ]
+    }
+  ],
+  "onsetTolerance": [
+    0.2,
+    0.35
+  ],
+  "baseline": {
+    "version": "v0.3.2",
+    "commit": "8ee409e2ea2fe70bf370d515efb0bd1c3428515a",
+    "date": "2026-09-24",
+    "mode": "portable CLI scan; 100 ms blocks; automatic pickup plus putdown veto",
+    "parametersChanged": false,
+    "privateLibraryActive": false,
+    "artifacts": {
+      "Listener.Cli.dll": "b97302947c22f9e7ab2a0e213dee9b95065b1ca7afb21951b0fc395638da5c20",
+      "Listener.Core.dll": "13c1b7318122582017c9d0757be4352d9bc5c74f4d20f9f429046dfc8b0e08f9",
+      "engine/Listener.Engine.exe": "cebf604951194aa3b73331d60666ade87c3d7f58a913cfc1c56f36baacadde42",
+      "library/library.json": "267d0d333175bd60db57709e2c3bd55e4f257393c4d60a391e994da2a0a24a0f",
+      "library/radar-index.bin": "bcdb31a7402559a2b8f204430bca1dda8501011dfd96d05d29f8c248abe1363d"
+    }
+  },
+  "limitations": [
+    "Five recordings from 2026-09-20 to 2026-09-22, not the September 23 clips previously used for threshold selection.",
+    "Eight visually labelled known-item operations cover five items and only two catalog sound groups; two drags and six rapid transfers are reported separately.",
+    "Labels were selected from pictures before inspecting those positive predictions. Hidden trader identities are never inferred from recognizer output.",
+    "Audio is a mixed AAC recording decoded by timestamp to mono PCM24k. There are no uncovered samples. It is not a live game-process capture test.",
+    "The replay is synchronous with no busy worker, foreground gating, live mouse hooks, UI publishing, or history deduplication. Counts are analysis outputs, not visible popup counts.",
+    "Temporal association uses onset -0.20 s to +0.35 s, choosing by time rather than score. No nearby onset is not proof that every overlapping audio window was empty.",
+    "Hidden trader labels confirm ten visible drags in one 40-second excerpt, not all merchant operations in all recordings. Very short unobserved actions may be absent.",
+    "Accepted-output reviews are post-prediction picture checks. Thirteen hidden-goods outputs remain unverifiable; no overall precision or whole-match accuracy is estimated.",
+    "Native48k and crop sweeps are post-evaluation diagnostics and do not count as independent successful recognition.",
+    "Source videos, screenshots, decoded WAVs, user profiles, and absolute media paths are not included in this report."
+  ]
+}

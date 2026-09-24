@@ -44,17 +44,6 @@ public sealed class RecognitionHistory
         first.Candidates.Select(c => (c.Item.Id, c.GroupId)).ToHashSet()
             .SetEquals(second.Candidates.Select(c => (c.Item.Id, c.GroupId)));
 
-    public bool ConfirmPutdown(PutdownMatch evidence, double secondsSincePickup)
-    {
-        if (!double.IsFinite(secondsSincePickup) || secondsSincePickup is < .18 or > 8 ||
-            !double.IsFinite(evidence.Score) || evidence.Score < .86 || Latest is not { } latest ||
-            latest.Result.BestMatch?.GroupId != evidence.GroupId || latest.Result.PutdownConfirmed) return false;
-        var entry = latest with { Result = latest.Result with { PutdownConfirmed = true } };
-        var index = entries.FindIndex(item => item.Id == entry.Id);
-        if (index < 0) return false;
-        entries[index] = entry; Latest = entry; Changed?.Invoke(); return true;
-    }
-
     public void ClearCurrent() { Latest = null; Changed?.Invoke(); }
     public void ClearHistory() { entries.Clear(); Changed?.Invoke(); }
 }

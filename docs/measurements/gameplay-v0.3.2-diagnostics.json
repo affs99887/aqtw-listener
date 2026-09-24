@@ -1,0 +1,285 @@
+{
+  "kind": "post-evaluation-diagnostic-not-accuracy",
+  "baselineVersion": "v0.3.2",
+  "cropDurationsSeconds": [
+    0.3,
+    0.44,
+    0.6,
+    0.8,
+    1.15,
+    1.6
+  ],
+  "cropStartOffsetsSeconds": [
+    -0.25,
+    -0.12,
+    0,
+    0.12,
+    0.25,
+    0.4,
+    0.6
+  ],
+  "native48kSweep": {
+    "startOffsetsSeconds": [
+      -1.5,
+      1.5
+    ],
+    "stepSeconds": 0.1,
+    "windowSeconds": 0.6
+  },
+  "references": [
+    {
+      "reference": "e9f62d39-1",
+      "score": [
+        [
+          "e9f62d39",
+          1
+        ],
+        [
+          "361affd2",
+          0.3717609908725844
+        ],
+        [
+          "267afca3",
+          0.33496014346245906
+        ]
+      ]
+    },
+    {
+      "reference": "361affd2-1",
+      "score": [
+        [
+          "361affd2",
+          0.9966436749793023
+        ],
+        [
+          "537b0217",
+          0.4822810562585299
+        ],
+        [
+          "267afca3",
+          0.481000936320809
+        ]
+      ]
+    },
+    {
+      "reference": "361affd2-2",
+      "score": [
+        [
+          "361affd2",
+          0.99731810159672
+        ],
+        [
+          "537b0217",
+          0.4602058616719119
+        ],
+        [
+          "267afca3",
+          0.4550666863311261
+        ]
+      ]
+    },
+    {
+      "reference": "361affd2-3",
+      "score": [
+        [
+          "361affd2",
+          0.9994077677611366
+        ],
+        [
+          "537b0217",
+          0.47673450658676575
+        ],
+        [
+          "267afca3",
+          0.46043111414575
+        ]
+      ]
+    }
+  ],
+  "events": [
+    {
+      "recording": "record20260920-213509",
+      "event": "tv-loot",
+      "expectedGroup": "e9f62d39",
+      "bestCrop": {
+        "start": 64.23,
+        "duration": 1.6,
+        "expected": 0.2764315829732129,
+        "top": [
+          "cb1c0d1d",
+          0.6373742679134605
+        ],
+        "expectedRank": 5
+      },
+      "native48kBest": {
+        "delta": 0.6,
+        "score": 0.27194353226290296,
+        "top": [
+          "cb1c0d1d",
+          0.5910611148816347
+        ]
+      }
+    },
+    {
+      "recording": "record20260920-213509",
+      "event": "tv-recovery",
+      "expectedGroup": "e9f62d39",
+      "bestCrop": {
+        "start": 550.295,
+        "duration": 0.3,
+        "expected": 0.23622817427028425,
+        "top": [
+          "cb1c0d1d",
+          0.5564630269071459
+        ],
+        "expectedRank": 5
+      },
+      "native48kBest": {
+        "delta": 0.1,
+        "score": 0.240386872350041,
+        "top": [
+          "cb1c0d1d",
+          0.7427150653630409
+        ]
+      }
+    },
+    {
+      "recording": "record20260921-205434",
+      "event": "egg-loot",
+      "expectedGroup": "e9f62d39",
+      "bestCrop": {
+        "start": 66.025,
+        "duration": 1.6,
+        "expected": 0.5087543096732184,
+        "top": [
+          "cb1c0d1d",
+          0.7110423752959267
+        ],
+        "expectedRank": 5
+      },
+      "native48kBest": {
+        "delta": 1.5,
+        "score": 0.5064283191746995,
+        "top": [
+          "cb1c0d1d",
+          0.658915382243591
+        ]
+      }
+    },
+    {
+      "recording": "record20260921-205434",
+      "event": "egg-drag",
+      "expectedGroup": "e9f62d39",
+      "bestCrop": {
+        "start": 66.825,
+        "duration": 0.8,
+        "expected": 0.508855131086477,
+        "top": [
+          "cb1c0d1d",
+          0.674064703042476
+        ],
+        "expectedRank": 4
+      },
+      "native48kBest": {
+        "delta": 0.0,
+        "score": 0.5003807205022958,
+        "top": [
+          "cb1c0d1d",
+          0.6556443276245155
+        ]
+      }
+    },
+    {
+      "recording": "record20260922-214737",
+      "event": "dawn-loot",
+      "expectedGroup": "361affd2",
+      "bestCrop": {
+        "start": 78.425,
+        "duration": 1.6,
+        "expected": 0.17488695836788717,
+        "top": [
+          "cb1c0d1d",
+          0.6802632001816348
+        ],
+        "expectedRank": 8
+      },
+      "native48kBest": {
+        "delta": -1.5,
+        "score": 0.1756967568045438,
+        "top": [
+          "cb1c0d1d",
+          0.5139551002156338
+        ]
+      }
+    },
+    {
+      "recording": "record20260922-214737",
+      "event": "dawn-drag",
+      "expectedGroup": "361affd2",
+      "bestCrop": {
+        "start": 80.475,
+        "duration": 0.44,
+        "expected": 0.2797764539371807,
+        "top": [
+          "cb1c0d1d",
+          0.6678019063387186
+        ],
+        "expectedRank": 5
+      },
+      "native48kBest": {
+        "delta": 0.0,
+        "score": 0.33176281826493087,
+        "top": [
+          "cb1c0d1d",
+          0.6926272948801394
+        ]
+      }
+    },
+    {
+      "recording": "record20260920-205237",
+      "event": "lens-loot",
+      "expectedGroup": "e9f62d39",
+      "bestCrop": {
+        "start": 2004.5,
+        "duration": 0.6,
+        "expected": 0.22782224200238763,
+        "top": [
+          "cb1c0d1d",
+          0.6310006348895713
+        ],
+        "expectedRank": 6
+      },
+      "native48kBest": {
+        "delta": -0.1,
+        "score": 0.2326772527370489,
+        "top": [
+          "cb1c0d1d",
+          0.6992352331318777
+        ]
+      }
+    },
+    {
+      "recording": "record20260920-205237",
+      "event": "nav-loot",
+      "expectedGroup": "361affd2",
+      "bestCrop": {
+        "start": 2011.05,
+        "duration": 0.3,
+        "expected": 0.14172397274093612,
+        "top": [
+          "983e0b90",
+          0.6215018279587352
+        ],
+        "expectedRank": 6
+      },
+      "native48kBest": {
+        "delta": -1.0,
+        "score": 0.2362226156894096,
+        "top": [
+          "cb1c0d1d",
+          0.6790295713592234
+        ]
+      }
+    }
+  ]
+}

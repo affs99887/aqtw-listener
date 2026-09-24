@@ -225,19 +225,6 @@ Test("校准不能复用 test 集", () =>
 RecognitionResult HistoryMatch(long id, string item = "red", bool final = true) => new(id, RecognitionStatus.Matched, final,
     [new(new(item, item, true), .9, "group")], 1, "match");
 var historyAt = DateTimeOffset.Parse("2026-09-22T12:00:00+08:00");
-Test("辅助确认只接受近期同组的放下证据，保持拿起候选与录音", () =>
-{
-    var history = new RecognitionHistory(); var snapshot = Guid.NewGuid();
-    Check(!history.ConfirmPutdown(new("group", .99), 1), "putdown fabricated a primary result");
-    history.Remember(HistoryMatch(1), "auto", true, historyAt, snapshot);
-    Check(!history.ConfirmPutdown(new("other", .99), 1) &&
-        !history.ConfirmPutdown(new("group", .99), 9) && !history.ConfirmPutdown(new("group", .7), 1),
-        "unrelated, stale or weak confirmation was accepted");
-    Check(history.ConfirmPutdown(new("group", .96), 1), "matching putdown did not confirm");
-    Check(history.Latest!.Result.PutdownConfirmed && history.Latest.SnapshotId == snapshot &&
-        history.Latest.Result.Candidates.SequenceEqual(HistoryMatch(1).Candidates) && history.Latest.Matches == 1,
-        "confirmation replaced the primary evidence or created another recognition");
-});
 Test("历史只接收有效匹配，保存候选快照", () =>
 {
     var history = new RecognitionHistory();

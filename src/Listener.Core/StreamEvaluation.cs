@@ -7,7 +7,7 @@ public sealed record StreamEvent(double AnalyzedAt, double Onset, double ClipSta
 // analysis as live listening. Reports contain measurements, never PCM samples.
 public static class StreamEvaluation
 {
-    public static IReadOnlyList<StreamEvent> Run(IRecognizer recognizer, AudioClip clip, IPutdownRecognizer? putdown = null)
+    public static IReadOnlyList<StreamEvent> Run(IRecognizer recognizer, AudioClip clip)
     {
         var timeline = new AudioTimeline(clip.SampleRate);
         var scanner = new AutomaticAudioScanner(); scanner.Reset(0);
@@ -21,13 +21,6 @@ public static class StreamEvaluation
             var window = scanner.TryTakeWindow(timeline, now, true, false);
             if (window is null) continue;
             var pickup = PickupRecognition.Analyze(recognizer, window);
-            var support = putdown?.Match(pickup.Window.Samples, window.SampleRate);
-            if (support is not null && support.IsAuxiliary(pickup.Analysis.Result))
-            {
-                events.Add(new(now, window.OnsetSeconds, pickup.Window.StartSeconds, pickup.Window.EndSeconds,
-                    RecognitionStatus.Listening, [new(support.GroupId, support.Score)], [], "putdown"));
-                continue;
-            }
             events.Add(new(now, window.OnsetSeconds, pickup.Window.StartSeconds, pickup.Window.EndSeconds,
                 pickup.Analysis.Result.Status, pickup.Analysis.Scores.Take(3).ToArray(),
                 pickup.Analysis.Result.Candidates.Select(candidate => candidate.Item.Id).ToArray()));

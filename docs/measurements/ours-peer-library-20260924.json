@@ -1,0 +1,2504 @@
+{
+  "kind": "frozen-ours-logic-peer-reference-library-replay-with-partial-visual-labels",
+  "date": "2026-09-24",
+  "overallAccuracy": null,
+  "acceptancePassed": false,
+  "successDefinition": {
+    "matchingSuccess": "The unchanged matcher emits an accepted non-empty candidate set; one or multiple same-sound items are equally valid. No unique-item guess is required.",
+    "soundFamilyCorrectness": "Verify that the candidate set belongs to the sound actually operated, when independent sound-family evidence exists. Missing one exact item name alone is not proof of failure.",
+    "falseOutput": "Output does not correspond to the player item-operation scene; not labelled false merely because it contains multiple items.",
+    "legacyFields": "legacyExpectedItemHits / legacyExpectedItemInCandidates and aligned correctAtCatalogThreshold are exact-ID diagnostics, not the user success criterion."
+  },
+  "librarySwap": {
+    "references": 62,
+    "items": 62,
+    "groups": 62,
+    "sourceRefSha256": "d18ec01dd063745d5a7bed148ff438c9014bfbf079b9aad7a8ac812c4601fe3f",
+    "sourceIndexSha256": "5ebb2a49a0d8fd43782ac4ccf57528e051188233351c7aaec60792a1027f7f68",
+    "conversion": "stored float32 * 32767, truncate to signed PCM16; 48 kHz mono, 0.45 seconds; no additional processing",
+    "maxAbsoluteSampleConversionError": 6.008148193359375e-05,
+    "catalogThreshold": 0.75,
+    "automaticMinimumScore": 0.78,
+    "catalogueAdaptation": "one item and its supplied waveform per group; all 62 references, including duplicates, retained",
+    "putdownLibraryUnchanged": true,
+    "mapping": [
+      {
+        "id": "peer-000",
+        "sourceName": "激光指示模块",
+        "baselineItemId": "267afca3-9",
+        "file": "audio/peer-000.wav",
+        "sha256": "db443fcf0933f71b650d0b2f82d1c373f635634b611532de8f31de7cdd409b64",
+        "sourceFloat32Sha256": "d787282dd32a879cb9593338a8f2e96789c60802590e6a4d1f05c72363034556"
+      },
+      {
+        "id": "peer-001",
+        "sourceName": "专用电池组",
+        "baselineItemId": null,
+        "file": "audio/peer-001.wav",
+        "sha256": "b3bdea12adbb4e8bb3be1e53c4c6def350756adaf83609bfeb6a9eaefaf15453",
+        "sourceFloat32Sha256": "286098f48e7394b6808d4545576fea2bf7ab5a0e12a20ff9fa9e90071c041ea6"
+      },
+      {
+        "id": "peer-002",
+        "sourceName": "汽车蓄电池",
+        "baselineItemId": null,
+        "file": "audio/peer-002.wav",
+        "sha256": "f8262eb214da02e291f55003e4ac7be371838d534fa02e042426d43fdad01a97",
+        "sourceFloat32Sha256": "250ec248de60923bb9ceb4bdee3ef1b3086e4a177bfc0e95e172ffe6a4bf5080"
+      },
+      {
+        "id": "peer-003",
+        "sourceName": "液压扩张器",
+        "baselineItemId": null,
+        "file": "audio/peer-003.wav",
+        "sha256": "59fcf99d9522ff697b04dcae5164c9556dea2d94d5e88ca7a5bd82f5f8254c37",
+        "sourceFloat32Sha256": "7b552bf6ff5f5b44baee84b81af215e5dad7d70bea6ee8eb6586e450eaaf53bf"
+      },
+      {
+        "id": "peer-004",
+        "sourceName": "航天实验室",
+        "baselineItemId": "361affd2-10",
+        "file": "audio/peer-004.wav",
+        "sha256": "716ca5ce4ceb849818dabe0f044c832b429ae263e38d6720f3bfd0fd56cc7559",
+        "sourceFloat32Sha256": "227c35a2c068431d1b5e4626212b28ea8fb6a2f2683ebe82d1295aa552eb8189"
+      },
+      {
+        "id": "peer-005",
+        "sourceName": "变异体样本",
+        "baselineItemId": null,
+        "file": "audio/peer-005.wav",
+        "sha256": "68fac1d0051e19743cdf8658a5e7685ea454042a76490997cc3e5cb7ce8ab158",
+        "sourceFloat32Sha256": "9ca0212a55767cab8983f9f0a080574cb9d7190ae8160efabc1740561389bdc8"
+      },
+      {
+        "id": "peer-006",
+        "sourceName": "体外去颤器",
+        "baselineItemId": null,
+        "file": "audio/peer-006.wav",
+        "sha256": "0c2e2ae939a668b7e33b8734af552471947c1e993a04b62a9a37d51ced70aefa",
+        "sourceFloat32Sha256": "bb1103689d04d526863c0054cb4fdbe5e098b70c16b5445dfb26664749d4db7b"
+      },
+      {
+        "id": "peer-007",
+        "sourceName": "老牌打字机",
+        "baselineItemId": null,
+        "file": "audio/peer-007.wav",
+        "sha256": "092ac338b6c0ed5d49a9825268888c3ed57789bb96b8e2f8fb2592a92fe53f18",
+        "sourceFloat32Sha256": "da9e169589b166b2680c8c75289b3a7b56bf6223118f1fbc619855c78ba15bcf"
+      },
+      {
+        "id": "peer-008",
+        "sourceName": "金杯",
+        "baselineItemId": null,
+        "file": "audio/peer-008.wav",
+        "sha256": "ab94fb19da9313e031d6ebfe0a2ee7a458a832d9866a6072187e69b0dcc07a64",
+        "sourceFloat32Sha256": "734bcd18d56f3084e6f1b1a90088f6316cdde1a7f3fe3e30970cf283d32d8101"
+      },
+      {
+        "id": "peer-009",
+        "sourceName": "金豹雕像",
+        "baselineItemId": null,
+        "file": "audio/peer-009.wav",
+        "sha256": "51bd7fee8ad0c800f2d4e3294bf256c69eec856237d6bedcbb4f7e3f13a177b3",
+        "sourceFloat32Sha256": "050464bc5b1e7b00cc7f77aefe06ae1ebda6b4ed2b11ca0793ae9e12a113fb2c"
+      },
+      {
+        "id": "peer-010",
+        "sourceName": "金狮雕像",
+        "baselineItemId": "983e0b90-0",
+        "file": "audio/peer-010.wav",
+        "sha256": "95ce7c93e5d18a4c45ee6001a0795e068146a12f56eddb3aefbfdbc2689154c3",
+        "sourceFloat32Sha256": "f15e629ff8b89d0ea0298ed8ea7babbadc907eba5df6297a55cc4d4f9dca49f0"
+      },
+      {
+        "id": "peer-011",
+        "sourceName": "盛宴雕像",
+        "baselineItemId": null,
+        "file": "audio/peer-011.wav",
+        "sha256": "bd2d73cdef48d7c44deaf80177fb96588141bf0a6b2154bfe415ee58ac252923",
+        "sourceFloat32Sha256": "f2f2ef96d254f65b86336c121410ebc9cd5ee25b0dcb35c7927e3a06e403d933"
+      },
+      {
+        "id": "peer-012",
+        "sourceName": "量子F2000玩具机器人",
+        "baselineItemId": null,
+        "file": "audio/peer-012.wav",
+        "sha256": "1fa71bd9c1a11e30970f28e3f7fb30a41e4ffc87210cdd33e36abaffcbc00c44",
+        "sourceFloat32Sha256": "9a4072197662c127f98eb57e6c927ec133e192c16e639c247a76f1759c56838a"
+      },
+      {
+        "id": "peer-013",
+        "sourceName": "黎明",
+        "baselineItemId": "361affd2-2",
+        "file": "audio/peer-013.wav",
+        "sha256": "5dc2dce6eb74fdec021a7d9cadd2ec78f4c1c9b813dff6864ad20ba4101589bb",
+        "sourceFloat32Sha256": "b347391b8f2865ed0b734bbaead446b39ea5481c80270b1a21ae8baa201edfd0"
+      },
+      {
+        "id": "peer-014",
+        "sourceName": "鎏金羽宫八音盒",
+        "baselineItemId": null,
+        "file": "audio/peer-014.wav",
+        "sha256": "5bae219e8b716c788a0868d68c8602fbc0bdf935156ca438006a8e6f6da9eb7d",
+        "sourceFloat32Sha256": "4e0d4fffe5535157254a647a1540ddcef9d8e19ff2b85ea25ff9723490bacbf2"
+      },
+      {
+        "id": "peer-015",
+        "sourceName": "黄金面具仿件",
+        "baselineItemId": null,
+        "file": "audio/peer-015.wav",
+        "sha256": "5bae219e8b716c788a0868d68c8602fbc0bdf935156ca438006a8e6f6da9eb7d",
+        "sourceFloat32Sha256": "4e0d4fffe5535157254a647a1540ddcef9d8e19ff2b85ea25ff9723490bacbf2"
+      },
+      {
+        "id": "peer-016",
+        "sourceName": "琥珀天心",
+        "baselineItemId": "e9f62d39-3",
+        "file": "audio/peer-016.wav",
+        "sha256": "80c0fa09af1de9d7c7e1e8e005c4f7f260b0a03fa0d559a8dca44a389392bbd8",
+        "sourceFloat32Sha256": "f48ae496da0a1d4c1a4bd7680ec2c2b1db0ec85af524c2c0417a172383102cf7"
+      },
+      {
+        "id": "peer-017",
+        "sourceName": "机械手臂",
+        "baselineItemId": "361affd2-9",
+        "file": "audio/peer-017.wav",
+        "sha256": "a71112a1cc13766189a537cfbef5c5c2f12cd28e283ee63e99fa0559de085e68",
+        "sourceFloat32Sha256": "6ac7e8abbc83ea5c3b2bbf616c8c65a7d776ad71cfd43f9fbb9b618c14893cce"
+      },
+      {
+        "id": "peer-018",
+        "sourceName": "理想国试剂盒",
+        "baselineItemId": null,
+        "file": "audio/peer-018.wav",
+        "sha256": "635681c475ef687f5f363c35c146ce41573ec6e28cee4973f02d237bd56ffa42",
+        "sourceFloat32Sha256": "db5165693bb5cb9984c9dcd37a2e3942a50a9c5c29af6d3e4caff82f540fca24"
+      },
+      {
+        "id": "peer-019",
+        "sourceName": "航天导航仪",
+        "baselineItemId": "361affd2-3",
+        "file": "audio/peer-019.wav",
+        "sha256": "f7b79a972c9e4ecb166b57baf21c91cc6f61f7c1c824bf7f7f053756519d4429",
+        "sourceFloat32Sha256": "a88211d6f43b3ad5136c778c3783b2506ef2568e7c83e3058508cb22fb9de25f"
+      },
+      {
+        "id": "peer-020",
+        "sourceName": "决胜奖杯",
+        "baselineItemId": null,
+        "file": "audio/peer-020.wav",
+        "sha256": "6082c377a1fe3421d5b6ea3c95e169ed65f7529b384b1337abc77f6f6b025b09",
+        "sourceFloat32Sha256": "edf83dd02d2bd3147eaabf00985e0db3f0b7c8c50700ea2beb35cb8c6181e393"
+      },
+      {
+        "id": "peer-021",
+        "sourceName": "陈列镜片",
+        "baselineItemId": "e9f62d39-7",
+        "file": "audio/peer-021.wav",
+        "sha256": "0d534e654feee517c2e22bb9e30bf981f46c08af08a912049af3b8b28f7526af",
+        "sourceFloat32Sha256": "80953691a2e3b884ae1ea1f5c1a1d5917c2c2c066d0cea14acc4d77a10a43f0e"
+      },
+      {
+        "id": "peer-022",
+        "sourceName": "热成像模块",
+        "baselineItemId": "267afca3-1",
+        "file": "audio/peer-022.wav",
+        "sha256": "0c2e2ae939a668b7e33b8734af552471947c1e993a04b62a9a37d51ced70aefa",
+        "sourceFloat32Sha256": "bb1103689d04d526863c0054cb4fdbe5e098b70c16b5445dfb26664749d4db7b"
+      },
+      {
+        "id": "peer-023",
+        "sourceName": "三轴陀螺仪",
+        "baselineItemId": "e9f62d39-0",
+        "file": "audio/peer-023.wav",
+        "sha256": "00b1864f9896547b34d62e45f2eb76651a64ced17e835c2f59786ae628c0e72e",
+        "sourceFloat32Sha256": "e7799acdb4b52968e48fbf784b30da905df21a32296b8d299f2b8b9e3d781d87"
+      },
+      {
+        "id": "peer-024",
+        "sourceName": "胶囊电视",
+        "baselineItemId": "e9f62d39-2",
+        "file": "audio/peer-024.wav",
+        "sha256": "6db58e3a0e3cca01fd4b4c7eaa61b5f3919362551b56eb7e37e728c4c7c3d9de",
+        "sourceFloat32Sha256": "f5c5cd6a47df636d4f5e008febd3c5cc4ba9f934da62b0191f75a327c3ea1a23"
+      },
+      {
+        "id": "peer-025",
+        "sourceName": "骏骊逐浪图",
+        "baselineItemId": null,
+        "file": "audio/peer-025.wav",
+        "sha256": "47b56268ec58b694e7a14968caafbddee8f1884e891828eb29671da0a4ede7d9",
+        "sourceFloat32Sha256": "6d795fc1f98ef584edbde846703067994503249c85bfaedf921b0620ede3e4c1"
+      },
+      {
+        "id": "peer-026",
+        "sourceName": "花瓶",
+        "baselineItemId": "388e122c-0",
+        "file": "audio/peer-026.wav",
+        "sha256": "bdc1755e1a51b77a3821444b120370f8b72fc3d388687cedd9cd9f9be99d3c7a",
+        "sourceFloat32Sha256": "e42f46f58ec2258eb9d4f235af976a06888e337a30d63dd0ab57c00f36b75f5f"
+      },
+      {
+        "id": "peer-027",
+        "sourceName": "盘蛇金像",
+        "baselineItemId": "9e7e9e83-1",
+        "file": "audio/peer-027.wav",
+        "sha256": "ea7a31b0925db11e0006f1a6f8c905baf00312b10ac4f9067582c20911caeecf",
+        "sourceFloat32Sha256": "3eaabdde024ec2d784a98f187d9233ed1f4fc587f60a6b0765c2eb9877bd8432"
+      },
+      {
+        "id": "peer-028",
+        "sourceName": "古董茶壶",
+        "baselineItemId": "56dfb35b-0",
+        "file": "audio/peer-028.wav",
+        "sha256": "fff42990b5c6ac308c4d5a2c5c59df18aceffa8c97f5b0a04cc3485e9322ca56",
+        "sourceFloat32Sha256": "8483f26df032d09e3ea74db605cfcacb0b3873ed4af024be607cb0fde8148df7"
+      },
+      {
+        "id": "peer-029",
+        "sourceName": "宝石项链",
+        "baselineItemId": "537b0217-1",
+        "file": "audio/peer-029.wav",
+        "sha256": "1134a4ceeb917726c95b4352ff9f231f7c8df7484e0195af32e3df1f9e1882d8",
+        "sourceFloat32Sha256": "1d868b797fe7cb4b9adfeefc80c9861cdabc2a773c42407dc6340a10bfffb4cb"
+      },
+      {
+        "id": "peer-030",
+        "sourceName": "目标定位模块",
+        "baselineItemId": "267afca3-0",
+        "file": "audio/peer-030.wav",
+        "sha256": "9a2df7def52f8b84f5cddd95098fe21f6f0a25203476aaaaa1f3f601527f9e6c",
+        "sourceFloat32Sha256": "f92a1cc362423b2ffffe8b6729a804dde64d37f3ec67986a79a78495ef2981b6"
+      },
+      {
+        "id": "peer-031",
+        "sourceName": "真实矩阵",
+        "baselineItemId": "361affd2-0",
+        "file": "audio/peer-031.wav",
+        "sha256": "96f405c29877b19d734cad3f8dc1788f6da0ce36848d27b115ca5c8a7eb15b7f",
+        "sourceFloat32Sha256": "70bc59325e149e07851e6513c485f56e10ce325afb3043651880db7d2f6fade0"
+      },
+      {
+        "id": "peer-032",
+        "sourceName": "文明之声",
+        "baselineItemId": "361affd2-6",
+        "file": "audio/peer-032.wav",
+        "sha256": "0f8f3841d7477c0832ac559968872747508772876cb28f11cdc47b2ce68ee4a4",
+        "sourceFloat32Sha256": "dc1aada52a7f2c3311121e24d6d8c9cebbdc3ab478949e61f660f23d81edcb58"
+      },
+      {
+        "id": "peer-033",
+        "sourceName": "脑电装置",
+        "baselineItemId": "361affd2-5",
+        "file": "audio/peer-033.wav",
+        "sha256": "5dc2dce6eb74fdec021a7d9cadd2ec78f4c1c9b813dff6864ad20ba4101589bb",
+        "sourceFloat32Sha256": "b347391b8f2865ed0b734bbaead446b39ea5481c80270b1a21ae8baa201edfd0"
+      },
+      {
+        "id": "peer-034",
+        "sourceName": "法厄同之钟",
+        "baselineItemId": "361affd2-4",
+        "file": "audio/peer-034.wav",
+        "sha256": "5dc2dce6eb74fdec021a7d9cadd2ec78f4c1c9b813dff6864ad20ba4101589bb",
+        "sourceFloat32Sha256": "b347391b8f2865ed0b734bbaead446b39ea5481c80270b1a21ae8baa201edfd0"
+      },
+      {
+        "id": "peer-035",
+        "sourceName": "赫芙拉彩蛋",
+        "baselineItemId": "e9f62d39-6",
+        "file": "audio/peer-035.wav",
+        "sha256": "578c3ee5c8a0b0ea40cba0aab36e8bb1e7da846201cfb262e7ca9fa726efdc79",
+        "sourceFloat32Sha256": "9be2eca053673f9fd73fa95c7171e232302d261a80ec9038a2487c370278bb2c"
+      },
+      {
+        "id": "peer-036",
+        "sourceName": "卡莫纳之星",
+        "baselineItemId": "537b0217-0",
+        "file": "audio/peer-036.wav",
+        "sha256": "69ff95311d63943d0f6a47c5742d1e4617fd5ecba695521120d7947e0343ae8e",
+        "sourceFloat32Sha256": "92d44bdd272a224546c8cd70aac68818d37eda802f80fd72661cd7c78d3e49a8"
+      },
+      {
+        "id": "peer-037",
+        "sourceName": "里拉琴",
+        "baselineItemId": "e9f62d39-4",
+        "file": "audio/peer-037.wav",
+        "sha256": "fe56c0bbe6216f96c165800c47401d0b716ad593ebc547b0f3515c8cad469137",
+        "sourceFloat32Sha256": "13aa62fc11e8deff043fdb54b4a7a039c7752ec50e56bbc3b7f8a81ddba27da6"
+      },
+      {
+        "id": "peer-038",
+        "sourceName": "承天浑仪",
+        "baselineItemId": "e9f62d39-5",
+        "file": "audio/peer-038.wav",
+        "sha256": "db16cf0c8125e366846b0e33d3a3e12230c15ee76b7b7354ae188810129643a1",
+        "sourceFloat32Sha256": "2c1a8fb2f0e61a0fbffff9ea091932901be9350f99a0205be8b91e2ca7a861ad"
+      },
+      {
+        "id": "peer-039",
+        "sourceName": "孔雀羽扇",
+        "baselineItemId": "361affd2-1",
+        "file": "audio/peer-039.wav",
+        "sha256": "48119c5ba65b09211d4e4a017155438076f549b55fad11e201b07be90a2ba70c",
+        "sourceFloat32Sha256": "d3920ad44f4d105051b35cc947ca8b62d59f3807b6b5f62968ae1bc891dd330c"
+      },
+      {
+        "id": "peer-040",
+        "sourceName": "原型机模块",
+        "baselineItemId": "e9f62d39-1",
+        "file": "audio/peer-040.wav",
+        "sha256": "122d71170851ed7ea641a8a80542a572ad761403cd87e7b0002b273728dfd9bc",
+        "sourceFloat32Sha256": "f7ba7e1ef58e0695b0d34579c55432d95d5a98a0c40c10823aa04db40a88eb68"
+      },
+      {
+        "id": "peer-041",
+        "sourceName": "燃料桶",
+        "baselineItemId": null,
+        "file": "audio/peer-041.wav",
+        "sha256": "b360b2c9645b8474f2d18272a53a2e7379e4a8b4390ee532ecfd5ed5e57831ac",
+        "sourceFloat32Sha256": "d92839369b9ab393b5951f5d44807e6bca5f710034813b18342b059cc5a56d3b"
+      },
+      {
+        "id": "peer-042",
+        "sourceName": "钛合金板",
+        "baselineItemId": null,
+        "file": "audio/peer-042.wav",
+        "sha256": "8697436504be31e03436ff9f875701b06c17940666edca41bbc9d40934e14ec9",
+        "sourceFloat32Sha256": "9975c9e24512d86d4d2c30bf1e8ded8c2f90f687fe6ae680e3b0fac484308c43"
+      },
+      {
+        "id": "peer-043",
+        "sourceName": "军用电台",
+        "baselineItemId": null,
+        "file": "audio/peer-043.wav",
+        "sha256": "051dccc185cdaefbf983fd5fac463179269b60cd95e7d101884ea8e406581dab",
+        "sourceFloat32Sha256": "12e59e2b246906d2750e2989e6495c41eb0549974833ffa80c45b7171928a929"
+      },
+      {
+        "id": "peer-044",
+        "sourceName": "金色手机",
+        "baselineItemId": null,
+        "file": "audio/peer-044.wav",
+        "sha256": "f0038c4f662c8638a6c6bc67876ddd529b2c17bfa2ca7e244147547b105243f7",
+        "sourceFloat32Sha256": "9d1ee0db114554fdc96017f1c7ecd06a898871edaa0ff85fbdd011afa74d62c9"
+      },
+      {
+        "id": "peer-045",
+        "sourceName": "钻戒",
+        "baselineItemId": null,
+        "file": "audio/peer-045.wav",
+        "sha256": "7a72876fd52de187150a5ed9e66e22585a08976d96177d0fef19bedf2ad211fd",
+        "sourceFloat32Sha256": "23bf0eec1f482e678d491cfb935c616996125ff403b7e78b172ed187447473fa"
+      },
+      {
+        "id": "peer-046",
+        "sourceName": "游戏机",
+        "baselineItemId": null,
+        "file": "audio/peer-046.wav",
+        "sha256": "5ee8046e7a735ab0386415474646c01e28838b870618adfcd9d73a7486325458",
+        "sourceFloat32Sha256": "5647269c8e759dbec32a26770ca1bd262483bf4f5ab618317a284ad7cdd64767"
+      },
+      {
+        "id": "peer-047",
+        "sourceName": "红外线理疗灯",
+        "baselineItemId": null,
+        "file": "audio/peer-047.wav",
+        "sha256": "55922e4717e71dd3ab8711ae75f688fe75ace3799cb9a04eaec77596449eba1b",
+        "sourceFloat32Sha256": "bd60a283461a1c4f511c14bf9da02605b98d2eb6b52940cba50a88e4cd324c2b"
+      },
+      {
+        "id": "peer-048",
+        "sourceName": "干花书签",
+        "baselineItemId": null,
+        "file": "audio/peer-048.wav",
+        "sha256": "bec2b0c79535c1a0bbb4897e3c6bbaf72f772411323b1fd09f4712827f970f9d",
+        "sourceFloat32Sha256": "72e9e83a02e1922d555616e6d582287425c0c0e0b72164380ad514aa43e0dbff"
+      },
+      {
+        "id": "peer-049",
+        "sourceName": "畸变组织块",
+        "baselineItemId": null,
+        "file": "audio/peer-049.wav",
+        "sha256": "fd16e3aec42ecc2b850acd284b3cd9e9fd670e0324a39b1b36fb6496f0662dd0",
+        "sourceFloat32Sha256": "72943932f5802fb25c2afa394861c7ae68e3bed5a9b2785f0a67f1fc8beb3df7"
+      },
+      {
+        "id": "peer-050",
+        "sourceName": "金块",
+        "baselineItemId": null,
+        "file": "audio/peer-050.wav",
+        "sha256": "e6f4ff50528f4fabad2722303b51abff157b343eed1a48d2eac106becb2ce6f0",
+        "sourceFloat32Sha256": "8ab057b72293934f9c69e132222ab844b166edfcc81eb47336064c5dd3aeb88b"
+      },
+      {
+        "id": "peer-051",
+        "sourceName": "天线",
+        "baselineItemId": "267afca3-10",
+        "file": "audio/peer-051.wav",
+        "sha256": "60e11656dd415013e024f09b05a898963598001de111d480bff8260571ad3c56",
+        "sourceFloat32Sha256": "fc0fb90272c42e9bed87e8c2fbc50ccdd6eea3c399d57e6a579e80060f136631"
+      },
+      {
+        "id": "peer-052",
+        "sourceName": "奢华茶具",
+        "baselineItemId": null,
+        "file": "audio/peer-052.wav",
+        "sha256": "d66bea8424b00f51fdc2c18a0d0158e711a1757df6c39c15c22c07798c474f4f",
+        "sourceFloat32Sha256": "08412be4bb8296a05847b586f12026d10eb321ad049fc69e4f1a2128f8482d4b"
+      },
+      {
+        "id": "peer-053",
+        "sourceName": "钢筋剪",
+        "baselineItemId": "e9f62d39-10",
+        "file": "audio/peer-053.wav",
+        "sha256": "67f0d8c58ef35ead47e3479b2e3b729b143b0d751b6dfa30a14e003b0b3c551c",
+        "sourceFloat32Sha256": "f259be1f4dd36fdf29f0948abffdd0751f8d1a66c9bc00deaa05f402f922b19d"
+      },
+      {
+        "id": "peer-054",
+        "sourceName": "耐冲击硬胶",
+        "baselineItemId": null,
+        "file": "audio/peer-054.wav",
+        "sha256": "3a47c0464251a7ed85d6f5e67f34858165af43aa52f0f4d0af8f63feae8afa3e",
+        "sourceFloat32Sha256": "8053d2e1174c395f7d470318ab063237c96ae5b4c075b9766664deb85fed630a"
+      },
+      {
+        "id": "peer-055",
+        "sourceName": "马刺",
+        "baselineItemId": null,
+        "file": "audio/peer-055.wav",
+        "sha256": "7dded24a70bdaf774e7ef25c26b1fcf661b2b2fdab1a19c5a57465d908916d01",
+        "sourceFloat32Sha256": "1af95e35740b7315ed2f7f8585de5b0509e7113a04e8739423b2b4ed2e782f98"
+      },
+      {
+        "id": "peer-056",
+        "sourceName": "水壶",
+        "baselineItemId": null,
+        "file": "audio/peer-056.wav",
+        "sha256": "8ecc435fea127c28ef0ca2e573f6aa40bd0e84ed131f8acffaeefcdd6ab53881",
+        "sourceFloat32Sha256": "10e67af975fe1175a99da30c356eedd19bf4083f5c98248e127af586478510ec"
+      },
+      {
+        "id": "peer-057",
+        "sourceName": "炮队镜",
+        "baselineItemId": null,
+        "file": "audio/peer-057.wav",
+        "sha256": "636076e3cad516a394fa36e820e2c0c8206149ffe7deff2bbc337da174639b7a",
+        "sourceFloat32Sha256": "96e9973b8a9e396daac7e7bcf808134e54461a5bb722c08f6ec1089bf335044f"
+      },
+      {
+        "id": "peer-058",
+        "sourceName": "测距望远镜",
+        "baselineItemId": null,
+        "file": "audio/peer-058.wav",
+        "sha256": "73248881df1c3eaf36ed8c70e8081b5f998fc1bdeb42911f37a34c4f4c5017b7",
+        "sourceFloat32Sha256": "c07c9bb6061f685fece01a872255888818706e36c1fa61d2d73d6462558037bc"
+      },
+      {
+        "id": "peer-059",
+        "sourceName": "镜头",
+        "baselineItemId": null,
+        "file": "audio/peer-059.wav",
+        "sha256": "ebe7d5cfcdfb31bf2fce452988dff573cbab6b049a6e28460fca3206a67b086c",
+        "sourceFloat32Sha256": "0f5dafebbd8a56a51de7a3b1bec21967a756bba45494ae780aaf64d6d72e52c6"
+      },
+      {
+        "id": "peer-060",
+        "sourceName": "照相机",
+        "baselineItemId": null,
+        "file": "audio/peer-060.wav",
+        "sha256": "8295d9d4ae4dfe9aac67fb703193450dd1e06943b0f0627363bc8885132ab24c",
+        "sourceFloat32Sha256": "43ddfc2cc749b9e8acc91df168a01588333091e704117bcdc2333550b716dab8"
+      },
+      {
+        "id": "peer-061",
+        "sourceName": "硝化棉",
+        "baselineItemId": null,
+        "file": "audio/peer-061.wav",
+        "sha256": "511f6d45881c57cfee973e30a0a682ddeeb948f0f5a51881bd7a6929047b7ebd",
+        "sourceFloat32Sha256": "5459271d7773ca5c4b06dfa3cbfb93fb289ea242933761ae3fef09737274b8a1"
+      }
+    ],
+    "baselineArtifacts": {
+      "Listener.Cli.dll": "b97302947c22f9e7ab2a0e213dee9b95065b1ca7afb21951b0fc395638da5c20",
+      "Listener.Core.dll": "13c1b7318122582017c9d0757be4352d9bc5c74f4d20f9f429046dfc8b0e08f9",
+      "engine/Listener.Engine.exe": "cebf604951194aa3b73331d60666ade87c3d7f58a913cfc1c56f36baacadde42",
+      "library/library.json": "267d0d333175bd60db57709e2c3bd55e4f257393c4d60a391e994da2a0a24a0f",
+      "library/radar-index.bin": "bcdb31a7402559a2b8f204430bca1dda8501011dfd96d05d29f8c248abe1363d"
+    },
+    "indexHeader": {
+      "algorithm": "mel-goertzel-v2",
+      "parameterJson": "{\n  \"algorithm\": \"mel-goertzel-v2\",\n  \"version\": 3,\n  \"sampleRate\": 48000,\n  \"frameSize\": 1024,\n  \"hopSize\": 256,\n  \"window\": \"hann-periodic\",\n  \"melBands\": 64,\n  \"fMinHz\": 40,\n  \"fMaxHz\": 16000,\n  \"windowFrames\": 32,\n  \"norm\": \"mean-subtract+l2\",\n  \"logFloorDb\": -20,\n  \"floorMode\": \"window-relative\",\n  \"noise\": {\n    \"method\": \"subtract\",\n    \"highPassHz\": 240,\n    \"overSubtract\": 1.5,\n    \"gainFloorDb\": -8,\n    \"mix\": 1,\n    \"adaptiveGate\": true,\n    \"gateMarginDb\": 4,\n    \"gateFloorDbfs\": -70\n  }\n}",
+      "fingerprint": "2899e374cf47d5691104f854a89a5da5ed481a9b1a0f2d53847773caca82690c",
+      "dimensions": 2048,
+      "samples": 62,
+      "groups": 62
+    },
+    "indexSha256": "b154e7b5a09acfaa14b5fc3a7aca607c377c432fbd8ff615875405d9ea89742a",
+    "librarySha256": "f19b702f89a4360f68be88367d74b317a122fb15f547797f8d42e695a63c7360",
+    "featureParametersIdenticalToBaseline": true
+  },
+  "putdownHashes": {
+    "library.json": "dd00abb98079b79ba8440e67e8a90d20e43f6bee7bfcce8bcbc6030d44c003eb",
+    "provenance.json": "d54525144e33ee3714586ad18e5f32e1edb2e765cf1bf6edb06542d58070ef5b",
+    "radar-index.bin": "8cabc4a60a6224dcb4f8bf0c8cf06d359da3c70b0e92646f9c7518cefde6c78b",
+    "audio/267afca3-1.wav": "c74560344662898a524fc8e7c2a88ebd2f6f2cf93f8716231af91b3efecc1d72",
+    "audio/267afca3-2.wav": "c74560344662898a524fc8e7c2a88ebd2f6f2cf93f8716231af91b3efecc1d72",
+    "audio/56dfb35b-1.wav": "542d3fcef11c0a376267d984afa979dd03e07c150f71924cb7c3a416ccc94ee7",
+    "audio/cb1c0d1d-1.wav": "59d95be50def7a43cf13d60451e8ddf0f7152220e1c2526794c90196266ef329",
+    "audio/e9f62d39-1.wav": "7ea621df8a1321e93a9f16da90f6525564368b1121d6af3ef80958f7438ebdc0"
+  },
+  "baselineArtifactsVerifiedUnchanged": true,
+  "frozenLabelsSha256": "e1160b6cbfda9c23477d958acc8e0088aba30cca10a3e33ce6fe2f80584c74ee",
+  "onsetTolerance": [
+    0.2,
+    0.35
+  ],
+  "identicalTriggerTimesAllJobs": true,
+  "totals": {
+    "fullRecordingSeconds": 7546.6,
+    "fullRecordingAnalyses": 9573,
+    "originalFullRecordingOutputs": 23,
+    "peerLibraryFullRecordingOutputs": 312,
+    "knownOperations": 8,
+    "knownOperationsTriggered": 5,
+    "knownOperationsWithCandidateSet": 0,
+    "legacyExpectedItemHits": 0,
+    "knownDrags": 2,
+    "knownDragsWithCandidateSet": 0,
+    "knownTransfers": 6,
+    "knownTransfersWithCandidateSet": 0,
+    "hiddenPickups": 10,
+    "hiddenTriggered": 7,
+    "hiddenAnalysesBeforeRelease": 2,
+    "hiddenFormalOutputs": 4,
+    "hiddenFormalOutputsBeforeRelease": 2,
+    "originalFalseScenes": 10,
+    "retainedFalseOutputs": 4,
+    "newlyReviewedFullOutputs": 15,
+    "newlyConfirmedFullFalseOutputs": 15,
+    "developmentSeconds": 610,
+    "developmentAnalyses": 399,
+    "originalDevelopmentOutputs": 27,
+    "peerLibraryDevelopmentOutputs": 73,
+    "developmentMovementFalseOutputs": 3
+  },
+  "conversionSanity": {
+    "positiveReferences": 62,
+    "referencesInOwnCandidates": 62,
+    "syntheticControls": 2,
+    "acceptedSyntheticControls": 0,
+    "isGameplayAccuracy": false
+  },
+  "reviewSelection": "For each full recording, first three newly accepted outputs in chronological order, >=2 seconds apart; additionally every accepted output in both development movement clips. Fixed before visual inspection; not random sampling.",
+  "limitations": [
+    "Only eight known operations covering five item identities; no overall gameplay accuracy estimate.",
+    "312 full-recording outputs are not 312 correct recognitions, nor all automatically labelled false; only explicit visual reviews count.",
+    "The library swap also changes catalogue coverage/group representation from 51 items/9 groups/14 references to 62 items/62 groups/62 references; matching code and thresholds remain frozen.",
+    "All 62 supplied pickup waveforms were imported; original putdown auxiliary library remains byte-identical because no separate peer putdown library was supplied.",
+    "The fixed threshold has not been recalibrated for the replacement library; these results do not isolate asset quality from algorithm/library compatibility.",
+    "Exact original mono 24 kHz PCM used for our frozen baseline, including compressed/mixed recording audio. This is not a live game-process capture or GUI test.",
+    "The 610-second September 23 cohort was used previously for development and is not an independent holdout.",
+    "Hidden trader goods have no identity ground truth. Output/trigger timing is measurable but correctness is not.",
+    "Manual aligned 0.44-second crops bypass the automatic trigger and are diagnostic only; no tuning on these labels.",
+    "Visual false labels mean the candidate output does not correspond to the player action; images do not isolate which overlapping sound caused it."
+  ],
+  "fullRecordings": [
+    {
+      "id": "record20260920-213509",
+      "start": 0,
+      "duration": 1967.6,
+      "cohort": "frozen-full-recording",
+      "audioSha256": "21538409e27186f8ee260d6571394b0a2e4faa87d16a6cfeb1f66cc083f39b29",
+      "baselineEventsSha256": "93afefb2d5b5ff4ba21de0983c2ced2556ba546e5771e9174cfe59e32bd533c1",
+      "eventsSha256": "193df494b1fddbf9521d0eee661f5c41b0cec19aaa0d514fa97279f6a56bf23c",
+      "analyses": 2725,
+      "matches": 121,
+      "elapsedSeconds": 89.064,
+      "identicalTriggerTimes": true,
+      "oldMatchedOutputs": 6,
+      "reviewedNewOutputs": [
+        {
+          "job": "record20260920-213509",
+          "recording": "record20260920-213509",
+          "eventIndex": 0,
+          "onset": 2.95,
+          "sourceOnset": 2.95,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.7876310026572789,
+          "verdict": "false",
+          "scene": "第一人称持刀跟随队友上台阶，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/00--0.30.jpg",
+              "sha256": "4b11960bcca8ef607c19904dbd2fdc25d924cad2e3d0c768ee6dd6d6a349ca4c"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/00-+0.35.jpg",
+              "sha256": "c1843868eddc9fda5b7172b0ca96b920c8e034acf417d487541387538dac7169"
+            }
+          ]
+        },
+        {
+          "job": "record20260920-213509",
+          "recording": "record20260920-213509",
+          "eventIndex": 8,
+          "onset": 6.65,
+          "sourceOnset": 6.65,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.8237156164173455,
+          "verdict": "false",
+          "scene": "第一人称持刀经过门口移动，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/01--0.30.jpg",
+              "sha256": "df3ecd76d6228d8d9e8591ee0134924b5ef8aeaa5213c632c3be7dbec047d3e6"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/01-+0.35.jpg",
+              "sha256": "713f028c2bd333b6852db315ece3986b10629e1b909c28338db2ff878dd1ce78"
+            }
+          ]
+        },
+        {
+          "job": "record20260920-213509",
+          "recording": "record20260920-213509",
+          "eventIndex": 16,
+          "onset": 10.39,
+          "sourceOnset": 10.39,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.7872193355122484,
+          "verdict": "false",
+          "scene": "第一人称持刀下楼梯，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/02--0.30.jpg",
+              "sha256": "c404b632d587f4e4fc7818bb003525e9be22415cea48edbc01ee38dab7088481"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/02-+0.35.jpg",
+              "sha256": "249109536acc9853926239a92194aff22ad7f271cfa7233a89b7af234acfe19f"
+            }
+          ]
+        }
+      ],
+      "knownOperations": [
+        {
+          "id": "tv-loot",
+          "item": "peer-024",
+          "name": "胶囊电视",
+          "onset": [
+            64.3,
+            64.4
+          ],
+          "action": "transfer",
+          "evidence": "tv-detail/frame-00064.400.jpg",
+          "baselineItemId": "e9f62d39-2",
+          "referenceName": "胶囊电视",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 64.8,
+              "onset": 64.25,
+              "clipStart": 64.17,
+              "clipEnd": 64.61,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "peer-058",
+                  "score": 0.6276216546721292
+                },
+                {
+                  "groupId": "peer-059",
+                  "score": 0.6276216546721292
+                },
+                {
+                  "groupId": "peer-056",
+                  "score": 0.6273325492426435
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup",
+              "candidateNames": []
+            }
+          ],
+          "analysisTriggered": true,
+          "analysisBeforeRelease": null,
+          "candidateSetProduced": false,
+          "candidateSetBeforeRelease": null,
+          "soundFamilyVerification": "no-accepted-candidates",
+          "legacyExpectedItemInCandidates": false,
+          "legacyExpectedItemBeforeRelease": null
+        },
+        {
+          "id": "tv-recovery",
+          "item": "peer-024",
+          "name": "胶囊电视",
+          "onset": [
+            550.15,
+            550.2
+          ],
+          "action": "transfer",
+          "evidence": "tv-transfer/frame-00550.200.jpg",
+          "baselineItemId": "e9f62d39-2",
+          "referenceName": "胶囊电视",
+          "associatedAnalyses": [],
+          "analysisTriggered": false,
+          "analysisBeforeRelease": null,
+          "candidateSetProduced": false,
+          "candidateSetBeforeRelease": null,
+          "soundFamilyVerification": "no-accepted-candidates",
+          "legacyExpectedItemInCandidates": false,
+          "legacyExpectedItemBeforeRelease": null
+        }
+      ],
+      "hiddenPickups": []
+    },
+    {
+      "id": "record20260921-205434",
+      "start": 0,
+      "duration": 1000.5,
+      "cohort": "frozen-full-recording",
+      "audioSha256": "360f4e4971924a22edbd11c5dcf5965614f8dfabea412d54457e8102eb8945e2",
+      "baselineEventsSha256": "6509f16a1ea06f507e473928f11142f0a60a5e85e618ed2e9009f5dea963f396",
+      "eventsSha256": "2db4350f349fbee7da3ca4668b75f575b89eec5f227de263ab254068969ddf1a",
+      "analyses": 1321,
+      "matches": 34,
+      "elapsedSeconds": 43.143,
+      "identicalTriggerTimes": true,
+      "oldMatchedOutputs": 0,
+      "reviewedNewOutputs": [
+        {
+          "job": "record20260921-205434",
+          "recording": "record20260921-205434",
+          "eventIndex": 17,
+          "onset": 9.15,
+          "sourceOnset": 9.15,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.7982979862594355,
+          "verdict": "false",
+          "scene": "第一人称持枪进入大厅，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/03--0.30.jpg",
+              "sha256": "38a835769677a21a872231532fcd97130a72cc9e8f2a2a82e4fa9bfd46929e61"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/03-+0.35.jpg",
+              "sha256": "322ee3353ba3f267e0110eacfd6a7d599800b28ab3cdf11e62896a2f6d790d19"
+            }
+          ]
+        },
+        {
+          "job": "record20260921-205434",
+          "recording": "record20260921-205434",
+          "eventIndex": 23,
+          "onset": 12.45,
+          "sourceOnset": 12.45,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.8010166806615431,
+          "verdict": "false",
+          "scene": "第一人称持刀在大厅移动，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/04--0.30.jpg",
+              "sha256": "1ed26f4695f5bec69b0a24bce9c6bef907d667e04d261023e13b47d2ca75c277"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/04-+0.35.jpg",
+              "sha256": "a629437c653b051e68f6832b4a1ab84730b570649ea500f94fbbd068d44e1a4a"
+            }
+          ]
+        },
+        {
+          "job": "record20260921-205434",
+          "recording": "record20260921-205434",
+          "eventIndex": 67,
+          "onset": 42.870000000000005,
+          "sourceOnset": 42.870000000000005,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.7944669271780174,
+          "verdict": "false",
+          "scene": "第一人称持枪处于操作台附近，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/05--0.30.jpg",
+              "sha256": "1f5bf9c1407bab208e3feffb24460fe800bc69214602f8a957dbc9534f19679a"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/05-+0.35.jpg",
+              "sha256": "b69c9d6616c2a8d0050adc70af20406a1c51d8c6fdc545c4699431d1ee36acee"
+            }
+          ]
+        }
+      ],
+      "knownOperations": [
+        {
+          "id": "egg-loot",
+          "item": "peer-035",
+          "name": "赫美拉彩蛋",
+          "onset": [
+            65.6,
+            65.65
+          ],
+          "action": "transfer",
+          "evidence": "egg-detail/frame-00065.650.jpg",
+          "baselineItemId": "e9f62d39-6",
+          "referenceName": "赫芙拉彩蛋",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 66,
+              "onset": 65.61,
+              "clipStart": 65.53,
+              "clipEnd": 65.92,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "peer-043",
+                  "score": 0.6383127912518387
+                },
+                {
+                  "groupId": "peer-054",
+                  "score": 0.6297002190557629
+                },
+                {
+                  "groupId": "peer-056",
+                  "score": 0.6229671385167721
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup",
+              "candidateNames": []
+            }
+          ],
+          "analysisTriggered": true,
+          "analysisBeforeRelease": null,
+          "candidateSetProduced": false,
+          "candidateSetBeforeRelease": null,
+          "soundFamilyVerification": "no-accepted-candidates",
+          "legacyExpectedItemInCandidates": false,
+          "legacyExpectedItemBeforeRelease": null
+        },
+        {
+          "id": "egg-drag",
+          "item": "peer-035",
+          "name": "赫美拉彩蛋",
+          "onset": [
+            67.05,
+            67.1
+          ],
+          "drop": [
+            67.6,
+            67.65
+          ],
+          "action": "drag",
+          "evidence": "egg-detail/frame-00067.100.jpg",
+          "baselineItemId": "e9f62d39-6",
+          "referenceName": "赫芙拉彩蛋",
+          "associatedAnalyses": [],
+          "analysisTriggered": false,
+          "analysisBeforeRelease": false,
+          "candidateSetProduced": false,
+          "candidateSetBeforeRelease": false,
+          "soundFamilyVerification": "no-accepted-candidates",
+          "legacyExpectedItemInCandidates": false,
+          "legacyExpectedItemBeforeRelease": false
+        }
+      ],
+      "hiddenPickups": []
+    },
+    {
+      "id": "record20260922-214737",
+      "start": 0,
+      "duration": 1096.7,
+      "cohort": "frozen-full-recording",
+      "audioSha256": "b8225ab1cdbf7382b07c2575ebc60c8306734f505da06420c931009e75ab0e33",
+      "baselineEventsSha256": "6494aa92dbb2deaadefcbdc55b3d2948c446783a543ccc525989cf2c3d430a14",
+      "eventsSha256": "90882ce2555dfcb406bfb10786466867062a2f7261ef5419ef91dca76db33ecb",
+      "analyses": 1495,
+      "matches": 41,
+      "elapsedSeconds": 49.464,
+      "identicalTriggerTimes": true,
+      "oldMatchedOutputs": 0,
+      "reviewedNewOutputs": [
+        {
+          "job": "record20260922-214737",
+          "recording": "record20260922-214737",
+          "eventIndex": 4,
+          "onset": 4.71,
+          "sourceOnset": 4.71,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.7971817386950037,
+          "verdict": "false",
+          "scene": "第一人称持刀跟随队友沿走廊移动，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/06--0.30.jpg",
+              "sha256": "4777d802a596f0cb2282ee6195ac529dbce012389ac43b37c5f6d43276a236ea"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/06-+0.35.jpg",
+              "sha256": "487d6c2d95d59073eff88bc91bad32beb71eb93dbc7454a216695b48bf91f5d0"
+            }
+          ]
+        },
+        {
+          "job": "record20260922-214737",
+          "recording": "record20260922-214737",
+          "eventIndex": 37,
+          "onset": 21.370000000000005,
+          "sourceOnset": 21.370000000000005,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.7820442938712133,
+          "verdict": "false",
+          "scene": "第一人称上楼并操作枪械，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/07--0.30.jpg",
+              "sha256": "4c1d271fb97562962d7a10bb6985c30775c67a5ffc439a34a597a1b4cd989b67"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/07-+0.35.jpg",
+              "sha256": "e64a5393929184758b3fe5bbe6342ed05feb68908cc59dd8c95c8e096c90e26e"
+            }
+          ]
+        },
+        {
+          "job": "record20260922-214737",
+          "recording": "record20260922-214737",
+          "eventIndex": 43,
+          "onset": 24.270000000000003,
+          "sourceOnset": 24.270000000000003,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头",
+            "耐冲击硬胶",
+            "军用电台"
+          ],
+          "bestScore": 0.7880350714128816,
+          "verdict": "false",
+          "scene": "第一人称在楼梯持枪检查弹匣后继续上楼，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/08--0.30.jpg",
+              "sha256": "e1d40943f916220e86e538f745efcf37380b7b3ca706e573fd08b36cb885bf44"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/08-+0.35.jpg",
+              "sha256": "ea538a2d829ba4257574ed16a23587252a01ae35a9567df50af33d68a4968971"
+            }
+          ]
+        }
+      ],
+      "knownOperations": [
+        {
+          "id": "dawn-loot",
+          "item": "peer-013",
+          "name": "黎明",
+          "onset": [
+            78.4,
+            78.45
+          ],
+          "action": "transfer",
+          "evidence": "dawn-detail/frame-00078.450.jpg",
+          "baselineItemId": "361affd2-2",
+          "referenceName": "黎明",
+          "associatedAnalyses": [],
+          "analysisTriggered": false,
+          "analysisBeforeRelease": null,
+          "candidateSetProduced": false,
+          "candidateSetBeforeRelease": null,
+          "soundFamilyVerification": "no-accepted-candidates",
+          "legacyExpectedItemInCandidates": false,
+          "legacyExpectedItemBeforeRelease": null
+        },
+        {
+          "id": "dawn-drag",
+          "item": "peer-013",
+          "name": "黎明",
+          "onset": [
+            80.45,
+            80.5
+          ],
+          "drop": [
+            80.9,
+            80.95
+          ],
+          "action": "drag",
+          "evidence": "dawn-detail/frame-00080.500.jpg",
+          "baselineItemId": "361affd2-2",
+          "referenceName": "黎明",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 81,
+              "onset": 80.45,
+              "clipStart": 80.37,
+              "clipEnd": 80.81,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "peer-054",
+                  "score": 0.7790385773225511
+                },
+                {
+                  "groupId": "peer-043",
+                  "score": 0.7759226160308234
+                },
+                {
+                  "groupId": "peer-056",
+                  "score": 0.7151084151704534
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup",
+              "candidateNames": []
+            }
+          ],
+          "analysisTriggered": true,
+          "analysisBeforeRelease": false,
+          "candidateSetProduced": false,
+          "candidateSetBeforeRelease": false,
+          "soundFamilyVerification": "no-accepted-candidates",
+          "legacyExpectedItemInCandidates": false,
+          "legacyExpectedItemBeforeRelease": false
+        }
+      ],
+      "hiddenPickups": []
+    },
+    {
+      "id": "record20260922-205653",
+      "start": 0,
+      "duration": 1442.4,
+      "cohort": "frozen-full-recording",
+      "audioSha256": "b7f583871548c9850f5d3cd923c4ce7299f741d96acbc7a85a6777137339718c",
+      "baselineEventsSha256": "4b7cf70fcd6609133ca037c724bf6904b4821012d030d7703e0657c2f3dd2acc",
+      "eventsSha256": "a60214e4b9d1497bc7d9b3885a30fe84a9a50146db25eedc445d8a9391d7cec4",
+      "analyses": 1574,
+      "matches": 51,
+      "elapsedSeconds": 51.661,
+      "identicalTriggerTimes": true,
+      "oldMatchedOutputs": 5,
+      "reviewedNewOutputs": [
+        {
+          "job": "record20260922-205653",
+          "recording": "record20260922-205653",
+          "eventIndex": 0,
+          "onset": 2.95,
+          "sourceOnset": 2.95,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.7808955208148197,
+          "verdict": "false",
+          "scene": "第一人称持刀跟随队友进入大厅，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/09--0.30.jpg",
+              "sha256": "45149271557d217d4278a34d5290e7a9b6d28b5bd7b22e7883c8d545eb0dde41"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/09-+0.35.jpg",
+              "sha256": "1b576d3681365ee0a8b1a9413a3fabe954de4048f326469fc8e7c032b40c5abc"
+            }
+          ]
+        },
+        {
+          "job": "record20260922-205653",
+          "recording": "record20260922-205653",
+          "eventIndex": 6,
+          "onset": 5.470000000000001,
+          "sourceOnset": 5.470000000000001,
+          "oldStatus": "unknown",
+          "names": [
+            "耐冲击硬胶",
+            "军用电台"
+          ],
+          "bestScore": 0.787323149476031,
+          "verdict": "false",
+          "scene": "第一人称持刀经过大厅门口，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/10--0.30.jpg",
+              "sha256": "76b0a4ebccb40fb5da7ec330cb1f75405496efe24f2f56f6091b8960123e7b59"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/10-+0.35.jpg",
+              "sha256": "f8869a81dcf5ab6eb4ca955d4cd17d81b5e6389e80b9d40f7263872fafdc9cf4"
+            }
+          ]
+        },
+        {
+          "job": "record20260922-205653",
+          "recording": "record20260922-205653",
+          "eventIndex": 23,
+          "onset": 13.57,
+          "sourceOnset": 13.57,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.8225229867149585,
+          "verdict": "false",
+          "scene": "第一人称持刀在楼梯与堆放箱体旁移动，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/11--0.30.jpg",
+              "sha256": "ba2d9b305d9ecece087b7893e8902cda53b7c6ab1177b65da264dead7b143599"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/11-+0.35.jpg",
+              "sha256": "99d041c2578be66e89c15c0cfbd009218cea98206d47559dd735322200d24559"
+            }
+          ]
+        }
+      ],
+      "knownOperations": [],
+      "hiddenPickups": [
+        {
+          "id": "trader-00",
+          "onset": [
+            1111.95,
+            1112.0
+          ],
+          "drop": [
+            1112.4,
+            1112.45
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/00-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1112.6,
+              "onset": 1112.1899999999998,
+              "clipStart": 1112.11,
+              "clipEnd": 1112.52,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "peer-008",
+                  "score": 0.7127831523650622
+                },
+                {
+                  "groupId": "peer-025",
+                  "score": 0.7111624733865558
+                },
+                {
+                  "groupId": "peer-027",
+                  "score": 0.7111579661111215
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup",
+              "candidateNames": []
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null,
+          "formalOutput": false,
+          "formalOutputBeforeRelease": false
+        },
+        {
+          "id": "trader-01",
+          "onset": [
+            1114.2,
+            1114.25
+          ],
+          "drop": [
+            1114.75,
+            1114.8
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/01-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1115,
+              "onset": 1114.45,
+              "clipStart": 1114.37,
+              "clipEnd": 1114.81,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "peer-025",
+                  "score": 0.7477127641600941
+                },
+                {
+                  "groupId": "peer-027",
+                  "score": 0.7476831028356382
+                },
+                {
+                  "groupId": "peer-008",
+                  "score": 0.7476462568452881
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup",
+              "candidateNames": []
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null,
+          "formalOutput": false,
+          "formalOutputBeforeRelease": false
+        },
+        {
+          "id": "trader-02",
+          "onset": [
+            1124.65,
+            1124.7
+          ],
+          "drop": [
+            1125.25,
+            1125.3
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/02-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1125.4,
+              "onset": 1124.8500000000001,
+              "clipStart": 1124.77,
+              "clipEnd": 1125.21,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "peer-003",
+                  "score": 0.7364202032220281
+                },
+                {
+                  "groupId": "peer-041",
+                  "score": 0.6873604055545187
+                },
+                {
+                  "groupId": "peer-018",
+                  "score": 0.6303831355506976
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup",
+              "candidateNames": []
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null,
+          "formalOutput": false,
+          "formalOutputBeforeRelease": false
+        },
+        {
+          "id": "trader-03",
+          "onset": [
+            1126.95,
+            1127.0
+          ],
+          "drop": [
+            1127.5,
+            1127.55
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/03-startIndex.jpg",
+          "associatedAnalyses": [],
+          "analysisTriggered": false,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null,
+          "formalOutput": false,
+          "formalOutputBeforeRelease": false
+        },
+        {
+          "id": "trader-04",
+          "onset": [
+            1129.85,
+            1129.9
+          ],
+          "drop": [
+            1130.35,
+            1130.4
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/04-startIndex.jpg",
+          "associatedAnalyses": [],
+          "analysisTriggered": false,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null,
+          "formalOutput": false,
+          "formalOutputBeforeRelease": false
+        },
+        {
+          "id": "trader-05",
+          "onset": [
+            1132.25,
+            1132.3
+          ],
+          "drop": [
+            1132.9,
+            1132.95
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/05-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1133,
+              "onset": 1132.55,
+              "clipStart": 1132.47,
+              "clipEnd": 1132.91,
+              "status": "matched",
+              "scores": [
+                {
+                  "groupId": "peer-041",
+                  "score": 0.7838395822467061
+                },
+                {
+                  "groupId": "peer-001",
+                  "score": 0.6569278973447135
+                },
+                {
+                  "groupId": "peer-002",
+                  "score": 0.6563850973901307
+                }
+              ],
+              "candidateIds": [
+                "peer-041"
+              ],
+              "action": "pickup",
+              "candidateNames": [
+                "燃料桶"
+              ]
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null,
+          "formalOutput": true,
+          "formalOutputBeforeRelease": false
+        },
+        {
+          "id": "trader-06",
+          "onset": [
+            1134.15,
+            1134.2
+          ],
+          "drop": [
+            1135.0,
+            1135.05
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/06-startIndex.jpg",
+          "associatedAnalyses": [],
+          "analysisTriggered": false,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null,
+          "formalOutput": false,
+          "formalOutputBeforeRelease": false
+        },
+        {
+          "id": "trader-07",
+          "onset": [
+            1136.5,
+            1136.55
+          ],
+          "drop": [
+            1137.45,
+            1137.5
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/07-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1137.2,
+              "onset": 1136.75,
+              "clipStart": 1136.67,
+              "clipEnd": 1137.1100000000001,
+              "status": "matched",
+              "scores": [
+                {
+                  "groupId": "peer-043",
+                  "score": 0.8679683398508492
+                },
+                {
+                  "groupId": "peer-054",
+                  "score": 0.7494438807632668
+                },
+                {
+                  "groupId": "peer-005",
+                  "score": 0.6508820813580919
+                }
+              ],
+              "candidateIds": [
+                "peer-043"
+              ],
+              "action": "pickup",
+              "candidateNames": [
+                "军用电台"
+              ]
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": true,
+          "correctCandidateBeforeRelease": null,
+          "formalOutput": true,
+          "formalOutputBeforeRelease": true
+        },
+        {
+          "id": "trader-08",
+          "onset": [
+            1139.75,
+            1139.8
+          ],
+          "drop": [
+            1140.35,
+            1140.4
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/08-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1140.4,
+              "onset": 1139.99,
+              "clipStart": 1139.91,
+              "clipEnd": 1140.3200000000002,
+              "status": "matched",
+              "scores": [
+                {
+                  "groupId": "peer-043",
+                  "score": 0.9084460719838428
+                },
+                {
+                  "groupId": "peer-054",
+                  "score": 0.8123807178658292
+                },
+                {
+                  "groupId": "peer-041",
+                  "score": 0.6699678530129715
+                }
+              ],
+              "candidateIds": [
+                "peer-043",
+                "peer-054"
+              ],
+              "action": "pickup",
+              "candidateNames": [
+                "军用电台",
+                "耐冲击硬胶"
+              ]
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null,
+          "formalOutput": true,
+          "formalOutputBeforeRelease": false
+        },
+        {
+          "id": "trader-09",
+          "onset": [
+            1144.55,
+            1144.6
+          ],
+          "drop": [
+            1145.4,
+            1145.45
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/09-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1145.2,
+              "onset": 1144.79,
+              "clipStart": 1144.71,
+              "clipEnd": 1145.1200000000001,
+              "status": "matched",
+              "scores": [
+                {
+                  "groupId": "peer-043",
+                  "score": 0.8795493806980396
+                },
+                {
+                  "groupId": "peer-054",
+                  "score": 0.7630309952893916
+                },
+                {
+                  "groupId": "peer-041",
+                  "score": 0.6605564907095034
+                }
+              ],
+              "candidateIds": [
+                "peer-043",
+                "peer-054"
+              ],
+              "action": "pickup",
+              "candidateNames": [
+                "军用电台",
+                "耐冲击硬胶"
+              ]
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": true,
+          "correctCandidateBeforeRelease": null,
+          "formalOutput": true,
+          "formalOutputBeforeRelease": true
+        }
+      ]
+    },
+    {
+      "id": "record20260920-205237",
+      "start": 0,
+      "duration": 2039.4,
+      "cohort": "frozen-full-recording",
+      "audioSha256": "4117f4aa3a173845f4a31d21473926563929a05b137f3f8203a16b3b8e185ee2",
+      "baselineEventsSha256": "cba0cd3b0e28f8076c8716a47916c1a95f35707220cd4b648cdbffe095dba22b",
+      "eventsSha256": "73a1f48b85cdaf5144c036c028897cc5dce87b72ef75d66eab621d93664cffad",
+      "analyses": 2458,
+      "matches": 65,
+      "elapsedSeconds": 80.881,
+      "identicalTriggerTimes": true,
+      "oldMatchedOutputs": 12,
+      "reviewedNewOutputs": [
+        {
+          "job": "record20260920-205237",
+          "recording": "record20260920-205237",
+          "eventIndex": 21,
+          "onset": 13.75,
+          "sourceOnset": 13.75,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.7823875347291844,
+          "verdict": "false",
+          "scene": "第一人称在楼梯前操作枪械/弹匣，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/12--0.30.jpg",
+              "sha256": "e400cee3fe7bf8a607d9230379fd8fae7454c78fa528831b97e8dc4d4042b8e5"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/12-+0.35.jpg",
+              "sha256": "3a1031a3538bbb489d89e12752e5c5933709dfbc361a51b039f2c43b531d36e6"
+            }
+          ]
+        },
+        {
+          "job": "record20260920-205237",
+          "recording": "record20260920-205237",
+          "eventIndex": 33,
+          "onset": 19.630000000000003,
+          "sourceOnset": 19.630000000000003,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.8131558240188882,
+          "verdict": "false",
+          "scene": "第一人称持刀穿过破墙进入房间，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/13--0.30.jpg",
+              "sha256": "249638fcddd5f972a5010876d7fc0250f3d0311657902903baa16c4f51496c54"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/13-+0.35.jpg",
+              "sha256": "9ec851cda3c9c5783080ec44c21e88c0f7831db4a88d3fdb4c53cbb225fd4b21"
+            }
+          ]
+        },
+        {
+          "job": "record20260920-205237",
+          "recording": "record20260920-205237",
+          "eventIndex": 65,
+          "onset": 35.93,
+          "sourceOnset": 35.93,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.8198535004951865,
+          "verdict": "false",
+          "scene": "第一人称持刀接近关闭的门，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/14--0.30.jpg",
+              "sha256": "586b79358e9471f08ca41e067aa64a4e0d377410b3d44da8b4b4043619a3148a"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/14-+0.35.jpg",
+              "sha256": "cdf4989c5d235789cc7c7e834e485d7f1d5fad5eccd6161125eadfecea5aed96"
+            }
+          ]
+        }
+      ],
+      "knownOperations": [
+        {
+          "id": "lens-loot",
+          "item": "peer-021",
+          "name": "阵列镜片",
+          "onset": [
+            2004.7,
+            2004.8
+          ],
+          "action": "transfer",
+          "evidence": "loot-detail/frame-02004.800.jpg",
+          "baselineItemId": "e9f62d39-7",
+          "referenceName": "陈列镜片",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 2005,
+              "onset": 2004.53,
+              "clipStart": 2004.4499999999998,
+              "clipEnd": 2004.8899999999999,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "peer-018",
+                  "score": 0.547877569404888
+                },
+                {
+                  "groupId": "peer-042",
+                  "score": 0.5475805937674092
+                },
+                {
+                  "groupId": "peer-001",
+                  "score": 0.5473898816131328
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup",
+              "candidateNames": []
+            }
+          ],
+          "analysisTriggered": true,
+          "analysisBeforeRelease": null,
+          "candidateSetProduced": false,
+          "candidateSetBeforeRelease": null,
+          "soundFamilyVerification": "no-accepted-candidates",
+          "legacyExpectedItemInCandidates": false,
+          "legacyExpectedItemBeforeRelease": null
+        },
+        {
+          "id": "nav-loot",
+          "item": "peer-019",
+          "name": "航天导航仪",
+          "onset": [
+            2010.4,
+            2010.5
+          ],
+          "action": "transfer",
+          "evidence": "loot-detail/frame-02010.500.jpg",
+          "baselineItemId": "361affd2-3",
+          "referenceName": "航天导航仪",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 2011,
+              "onset": 2010.45,
+              "clipStart": 2010.37,
+              "clipEnd": 2010.81,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "peer-018",
+                  "score": 0.5921173452609717
+                },
+                {
+                  "groupId": "peer-001",
+                  "score": 0.5919928153164614
+                },
+                {
+                  "groupId": "peer-042",
+                  "score": 0.591277277070632
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup",
+              "candidateNames": []
+            }
+          ],
+          "analysisTriggered": true,
+          "analysisBeforeRelease": null,
+          "candidateSetProduced": false,
+          "candidateSetBeforeRelease": null,
+          "soundFamilyVerification": "no-accepted-candidates",
+          "legacyExpectedItemInCandidates": false,
+          "legacyExpectedItemBeforeRelease": null
+        }
+      ],
+      "hiddenPickups": []
+    }
+  ],
+  "previousFalseScenes": [
+    {
+      "recording": "record20260920-213509",
+      "onset": 449.35,
+      "scene": "第一人称使用医疗用品，未操作目标物品",
+      "originalEvidence": "predictions/00-+0.35.jpg",
+      "newEvent": {
+        "analyzedAt": 449.8,
+        "onset": 449.35,
+        "clipStart": 449.27000000000004,
+        "clipEnd": 449.71000000000004,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.6883274435045441
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.6877819552392875
+          },
+          {
+            "groupId": "peer-042",
+            "score": 0.687403829136533
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup",
+        "candidateNames": []
+      },
+      "stillFalseOutput": false
+    },
+    {
+      "recording": "record20260920-213509",
+      "onset": 958.65,
+      "scene": "第一人称移动，未操作目标物品",
+      "originalEvidence": "predictions/01-+0.35.jpg",
+      "newEvent": {
+        "analyzedAt": 959.2,
+        "onset": 958.65,
+        "clipStart": 958.5699999999999,
+        "clipEnd": 959.01,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-042",
+            "score": 0.8224271330153948
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.8218004327831433
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.8214270052501448
+          }
+        ],
+        "candidateIds": [
+          "peer-042",
+          "peer-001",
+          "peer-018",
+          "peer-002"
+        ],
+        "action": "pickup",
+        "candidateNames": [
+          "钛合金板",
+          "专用电池组",
+          "理想国试剂盒",
+          "汽车蓄电池"
+        ]
+      },
+      "stillFalseOutput": true
+    },
+    {
+      "recording": "record20260920-213509",
+      "onset": 1562.21,
+      "scene": "第一人称持刀移动，未操作目标物品",
+      "originalEvidence": "predictions/04-+0.35.jpg",
+      "newEvent": {
+        "analyzedAt": 1562.6,
+        "onset": 1562.2099999999998,
+        "clipStart": 1562.1299999999999,
+        "clipEnd": 1562.52,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.773560828230775
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.773284165985472
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.7726410193276739
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup",
+        "candidateNames": []
+      },
+      "stillFalseOutput": false
+    },
+    {
+      "recording": "record20260920-213509",
+      "onset": 1818.75,
+      "scene": "进入行商对话，尚未进入货物界面",
+      "originalEvidence": "predictions/05-+0.35.jpg",
+      "newEvent": {
+        "analyzedAt": 1819.2,
+        "onset": 1818.75,
+        "clipStart": 1818.67,
+        "clipEnd": 1819.1100000000001,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-018",
+            "score": 0.751766248100125
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.7516828494437047
+          },
+          {
+            "groupId": "peer-042",
+            "score": 0.7514838659665591
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup",
+        "candidateNames": []
+      },
+      "stillFalseOutput": false
+    },
+    {
+      "recording": "record20260922-205653",
+      "onset": 99.39,
+      "scene": "打开文档箱并开始搜索，尚未出现可操作物品",
+      "originalEvidence": "predictions/00-+0.35.jpg",
+      "newEvent": {
+        "analyzedAt": 99.8,
+        "onset": 99.38999999999999,
+        "clipStart": 99.31,
+        "clipEnd": 99.72,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.8074749220803307
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.8067654440741833
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.8065612395607122
+          }
+        ],
+        "candidateIds": [
+          "peer-001",
+          "peer-018",
+          "peer-002",
+          "peer-042"
+        ],
+        "action": "pickup",
+        "candidateNames": [
+          "专用电池组",
+          "理想国试剂盒",
+          "汽车蓄电池",
+          "钛合金板"
+        ]
+      },
+      "stillFalseOutput": true
+    },
+    {
+      "recording": "record20260922-205653",
+      "onset": 1247.67,
+      "scene": "结束行商对话，未操作目标物品",
+      "originalEvidence": "predictions/04-+0.35.jpg",
+      "newEvent": {
+        "analyzedAt": 1248.2,
+        "onset": 1247.67,
+        "clipStart": 1247.59,
+        "clipEnd": 1248.03,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.8098871983362697
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.8094401075446823
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.8089153337469838
+          }
+        ],
+        "candidateIds": [
+          "peer-001",
+          "peer-018",
+          "peer-002",
+          "peer-042"
+        ],
+        "action": "pickup",
+        "candidateNames": [
+          "专用电池组",
+          "理想国试剂盒",
+          "汽车蓄电池",
+          "钛合金板"
+        ]
+      },
+      "stillFalseOutput": true
+    },
+    {
+      "recording": "record20260920-205237",
+      "onset": 891.67,
+      "scene": "第一人称武器/姿态动作，未操作目标物品",
+      "originalEvidence": "predictions/00-+0.35.jpg",
+      "newEvent": {
+        "analyzedAt": 892.2,
+        "onset": 891.6700000000001,
+        "clipStart": 891.5899999999999,
+        "clipEnd": 892.03,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-018",
+            "score": 0.7738827708081257
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.7735361069012202
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.772643147647106
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup",
+        "candidateNames": []
+      },
+      "stillFalseOutput": false
+    },
+    {
+      "recording": "record20260920-205237",
+      "onset": 1005.11,
+      "scene": "武器详情和背包界面，连续画面未见目标物品操作",
+      "originalEvidence": "predictions/01-+0.35.jpg",
+      "newEvent": {
+        "analyzedAt": 1005.6,
+        "onset": 1005.11,
+        "clipStart": 1005.03,
+        "clipEnd": 1005.47,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-001",
+            "score": 0.7338507477997687
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.7336415238992253
+          },
+          {
+            "groupId": "peer-002",
+            "score": 0.732987494716456
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup",
+        "candidateNames": []
+      },
+      "stillFalseOutput": false
+    },
+    {
+      "recording": "record20260920-205237",
+      "onset": 1323.73,
+      "scene": "第一人称持枪瞄准，未操作目标物品",
+      "originalEvidence": "predictions/02-+0.35.jpg",
+      "newEvent": {
+        "analyzedAt": 1324.2,
+        "onset": 1323.73,
+        "clipStart": 1323.6499999999999,
+        "clipEnd": 1324.09,
+        "status": "unknown",
+        "scores": [
+          {
+            "groupId": "peer-042",
+            "score": 0.7699272039067417
+          },
+          {
+            "groupId": "peer-001",
+            "score": 0.7688573817045983
+          },
+          {
+            "groupId": "peer-018",
+            "score": 0.7688353379330529
+          }
+        ],
+        "candidateIds": [],
+        "action": "pickup",
+        "candidateNames": []
+      },
+      "stillFalseOutput": false
+    },
+    {
+      "recording": "record20260920-205237",
+      "onset": 2011.75,
+      "scene": "拿起库外金魔方，错误输出雕塑组；不属于已标注导航仪拿起",
+      "originalEvidence": "predictions/11-+0.35.jpg",
+      "newEvent": {
+        "analyzedAt": 2012.2,
+        "onset": 2011.75,
+        "clipStart": 2011.67,
+        "clipEnd": 2012.1100000000001,
+        "status": "matched",
+        "scores": [
+          {
+            "groupId": "peer-008",
+            "score": 0.7830024643949741
+          },
+          {
+            "groupId": "peer-027",
+            "score": 0.7828330959518635
+          },
+          {
+            "groupId": "peer-025",
+            "score": 0.7828269774074763
+          }
+        ],
+        "candidateIds": [
+          "peer-008",
+          "peer-027",
+          "peer-025",
+          "peer-020",
+          "peer-011"
+        ],
+        "action": "pickup",
+        "candidateNames": [
+          "金杯",
+          "盘蛇金像",
+          "骏骊逐浪图",
+          "决胜奖杯",
+          "盛宴雕像"
+        ]
+      },
+      "stillFalseOutput": true
+    }
+  ],
+  "development": [
+    {
+      "id": "204258-trader",
+      "recording": "record20260923-204258",
+      "start": 600,
+      "duration": 210,
+      "cohort": "previous-development",
+      "audioSha256": "9c8a25dca8fe2a9d5b523e288c53b1821becb669208fb28850637025f350a2d5",
+      "baselineEventsSha256": "6d586dbe8cdd0e91398932d21d5fb74a20eccae5dc37ad307f7809f08b879a83",
+      "eventsSha256": "6766c2b9e21b542b7f915cbebcae8c77a42296bfb43d8497cbfc6ebd4e34db5b",
+      "analyses": 87,
+      "matches": 36,
+      "elapsedSeconds": 3.11,
+      "identicalTriggerTimes": true,
+      "oldMatchedOutputs": 21,
+      "reviewedNewOutputs": []
+    },
+    {
+      "id": "211647-trader",
+      "recording": "record20260923-211647",
+      "start": 570,
+      "duration": 190,
+      "cohort": "previous-development",
+      "audioSha256": "5c416c96af038e2a89603dddcce52976e3b32fee2a270089474a71a7246583c0",
+      "baselineEventsSha256": "cd1a5e632b1f8d7357932ad66213ef376ffc3a6ec30b77a4fd5185171bcedc2a",
+      "eventsSha256": "4e2770a1b54feec2adb2b890d7f0ead757cd4451a05dccb90639bfc99fc763bc",
+      "analyses": 76,
+      "matches": 34,
+      "elapsedSeconds": 2.588,
+      "identicalTriggerTimes": true,
+      "oldMatchedOutputs": 5,
+      "reviewedNewOutputs": []
+    },
+    {
+      "id": "204258-backpack",
+      "recording": "record20260923-204258",
+      "start": 1100,
+      "duration": 70,
+      "cohort": "previous-development",
+      "audioSha256": "02f1f3aef3b112ae104b0e61647cee693d5a24dd91ee5b672283da4bd870d66d",
+      "baselineEventsSha256": "a69fcb5c6f2fd257dea128b9196539c8fb12bd8e8b1e6a68c47c37f561e0d016",
+      "eventsSha256": "0c36d4f992198141ffaceaa923926d4cf80de7657bf88489710a3d60b3e4ca39",
+      "analyses": 50,
+      "matches": 0,
+      "elapsedSeconds": 1.972,
+      "identicalTriggerTimes": true,
+      "oldMatchedOutputs": 0,
+      "reviewedNewOutputs": []
+    },
+    {
+      "id": "204258-movement",
+      "recording": "record20260923-204258",
+      "start": 350,
+      "duration": 60,
+      "cohort": "previous-development",
+      "audioSha256": "376307874af0427d3d68028c3f48e9933a5ed500f7bfc31a028d01675e4d423e",
+      "baselineEventsSha256": "d1f78ce6f0762ef28d9faf78b8b7d089042f1bc48ed5d0a2ee5739f35dd9c486",
+      "eventsSha256": "e4b92cb104651a18030d3d2e40f85c786ca85d484badfb045d3890c471784772",
+      "analyses": 94,
+      "matches": 2,
+      "elapsedSeconds": 3.192,
+      "identicalTriggerTimes": true,
+      "oldMatchedOutputs": 0,
+      "reviewedNewOutputs": [
+        {
+          "job": "204258-movement",
+          "recording": "record20260923-204258",
+          "eventIndex": 30,
+          "onset": 365.17,
+          "sourceOnset": 15.17,
+          "oldStatus": "unknown",
+          "names": [
+            "钛合金板",
+            "专用电池组",
+            "理想国试剂盒",
+            "汽车蓄电池"
+          ],
+          "bestScore": 0.7907283908375529,
+          "verdict": "false",
+          "scene": "第一人称持枪沿大厅移动，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/15--0.30.jpg",
+              "sha256": "db85cddf61d04ac605831ce56076641920873122241fbae12a77e922359a633b"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/15-+0.35.jpg",
+              "sha256": "c9f676582a38f2706e16924ff1d7c7a8b2c5d44dc0f535dbf3e7e8254abe04a2"
+            }
+          ]
+        },
+        {
+          "job": "204258-movement",
+          "recording": "record20260923-204258",
+          "eventIndex": 53,
+          "onset": 380.27,
+          "sourceOnset": 30.270000000000003,
+          "oldStatus": "unknown",
+          "names": [
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "bestScore": 0.8179718748289593,
+          "verdict": "false",
+          "scene": "第一人称持枪经过接待台与箱体，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/16--0.30.jpg",
+              "sha256": "0e075aacdcb665010ace7937963aede27a081a7997b113abc073d61a55f0ea84"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/16-+0.35.jpg",
+              "sha256": "7c975ffc592237b5116c2e67c603d45b0f308794ddffdee9adc78432bb20ab4f"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "211647-movement",
+      "recording": "record20260923-211647",
+      "start": 980,
+      "duration": 80,
+      "cohort": "previous-development",
+      "audioSha256": "08f45296e9020de49f44a654aff7a6f8b606db9e518d01d9dd599bf3946bb150",
+      "baselineEventsSha256": "49d5aec5abc15368db9d35589f42780d806b00b3e02bb96d056cda701240b740",
+      "eventsSha256": "4d2fb8a722e393f4af00819805516cce8142dc37879380183251a61fdd8b9a48",
+      "analyses": 92,
+      "matches": 1,
+      "elapsedSeconds": 3.422,
+      "identicalTriggerTimes": true,
+      "oldMatchedOutputs": 1,
+      "reviewedNewOutputs": [
+        {
+          "job": "211647-movement",
+          "recording": "record20260923-211647",
+          "eventIndex": 83,
+          "onset": 1054.41,
+          "sourceOnset": 74.41,
+          "oldStatus": "matched",
+          "names": [
+            "专用电池组",
+            "理想国试剂盒",
+            "钛合金板",
+            "汽车蓄电池"
+          ],
+          "bestScore": 0.7907504365612947,
+          "verdict": "false",
+          "scene": "第一人称处于原报告已确认的包扎片段，未操作候选物品",
+          "evidence": [
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/17--0.30.jpg",
+              "sha256": "4d1e89e63c98a4911ea3ef8cdc1675b09e295603f1973be968e99e95b9e781c7"
+            },
+            {
+              "path": ".tools/research/ours-peer-library-20260924/review/17-+0.35.jpg",
+              "sha256": "1861556543b194f55006563e5d0e31a7b326063ef9fc8860eda384e564eff889"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "alignedCropDiagnostic": {
+    "kind": "manual-visual-crop-diagnostic-not-automatic-recognition",
+    "events": [
+      {
+        "recording": "record20260920-213509",
+        "id": "tv-loot",
+        "name": "胶囊电视",
+        "start": 64.27,
+        "end": 64.71,
+        "beforeRelease": false,
+        "original": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        },
+        "peerReferences": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        }
+      },
+      {
+        "recording": "record20260920-213509",
+        "id": "tv-recovery",
+        "name": "胶囊电视",
+        "start": 550.0949999999999,
+        "end": 550.535,
+        "beforeRelease": false,
+        "original": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        },
+        "peerReferences": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        }
+      },
+      {
+        "recording": "record20260921-205434",
+        "id": "egg-loot",
+        "name": "赫美拉彩蛋",
+        "start": 65.545,
+        "end": 65.985,
+        "beforeRelease": false,
+        "original": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        },
+        "peerReferences": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        }
+      },
+      {
+        "recording": "record20260921-205434",
+        "id": "egg-drag",
+        "name": "赫美拉彩蛋",
+        "start": 66.99499999999999,
+        "end": 67.43499999999999,
+        "beforeRelease": true,
+        "original": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        },
+        "peerReferences": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        }
+      },
+      {
+        "recording": "record20260922-214737",
+        "id": "dawn-loot",
+        "name": "黎明",
+        "start": 78.34500000000001,
+        "end": 78.78500000000001,
+        "beforeRelease": false,
+        "original": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        },
+        "peerReferences": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        }
+      },
+      {
+        "recording": "record20260922-214737",
+        "id": "dawn-drag",
+        "name": "黎明",
+        "start": 80.395,
+        "end": 80.835,
+        "beforeRelease": true,
+        "original": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        },
+        "peerReferences": {
+          "status": "matched",
+          "candidateIds": [
+            "peer-054",
+            "peer-043",
+            "peer-056",
+            "peer-058",
+            "peer-059"
+          ],
+          "candidateNames": [
+            "耐冲击硬胶",
+            "军用电台",
+            "水壶",
+            "测距望远镜",
+            "镜头"
+          ],
+          "correctAtCatalogThreshold": false,
+          "bestScore": 0.7982058615466558
+        }
+      },
+      {
+        "recording": "record20260920-205237",
+        "id": "lens-loot",
+        "name": "阵列镜片",
+        "start": 2004.67,
+        "end": 2005.11,
+        "beforeRelease": false,
+        "original": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        },
+        "peerReferences": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        }
+      },
+      {
+        "recording": "record20260920-205237",
+        "id": "nav-loot",
+        "name": "航天导航仪",
+        "start": 2010.3700000000001,
+        "end": 2010.81,
+        "beforeRelease": false,
+        "original": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        },
+        "peerReferences": {
+          "status": "unknown",
+          "candidateIds": [],
+          "candidateNames": [],
+          "correctAtCatalogThreshold": false,
+          "bestScore": null
+        }
+      }
+    ],
+    "interpretation": "Accepted candidate sets are matching successes even when multiple items are returned. Exact-name inclusion is diagnostic only; the Dawn crop candidate sound-family identity has not been independently verified.",
+    "originalCandidateSets": 0,
+    "peerLibraryCandidateSets": 1
+  }
+}

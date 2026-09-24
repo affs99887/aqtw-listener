@@ -1,0 +1,1185 @@
+{
+  "kind": "peer-original-numerical-functions-offline-gameplay-comparison",
+  "date": "2026-09-24",
+  "conclusion": "No correct formal candidate on the eight frozen known operations; no evidence of accuracy improvement on this labelled subset.",
+  "method": {
+    "algorithm": "v0.67 default new criterion",
+    "implementation": "audited original Python 3.11 code objects; original application entrypoint never executed",
+    "sourceSha256": {
+      "listen.pyc": "60363c851c43271bc70d6645450e287da7d73d65d7630a8b3a704ad2e9f679f9",
+      "_lib/refs.npz": "d18ec01dd063745d5a7bed148ff438c9014bfbf079b9aad7a8ac812c4601fe3f",
+      "_lib/index.json": "5ebb2a49a0d8fd43782ac4ccf57528e051188233351c7aaec60792a1027f7f68",
+      "_lib/sim.json": "0f169e59f72a3400f810534844bad753f935b5e6847ecfb452652f843a67625e",
+      "config.json": "2c9c38d60cd43b0eae009b5286e98d75a09022c6053bdd4303e8626dfc3c2ff6"
+    },
+    "references": 62,
+    "referenceSamples": 21600,
+    "sampleRate": 48000,
+    "windowSeconds": 1.6,
+    "nominalScanHopSeconds": 0.3,
+    "crossCorrelationCandidates": 8,
+    "minimumEnvelopeCorrelation": 0.94,
+    "minimumLogSpectrumCosine": 0.85,
+    "unclearEnvelopeThreshold": 0.88,
+    "sameNameSuppressionSeconds": 2.1,
+    "input": "native 48 kHz stereo from stream 1 of original recordings, timestamp aligned; per-2048-frame M/S selection; gain 6 and clipping",
+    "sameSoundSuggestionResidualThreshold": 0.05,
+    "numpy": "2.2.6",
+    "python": "3.11.9"
+  },
+  "controls": {
+    "selfReferencePass": 62,
+    "negativeControlsPass": 2,
+    "meanSecondsPerScan": 0.1091154919441549,
+    "numpy": "2.2.6",
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]"
+  },
+  "pairedLabeledCohort": {
+    "clips": 23,
+    "seconds": 187.64,
+    "scans": 505,
+    "formalHitWindows": 8,
+    "unclearWindows": 92,
+    "knownOperations": 8,
+    "correctFormalCandidates": 0,
+    "emittedFormalOutputs": [
+      {
+        "recording": "record20260922-205653",
+        "scanEnd": 1137.9,
+        "estimatedSoundStart": 1136.7419166666666,
+        "name": "军用电台",
+        "envelope": 0.9439333199775063,
+        "spectrum": 0.8925427794456482,
+        "status": "hit",
+        "formalCandidates": [
+          "军用电台"
+        ]
+      },
+      {
+        "recording": "record20260920-205237",
+        "scanEnd": 1560.6,
+        "estimatedSoundStart": 1560.0827083333334,
+        "name": "钛合金板",
+        "envelope": 0.9654819385015668,
+        "spectrum": 0.9455424547195435,
+        "status": "ambiguous",
+        "formalCandidates": [
+          "钛合金板",
+          "专用电池组",
+          "理想国试剂盒",
+          "汽车蓄电池"
+        ]
+      },
+      {
+        "recording": "record20260920-205237",
+        "scanEnd": 1726.2,
+        "estimatedSoundStart": 1725.5866458333333,
+        "name": "钛合金板",
+        "envelope": 0.9438848306999451,
+        "spectrum": 0.9506056904792786,
+        "status": "hit",
+        "formalCandidates": [
+          "钛合金板",
+          "专用电池组",
+          "汽车蓄电池",
+          "理想国试剂盒"
+        ]
+      }
+    ],
+    "known": [
+      {
+        "recording": "record20260920-213509",
+        "id": "tv-loot",
+        "name": "胶囊电视",
+        "peerName": "胶囊电视",
+        "action": "transfer",
+        "onset": [
+          64.3,
+          64.4
+        ],
+        "peerCorrectFormalCandidate": false,
+        "matches": [],
+        "oursCorrectFormalCandidate": false,
+        "denseCorrectHitWindows": 0,
+        "denseUnclearWithCorrectSuggestionWindows": 0,
+        "bestAlignedExpectedDiagnostic": {
+          "scanEnd": 66.10000000000001,
+          "expectedStart": 64.64695833333334,
+          "correctRow": [
+            0.15615588608814118,
+            0.5459790229797363,
+            1.0210880041122437
+          ],
+          "gate": 0.025225323397670914,
+          "backgroundRms": 0.014014068554261619,
+          "expectedAnyEnergyGatePass": true,
+          "expectedCandidateRmsMax": 0.03583627615225184,
+          "expectedRank": 48,
+          "top": [
+            [
+              "孔雀羽扇",
+              1.0821772813796997,
+              0.8575437383249186,
+              0.5188788175582886
+            ],
+            [
+              "真实矩阵",
+              1.0864733457565308,
+              0.8573550770373914,
+              0.5223591923713684
+            ],
+            [
+              "机械手臂",
+              1.0801924467086792,
+              0.8512402110576303,
+              0.5540076494216919
+            ]
+          ],
+          "hits": [],
+          "suggested": false,
+          "unclear": false
+        }
+      },
+      {
+        "recording": "record20260920-213509",
+        "id": "tv-recovery",
+        "name": "胶囊电视",
+        "peerName": "胶囊电视",
+        "action": "transfer",
+        "onset": [
+          550.15,
+          550.2
+        ],
+        "peerCorrectFormalCandidate": false,
+        "matches": [],
+        "oursCorrectFormalCandidate": false,
+        "denseCorrectHitWindows": 0,
+        "denseUnclearWithCorrectSuggestionWindows": 0,
+        "bestAlignedExpectedDiagnostic": {
+          "scanEnd": 550.95,
+          "expectedStart": 550.4031875000001,
+          "correctRow": [
+            -2.0,
+            -1.0,
+            9.9
+          ],
+          "gate": 0.012964867160031803,
+          "backgroundRms": 0.007202703977795447,
+          "expectedAnyEnergyGatePass": false,
+          "expectedCandidateRmsMax": 0.009253309265955023,
+          "expectedRank": 25,
+          "top": [
+            [
+              "激光指示模块",
+              9.9,
+              -2.0,
+              -1.0
+            ],
+            [
+              "专用电池组",
+              9.9,
+              -2.0,
+              -1.0
+            ],
+            [
+              "汽车蓄电池",
+              9.9,
+              -2.0,
+              -1.0
+            ]
+          ],
+          "hits": [],
+          "suggested": false,
+          "unclear": false
+        }
+      },
+      {
+        "recording": "record20260921-205434",
+        "id": "egg-loot",
+        "name": "赫美拉彩蛋",
+        "peerName": "赫芙拉彩蛋",
+        "action": "transfer",
+        "onset": [
+          65.6,
+          65.65
+        ],
+        "peerCorrectFormalCandidate": false,
+        "matches": [],
+        "oursCorrectFormalCandidate": false,
+        "denseCorrectHitWindows": 0,
+        "denseUnclearWithCorrectSuggestionWindows": 0,
+        "bestAlignedExpectedDiagnostic": null
+      },
+      {
+        "recording": "record20260921-205434",
+        "id": "egg-drag",
+        "name": "赫美拉彩蛋",
+        "peerName": "赫芙拉彩蛋",
+        "action": "drag",
+        "onset": [
+          67.05,
+          67.1
+        ],
+        "peerCorrectFormalCandidate": false,
+        "matches": [],
+        "oursCorrectFormalCandidate": false,
+        "denseCorrectHitWindows": 0,
+        "denseUnclearWithCorrectSuggestionWindows": 0,
+        "bestAlignedExpectedDiagnostic": {
+          "scanEnd": 68.5,
+          "expectedStart": 66.90020833333334,
+          "correctRow": [
+            0.7271819335979273,
+            0.5199587941169739,
+            1.2179245948791504
+          ],
+          "gate": 0.015080951187237618,
+          "backgroundRms": 0.00837830621513201,
+          "expectedAnyEnergyGatePass": true,
+          "expectedCandidateRmsMax": 0.021590417314516996,
+          "expectedRank": 12,
+          "top": [
+            [
+              "干花书签",
+              1.6192508935928345,
+              0.7690086688530202,
+              0.7910065650939941
+            ],
+            [
+              "马刺",
+              1.218873381614685,
+              0.7296379449170118,
+              0.5383523106575012
+            ],
+            [
+              "钢筋剪",
+              1.2156356573104858,
+              0.7285464681926198,
+              0.5365048050880432
+            ]
+          ],
+          "hits": [],
+          "suggested": false,
+          "unclear": false
+        }
+      },
+      {
+        "recording": "record20260922-214737",
+        "id": "dawn-loot",
+        "name": "黎明",
+        "peerName": "黎明",
+        "action": "transfer",
+        "onset": [
+          78.4,
+          78.45
+        ],
+        "peerCorrectFormalCandidate": false,
+        "matches": [],
+        "oursCorrectFormalCandidate": false,
+        "denseCorrectHitWindows": 0,
+        "denseUnclearWithCorrectSuggestionWindows": 0,
+        "bestAlignedExpectedDiagnostic": {
+          "scanEnd": 79.80000000000001,
+          "expectedStart": 78.20481250000002,
+          "correctRow": [
+            0.6288776633469969,
+            0.49463319778442383,
+            1.1090307235717773
+          ],
+          "gate": 0.021570049590371648,
+          "backgroundRms": 0.011983360883539804,
+          "expectedAnyEnergyGatePass": true,
+          "expectedCandidateRmsMax": 0.04985567548747643,
+          "expectedRank": 13,
+          "top": [
+            [
+              "干花书签",
+              1.1052820682525635,
+              0.8602407001123322,
+              0.7976735830307007
+            ],
+            [
+              "耐冲击硬胶",
+              1.1077419519424438,
+              0.7249497914666452,
+              0.7403028011322021
+            ],
+            [
+              "钻戒",
+              1.0078595876693726,
+              0.6610396438116729,
+              0.10708970576524734
+            ]
+          ],
+          "hits": [],
+          "suggested": false,
+          "unclear": false
+        }
+      },
+      {
+        "recording": "record20260922-214737",
+        "id": "dawn-drag",
+        "name": "黎明",
+        "peerName": "黎明",
+        "action": "drag",
+        "onset": [
+          80.45,
+          80.5
+        ],
+        "peerCorrectFormalCandidate": false,
+        "matches": [],
+        "oursCorrectFormalCandidate": false,
+        "denseCorrectHitWindows": 0,
+        "denseUnclearWithCorrectSuggestionWindows": 0,
+        "bestAlignedExpectedDiagnostic": {
+          "scanEnd": 81.60000000000001,
+          "expectedStart": 80.69206250000002,
+          "correctRow": [
+            0.6884790484442188,
+            0.7145451903343201,
+            1.3797965049743652
+          ],
+          "gate": 0.013056884464097186,
+          "backgroundRms": 0.0072538247022762145,
+          "expectedAnyEnergyGatePass": true,
+          "expectedCandidateRmsMax": 0.013069580408060756,
+          "expectedRank": 15,
+          "top": [
+            [
+              "畸变组织块",
+              1.24793541431427,
+              0.7789794928863543,
+              0.7310306429862976
+            ],
+            [
+              "耐冲击硬胶",
+              1.0625511407852173,
+              0.7780290774838787,
+              0.7875454425811768
+            ],
+            [
+              "奢华茶具",
+              1.1237379312515259,
+              0.7699086666754056,
+              0.8030099272727966
+            ]
+          ],
+          "hits": [],
+          "suggested": false,
+          "unclear": false
+        }
+      },
+      {
+        "recording": "record20260920-205237",
+        "id": "lens-loot",
+        "name": "阵列镜片",
+        "peerName": "陈列镜片",
+        "action": "transfer",
+        "onset": [
+          2004.7,
+          2004.8
+        ],
+        "peerCorrectFormalCandidate": false,
+        "matches": [],
+        "oursCorrectFormalCandidate": false,
+        "denseCorrectHitWindows": 0,
+        "denseUnclearWithCorrectSuggestionWindows": 0,
+        "bestAlignedExpectedDiagnostic": {
+          "scanEnd": 2005.0,
+          "expectedStart": 2004.524625,
+          "correctRow": [
+            0.8793813578108081,
+            0.6135190725326538,
+            1.374361515045166
+          ],
+          "gate": 0.014571546218053353,
+          "backgroundRms": 0.008095303454474085,
+          "expectedAnyEnergyGatePass": true,
+          "expectedCandidateRmsMax": 0.05915588105806344,
+          "expectedRank": 32,
+          "top": [
+            [
+              "干花书签",
+              1.676378846168518,
+              0.9249538685447459,
+              0.798999011516571
+            ],
+            [
+              "奢华茶具",
+              1.4216176271438599,
+              0.9156660509357398,
+              0.7542316317558289
+            ],
+            [
+              "航天导航仪",
+              1.7965925931930542,
+              0.9144715397054956,
+              0.5966197848320007
+            ]
+          ],
+          "hits": [],
+          "suggested": false,
+          "unclear": true
+        }
+      },
+      {
+        "recording": "record20260920-205237",
+        "id": "nav-loot",
+        "name": "航天导航仪",
+        "peerName": "航天导航仪",
+        "action": "transfer",
+        "onset": [
+          2010.4,
+          2010.5
+        ],
+        "peerCorrectFormalCandidate": false,
+        "matches": [],
+        "oursCorrectFormalCandidate": false,
+        "denseCorrectHitWindows": 0,
+        "denseUnclearWithCorrectSuggestionWindows": 0,
+        "bestAlignedExpectedDiagnostic": null
+      }
+    ],
+    "previousFalseScenes": [
+      {
+        "recording": "record20260920-213509",
+        "onset": 449.35,
+        "scene": "第一人称使用医疗用品，未操作目标物品",
+        "oursAcceptedWrongOutputs": 1,
+        "peerFormalHitWindowsInWholeClip": 0,
+        "peerUnclearWindowsNearby": 2
+      },
+      {
+        "recording": "record20260920-213509",
+        "onset": 958.65,
+        "scene": "第一人称移动，未操作目标物品",
+        "oursAcceptedWrongOutputs": 1,
+        "peerFormalHitWindowsInWholeClip": 0,
+        "peerUnclearWindowsNearby": 7
+      },
+      {
+        "recording": "record20260920-213509",
+        "onset": 1562.21,
+        "scene": "第一人称持刀移动，未操作目标物品",
+        "oursAcceptedWrongOutputs": 1,
+        "peerFormalHitWindowsInWholeClip": 0,
+        "peerUnclearWindowsNearby": 4
+      },
+      {
+        "recording": "record20260920-213509",
+        "onset": 1818.75,
+        "scene": "进入行商对话，尚未进入货物界面",
+        "oursAcceptedWrongOutputs": 1,
+        "peerFormalHitWindowsInWholeClip": 0,
+        "peerUnclearWindowsNearby": 0
+      },
+      {
+        "recording": "record20260922-205653",
+        "onset": 99.39,
+        "scene": "打开文档箱并开始搜索，尚未出现可操作物品",
+        "oursAcceptedWrongOutputs": 1,
+        "peerFormalHitWindowsInWholeClip": 0,
+        "peerUnclearWindowsNearby": 3
+      },
+      {
+        "recording": "record20260922-205653",
+        "onset": 1247.67,
+        "scene": "结束行商对话，未操作目标物品",
+        "oursAcceptedWrongOutputs": 1,
+        "peerFormalHitWindowsInWholeClip": 0,
+        "peerUnclearWindowsNearby": 4
+      },
+      {
+        "recording": "record20260920-205237",
+        "onset": 891.67,
+        "scene": "第一人称武器/姿态动作，未操作目标物品",
+        "oursAcceptedWrongOutputs": 1,
+        "peerFormalHitWindowsInWholeClip": 0,
+        "peerUnclearWindowsNearby": 5
+      },
+      {
+        "recording": "record20260920-205237",
+        "onset": 1005.11,
+        "scene": "武器详情和背包界面，连续画面未见目标物品操作",
+        "oursAcceptedWrongOutputs": 1,
+        "peerFormalHitWindowsInWholeClip": 0,
+        "peerUnclearWindowsNearby": 0
+      },
+      {
+        "recording": "record20260920-205237",
+        "onset": 1323.73,
+        "scene": "第一人称持枪瞄准，未操作目标物品",
+        "oursAcceptedWrongOutputs": 1,
+        "peerFormalHitWindowsInWholeClip": 0,
+        "peerUnclearWindowsNearby": 0
+      },
+      {
+        "recording": "record20260920-205237",
+        "onset": 2011.75,
+        "scene": "拿起库外金魔方，错误输出雕塑组；不属于已标注导航仪拿起",
+        "oursAcceptedWrongOutputs": 1,
+        "peerFormalHitWindowsInWholeClip": 0,
+        "peerUnclearWindowsNearby": 2
+      }
+    ],
+    "hiddenPickups": [
+      {
+        "id": "trader-00",
+        "onset": [
+          1111.95,
+          1112.0
+        ],
+        "drop": [
+          1112.4,
+          1112.45
+        ],
+        "visualReviewed": true,
+        "evidence": "trader-drag-review/00-startIndex.jpg",
+        "peerFormalOutputs": [],
+        "formalOutputBeforeRelease": false,
+        "identityAccuracy": null
+      },
+      {
+        "id": "trader-01",
+        "onset": [
+          1114.2,
+          1114.25
+        ],
+        "drop": [
+          1114.75,
+          1114.8
+        ],
+        "visualReviewed": true,
+        "evidence": "trader-drag-review/01-startIndex.jpg",
+        "peerFormalOutputs": [],
+        "formalOutputBeforeRelease": false,
+        "identityAccuracy": null
+      },
+      {
+        "id": "trader-02",
+        "onset": [
+          1124.65,
+          1124.7
+        ],
+        "drop": [
+          1125.25,
+          1125.3
+        ],
+        "visualReviewed": true,
+        "evidence": "trader-drag-review/02-startIndex.jpg",
+        "peerFormalOutputs": [],
+        "formalOutputBeforeRelease": false,
+        "identityAccuracy": null
+      },
+      {
+        "id": "trader-03",
+        "onset": [
+          1126.95,
+          1127.0
+        ],
+        "drop": [
+          1127.5,
+          1127.55
+        ],
+        "visualReviewed": true,
+        "evidence": "trader-drag-review/03-startIndex.jpg",
+        "peerFormalOutputs": [],
+        "formalOutputBeforeRelease": false,
+        "identityAccuracy": null
+      },
+      {
+        "id": "trader-04",
+        "onset": [
+          1129.85,
+          1129.9
+        ],
+        "drop": [
+          1130.35,
+          1130.4
+        ],
+        "visualReviewed": true,
+        "evidence": "trader-drag-review/04-startIndex.jpg",
+        "peerFormalOutputs": [],
+        "formalOutputBeforeRelease": false,
+        "identityAccuracy": null
+      },
+      {
+        "id": "trader-05",
+        "onset": [
+          1132.25,
+          1132.3
+        ],
+        "drop": [
+          1132.9,
+          1132.95
+        ],
+        "visualReviewed": true,
+        "evidence": "trader-drag-review/05-startIndex.jpg",
+        "peerFormalOutputs": [],
+        "formalOutputBeforeRelease": false,
+        "identityAccuracy": null
+      },
+      {
+        "id": "trader-06",
+        "onset": [
+          1134.15,
+          1134.2
+        ],
+        "drop": [
+          1135.0,
+          1135.05
+        ],
+        "visualReviewed": true,
+        "evidence": "trader-drag-review/06-startIndex.jpg",
+        "peerFormalOutputs": [],
+        "formalOutputBeforeRelease": false,
+        "identityAccuracy": null
+      },
+      {
+        "id": "trader-07",
+        "onset": [
+          1136.5,
+          1136.55
+        ],
+        "drop": [
+          1137.45,
+          1137.5
+        ],
+        "visualReviewed": true,
+        "evidence": "trader-drag-review/07-startIndex.jpg",
+        "peerFormalOutputs": [
+          {
+            "recording": "record20260922-205653",
+            "scanEnd": 1137.9,
+            "estimatedSoundStart": 1136.7419166666666,
+            "name": "军用电台",
+            "envelope": 0.9439333199775063,
+            "spectrum": 0.8925427794456482,
+            "status": "hit",
+            "formalCandidates": [
+              "军用电台"
+            ]
+          }
+        ],
+        "formalOutputBeforeRelease": false,
+        "identityAccuracy": null
+      },
+      {
+        "id": "trader-08",
+        "onset": [
+          1139.75,
+          1139.8
+        ],
+        "drop": [
+          1140.35,
+          1140.4
+        ],
+        "visualReviewed": true,
+        "evidence": "trader-drag-review/08-startIndex.jpg",
+        "peerFormalOutputs": [],
+        "formalOutputBeforeRelease": false,
+        "identityAccuracy": null
+      },
+      {
+        "id": "trader-09",
+        "onset": [
+          1144.55,
+          1144.6
+        ],
+        "drop": [
+          1145.4,
+          1145.45
+        ],
+        "visualReviewed": true,
+        "evidence": "trader-drag-review/09-startIndex.jpg",
+        "peerFormalOutputs": [],
+        "formalOutputBeforeRelease": false,
+        "identityAccuracy": null
+      }
+    ],
+    "overallAccuracy": null
+  },
+  "scanPhaseDiagnostic": {
+    "hopSeconds": 0.05,
+    "scans": 304,
+    "correctKnownHitWindows": 0,
+    "postHocDiagnosticNotNewAccuracySet": true
+  },
+  "previousDevelopmentCohort": {
+    "seconds": 610,
+    "independent": false,
+    "clips": [
+      {
+        "recording": "record20260923-204258",
+        "scene": "trader",
+        "start": 600,
+        "end": 810,
+        "scans": 695,
+        "peerFormalHitWindows": 67,
+        "peerOutputsAfterSameNameSuppression": 17,
+        "peerUnclearWindows": 80,
+        "oursHistoricalAcceptedAnalysisOutputs": 21,
+        "identityAccuracy": null,
+        "outputs": [
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 633.3,
+            "estimatedSoundStart": 632.7760000000001,
+            "name": "金杯",
+            "envelope": 0.9687827661611922,
+            "spectrum": 0.8793444037437439,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "金杯",
+              "骏骊逐浪图",
+              "盘蛇金像",
+              "盛宴雕像",
+              "决胜奖杯"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 637.8,
+            "estimatedSoundStart": 637.1280833333334,
+            "name": "骏骊逐浪图",
+            "envelope": 0.9665365044587869,
+            "spectrum": 0.8679657578468323,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "骏骊逐浪图",
+              "盘蛇金像",
+              "金杯",
+              "盛宴雕像",
+              "决胜奖杯"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 639.6,
+            "estimatedSoundStart": 638.9200833333333,
+            "name": "金杯",
+            "envelope": 0.9784005130575703,
+            "spectrum": 0.8830794095993042,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "金杯",
+              "盛宴雕像",
+              "骏骊逐浪图",
+              "盘蛇金像",
+              "决胜奖杯"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 643.2,
+            "estimatedSoundStart": 642.5466875000001,
+            "name": "骏骊逐浪图",
+            "envelope": 0.957269333682809,
+            "spectrum": 0.8646645545959473,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "骏骊逐浪图",
+              "盘蛇金像",
+              "金杯",
+              "盛宴雕像",
+              "决胜奖杯"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 646.2,
+            "estimatedSoundStart": 645.55475,
+            "name": "金杯",
+            "envelope": 0.965559628298819,
+            "spectrum": 0.8561077117919922,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "金杯",
+              "骏骊逐浪图",
+              "盘蛇金像",
+              "盛宴雕像",
+              "决胜奖杯"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 695.7,
+            "estimatedSoundStart": 695.0480208333333,
+            "name": "骏骊逐浪图",
+            "envelope": 0.9641965638253988,
+            "spectrum": 0.8915464878082275,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "骏骊逐浪图",
+              "盘蛇金像",
+              "金杯",
+              "盛宴雕像",
+              "决胜奖杯"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 696.9,
+            "estimatedSoundStart": 696.2640833333332,
+            "name": "金杯",
+            "envelope": 0.9685029326727173,
+            "spectrum": 0.8916257619857788,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "金杯",
+              "骏骊逐浪图",
+              "盘蛇金像",
+              "盛宴雕像",
+              "决胜奖杯"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 698.1,
+            "estimatedSoundStart": 697.4372708333333,
+            "name": "骏骊逐浪图",
+            "envelope": 0.9652638611449383,
+            "spectrum": 0.8682836890220642,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "骏骊逐浪图",
+              "盘蛇金像",
+              "金杯",
+              "盛宴雕像",
+              "决胜奖杯"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 708.3,
+            "estimatedSoundStart": 707.4608333333334,
+            "name": "燃料桶",
+            "envelope": 0.9488795626429801,
+            "spectrum": 0.8818097114562988,
+            "status": "hit",
+            "formalCandidates": [
+              "燃料桶"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 718.2,
+            "estimatedSoundStart": 717.5300625,
+            "name": "硝化棉",
+            "envelope": 0.9584841769989695,
+            "spectrum": 0.903538167476654,
+            "status": "hit",
+            "formalCandidates": [
+              "硝化棉"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 723.6,
+            "estimatedSoundStart": 723.0127291666666,
+            "name": "硝化棉",
+            "envelope": 0.9495927023084323,
+            "spectrum": 0.9289827346801758,
+            "status": "hit",
+            "formalCandidates": [
+              "硝化棉"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 726.3,
+            "estimatedSoundStart": 725.6153958333334,
+            "name": "硝化棉",
+            "envelope": 0.9543191054670851,
+            "spectrum": 0.9257107973098755,
+            "status": "hit",
+            "formalCandidates": [
+              "硝化棉"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 738.0,
+            "estimatedSoundStart": 737.4767291666667,
+            "name": "硝化棉",
+            "envelope": 0.9586525677301531,
+            "spectrum": 0.8784324526786804,
+            "status": "hit",
+            "formalCandidates": [
+              "硝化棉"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 744.0,
+            "estimatedSoundStart": 743.2826249999999,
+            "name": "金杯",
+            "envelope": 0.9678094683747668,
+            "spectrum": 0.9075734615325928,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "金杯",
+              "骏骊逐浪图",
+              "盘蛇金像",
+              "决胜奖杯",
+              "盛宴雕像"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 762.3,
+            "estimatedSoundStart": 761.8000833333334,
+            "name": "骏骊逐浪图",
+            "envelope": 0.9675674690904301,
+            "spectrum": 0.9006493091583252,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "骏骊逐浪图",
+              "盘蛇金像",
+              "金杯",
+              "盛宴雕像",
+              "决胜奖杯"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 787.5,
+            "estimatedSoundStart": 786.9487291666667,
+            "name": "硝化棉",
+            "envelope": 0.9619807934175879,
+            "spectrum": 0.9230058193206787,
+            "status": "hit",
+            "formalCandidates": [
+              "硝化棉"
+            ]
+          },
+          {
+            "recording": "record20260923-204258",
+            "scanEnd": 795.9,
+            "estimatedSoundStart": 795.31475,
+            "name": "金杯",
+            "envelope": 0.9509844454827175,
+            "spectrum": 0.8895054459571838,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "金杯",
+              "骏骊逐浪图",
+              "盘蛇金像",
+              "盛宴雕像",
+              "决胜奖杯"
+            ]
+          }
+        ]
+      },
+      {
+        "recording": "record20260923-211647",
+        "scene": "trader",
+        "start": 570,
+        "end": 760,
+        "scans": 628,
+        "peerFormalHitWindows": 42,
+        "peerOutputsAfterSameNameSuppression": 10,
+        "peerUnclearWindows": 48,
+        "oursHistoricalAcceptedAnalysisOutputs": 5,
+        "identityAccuracy": null,
+        "outputs": [
+          {
+            "recording": "record20260923-211647",
+            "scanEnd": 580.2,
+            "estimatedSoundStart": 579.7178958333334,
+            "name": "理想国试剂盒",
+            "envelope": 0.9638456724024044,
+            "spectrum": 0.9316500425338745,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "理想国试剂盒",
+              "汽车蓄电池",
+              "专用电池组",
+              "钛合金板"
+            ]
+          },
+          {
+            "recording": "record20260923-211647",
+            "scanEnd": 581.4,
+            "estimatedSoundStart": 580.1699375,
+            "name": "液压扩张器",
+            "envelope": 0.9458323397027573,
+            "spectrum": 0.9042951464653015,
+            "status": "hit",
+            "formalCandidates": [
+              "液压扩张器"
+            ]
+          },
+          {
+            "recording": "record20260923-211647",
+            "scanEnd": 638.4,
+            "estimatedSoundStart": 637.6846875,
+            "name": "液压扩张器",
+            "envelope": 0.9419287057348398,
+            "spectrum": 0.931731104850769,
+            "status": "hit",
+            "formalCandidates": [
+              "液压扩张器"
+            ]
+          },
+          {
+            "recording": "record20260923-211647",
+            "scanEnd": 640.5,
+            "estimatedSoundStart": 639.8779166666667,
+            "name": "理想国试剂盒",
+            "envelope": 0.972470981394109,
+            "spectrum": 0.9427213668823242,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "理想国试剂盒",
+              "汽车蓄电池",
+              "专用电池组",
+              "钛合金板"
+            ]
+          },
+          {
+            "recording": "record20260923-211647",
+            "scanEnd": 641.1,
+            "estimatedSoundStart": 640.4753333333333,
+            "name": "钛合金板",
+            "envelope": 0.9767867099961731,
+            "spectrum": 0.9440770745277405,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "钛合金板",
+              "理想国试剂盒",
+              "专用电池组",
+              "汽车蓄电池"
+            ]
+          },
+          {
+            "recording": "record20260923-211647",
+            "scanEnd": 641.7,
+            "estimatedSoundStart": 640.475375,
+            "name": "理想国试剂盒",
+            "envelope": 0.9767348685898358,
+            "spectrum": 0.9477043151855469,
+            "status": "ambiguous",
+            "formalCandidates": [
+              "理想国试剂盒",
+              "专用电池组",
+              "汽车蓄电池",
+              "钛合金板"
+            ]
+          },
+          {
+            "recording": "record20260923-211647",
+            "scanEnd": 649.2,
+            "estimatedSoundStart": 648.6895833333333,
+            "name": "硝化棉",
+            "envelope": 0.9548605249393998,
+            "spectrum": 0.9143698811531067,
+            "status": "hit",
+            "formalCandidates": [
+              "硝化棉"
+            ]
+          },
+          {
+            "recording": "record20260923-211647",
+            "scanEnd": 685.5,
+            "estimatedSoundStart": 684.8137708333334,
+            "name": "军用电台",
+            "envelope": 0.945883655546972,
+            "spectrum": 0.8944536447525024,
+            "status": "hit",
+            "formalCandidates": [
+              "军用电台"
+            ]
+          },
+          {
+            "recording": "record20260923-211647",
+            "scanEnd": 687.6,
+            "estimatedSoundStart": 686.1365416666666,
+            "name": "军用电台",
+            "envelope": 0.9617787514931438,
+            "spectrum": 0.8665784597396851,
+            "status": "hit",
+            "formalCandidates": [
+              "军用电台"
+            ]
+          },
+          {
+            "recording": "record20260923-211647",
+            "scanEnd": 747.3,
+            "estimatedSoundStart": 746.7232083333333,
+            "name": "军用电台",
+            "envelope": 0.9671417258173292,
+            "spectrum": 0.8843259811401367,
+            "status": "hit",
+            "formalCandidates": [
+              "军用电台"
+            ]
+          }
+        ]
+      },
+      {
+        "recording": "record20260923-204258",
+        "scene": "backpack",
+        "start": 1100,
+        "end": 1170,
+        "scans": 229,
+        "peerFormalHitWindows": 0,
+        "peerOutputsAfterSameNameSuppression": 0,
+        "peerUnclearWindows": 40,
+        "oursHistoricalAcceptedAnalysisOutputs": 0,
+        "identityAccuracy": null,
+        "outputs": []
+      },
+      {
+        "recording": "record20260923-204258",
+        "scene": "movement",
+        "start": 350,
+        "end": 410,
+        "scans": 195,
+        "peerFormalHitWindows": 0,
+        "peerOutputsAfterSameNameSuppression": 0,
+        "peerUnclearWindows": 26,
+        "oursHistoricalAcceptedAnalysisOutputs": 0,
+        "identityAccuracy": null,
+        "outputs": []
+      },
+      {
+        "recording": "record20260923-211647",
+        "scene": "movement-and-bandage",
+        "start": 980,
+        "end": 1060,
+        "scans": 262,
+        "peerFormalHitWindows": 0,
+        "peerOutputsAfterSameNameSuppression": 0,
+        "peerUnclearWindows": 42,
+        "oursHistoricalAcceptedAnalysisOutputs": 1,
+        "identityAccuracy": null,
+        "outputs": []
+      }
+    ]
+  },
+  "provenance": {
+    "labelsSha256": "e1160b6cbfda9c23477d958acc8e0088aba30cca10a3e33ce6fe2f80584c74ee",
+    "localPlanSha256": "3a9a02f3540ac58741301e3f43cbd4271afeb2826c4d67e822c7f258a3febf22",
+    "localResultsSha256": "1c58f3b3bb867590d3d55a82a45af66e70aaf9b03d5780cb6fce01145d7d9d4b",
+    "localDevelopmentResultsSha256": "c1a959e65dbfaac5d8d6a1a69023df5d1b41db26015cdd83f7f83de4ac98d157",
+    "frozenBaselineReportSha256": "da0ad3dd024a1edad521b78a8add383121e11faa178ed17abd1ef89068478b2e",
+    "harnessSha256": {
+      "core.py": "81460dd0a8541949eb98338df5f6d0c0d253e3e4379b4b608cd5c4d5d60dedf9",
+      "prepare.py": "20391e05b9318f53c5f7aa294fe54be01ee8da7a0e6d54c72e87eb7077a24dde",
+      "run.py": "fac3b2929aff0998c2ae6d4766132960e9b21c45190cfb511c4b3d4e13e2c58d",
+      "diagnose.py": "75e309e7397e19c3a1c1b4f16051d42f13c754cdc3d23a416264cb5d0cc2d5d0"
+    }
+  },
+  "limitations": [
+    "Selected 187.64 s of previously labelled scenes plus the prior 610 s development set, not a second full 7546.6 s replay.",
+    "Eight known actions cover only five items. Two are drags; six are quick transfers without a separately visible pickup stage.",
+    "Hidden goods are not labelled correct or incorrect solely from algorithm names.",
+    "Unclear hints and comparison-panel suggestions are not formal identifications.",
+    "Fixed nominal .3 s scans do not simulate CPU-adaptive .3-.9 s scheduling, packet timing, GUI state or live audio capture.",
+    "Peer uses its own references and preprocessing; this compares the configured method, not the isolated effect of the scoring formula.",
+    "Both recordings contain mixed/compressed playback; results do not establish live UAGame process-capture accuracy.",
+    "Thresholds were unchanged. The 50 ms scan-phase sweep is post-hoc diagnostic only.",
+    "Our historical counts are analysis outputs; peer output counts apply its same-name suppression, so raw count differences are not accuracy differences."
+  ]
+}

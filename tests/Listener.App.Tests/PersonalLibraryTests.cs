@@ -75,7 +75,8 @@ internal static class PersonalLibraryTests
         var built = store.BuildDraft(draft).GetAwaiter().GetResult();
         Check(built.Version is not null, "build/trial failed: " + built.Message + " " + built.ReportPath);
         var version = built.Version!;
-        Check(ReferenceAudio.Load(version.Root).Samples.Count == 17, "held-out sample leaked into index or references missing");
+        Check(ReferenceAudio.Load(version.Root).Samples.Count == ReferenceAudio.Load(Base).Samples.Count + 3,
+            "held-out sample leaked into index or references missing");
         Check(ReferenceAudio.Load(version.Root).Samples.All(s => !s.TemplateId.Contains(heldout.Id)), "heldout indexed");
         store.Activate(version);
         Check(store.ResolveActive().Library.Items.Any(i => i.Id == draft.Item.Id), "new item not activated");

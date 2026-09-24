@@ -1,0 +1,1488 @@
+{
+  "kind": "frozen-version-gameplay-replay-with-partial-visual-labels",
+  "baseline": {
+    "version": "v0.3.2",
+    "commit": "8ee409e2ea2fe70bf370d515efb0bd1c3428515a",
+    "date": "2026-09-24",
+    "mode": "portable CLI scan; 100 ms blocks; automatic pickup plus putdown veto",
+    "parametersChanged": false,
+    "privateLibraryActive": false,
+    "artifacts": {
+      "Listener.Cli.dll": "b97302947c22f9e7ab2a0e213dee9b95065b1ca7afb21951b0fc395638da5c20",
+      "Listener.Core.dll": "13c1b7318122582017c9d0757be4352d9bc5c74f4d20f9f429046dfc8b0e08f9",
+      "engine/Listener.Engine.exe": "cebf604951194aa3b73331d60666ade87c3d7f58a913cfc1c56f36baacadde42",
+      "library/library.json": "267d0d333175bd60db57709e2c3bd55e4f257393c4d60a391e994da2a0a24a0f",
+      "library/radar-index.bin": "bcdb31a7402559a2b8f204430bca1dda8501011dfd96d05d29f8c248abe1363d"
+    }
+  },
+  "onsetTolerance": [
+    0.2,
+    0.35
+  ],
+  "totals": {
+    "seconds": 7546.6,
+    "analyses": 9573,
+    "matchedOutputs": 23,
+    "knownOperations": 8,
+    "correctKnownOperations": 0,
+    "knownDragOperations": 2,
+    "correctKnownDrags": 0,
+    "knownTransferOperations": 6,
+    "correctKnownTransfers": 0,
+    "hiddenPickups": 10,
+    "hiddenTriggered": 7,
+    "hiddenAnalysesBeforeRelease": 2,
+    "confirmedFalseOutputs": 10,
+    "unverifiableOutputs": 13
+  },
+  "acceptancePassed": false,
+  "overallAccuracy": null,
+  "limitations": [
+    "Five recordings from 2026-09-20 to 2026-09-22, not the September 23 clips previously used for threshold selection.",
+    "Eight visually labelled known-item operations cover five items and only two catalog sound groups; two drags and six rapid transfers are reported separately.",
+    "Labels were selected from pictures before inspecting those positive predictions. Hidden trader identities are never inferred from recognizer output.",
+    "Audio is a mixed AAC recording decoded by timestamp to mono PCM24k. There are no uncovered samples. It is not a live game-process capture test.",
+    "The replay is synchronous with no busy worker, foreground gating, live mouse hooks, UI publishing, or history deduplication. Counts are analysis outputs, not visible popup counts.",
+    "Temporal association uses onset -0.20 s to +0.35 s, choosing by time rather than score. No nearby onset is not proof that every overlapping audio window was empty.",
+    "Hidden trader labels confirm ten visible drags in one 40-second excerpt, not all merchant operations in all recordings. Very short unobserved actions may be absent.",
+    "Accepted-output reviews are post-prediction picture checks. Thirteen hidden-goods outputs remain unverifiable; no overall precision or whole-match accuracy is estimated.",
+    "Native48k and crop sweeps are post-evaluation diagnostics and do not count as independent successful recognition.",
+    "Source videos, screenshots, decoded WAVs, user profiles, and absolute media paths are not included in this report."
+  ],
+  "recordings": [
+    {
+      "id": "record20260920-213509",
+      "duration": 1967.6,
+      "audioSha256": "21538409e27186f8ee260d6571394b0a2e4faa87d16a6cfeb1f66cc083f39b29",
+      "eventsSha256": "93afefb2d5b5ff4ba21de0983c2ced2556ba546e5771e9174cfe59e32bd533c1",
+      "analysisCount": 2725,
+      "matchedOutputCount": 6,
+      "knownOperations": [
+        {
+          "id": "tv-loot",
+          "item": "e9f62d39-2",
+          "name": "胶囊电视",
+          "onset": [
+            64.3,
+            64.4
+          ],
+          "action": "transfer",
+          "evidence": "tv-detail/frame-00064.400.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 64.8,
+              "onset": 64.25,
+              "clipStart": 64.17,
+              "clipEnd": 64.61,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "388e122c",
+                  "score": 0.6197513702280429
+                },
+                {
+                  "groupId": "cb1c0d1d",
+                  "score": 0.5968212429513079
+                },
+                {
+                  "groupId": "9e7e9e83",
+                  "score": 0.5142959650543494
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup"
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": false,
+          "analysisBeforeRelease": null,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "tv-recovery",
+          "item": "e9f62d39-2",
+          "name": "胶囊电视",
+          "onset": [
+            550.15,
+            550.2
+          ],
+          "action": "transfer",
+          "evidence": "tv-transfer/frame-00550.200.jpg",
+          "associatedAnalyses": [],
+          "analysisTriggered": false,
+          "correctCandidate": false,
+          "analysisBeforeRelease": null,
+          "correctCandidateBeforeRelease": null
+        }
+      ],
+      "hiddenPickups": [],
+      "reviewedOutputs": [
+        {
+          "index": 0,
+          "onset": 449.35,
+          "verdict": "false",
+          "scene": "第一人称使用医疗用品，未操作目标物品",
+          "evidence": "predictions/00-+0.35.jpg",
+          "event": {
+            "analyzedAt": 449.8,
+            "onset": 449.35,
+            "clipStart": 449.27000000000004,
+            "clipEnd": 449.71000000000004,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.7817328408004336
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.5590642417939907
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.5298825433308849
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 1,
+          "onset": 958.65,
+          "verdict": "false",
+          "scene": "第一人称移动，未操作目标物品",
+          "evidence": "predictions/01-+0.35.jpg",
+          "event": {
+            "analyzedAt": 959.2,
+            "onset": 958.65,
+            "clipStart": 958.5699999999999,
+            "clipEnd": 959.01,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.8002115995725002
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6136574550780235
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.5647409630854392
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 2,
+          "onset": 1224.75,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/02-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1225.2,
+            "onset": 1224.75,
+            "clipStart": 1224.67,
+            "clipEnd": 1225.1100000000001,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.8279623712996012
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.5920798266200433
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.5738860392880065
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 3,
+          "onset": 1258.63,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/03-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1259.2,
+            "onset": 1258.63,
+            "clipStart": 1258.55,
+            "clipEnd": 1258.99,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.9113520212887009
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.6233479934059027
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6110118101367736
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 4,
+          "onset": 1562.21,
+          "verdict": "false",
+          "scene": "第一人称持刀移动，未操作目标物品",
+          "evidence": "predictions/04-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1562.6,
+            "onset": 1562.2099999999998,
+            "clipStart": 1562.1299999999999,
+            "clipEnd": 1562.52,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.8051642370460063
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.5919552527252853
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.5295940981109614
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 5,
+          "onset": 1818.75,
+          "verdict": "false",
+          "scene": "进入行商对话，尚未进入货物界面",
+          "evidence": "predictions/05-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1819.2,
+            "onset": 1818.75,
+            "clipStart": 1818.67,
+            "clipEnd": 1819.1100000000001,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.782520087545172
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.6209841315109838
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.5374491547734047
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        }
+      ]
+    },
+    {
+      "id": "record20260921-205434",
+      "duration": 1000.5,
+      "audioSha256": "360f4e4971924a22edbd11c5dcf5965614f8dfabea412d54457e8102eb8945e2",
+      "eventsSha256": "6509f16a1ea06f507e473928f11142f0a60a5e85e618ed2e9009f5dea963f396",
+      "analysisCount": 1321,
+      "matchedOutputCount": 0,
+      "knownOperations": [
+        {
+          "id": "egg-loot",
+          "item": "e9f62d39-6",
+          "name": "赫美拉彩蛋",
+          "onset": [
+            65.6,
+            65.65
+          ],
+          "action": "transfer",
+          "evidence": "egg-detail/frame-00065.650.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 66,
+              "onset": 65.61,
+              "clipStart": 65.53,
+              "clipEnd": 65.92,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "cb1c0d1d",
+                  "score": 0.6478779287954288
+                },
+                {
+                  "groupId": "9e7e9e83",
+                  "score": 0.5510488125239069
+                },
+                {
+                  "groupId": "983e0b90",
+                  "score": 0.5351959426364907
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup"
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": false,
+          "analysisBeforeRelease": null,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "egg-drag",
+          "item": "e9f62d39-6",
+          "name": "赫美拉彩蛋",
+          "onset": [
+            67.05,
+            67.1
+          ],
+          "drop": [
+            67.6,
+            67.65
+          ],
+          "action": "drag",
+          "evidence": "egg-detail/frame-00067.100.jpg",
+          "associatedAnalyses": [],
+          "analysisTriggered": false,
+          "correctCandidate": false,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": false
+        }
+      ],
+      "hiddenPickups": [],
+      "reviewedOutputs": []
+    },
+    {
+      "id": "record20260922-214737",
+      "duration": 1096.7,
+      "audioSha256": "b8225ab1cdbf7382b07c2575ebc60c8306734f505da06420c931009e75ab0e33",
+      "eventsSha256": "6494aa92dbb2deaadefcbdc55b3d2948c446783a543ccc525989cf2c3d430a14",
+      "analysisCount": 1495,
+      "matchedOutputCount": 0,
+      "knownOperations": [
+        {
+          "id": "dawn-loot",
+          "item": "361affd2-2",
+          "name": "黎明",
+          "onset": [
+            78.4,
+            78.45
+          ],
+          "action": "transfer",
+          "evidence": "dawn-detail/frame-00078.450.jpg",
+          "associatedAnalyses": [],
+          "analysisTriggered": false,
+          "correctCandidate": false,
+          "analysisBeforeRelease": null,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "dawn-drag",
+          "item": "361affd2-2",
+          "name": "黎明",
+          "onset": [
+            80.45,
+            80.5
+          ],
+          "drop": [
+            80.9,
+            80.95
+          ],
+          "action": "drag",
+          "evidence": "dawn-detail/frame-00080.500.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 81,
+              "onset": 80.45,
+              "clipStart": 80.37,
+              "clipEnd": 80.81,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "cb1c0d1d",
+                  "score": 0.6097366364923442
+                },
+                {
+                  "groupId": "983e0b90",
+                  "score": 0.5608943688744923
+                },
+                {
+                  "groupId": "9e7e9e83",
+                  "score": 0.5608796949256855
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup"
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": false,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": false
+        }
+      ],
+      "hiddenPickups": [],
+      "reviewedOutputs": []
+    },
+    {
+      "id": "record20260922-205653",
+      "duration": 1442.4,
+      "audioSha256": "b7f583871548c9850f5d3cd923c4ce7299f741d96acbc7a85a6777137339718c",
+      "eventsSha256": "4b7cf70fcd6609133ca037c724bf6904b4821012d030d7703e0657c2f3dd2acc",
+      "analysisCount": 1574,
+      "matchedOutputCount": 5,
+      "knownOperations": [],
+      "hiddenPickups": [
+        {
+          "id": "trader-00",
+          "onset": [
+            1111.95,
+            1112.0
+          ],
+          "drop": [
+            1112.4,
+            1112.45
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/00-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1112.6,
+              "onset": 1112.1899999999998,
+              "clipStart": 1112.11,
+              "clipEnd": 1112.52,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "9e7e9e83",
+                  "score": 0.7238868266030105
+                },
+                {
+                  "groupId": "cb1c0d1d",
+                  "score": 0.6941571571141516
+                },
+                {
+                  "groupId": "983e0b90",
+                  "score": 0.637304311016835
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup"
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "trader-01",
+          "onset": [
+            1114.2,
+            1114.25
+          ],
+          "drop": [
+            1114.75,
+            1114.8
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/01-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1115,
+              "onset": 1114.45,
+              "clipStart": 1114.37,
+              "clipEnd": 1114.81,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "9e7e9e83",
+                  "score": 0.7614433764327724
+                },
+                {
+                  "groupId": "cb1c0d1d",
+                  "score": 0.675804261857229
+                },
+                {
+                  "groupId": "983e0b90",
+                  "score": 0.5997365187700273
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup"
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "trader-02",
+          "onset": [
+            1124.65,
+            1124.7
+          ],
+          "drop": [
+            1125.25,
+            1125.3
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/02-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1125.4,
+              "onset": 1124.8500000000001,
+              "clipStart": 1124.77,
+              "clipEnd": 1125.21,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "cb1c0d1d",
+                  "score": 0.6705163949882293
+                },
+                {
+                  "groupId": "983e0b90",
+                  "score": 0.6160079006946644
+                },
+                {
+                  "groupId": "388e122c",
+                  "score": 0.5501657594002156
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup"
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "trader-03",
+          "onset": [
+            1126.95,
+            1127.0
+          ],
+          "drop": [
+            1127.5,
+            1127.55
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/03-startIndex.jpg",
+          "associatedAnalyses": [],
+          "analysisTriggered": false,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "trader-04",
+          "onset": [
+            1129.85,
+            1129.9
+          ],
+          "drop": [
+            1130.35,
+            1130.4
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/04-startIndex.jpg",
+          "associatedAnalyses": [],
+          "analysisTriggered": false,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "trader-05",
+          "onset": [
+            1132.25,
+            1132.3
+          ],
+          "drop": [
+            1132.9,
+            1132.95
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/05-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1133,
+              "onset": 1132.55,
+              "clipStart": 1132.47,
+              "clipEnd": 1132.91,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "cb1c0d1d",
+                  "score": 0.6825781115072971
+                },
+                {
+                  "groupId": "983e0b90",
+                  "score": 0.6708041538928841
+                },
+                {
+                  "groupId": "388e122c",
+                  "score": 0.5791834412658208
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup"
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "trader-06",
+          "onset": [
+            1134.15,
+            1134.2
+          ],
+          "drop": [
+            1135.0,
+            1135.05
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/06-startIndex.jpg",
+          "associatedAnalyses": [],
+          "analysisTriggered": false,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "trader-07",
+          "onset": [
+            1136.5,
+            1136.55
+          ],
+          "drop": [
+            1137.45,
+            1137.5
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/07-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1137.2,
+              "onset": 1136.75,
+              "clipStart": 1136.67,
+              "clipEnd": 1137.1100000000001,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "cb1c0d1d",
+                  "score": 0.6707877549125373
+                },
+                {
+                  "groupId": "388e122c",
+                  "score": 0.6493689860507001
+                },
+                {
+                  "groupId": "983e0b90",
+                  "score": 0.595328070566972
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup"
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": true,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "trader-08",
+          "onset": [
+            1139.75,
+            1139.8
+          ],
+          "drop": [
+            1140.35,
+            1140.4
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/08-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1140.4,
+              "onset": 1139.99,
+              "clipStart": 1139.91,
+              "clipEnd": 1140.3200000000002,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "388e122c",
+                  "score": 0.6379661170678087
+                },
+                {
+                  "groupId": "983e0b90",
+                  "score": 0.6253224234704916
+                },
+                {
+                  "groupId": "cb1c0d1d",
+                  "score": 0.5882597393636066
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup"
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": false,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "trader-09",
+          "onset": [
+            1144.55,
+            1144.6
+          ],
+          "drop": [
+            1145.4,
+            1145.45
+          ],
+          "visualReviewed": true,
+          "evidence": "trader-drag-review/09-startIndex.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 1145.2,
+              "onset": 1144.79,
+              "clipStart": 1144.71,
+              "clipEnd": 1145.1200000000001,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "388e122c",
+                  "score": 0.5911897012998635
+                },
+                {
+                  "groupId": "983e0b90",
+                  "score": 0.5813821214124784
+                },
+                {
+                  "groupId": "cb1c0d1d",
+                  "score": 0.5485952698686261
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup"
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": null,
+          "analysisBeforeRelease": true,
+          "correctCandidateBeforeRelease": null
+        }
+      ],
+      "reviewedOutputs": [
+        {
+          "index": 0,
+          "onset": 99.39,
+          "verdict": "false",
+          "scene": "打开文档箱并开始搜索，尚未出现可操作物品",
+          "evidence": "predictions/00-+0.35.jpg",
+          "event": {
+            "analyzedAt": 99.8,
+            "onset": 99.38999999999999,
+            "clipStart": 99.31,
+            "clipEnd": 99.72,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.7999153240872963
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6458652183300844
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.6137602879693779
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 1,
+          "onset": 1180.05,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/01-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1180.6,
+            "onset": 1180.05,
+            "clipStart": 1179.9699999999998,
+            "clipEnd": 1180.4099999999999,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "9e7e9e83",
+                "score": 0.8058226078221608
+              },
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.6822436686815552
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6110802701097641
+              }
+            ],
+            "candidateIds": [
+              "9e7e9e83-0",
+              "9e7e9e83-1",
+              "9e7e9e83-2",
+              "9e7e9e83-3",
+              "9e7e9e83-4"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 2,
+          "onset": 1201.13,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/02-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1201.6,
+            "onset": 1201.1299999999999,
+            "clipStart": 1201.0499999999997,
+            "clipEnd": 1201.4899999999998,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "983e0b90",
+                "score": 0.8355066533388333
+              },
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.6961979859496229
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.6490538692318012
+              }
+            ],
+            "candidateIds": [
+              "983e0b90-0"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 3,
+          "onset": 1233.47,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/03-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1234,
+            "onset": 1233.47,
+            "clipStart": 1233.3899999999999,
+            "clipEnd": 1233.83,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "9e7e9e83",
+                "score": 0.7883314375771499
+              },
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.6467502871069427
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.6094463713548578
+              }
+            ],
+            "candidateIds": [
+              "9e7e9e83-0",
+              "9e7e9e83-1",
+              "9e7e9e83-2",
+              "9e7e9e83-3",
+              "9e7e9e83-4"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 4,
+          "onset": 1247.67,
+          "verdict": "false",
+          "scene": "结束行商对话，未操作目标物品",
+          "evidence": "predictions/04-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1248.2,
+            "onset": 1247.67,
+            "clipStart": 1247.59,
+            "clipEnd": 1248.03,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.7854299733069533
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.5861865076852876
+              },
+              {
+                "groupId": "9e7e9e83",
+                "score": 0.5454774529756807
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        }
+      ]
+    },
+    {
+      "id": "record20260920-205237",
+      "duration": 2039.4,
+      "audioSha256": "4117f4aa3a173845f4a31d21473926563929a05b137f3f8203a16b3b8e185ee2",
+      "eventsSha256": "cba0cd3b0e28f8076c8716a47916c1a95f35707220cd4b648cdbffe095dba22b",
+      "analysisCount": 2458,
+      "matchedOutputCount": 12,
+      "knownOperations": [
+        {
+          "id": "lens-loot",
+          "item": "e9f62d39-7",
+          "name": "阵列镜片",
+          "onset": [
+            2004.7,
+            2004.8
+          ],
+          "action": "transfer",
+          "evidence": "loot-detail/frame-02004.800.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 2005,
+              "onset": 2004.53,
+              "clipStart": 2004.4499999999998,
+              "clipEnd": 2004.8899999999999,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "cb1c0d1d",
+                  "score": 0.5521803346797381
+                },
+                {
+                  "groupId": "388e122c",
+                  "score": 0.5501480708995337
+                },
+                {
+                  "groupId": "983e0b90",
+                  "score": 0.4534156318881665
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup"
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": false,
+          "analysisBeforeRelease": null,
+          "correctCandidateBeforeRelease": null
+        },
+        {
+          "id": "nav-loot",
+          "item": "361affd2-3",
+          "name": "航天导航仪",
+          "onset": [
+            2010.4,
+            2010.5
+          ],
+          "action": "transfer",
+          "evidence": "loot-detail/frame-02010.500.jpg",
+          "associatedAnalyses": [
+            {
+              "analyzedAt": 2011,
+              "onset": 2010.45,
+              "clipStart": 2010.37,
+              "clipEnd": 2010.81,
+              "status": "unknown",
+              "scores": [
+                {
+                  "groupId": "cb1c0d1d",
+                  "score": 0.6516211337714088
+                },
+                {
+                  "groupId": "388e122c",
+                  "score": 0.6073351281747689
+                },
+                {
+                  "groupId": "983e0b90",
+                  "score": 0.5590529473011278
+                }
+              ],
+              "candidateIds": [],
+              "action": "pickup"
+            }
+          ],
+          "analysisTriggered": true,
+          "correctCandidate": false,
+          "analysisBeforeRelease": null,
+          "correctCandidateBeforeRelease": null
+        }
+      ],
+      "hiddenPickups": [],
+      "reviewedOutputs": [
+        {
+          "index": 0,
+          "onset": 891.67,
+          "verdict": "false",
+          "scene": "第一人称武器/姿态动作，未操作目标物品",
+          "evidence": "predictions/00-+0.35.jpg",
+          "event": {
+            "analyzedAt": 892.2,
+            "onset": 891.6700000000001,
+            "clipStart": 891.5899999999999,
+            "clipEnd": 892.03,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.786867001968155
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.6890933504010233
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6658894585525522
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 1,
+          "onset": 1005.11,
+          "verdict": "false",
+          "scene": "武器详情和背包界面，连续画面未见目标物品操作",
+          "evidence": "predictions/01-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1005.6,
+            "onset": 1005.11,
+            "clipStart": 1005.03,
+            "clipEnd": 1005.47,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.7938471661661961
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6155020377376234
+              },
+              {
+                "groupId": "9e7e9e83",
+                "score": 0.5704128462247295
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 2,
+          "onset": 1323.73,
+          "verdict": "false",
+          "scene": "第一人称持枪瞄准，未操作目标物品",
+          "evidence": "predictions/02-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1324.2,
+            "onset": 1323.73,
+            "clipStart": 1323.6499999999999,
+            "clipEnd": 1324.09,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.7813791012560607
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.5492941751256328
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.5316305390751909
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 3,
+          "onset": 1557.27,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/03-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1557.8,
+            "onset": 1557.27,
+            "clipStart": 1557.1899999999998,
+            "clipEnd": 1557.6299999999999,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.895720355330492
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6363358276716423
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.5774942741829352
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 4,
+          "onset": 1557.81,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/04-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1558.2,
+            "onset": 1557.81,
+            "clipStart": 1557.73,
+            "clipEnd": 1558.1200000000001,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.9211943825212098
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6308100193810802
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.583900751200309
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 5,
+          "onset": 1558.33,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/05-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1558.8,
+            "onset": 1558.33,
+            "clipStart": 1558.2499999999998,
+            "clipEnd": 1558.6899999999998,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.9220881682157606
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6316451090073912
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.626912981236027
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 6,
+          "onset": 1560.07,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/06-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1560.6,
+            "onset": 1560.07,
+            "clipStart": 1559.9899999999998,
+            "clipEnd": 1560.4299999999998,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.9247673003224834
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6147909413101499
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.5730798973480012
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 7,
+          "onset": 1560.59,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/07-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1561,
+            "onset": 1560.59,
+            "clipStart": 1560.51,
+            "clipEnd": 1560.92,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.9220263083070516
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.6276508024693099
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6254115911099157
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 8,
+          "onset": 1725.57,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/08-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1726,
+            "onset": 1725.57,
+            "clipStart": 1725.49,
+            "clipEnd": 1725.92,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.8971312310599349
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6511070936173725
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.614009709903207
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 9,
+          "onset": 1735.87,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/09-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1736.4,
+            "onset": 1735.8700000000001,
+            "clipStart": 1735.79,
+            "clipEnd": 1736.23,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.8107342609130845
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.6327563690893837
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6006824184917389
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 10,
+          "onset": 1737.39,
+          "verdict": "unverifiable",
+          "scene": "行商隐藏货物，未揭示物品身份",
+          "evidence": "predictions/10-+0.35.jpg",
+          "event": {
+            "analyzedAt": 1737.8,
+            "onset": 1737.3899999999999,
+            "clipStart": 1737.31,
+            "clipEnd": 1737.72,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.8959663215540384
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6100024323420455
+              },
+              {
+                "groupId": "388e122c",
+                "score": 0.5873875790676946
+              }
+            ],
+            "candidateIds": [
+              "cb1c0d1d-0",
+              "cb1c0d1d-1"
+            ],
+            "action": "pickup"
+          }
+        },
+        {
+          "index": 11,
+          "onset": 2011.75,
+          "verdict": "false",
+          "scene": "拿起库外金魔方，错误输出雕塑组；不属于已标注导航仪拿起",
+          "evidence": "predictions/11-+0.35.jpg",
+          "event": {
+            "analyzedAt": 2012.2,
+            "onset": 2011.75,
+            "clipStart": 2011.67,
+            "clipEnd": 2012.1100000000001,
+            "status": "matched",
+            "scores": [
+              {
+                "groupId": "9e7e9e83",
+                "score": 0.7887252602434074
+              },
+              {
+                "groupId": "983e0b90",
+                "score": 0.6175474351340755
+              },
+              {
+                "groupId": "cb1c0d1d",
+                "score": 0.5983959252864905
+              }
+            ],
+            "candidateIds": [
+              "9e7e9e83-0",
+              "9e7e9e83-1",
+              "9e7e9e83-2",
+              "9e7e9e83-3",
+              "9e7e9e83-4"
+            ],
+            "action": "pickup"
+          }
+        }
+      ]
+    }
+  ]
+}
