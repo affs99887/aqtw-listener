@@ -1,0 +1,4 @@
+{
+  "name": "AQTW Listener (.NET 10)",
+  "install": "bash .cursor/install.sh"
+}
