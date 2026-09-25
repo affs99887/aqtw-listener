@@ -386,6 +386,24 @@ Test("局内匹配器：起点估计偏早或偏晚仍能对齐拿起声", () =>
             $"onset estimate {estimate} lost the pickup");
     Directory.Delete(root, true);
 });
+// At the trader and in the guide video a faint interface click opens the event and the
+// item's own sound starts 0.10–0.16 s later, beyond the plain slide: the item's attack is
+// its own anchor. A click that follows the item, or a lone click, changes nothing.
+Test("局内匹配器：界面点击先于拿起声 0.13 秒时，物品声的起振作为锚点仍能匹配", () =>
+{
+    var (library, root) = InMatchLibrary();
+    using var recognizer = new InMatchRecognizer(library, root);
+    var click = Burst(3, 3000, ms: 12, gain: .6);
+    var late = Raid(Burst(1, 6000), .63);
+    for (var i = 0; i < click.Length; i++) late[(int)(.5 * 48000) + i] += .02f * click[i];
+    var anchors = InMatchFeatures.QueryAnchors(InMatchFeatures.MelPower(late), (int)(.5 * 48000 / InMatchFeatures.Hop));
+    Check(anchors.Length >= 2 && anchors.Skip(1).Any(a => Math.Abs(a * InMatchFeatures.Hop / 48000.0 - .63) < .02), "the item's attack was not offered as an anchor: " + string.Join(",", anchors));
+    var result = recognizer.AnalyzeAt(late, 48000, .5).Result;
+    Check(result is { Status: RecognitionStatus.Matched, BestMatch: { Item.Id: "a", Score: >= .95 } }, $"item after a click unmatched: {result.Status} {result.BestMatch?.Score:F3}");
+    var lone = Raid(click, .5, clickGain: .02);
+    Check(recognizer.AnalyzeAt(lone, 48000, .5).Result.Status != RecognitionStatus.Matched, "a lone interface click matched an item");
+    Directory.Delete(root, true);
+});
 Test("扫描器按高频能量检测起点，低频轰鸣不掩盖也不触发", () =>
 {
     const int rate = 48000;

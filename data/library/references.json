@@ -433,6 +433,195 @@
       "file": "audio/peer-061.wav",
       "sha256": "511f6d45881c57cfee973e30a0a682ddeeb948f0f5a51881bd7a6929047b7ebd",
       "recordingId": "peer-v0.67-packaged-references"
+    },
+    {
+      "groupId": "peer-004",
+      "templateId": "peer-004-2",
+      "file": "audio/guide-high-class.wav",
+      "sha256": "A3BB751955FBAD35949F613FF1E87AC8B75EB4A6C1439BA859C229E2A3F42FC1",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-013",
+      "templateId": "peer-013-2",
+      "file": "audio/guide-high-class.wav",
+      "sha256": "A3BB751955FBAD35949F613FF1E87AC8B75EB4A6C1439BA859C229E2A3F42FC1",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-014",
+      "templateId": "peer-014-2",
+      "file": "audio/guide-high-class.wav",
+      "sha256": "A3BB751955FBAD35949F613FF1E87AC8B75EB4A6C1439BA859C229E2A3F42FC1",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-015",
+      "templateId": "peer-015-2",
+      "file": "audio/guide-high-class.wav",
+      "sha256": "A3BB751955FBAD35949F613FF1E87AC8B75EB4A6C1439BA859C229E2A3F42FC1",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-017",
+      "templateId": "peer-017-2",
+      "file": "audio/guide-high-class.wav",
+      "sha256": "A3BB751955FBAD35949F613FF1E87AC8B75EB4A6C1439BA859C229E2A3F42FC1",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-019",
+      "templateId": "peer-019-2",
+      "file": "audio/guide-high-class.wav",
+      "sha256": "A3BB751955FBAD35949F613FF1E87AC8B75EB4A6C1439BA859C229E2A3F42FC1",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-031",
+      "templateId": "peer-031-2",
+      "file": "audio/guide-high-class.wav",
+      "sha256": "A3BB751955FBAD35949F613FF1E87AC8B75EB4A6C1439BA859C229E2A3F42FC1",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-032",
+      "templateId": "peer-032-2",
+      "file": "audio/guide-high-class.wav",
+      "sha256": "A3BB751955FBAD35949F613FF1E87AC8B75EB4A6C1439BA859C229E2A3F42FC1",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-033",
+      "templateId": "peer-033-2",
+      "file": "audio/guide-high-class.wav",
+      "sha256": "A3BB751955FBAD35949F613FF1E87AC8B75EB4A6C1439BA859C229E2A3F42FC1",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-034",
+      "templateId": "peer-034-2",
+      "file": "audio/guide-high-class.wav",
+      "sha256": "A3BB751955FBAD35949F613FF1E87AC8B75EB4A6C1439BA859C229E2A3F42FC1",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-039",
+      "templateId": "peer-039-2",
+      "file": "audio/guide-high-class.wav",
+      "sha256": "A3BB751955FBAD35949F613FF1E87AC8B75EB4A6C1439BA859C229E2A3F42FC1",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-004",
+      "templateId": "peer-004-3",
+      "file": "audio/raid-high-class.wav",
+      "sha256": "66FB3C188250C6C8DD2DF7F7F5ACA9259385BDE6D8014F4D374C9128DEA7A186",
+      "recordingId": "raid-20260924-210714"
+    },
+    {
+      "groupId": "peer-013",
+      "templateId": "peer-013-3",
+      "file": "audio/raid-high-class.wav",
+      "sha256": "66FB3C188250C6C8DD2DF7F7F5ACA9259385BDE6D8014F4D374C9128DEA7A186",
+      "recordingId": "raid-20260924-210714"
+    },
+    {
+      "groupId": "peer-014",
+      "templateId": "peer-014-3",
+      "file": "audio/raid-high-class.wav",
+      "sha256": "66FB3C188250C6C8DD2DF7F7F5ACA9259385BDE6D8014F4D374C9128DEA7A186",
+      "recordingId": "raid-20260924-210714"
+    },
+    {
+      "groupId": "peer-015",
+      "templateId": "peer-015-3",
+      "file": "audio/raid-high-class.wav",
+      "sha256": "66FB3C188250C6C8DD2DF7F7F5ACA9259385BDE6D8014F4D374C9128DEA7A186",
+      "recordingId": "raid-20260924-210714"
+    },
+    {
+      "groupId": "peer-017",
+      "templateId": "peer-017-3",
+      "file": "audio/raid-high-class.wav",
+      "sha256": "66FB3C188250C6C8DD2DF7F7F5ACA9259385BDE6D8014F4D374C9128DEA7A186",
+      "recordingId": "raid-20260924-210714"
+    },
+    {
+      "groupId": "peer-019",
+      "templateId": "peer-019-3",
+      "file": "audio/raid-high-class.wav",
+      "sha256": "66FB3C188250C6C8DD2DF7F7F5ACA9259385BDE6D8014F4D374C9128DEA7A186",
+      "recordingId": "raid-20260924-210714"
+    },
+    {
+      "groupId": "peer-031",
+      "templateId": "peer-031-3",
+      "file": "audio/raid-high-class.wav",
+      "sha256": "66FB3C188250C6C8DD2DF7F7F5ACA9259385BDE6D8014F4D374C9128DEA7A186",
+      "recordingId": "raid-20260924-210714"
+    },
+    {
+      "groupId": "peer-032",
+      "templateId": "peer-032-3",
+      "file": "audio/raid-high-class.wav",
+      "sha256": "66FB3C188250C6C8DD2DF7F7F5ACA9259385BDE6D8014F4D374C9128DEA7A186",
+      "recordingId": "raid-20260924-210714"
+    },
+    {
+      "groupId": "peer-033",
+      "templateId": "peer-033-3",
+      "file": "audio/raid-high-class.wav",
+      "sha256": "66FB3C188250C6C8DD2DF7F7F5ACA9259385BDE6D8014F4D374C9128DEA7A186",
+      "recordingId": "raid-20260924-210714"
+    },
+    {
+      "groupId": "peer-034",
+      "templateId": "peer-034-3",
+      "file": "audio/raid-high-class.wav",
+      "sha256": "66FB3C188250C6C8DD2DF7F7F5ACA9259385BDE6D8014F4D374C9128DEA7A186",
+      "recordingId": "raid-20260924-210714"
+    },
+    {
+      "groupId": "peer-039",
+      "templateId": "peer-039-3",
+      "file": "audio/raid-high-class.wav",
+      "sha256": "66FB3C188250C6C8DD2DF7F7F5ACA9259385BDE6D8014F4D374C9128DEA7A186",
+      "recordingId": "raid-20260924-210714"
+    },
+    {
+      "groupId": "peer-026",
+      "templateId": "peer-026-2",
+      "file": "audio/guide-vase-class.wav",
+      "sha256": "9AE3EC6DF55AF917E69665B50D7EA7D6DE2A271846A2F904160F5B445E435676",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-005",
+      "templateId": "peer-005-2",
+      "file": "audio/guide-vase-class.wav",
+      "sha256": "9AE3EC6DF55AF917E69665B50D7EA7D6DE2A271846A2F904160F5B445E435676",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-029",
+      "templateId": "peer-029-2",
+      "file": "audio/guide-jewel-class.wav",
+      "sha256": "F549E0C83C1B385B05BB19F1125050D1FA6BBDF4A3203B98BB72D114A1E449D5",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-036",
+      "templateId": "peer-036-2",
+      "file": "audio/guide-jewel-class.wav",
+      "sha256": "F549E0C83C1B385B05BB19F1125050D1FA6BBDF4A3203B98BB72D114A1E449D5",
+      "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-045",
+      "templateId": "peer-045-2",
+      "file": "audio/guide-jewel-class.wav",
+      "sha256": "F549E0C83C1B385B05BB19F1125050D1FA6BBDF4A3203B98BB72D114A1E449D5",
+      "recordingId": "guide-video-20260925"
     }
   ]
 }

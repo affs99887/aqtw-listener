@@ -166,8 +166,10 @@ internal sealed partial class MainWindow : Window
     {
         var pickup = library.Groups.Where(g => g.Action == "pickup" && g.Templates.Count > 0).ToArray();
         var covered = pickup.SelectMany(g => g.ItemIds).Distinct().Count();
-        var references = pickup.Sum(g => g.Templates.Count);
-        var putdowns = library.Groups.Where(g => g.Action == "putdown").Sum(g => g.Templates.Count);
+        // Distinct recordings: a class shares one file across its groups, and a class the
+        // game plays in several variants carries one file per variant.
+        var references = pickup.SelectMany(g => g.Templates.Select(t => t.AudioSha256)).Distinct().Count();
+        var putdowns = library.Groups.Where(g => g.Action == "putdown").SelectMany(g => g.Templates.Select(t => t.AudioSha256)).Distinct().Count();
         var engine = library.PrimaryEngine == RecognizerFactory.Engine ? "局内匹配器" : library.PrimaryEngine;
         libraryInfo.Text = $"{covered} 件物品已接入 / {library.Items.Count} 件目录 · {references} 条拿起参考" +
             (putdowns > 0 ? $" · {putdowns} 条放下声" : "") + $"\n{engine} · {library.Version}";

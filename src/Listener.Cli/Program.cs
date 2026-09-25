@@ -2,9 +2,12 @@ using Listener.Core;
 
 try
 {
-    if (args.Length < 2) throw new ArgumentException("用法：build 清单.json 输出库.json | match 库.json 音频.wav | scan 库.json 音频.wav 报告.json | evaluate 库.json 测试清单.json 报告.json | calibrate 库.json 校准清单.json 输出库.json | coverage 库.json");
+    if (args.Length < 2) throw new ArgumentException("用法：build 清单.json 输出库.json | match 库.json 音频.wav | scan 库.json 音频.wav 报告.json | evaluate 库.json 测试清单.json 报告.json | calibrate 库.json 校准清单.json 输出库.json | coverage 库.json | add-reference 库目录 音频.wav 录制编号 来源说明 组ID[,组ID...]");
     switch (args[0])
     {
+        case "add-reference" when args.Length == 6:
+            var added = LibraryReferences.Add(args[1], args[2], args[3], args[4], args[5].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+            Console.WriteLine($"已加入 {added.File}（{added.Sha256[..12]}）→ {string.Join(", ", added.TemplateIds)}"); break;
         case "build" when args.Length == 3:
             var built = LibraryBuilder.Build(args[1]); JsonFile.Write(args[2], built);
             Console.WriteLine($"已构建 {built.Groups.Count} 组 / {built.Items.Count} 件物品 / {built.Groups.Sum(g => g.Templates.Count)} 个样本"); break;

@@ -1,5 +1,5 @@
 {
-  "version": "0.4.3-putdown-relabel-20260924",
+  "version": "0.4.5-variants-20260925",
   "source": "User-provided peer v0.67 packaged material library",
   "sourceExecutableSha256": "f421fc13e12dcb495ef143895e1398b9c44ac4c73ba3d94b74f3f17fb7cfec35",
   "sourceReferencesSha256": "d18ec01dd063745d5a7bed148ff438c9014bfbf079b9aad7a8ac812c4601fe3f",
@@ -7,7 +7,7 @@
   "licenseStatus": "No verifiable source repository or license supplied for these peer materials; original rights retained.",
   "conversion": "stored float32 * 32767, truncate to signed PCM16; 48 kHz mono, 0.45 seconds; no additional processing",
   "indexSha256": null,
-  "recognition": "v0.4.0: in-process in-match matcher (onset-anchored, pre-onset background subtraction, mel bands 16-55); group thresholds .82 with five short/noise-like references at .90, automatic single-event minimum .86; no putdown auxiliary matching. The Go SoundRadar index is no longer bundled. v0.4.3: peer-047 and peer-051 relinked from the 红外线理疗灯 / 天线 pickups to the 琥珀天心-class (13 items) and 定位组 (9 items) putdown/transfer sounds; 红外线理疗灯 and 天线 added to the matching pickup groups.",
+  "recognition": "v0.4.0: in-process in-match matcher (onset-anchored, pre-onset background subtraction, mel bands 16-55); group thresholds .82 with five short/noise-like references at .90, automatic single-event minimum .86; no putdown auxiliary matching. The Go SoundRadar index is no longer bundled. v0.4.3: peer-047 and peer-051 relinked from the 红外线理疗灯 / 天线 pickups to the 琥珀天心-class (13 items) and 定位组 (9 items) putdown/transfer sounds; 红外线理疗灯 and 天线 added to the matching pickup groups. v0.4.5: query anchors = scanner onset plus every sharp high-band rise within 224 ms (an interface click may open the event 0.10-0.16 s before the item sound); tail 0.45 s; multi-variant templates per class (see additionalReferences).",
   "entries": [
     {
       "sourceReferenceId": "peer-000",
@@ -1218,5 +1218,94 @@
       "thumbnailEdit": "in-game label removed by inpainting (scripts/clean-thumbnails.py)"
     }
   ],
-  "referencesJsonSha256": "56C9566471523B7BF3E47B1799E1D53CB2E6B97DEFC26C128BDC33C55BCE8B8F"
+  "referencesJsonSha256": "D4EDCBED5F19FD58DE5292814C53CAC8626607231D419D65CCE755A4CBD1D736",
+  "additionalReferences": {
+    "note": "游戏对同一类声音随机使用几段不同录音；每类需要它实际使用的每个变体各一条参考。以下参考由 CLI add-reference 加入，一段文件可挂多个同音组。",
+    "sources": {
+      "guide-video-20260925": {
+        "description": "用户提供的 B 站听声教学视频（tests/9d769840a1f45598d0a5ab3cb125a96e.mp4），视频作者说明仅含拾取音效、无杂音；仅截取游戏音效本身，权利归游戏及原作者，与其余素材同样保留",
+        "sha256": "c0597f4b99cdf920a17f2db52aea20742aa83c0719af9964d6b3f793fc0986be"
+      },
+      "raid-20260924-210714": {
+        "description": "用户本人 2026-09-24 21:07 的对局录像，拿起时刻由行商界面被拿起物品的红色高亮确认"
+      }
+    },
+    "references": [
+      {
+        "file": "audio/guide-high-class.wav",
+        "class": "高概率类（文明之声、黎明、孔雀羽扇、真实矩阵、机械手臂、法厄同之钟、航天实验室、航天导航仪、脑电装置、鎏金羽宫八音盒、黄金面具仿件）",
+        "recordingId": "guide-video-20260925",
+        "sourceOffsetSeconds": 23.69,
+        "note": "视频中该类第 1 次播放；与库内原参考相似度 0.737（另一变体），与视频其余 5 次播放 0.92–0.96",
+        "sha256": "a3bb751955fbad35949f613ff1e87ac8b75eb4a6c1439ba859c229e2a3f42fc1",
+        "durationSeconds": 0.45,
+        "groupIds": [
+          "peer-004",
+          "peer-013",
+          "peer-014",
+          "peer-015",
+          "peer-017",
+          "peer-019",
+          "peer-031",
+          "peer-032",
+          "peer-033",
+          "peer-034",
+          "peer-039"
+        ],
+        "processing": "从源音频解码为 48 kHz 单声道，自物品声起振帧起切 0.45 s，峰值归一化到 -1 dBFS；不滤波、不门限"
+      },
+      {
+        "file": "audio/raid-high-class.wav",
+        "class": "高概率类",
+        "recordingId": "raid-20260924-210714",
+        "sourceOffsetSeconds": 1532.83,
+        "note": "用户 2026-09-24 21:07 对局录像，行商界面红框确认的拿起；7 次对局播放的中位样本，对其余 6 次 0.90–0.97",
+        "sha256": "66fb3c188250c6c8dd2df7f7f5aca9259385bde6d8014f4d374c9128dea7a186",
+        "durationSeconds": 0.45,
+        "groupIds": [
+          "peer-004",
+          "peer-013",
+          "peer-014",
+          "peer-015",
+          "peer-017",
+          "peer-019",
+          "peer-031",
+          "peer-032",
+          "peer-033",
+          "peer-034",
+          "peer-039"
+        ],
+        "processing": "从源音频解码为 48 kHz 单声道，自物品声起振帧起切 0.45 s，峰值归一化到 -1 dBFS；不滤波、不门限"
+      },
+      {
+        "file": "audio/guide-vase-class.wav",
+        "class": "花瓶类（花瓶、变异体样本）",
+        "recordingId": "guide-video-20260925",
+        "sourceOffsetSeconds": 9.01,
+        "note": "与库内原参考 0.885，与视频其余 2 次播放 0.97–0.98",
+        "sha256": "9ae3ec6df55af917e69665b50d7ea7d6de2a271846a2f904160f5b445e435676",
+        "durationSeconds": 0.45,
+        "groupIds": [
+          "peer-005",
+          "peer-026"
+        ],
+        "processing": "从源音频解码为 48 kHz 单声道，自物品声起振帧起切 0.45 s，峰值归一化到 -1 dBFS；不滤波、不门限"
+      },
+      {
+        "file": "audio/guide-jewel-class.wav",
+        "class": "宝石类（宝石项链、卡莫纳之星、钻戒）",
+        "recordingId": "guide-video-20260925",
+        "sourceOffsetSeconds": 14.11,
+        "note": "与库内原参考 0.911，与视频其余 2 次播放 0.92–0.94",
+        "sha256": "f549e0c83c1b385b05bb19f1125050d1fa6bbdf4a3203b98bb72d114a1e449d5",
+        "durationSeconds": 0.45,
+        "groupIds": [
+          "peer-029",
+          "peer-036",
+          "peer-045"
+        ],
+        "processing": "从源音频解码为 48 kHz 单声道，自物品声起振帧起切 0.45 s，峰值归一化到 -1 dBFS；不滤波、不门限"
+      }
+    ]
+  }
 }

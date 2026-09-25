@@ -1,6 +1,17 @@
-# 当前接续状态 · 2026-09-24
+# 当前接续状态 · 2026-09-25
 
-当前版本为 **v0.4.4（放下声不识别、拿起识别率）**，发布为 GitHub Release。用户在仓库用 v0.4.4 之前的便携版实测：放下胶囊电视、琥珀天心几乎每次触发一次识别；拿起这两件偶尔没有反应。9 月 24 日晚四场录像（`.tools/research/putdown-skip`，gitignored）里 33 分钟一局含两次行商访问，`trader_gt.py` 用行商界面中被拿起物品的红色高亮得到 45 次真实拖动的拿起/放下时刻（`docs/measurements/trader-drags-20260924-v0.4.4.json`）：
+当前版本为 **v0.4.5（多锚点对齐与多变体参考）**，发布为 GitHub Release。用户提供一段 B 站听声教学视频（`tests/9d769840a1f45598d0a5ab3cb125a96e.mp4`，未入库，gitignored；仅含拾取音效、无杂音、9 类 42 次播放）并反馈"仓库里也识别不到"。研究脚本在 `.tools/research/pickup10`（gitignored）：`features.py` 是 C# 特征的 Python 移植，`bench.py`/`sweep.py` 用 `dataset.json`（视频 42 + 9 月 24 日行商 45 + 9 月 22 日行商 10 个正样本，行商空闲 158 个负样本）跑特征对照。
+
+- 根因一：界面点击先于物品声 0.10–0.16 s，扫描器以点击为起点，`InMatchFeatures.SlideAfter`（24 帧 = 128 ms，减去 Lead 后有效 117 ms）够不到物品声。改动：`InMatchFeatures.QueryAnchors` 返回起点加起点后 `AnchorSpanFrames`（42 帧）内每个 ≥6 dB 的高频突起（`RiseDb`，取 1 帧或 2 帧差），`ScoreAudio` 对每个锚点各自 `Subtracted` 并滑动（起点 −6..+24，突起锚点 −4..+8），取最高；`AutomaticAudioScanner.TailSeconds` 与 `Focus(after)` 0.36 → 0.45。视频 42 次播放 29 → 42。
+- 根因二：游戏对同一类声音随机使用几段录音（同一物品两次拿起相似度 0.72–0.75；音高/时长实验排除）。新增 `LibraryReferences.Add` 与 CLI `add-reference 库目录 音频.wav 录制编号 来源说明 组ID[,…]`（写 `library.json` 模板+特征、`references.json` 样本、重算 `engineIndexSha256`，一个文件可挂多个组）。入库 4 条：`audio/guide-high-class.wav`（视频 23.69 s，高概率类 11 组）、`audio/raid-high-class.wav`（9 月 24 日对局 1532.83 s，7 次对局播放的中位样本，同 11 组）、`audio/guide-vase-class.wav`（花瓶、变异体样本）、`audio/guide-jewel-class.wav`（宝石项链、卡莫纳之星、钻戒——库内三者参考相似度 0.998）。切参考时必须从物品声起振帧开始（与随包参考同一约定），若把前面的点击切进去会得到"点击模板"，能匹配一切带点击的拾取。provenance `additionalReferences` 记录来源与偏移。库版本 `0.4.5-variants-20260925`。
+- 未采用（实验无收益）：3/5 帧时间平滑、频带平滑、2–3 倍时间降采样、信噪比加权余弦；燃料桶与镜头类的对局播放不聚簇，未收对局参考。
+- 控制器：已接受拿起后 `RecognitionHistory.FollowUpMaxSeconds` 内的未匹配结果不进入 `pendingFailure`（两段式物品声的第二段）。主窗口参考数按模板 `AudioSha256` 去重。
+- 验证：视频 42/42、播放之外 0 误匹配；9 月 24 日行商 45 次拖动 39 → 40，行商空闲 154 事件误报 0，整局匹配 75 → 82（新增为背包操作，画面确认）；核心 44/44、应用 54/54、`--ui-smoke` 通过。剩余未识别：库外或被盖住的低分（0.57–0.59）、燃料桶 0.743、干花书签 0.788（自身 0.90 门限）、0.17 s 极短拖动 0.796。
+- 已知弱点：特征对 1 帧错位敏感（最佳 0.885 → 偏 1 帧 0.49），靶向补变体比改特征有效；其余类仍只有一条参考，遇到新变体需继续用 `add-reference` 补。
+
+以下为 v0.4.4 时的状态记录。
+
+v0.4.4（放下声不识别、拿起识别率）发布为 GitHub Release。用户在仓库用 v0.4.4 之前的便携版实测：放下胶囊电视、琥珀天心几乎每次触发一次识别；拿起这两件偶尔没有反应。9 月 24 日晚四场录像（`.tools/research/putdown-skip`，gitignored）里 33 分钟一局含两次行商访问，`trader_gt.py` 用行商界面中被拿起物品的红色高亮得到 45 次真实拖动的拿起/放下时刻（`docs/measurements/trader-drags-20260924-v0.4.4.json`）：
 
 - 放下声：`peer-047`、`peer-051` 改为 `action: "putdown"`（库版本 `0.4.4-putdown-veto-20260924`），`InMatchRecognizer` 为放下声组也建模板，`Putdown()` 在放下声组过自身门限且高于所有拿起组时返回该组，`RecognitionAnalysis.Putdown` 非空即为放下声，`CandidateSelection` 仍只取拿起组。`ListeningController.PollAutomaticRecognition` 三层跳过：`MouseEdgeLog.Latest` 归到松开边沿的声音不分析（起点加 `AudioCaptureHealth.TimelineLagSeconds` 对齐到达时钟）；`PickupAnalysis.IsPutdown` 的结果不发布；无鼠标信号时 `RecognitionHistory.WouldHold`（拿起后 0.15–1.0 s 的不同候选）的结果不发布。同一次按下（`publishedPress`）内的第二段声音也走 `WouldHold`。三种都只计入 `SkippedPutdowns` 与 `RecentSounds`。录像中 13 次放下声组事件全部判为放下；行商 45 次放下 0 次产生匹配（行商界面放下几乎无声）。
 - 拿起：`AutomaticAudioScanner.RefractorySeconds` 0.25 → 0.12（行商界面音先于物品声 0.12–0.19 s）；`PickupRecognition` 新增 `ConfidentScore` 0.80 + `ConfidentSeparation` 0.20（`RecognitionAnalysis.Separation` = 候选最高分 − 未入候选的最高拿起组分）；失败结果经 `pendingFailure` 延迟 `FailureDelaySeconds` 0.4 s 显示，期间匹配则取消，显示时附「最接近 X 差异率 Y%」。行商拖动识别 36/45 → 39/45，整局匹配 71 → 75 且无移除。剩余未识别：3 次被更响声音盖住或最高分仅 0.43–0.60，3 次接近门限（0.74、0.79、0.80）。

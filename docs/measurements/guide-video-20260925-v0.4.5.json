@@ -1,0 +1,864 @@
+{
+ "note": "B 站听声教学视频（用户提供，仅含拾取音效、无杂音）：9 类声音、42 次播放，命令行扫描（scan）逐事件结果。v0.4.4 与 v0.4.5 使用同一音频。",
+ "video": {
+  "path": "tests/9d769840a1f45598d0a5ab3cb125a96e.mp4",
+  "sha256": "c0597f4b99cdf920a17f2db52aea20742aa83c0719af9964d6b3f793fc0986be",
+  "durationSeconds": 64.57
+ },
+ "summary": {
+  "plays": 42,
+  "matched_v0.4.4": 29,
+  "matched_v0.4.5": 42,
+  "byClass": {
+   "花瓶类": {
+    "plays": 3,
+    "matched_v0.4.4": 3,
+    "matched_v0.4.5": 3,
+    "scores_v0.4.4": [
+     0.889,
+     0.885,
+     0.907
+    ],
+    "scores_v0.4.5": [
+     0.965,
+     1.0,
+     0.978
+    ]
+   },
+   "宝石类": {
+    "plays": 3,
+    "matched_v0.4.4": 0,
+    "matched_v0.4.5": 3,
+    "scores_v0.4.4": [
+     0.489,
+     0.499,
+     0.421
+    ],
+    "scores_v0.4.5": [
+     0.92,
+     0.939,
+     1.0
+    ]
+   },
+   "古董茶壶": {
+    "plays": 3,
+    "matched_v0.4.4": 3,
+    "matched_v0.4.5": 3,
+    "scores_v0.4.4": [
+     0.977,
+     0.988,
+     0.946
+    ],
+    "scores_v0.4.5": [
+     0.977,
+     0.988,
+     0.946
+    ]
+   },
+   "金狮/金豹": {
+    "plays": 3,
+    "matched_v0.4.4": 2,
+    "matched_v0.4.5": 3,
+    "scores_v0.4.4": [
+     0.755,
+     0.989,
+     0.995
+    ],
+    "scores_v0.4.5": [
+     0.956,
+     0.989,
+     0.995
+    ]
+   },
+   "高概率类": {
+    "plays": 6,
+    "matched_v0.4.4": 0,
+    "matched_v0.4.5": 6,
+    "scores_v0.4.4": [
+     0.74,
+     0.789,
+     0.727,
+     0.736,
+     0.818,
+     0.804
+    ],
+    "scores_v0.4.5": [
+     1.0,
+     0.93,
+     0.959,
+     0.955,
+     0.932,
+     0.934
+    ]
+   },
+   "中概率类（琥珀天心类）": {
+    "plays": 6,
+    "matched_v0.4.4": 3,
+    "matched_v0.4.5": 6,
+    "scores_v0.4.4": [
+     0.556,
+     0.975,
+     0.522,
+     0.973,
+     0.433,
+     0.949
+    ],
+    "scores_v0.4.5": [
+     0.903,
+     0.975,
+     0.921,
+     0.973,
+     0.952,
+     0.949
+    ]
+   },
+   "奖杯类": {
+    "plays": 6,
+    "matched_v0.4.4": 6,
+    "matched_v0.4.5": 6,
+    "scores_v0.4.4": [
+     0.97,
+     0.971,
+     0.946,
+     0.969,
+     0.972,
+     0.947
+    ],
+    "scores_v0.4.5": [
+     0.97,
+     0.971,
+     0.946,
+     0.969,
+     0.972,
+     0.947
+    ]
+   },
+   "定位组": {
+    "plays": 6,
+    "matched_v0.4.4": 6,
+    "matched_v0.4.5": 6,
+    "scores_v0.4.4": [
+     0.906,
+     0.968,
+     0.961,
+     0.972,
+     0.913,
+     0.936
+    ],
+    "scores_v0.4.5": [
+     0.906,
+     0.968,
+     0.961,
+     0.972,
+     0.913,
+     0.936
+    ]
+   },
+   "电池组": {
+    "plays": 6,
+    "matched_v0.4.4": 6,
+    "matched_v0.4.5": 6,
+    "scores_v0.4.4": [
+     0.945,
+     0.99,
+     0.99,
+     0.973,
+     0.96,
+     0.967
+    ],
+    "scores_v0.4.5": [
+     0.945,
+     0.99,
+     0.99,
+     0.973,
+     0.96,
+     0.967
+    ]
+   }
+  },
+  "falseMatchesOutsidePlays_v0.4.5": 0
+ },
+ "plays_v0.4.5": [
+  {
+   "onset": 7.95,
+   "class": "花瓶类",
+   "expectedGroups": [
+    "peer-005",
+    "peer-026"
+   ],
+   "matched": true,
+   "topGroup": "peer-005",
+   "topLabel": "变异体样本",
+   "topScore": 0.965
+  },
+  {
+   "onset": 9.01,
+   "class": "花瓶类",
+   "expectedGroups": [
+    "peer-005",
+    "peer-026"
+   ],
+   "matched": true,
+   "topGroup": "peer-005",
+   "topLabel": "变异体样本",
+   "topScore": 1.0
+  },
+  {
+   "onset": 10.11,
+   "class": "花瓶类",
+   "expectedGroups": [
+    "peer-005",
+    "peer-026"
+   ],
+   "matched": true,
+   "topGroup": "peer-005",
+   "topLabel": "变异体样本",
+   "topScore": 0.978
+  },
+  {
+   "onset": 11.59,
+   "class": "宝石类",
+   "expectedGroups": [
+    "peer-029",
+    "peer-036"
+   ],
+   "matched": true,
+   "topGroup": "peer-029",
+   "topLabel": "宝石项链",
+   "topScore": 0.92
+  },
+  {
+   "onset": 12.83,
+   "class": "宝石类",
+   "expectedGroups": [
+    "peer-029",
+    "peer-036"
+   ],
+   "matched": true,
+   "topGroup": "peer-029",
+   "topLabel": "宝石项链",
+   "topScore": 0.939
+  },
+  {
+   "onset": 14.11,
+   "class": "宝石类",
+   "expectedGroups": [
+    "peer-029",
+    "peer-036"
+   ],
+   "matched": true,
+   "topGroup": "peer-029",
+   "topLabel": "宝石项链",
+   "topScore": 1.0
+  },
+  {
+   "onset": 15.79,
+   "class": "古董茶壶",
+   "expectedGroups": [
+    "peer-028"
+   ],
+   "matched": true,
+   "topGroup": "peer-028",
+   "topLabel": "古董茶壶",
+   "topScore": 0.977
+  },
+  {
+   "onset": 16.89,
+   "class": "古董茶壶",
+   "expectedGroups": [
+    "peer-028"
+   ],
+   "matched": true,
+   "topGroup": "peer-028",
+   "topLabel": "古董茶壶",
+   "topScore": 0.988
+  },
+  {
+   "onset": 17.93,
+   "class": "古董茶壶",
+   "expectedGroups": [
+    "peer-028"
+   ],
+   "matched": true,
+   "topGroup": "peer-028",
+   "topLabel": "古董茶壶",
+   "topScore": 0.946
+  },
+  {
+   "onset": 19.39,
+   "class": "金狮/金豹",
+   "expectedGroups": [
+    "peer-009",
+    "peer-010"
+   ],
+   "matched": true,
+   "topGroup": "peer-010",
+   "topLabel": "金狮雕像",
+   "topScore": 0.956
+  },
+  {
+   "onset": 20.49,
+   "class": "金狮/金豹",
+   "expectedGroups": [
+    "peer-009",
+    "peer-010"
+   ],
+   "matched": true,
+   "topGroup": "peer-009",
+   "topLabel": "金豹雕像",
+   "topScore": 0.989
+  },
+  {
+   "onset": 21.71,
+   "class": "金狮/金豹",
+   "expectedGroups": [
+    "peer-009",
+    "peer-010"
+   ],
+   "matched": true,
+   "topGroup": "peer-009",
+   "topLabel": "金豹雕像",
+   "topScore": 0.995
+  },
+  {
+   "onset": 23.65,
+   "class": "高概率类",
+   "expectedGroups": [
+    "peer-004",
+    "peer-013",
+    "peer-014",
+    "peer-015",
+    "peer-017",
+    "peer-019",
+    "peer-031",
+    "peer-032",
+    "peer-033",
+    "peer-034",
+    "peer-039"
+   ],
+   "matched": true,
+   "topGroup": "peer-004",
+   "topLabel": "航天实验室",
+   "topScore": 1.0
+  },
+  {
+   "onset": 24.71,
+   "class": "高概率类",
+   "expectedGroups": [
+    "peer-004",
+    "peer-013",
+    "peer-014",
+    "peer-015",
+    "peer-017",
+    "peer-019",
+    "peer-031",
+    "peer-032",
+    "peer-033",
+    "peer-034",
+    "peer-039"
+   ],
+   "matched": true,
+   "topGroup": "peer-004",
+   "topLabel": "航天实验室",
+   "topScore": 0.93
+  },
+  {
+   "onset": 25.67,
+   "class": "高概率类",
+   "expectedGroups": [
+    "peer-004",
+    "peer-013",
+    "peer-014",
+    "peer-015",
+    "peer-017",
+    "peer-019",
+    "peer-031",
+    "peer-032",
+    "peer-033",
+    "peer-034",
+    "peer-039"
+   ],
+   "matched": true,
+   "topGroup": "peer-004",
+   "topLabel": "航天实验室",
+   "topScore": 0.959
+  },
+  {
+   "onset": 26.65,
+   "class": "高概率类",
+   "expectedGroups": [
+    "peer-004",
+    "peer-013",
+    "peer-014",
+    "peer-015",
+    "peer-017",
+    "peer-019",
+    "peer-031",
+    "peer-032",
+    "peer-033",
+    "peer-034",
+    "peer-039"
+   ],
+   "matched": true,
+   "topGroup": "peer-004",
+   "topLabel": "航天实验室",
+   "topScore": 0.955
+  },
+  {
+   "onset": 27.71,
+   "class": "高概率类",
+   "expectedGroups": [
+    "peer-004",
+    "peer-013",
+    "peer-014",
+    "peer-015",
+    "peer-017",
+    "peer-019",
+    "peer-031",
+    "peer-032",
+    "peer-033",
+    "peer-034",
+    "peer-039"
+   ],
+   "matched": true,
+   "topGroup": "peer-004",
+   "topLabel": "航天实验室",
+   "topScore": 0.932
+  },
+  {
+   "onset": 28.67,
+   "class": "高概率类",
+   "expectedGroups": [
+    "peer-004",
+    "peer-013",
+    "peer-014",
+    "peer-015",
+    "peer-017",
+    "peer-019",
+    "peer-031",
+    "peer-032",
+    "peer-033",
+    "peer-034",
+    "peer-039"
+   ],
+   "matched": true,
+   "topGroup": "peer-004",
+   "topLabel": "航天实验室",
+   "topScore": 0.934
+  },
+  {
+   "onset": 30.33,
+   "class": "中概率类（琥珀天心类）",
+   "expectedGroups": [
+    "peer-012",
+    "peer-016",
+    "peer-020",
+    "peer-021",
+    "peer-023",
+    "peer-024",
+    "peer-035",
+    "peer-037",
+    "peer-040",
+    "peer-050",
+    "peer-053",
+    "peer-055"
+   ],
+   "matched": true,
+   "topGroup": "peer-055",
+   "topLabel": "马刺",
+   "topScore": 0.903
+  },
+  {
+   "onset": 31.35,
+   "class": "中概率类（琥珀天心类）",
+   "expectedGroups": [
+    "peer-012",
+    "peer-016",
+    "peer-020",
+    "peer-021",
+    "peer-023",
+    "peer-024",
+    "peer-035",
+    "peer-037",
+    "peer-040",
+    "peer-050",
+    "peer-053",
+    "peer-055"
+   ],
+   "matched": true,
+   "topGroup": "peer-050",
+   "topLabel": "金块",
+   "topScore": 0.975
+  },
+  {
+   "onset": 32.31,
+   "class": "中概率类（琥珀天心类）",
+   "expectedGroups": [
+    "peer-012",
+    "peer-016",
+    "peer-020",
+    "peer-021",
+    "peer-023",
+    "peer-024",
+    "peer-035",
+    "peer-037",
+    "peer-040",
+    "peer-050",
+    "peer-053",
+    "peer-055"
+   ],
+   "matched": true,
+   "topGroup": "peer-021",
+   "topLabel": "阵列镜片",
+   "topScore": 0.921
+  },
+  {
+   "onset": 33.37,
+   "class": "中概率类（琥珀天心类）",
+   "expectedGroups": [
+    "peer-012",
+    "peer-016",
+    "peer-020",
+    "peer-021",
+    "peer-023",
+    "peer-024",
+    "peer-035",
+    "peer-037",
+    "peer-040",
+    "peer-050",
+    "peer-053",
+    "peer-055"
+   ],
+   "matched": true,
+   "topGroup": "peer-021",
+   "topLabel": "阵列镜片",
+   "topScore": 0.973
+  },
+  {
+   "onset": 34.37,
+   "class": "中概率类（琥珀天心类）",
+   "expectedGroups": [
+    "peer-012",
+    "peer-016",
+    "peer-020",
+    "peer-021",
+    "peer-023",
+    "peer-024",
+    "peer-035",
+    "peer-037",
+    "peer-040",
+    "peer-050",
+    "peer-053",
+    "peer-055"
+   ],
+   "matched": true,
+   "topGroup": "peer-037",
+   "topLabel": "里拉琴",
+   "topScore": 0.952
+  },
+  {
+   "onset": 35.35,
+   "class": "中概率类（琥珀天心类）",
+   "expectedGroups": [
+    "peer-012",
+    "peer-016",
+    "peer-020",
+    "peer-021",
+    "peer-023",
+    "peer-024",
+    "peer-035",
+    "peer-037",
+    "peer-040",
+    "peer-050",
+    "peer-053",
+    "peer-055"
+   ],
+   "matched": true,
+   "topGroup": "peer-053",
+   "topLabel": "钢筋剪",
+   "topScore": 0.949
+  },
+  {
+   "onset": 37.07,
+   "class": "奖杯类",
+   "expectedGroups": [
+    "peer-001",
+    "peer-002",
+    "peer-006",
+    "peer-007",
+    "peer-008"
+   ],
+   "matched": true,
+   "topGroup": "peer-020",
+   "topLabel": "决胜奖杯",
+   "topScore": 0.97
+  },
+  {
+   "onset": 38.15,
+   "class": "奖杯类",
+   "expectedGroups": [
+    "peer-001",
+    "peer-002",
+    "peer-006",
+    "peer-007",
+    "peer-008"
+   ],
+   "matched": true,
+   "topGroup": "peer-011",
+   "topLabel": "盛宴雕像",
+   "topScore": 0.971
+  },
+  {
+   "onset": 39.29,
+   "class": "奖杯类",
+   "expectedGroups": [
+    "peer-001",
+    "peer-002",
+    "peer-006",
+    "peer-007",
+    "peer-008"
+   ],
+   "matched": true,
+   "topGroup": "peer-020",
+   "topLabel": "决胜奖杯",
+   "topScore": 0.946
+  },
+  {
+   "onset": 40.67,
+   "class": "奖杯类",
+   "expectedGroups": [
+    "peer-001",
+    "peer-002",
+    "peer-006",
+    "peer-007",
+    "peer-008"
+   ],
+   "matched": true,
+   "topGroup": "peer-008",
+   "topLabel": "金杯",
+   "topScore": 0.969
+  },
+  {
+   "onset": 41.75,
+   "class": "奖杯类",
+   "expectedGroups": [
+    "peer-001",
+    "peer-002",
+    "peer-006",
+    "peer-007",
+    "peer-008"
+   ],
+   "matched": true,
+   "topGroup": "peer-011",
+   "topLabel": "盛宴雕像",
+   "topScore": 0.972
+  },
+  {
+   "onset": 42.89,
+   "class": "奖杯类",
+   "expectedGroups": [
+    "peer-001",
+    "peer-002",
+    "peer-006",
+    "peer-007",
+    "peer-008"
+   ],
+   "matched": true,
+   "topGroup": "peer-020",
+   "topLabel": "决胜奖杯",
+   "topScore": 0.947
+  },
+  {
+   "onset": 44.77,
+   "class": "定位组",
+   "expectedGroups": [
+    "peer-000",
+    "peer-006",
+    "peer-022",
+    "peer-030",
+    "peer-044",
+    "peer-046",
+    "peer-057",
+    "peer-060"
+   ],
+   "matched": true,
+   "topGroup": "peer-030",
+   "topLabel": "目标定位模块+1",
+   "topScore": 0.906
+  },
+  {
+   "onset": 45.85,
+   "class": "定位组",
+   "expectedGroups": [
+    "peer-000",
+    "peer-006",
+    "peer-022",
+    "peer-030",
+    "peer-044",
+    "peer-046",
+    "peer-057",
+    "peer-060"
+   ],
+   "matched": true,
+   "topGroup": "peer-057",
+   "topLabel": "炮队镜",
+   "topScore": 0.968
+  },
+  {
+   "onset": 46.95,
+   "class": "定位组",
+   "expectedGroups": [
+    "peer-000",
+    "peer-006",
+    "peer-022",
+    "peer-030",
+    "peer-044",
+    "peer-046",
+    "peer-057",
+    "peer-060"
+   ],
+   "matched": true,
+   "topGroup": "peer-000",
+   "topLabel": "激光指示模块",
+   "topScore": 0.961
+  },
+  {
+   "onset": 48.21,
+   "class": "定位组",
+   "expectedGroups": [
+    "peer-000",
+    "peer-006",
+    "peer-022",
+    "peer-030",
+    "peer-044",
+    "peer-046",
+    "peer-057",
+    "peer-060"
+   ],
+   "matched": true,
+   "topGroup": "peer-006",
+   "topLabel": "体外去颤器",
+   "topScore": 0.972
+  },
+  {
+   "onset": 49.29,
+   "class": "定位组",
+   "expectedGroups": [
+    "peer-000",
+    "peer-006",
+    "peer-022",
+    "peer-030",
+    "peer-044",
+    "peer-046",
+    "peer-057",
+    "peer-060"
+   ],
+   "matched": true,
+   "topGroup": "peer-000",
+   "topLabel": "激光指示模块",
+   "topScore": 0.913
+  },
+  {
+   "onset": 50.37,
+   "class": "定位组",
+   "expectedGroups": [
+    "peer-000",
+    "peer-006",
+    "peer-022",
+    "peer-030",
+    "peer-044",
+    "peer-046",
+    "peer-057",
+    "peer-060"
+   ],
+   "matched": true,
+   "topGroup": "peer-057",
+   "topLabel": "炮队镜",
+   "topScore": 0.936
+  },
+  {
+   "onset": 51.75,
+   "class": "电池组",
+   "expectedGroups": [
+    "peer-001",
+    "peer-002",
+    "peer-018",
+    "peer-042"
+   ],
+   "matched": true,
+   "topGroup": "peer-042",
+   "topLabel": "钛合金板",
+   "topScore": 0.945
+  },
+  {
+   "onset": 53.07,
+   "class": "电池组",
+   "expectedGroups": [
+    "peer-001",
+    "peer-002",
+    "peer-018",
+    "peer-042"
+   ],
+   "matched": true,
+   "topGroup": "peer-018",
+   "topLabel": "理想国试剂盒",
+   "topScore": 0.99
+  },
+  {
+   "onset": 54.37,
+   "class": "电池组",
+   "expectedGroups": [
+    "peer-001",
+    "peer-002",
+    "peer-018",
+    "peer-042"
+   ],
+   "matched": true,
+   "topGroup": "peer-001",
+   "topLabel": "专用电池组",
+   "topScore": 0.99
+  },
+  {
+   "onset": 55.89,
+   "class": "电池组",
+   "expectedGroups": [
+    "peer-001",
+    "peer-002",
+    "peer-018",
+    "peer-042"
+   ],
+   "matched": true,
+   "topGroup": "peer-042",
+   "topLabel": "钛合金板",
+   "topScore": 0.973
+  },
+  {
+   "onset": 57.19,
+   "class": "电池组",
+   "expectedGroups": [
+    "peer-001",
+    "peer-002",
+    "peer-018",
+    "peer-042"
+   ],
+   "matched": true,
+   "topGroup": "peer-001",
+   "topLabel": "专用电池组",
+   "topScore": 0.96
+  },
+  {
+   "onset": 58.51,
+   "class": "电池组",
+   "expectedGroups": [
+    "peer-001",
+    "peer-002",
+    "peer-018",
+    "peer-042"
+   ],
+   "matched": true,
+   "topGroup": "peer-018",
+   "topLabel": "理想国试剂盒",
+   "topScore": 0.967
+  }
+ ]
+}

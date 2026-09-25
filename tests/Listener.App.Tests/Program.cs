@@ -94,7 +94,9 @@ internal static class Program
             {
                 var root = Path.Combine(AppContext.BaseDirectory, "library");
                 var references = ReferenceAudio.Load(root).Samples;
-                Check(references.Count == 62, "reference archive is incomplete");
+                // 62 groups each keep their original reference; classes the game plays in several
+                // variants carry extra templates (guide video, in-match capture).
+                Check(references.Select(s => s.GroupId).Distinct().Count() == 62 && references.Count >= 62, "reference archive is incomplete");
                 foreach (var reference in references)
                 {
                     var clip = WaveAudio.Read(ReferenceAudio.VerifiedPath(root, reference));
@@ -197,21 +199,25 @@ internal static class Program
                 Check(f.Controller.CurrentActivity.Status == RecognitionStatus.Unknown && f.Controller.CurrentActivity.Message.Contains("最接近"),
                     "the lone failure was never shown or lacks the nearest class: " + f.Controller.CurrentActivity.Message);
             }),
-            ("后续未匹配声音保留已发布的拿起候选与录音", () =>
+            ("后续未匹配声音保留已发布的拿起候选与录音，一秒内的尾段不显示失败", () =>
             {
                 using var f = new Fixture(); f.StartSound(); f.Finish();
-                var before = f.Controller.History.Latest!;
+                var before = f.Controller.History.Latest!; var shown = f.Controller.CurrentActivity;
                 f.Recognizer.Status = RecognitionStatus.Unknown;
+                // The second part of a two-part item sound 0.3 s after the pickup: analysed, never shown as a failure.
                 f.Capture.Timeline.Append(Fixture.Sound(), f.Now + .3); f.Tick(f.Now + .95); f.Finish();
+                f.Tick(f.Now + ListeningController.FailureDelaySeconds + .1);
                 var after = f.Controller.History.Latest!;
                 Check(after.SnapshotId == before.SnapshotId &&
                     after.Result.Candidates.SequenceEqual(before.Result.Candidates) && f.Controller.History.Entries.Count == 1,
                     "unmatched follow-up replaced the pickup evidence");
+                Check(f.Controller.CurrentActivity.Status == shown.Status && f.Controller.Audio.Recent.Count == 1 &&
+                    f.Controller.Diagnostics().RecentSounds.Last().Contains("未显示"), "a miss right after the pickup was shown as a failure");
                 f.Controller.ClearCurrentResult();
                 f.Capture.Timeline.Append(Fixture.Sound(), f.Now + .3); f.Tick(f.Now + .95); f.Finish();
                 Check(f.Controller.History.Latest is null, "unmatched sound created a result");
             }),
-            ("拿起窗口经扫描器与匹配器可确认全部 62 条参考", () =>
+            ("拿起窗口经扫描器与匹配器可确认全部参考，含变体", () =>
             {
                 var root = Path.Combine(AppContext.BaseDirectory, "library");
                 var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
@@ -229,12 +235,12 @@ internal static class Program
                     var confirmed = analysis.Result;
                     if (library.Groups.Single(g => g.Id == reference.GroupId).Action == "putdown")
                     {
-                        if (analysis.Putdown?.GroupId != reference.GroupId) failures.Add(reference.GroupId, reference.File + " putdown sound not vetoed");
+                        if (analysis.Putdown?.GroupId != reference.GroupId) failures.Add(reference.TemplateId, reference.File + " putdown sound not vetoed");
                         continue;
                     }
                     if (confirmed.Status != RecognitionStatus.Matched ||
                         !confirmed.Candidates.Any(candidate => candidate.GroupId == reference.GroupId))
-                        failures.Add(reference.GroupId, reference.File + " status=" + confirmed.Status + " candidates=" +
+                        failures.Add(reference.TemplateId, reference.File + " status=" + confirmed.Status + " candidates=" +
                             string.Join(",", confirmed.Candidates.Select(c => c.GroupId)) + " scores=" +
                             string.Join(",", analysis.Scores.Take(3).Select(s => $"{s.GroupId}:{s.Score:F5}")));
                 }
@@ -393,7 +399,8 @@ internal static class Program
                 using var f = new Fixture(); f.StartSound(); f.Finish();
                 Check(!f.Controller.CurrentActivity.Busy, "quick completion kept spinner");
                 f.Recognizer.Release.Reset(); f.Recognizer.Entered.Reset(); f.Recognizer.Status = RecognitionStatus.Unknown;
-                f.Capture.Timeline.Append(Fixture.Sound(), f.Now); f.Tick(f.Now + .65);
+                // More than a second after the pickup, so the miss is not taken for its tail.
+                f.Capture.Timeline.Append(Fixture.Sound(), f.Now + .6); f.Tick(f.Now + 1.25);
                 PumpUntil(() => f.Controller.CurrentActivity.Busy);
                 Check(f.Results.Last()?.CandidateCount == 1, "loading blanked candidates");
                 f.Recognizer.Release.Set(); f.Finish();

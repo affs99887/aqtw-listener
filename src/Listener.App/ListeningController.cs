@@ -387,9 +387,15 @@ internal sealed class ListeningController : IAsyncDisposable
                     automaticStatus = result.Status == RecognitionStatus.Unknown ? "已分析，暂未匹配" : result.Message;
                     if (result.Status == RecognitionStatus.Unknown && nearest.Length > 0) automaticStatus += " · 最接近 " + nearest;
                     lastRecognition = "声音自动识别 · " + automaticStatus;
-                    Note(window.OnsetSeconds, (result.Status == RecognitionStatus.Unknown ? "未匹配" : result.Message) + (nearest.Length > 0 ? $"，最接近 {nearest}" : ""));
-                    pendingFailure = new(analysis with { Result = result with { Message = lastRecognition } }, pickup, phase, clock() + FailureDelaySeconds,
-                        result.Status == RecognitionStatus.Unknown && nearest.Length > 0 ? "最接近 " + nearest : "");
+                    // A miss within a second of an accepted pickup is that sound's second part
+                    // or its putdown (a two-part item sound splits into two events): not a
+                    // failure worth showing over the result.
+                    var tail = History.Latest is { Automatic: true, AudioSeconds: { } shownAt } &&
+                        window.OnsetSeconds - shownAt is > 0 and <= RecognitionHistory.FollowUpMaxSeconds;
+                    Note(window.OnsetSeconds, (result.Status == RecognitionStatus.Unknown ? "未匹配" : result.Message) + (nearest.Length > 0 ? $"，最接近 {nearest}" : "") + (tail ? "，拿起后 1 秒内，未显示" : ""));
+                    if (!tail)
+                        pendingFailure = new(analysis with { Result = result with { Message = lastRecognition } }, pickup, phase, clock() + FailureDelaySeconds,
+                            result.Status == RecognitionStatus.Unknown && nearest.Length > 0 ? "最接近 " + nearest : "");
                     Dismiss();
                 });
             }

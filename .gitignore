@@ -8,6 +8,9 @@ portable/
 local-data/
 __pycache__/
 
+# 第三方教学视频等本地测试素材，仅以哈希记录在 provenance.json
+tests/*.mp4
+
 # 本机 IDE 配置及可重建的识别引擎
 .idea/
 data/engine/

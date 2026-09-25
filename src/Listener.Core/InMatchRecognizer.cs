@@ -21,6 +21,13 @@ public static class InMatchFeatures
     public const string Version = "inmatch-v1";
     public const int SampleRate = 48000, FrameSize = 1024, Hop = 256, MelBands = 64;
     public const int Band0 = 16, Band1 = 56, WindowFrames = 32, Lead = 2, SlideBefore = 6, SlideAfter = 24;
+    // A live query is also anchored on every sharp high-band rise up to AnchorSpanFrames
+    // (~224 ms) after the scanner's onset: at the trader and in a clean guide recording a
+    // faint interface click precedes the item's own sound by 0.10–0.16 s, so the click opens
+    // the event and the item's attack lies past the plain slide. A rise is a precise anchor
+    // and slides only a little; RiseDb is the frame-to-frame jump that counts as an attack.
+    public const int AnchorSpanFrames = 42, RiseSlideBefore = 4, RiseSlideAfter = 8, MinAnchorGap = 4;
+    public const double RiseDb = 6;
     public const int BackgroundFrames = 56, BackgroundGap = 3, MinBackgroundFrames = 8;
     public const double FloorDb = 20, OverSubtract = 1.5, SpectralFloor = .05, OnsetRelativeDb = 25, MinHz = 40, MaxHz = 16000;
     public static int Dim => (Band1 - Band0) * WindowFrames;
@@ -169,6 +176,22 @@ public static class InMatchFeatures
         return patch is not null && patch.Any(v => v != 0) ? patch : null;
     }
 
+    // Anchors for a query whose event the scanner placed at onsetFrame: that frame first,
+    // then each sharp high-band rise shortly after it (the earliest frame of a rise).
+    public static int[] QueryAnchors(double[][] mel, int onsetFrame)
+    {
+        var anchors = new List<int> { onsetFrame };
+        if (mel.Length == 0) return anchors.ToArray();
+        var high = HighBandDb(mel); var peak = high.Max();
+        var last = Math.Min(high.Length - 1, onsetFrame + AnchorSpanFrames);
+        for (var f = Math.Max(2, onsetFrame + MinAnchorGap); f <= last; f++)
+        {
+            var rise = Math.Max(high[f] - high[f - 1], high[f] - high[f - 2]);
+            if (rise >= RiseDb && high[f] > peak - OnsetRelativeDb && anchors.All(a => f - a > MinAnchorGap)) anchors.Add(f);
+        }
+        return anchors.ToArray();
+    }
+
     // Onset candidates for a clip supplied without an onset (CLI match, learning checks, tests):
     // the anchor plus the sharpest high-band rises, loudest first.
     public static int[] SelfOnsets(double[][] mel, int limit = 6)
@@ -237,13 +260,17 @@ public sealed class InMatchRecognizer : IRecognizer
         Array.Fill(best, -1);
         if (mel.Length < InMatchFeatures.WindowFrames) return groups.Select((g, i) => (g.Group, best[i])).ToArray();
         var onsets = onsetSeconds is { } seconds
-            ? [Math.Clamp((int)(seconds * InMatchFeatures.SampleRate / InMatchFeatures.Hop), 0, mel.Length - 1)]
+            ? InMatchFeatures.QueryAnchors(mel, Math.Clamp((int)(seconds * InMatchFeatures.SampleRate / InMatchFeatures.Hop), 0, mel.Length - 1))
             : InMatchFeatures.SelfOnsets(mel);
-        foreach (var onset in onsets)
+        for (var index = 0; index < onsets.Length; index++)
         {
             cancellation.ThrowIfCancellationRequested();
+            var onset = onsets[index];
             var logMel = InMatchFeatures.Subtracted(mel, onset);
-            for (var k = onset - InMatchFeatures.Lead - InMatchFeatures.SlideBefore; k <= onset - InMatchFeatures.Lead + InMatchFeatures.SlideAfter; k++)
+            var (before, after) = onsetSeconds is null || index == 0
+                ? (InMatchFeatures.SlideBefore, InMatchFeatures.SlideAfter)
+                : (InMatchFeatures.RiseSlideBefore, InMatchFeatures.RiseSlideAfter);
+            for (var k = onset - InMatchFeatures.Lead - before; k <= onset - InMatchFeatures.Lead + after; k++)
             {
                 var patch = InMatchFeatures.Patch(logMel, k);
                 if (patch is null) continue;

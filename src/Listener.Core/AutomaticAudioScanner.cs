@@ -7,7 +7,7 @@ public sealed record AudioScanWindow(float[] Samples, int SampleRate, double End
     // Hand the matcher the pickup with enough context before it to estimate the
     // room tone, and enough after it to hold the longest catalogue sound (~0.33 s).
     // Later putdown/UI sounds must not decide whether this event was a valid pickup.
-    public AudioScanWindow Focus(double before = .45, double after = .36)
+    public AudioScanWindow Focus(double before = .45, double after = AutomaticAudioScanner.TailSeconds)
     {
         var first = (int)Math.Clamp(Math.Round((OnsetSeconds - before - StartSeconds) * SampleRate), 0, Samples.Length);
         var last = (int)Math.Clamp(Math.Round((OnsetSeconds + after - StartSeconds) * SampleRate), first, Samples.Length);
@@ -30,9 +30,10 @@ public sealed class AutomaticAudioScanner
     public const double IntervalSeconds = .18;
     public const double WindowSeconds = 1.15;
     public const double HighPassHz = 700;
-    // Audio that must exist after the onset before the window is analysed: the
-    // longest catalogue sound is ~0.33 s and the matcher searches up to +128 ms.
-    public const double TailSeconds = .36;
+    // Audio that must exist after the onset before the window is analysed: the item's
+    // attack may follow the interface click that opened the event by up to ~224 ms
+    // (InMatchFeatures.AnchorSpanFrames), and its patch needs another ~213 ms.
+    public const double TailSeconds = .45;
     // At the trader a faint interface click can precede the item's own sound by
     // 0.12–0.19 s; the item sound must still open its own event, so the refractory
     // only has to outlast the two-click putdown sounds (40 ms apart).
