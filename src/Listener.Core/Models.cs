@@ -24,9 +24,11 @@ public static class JsonFile
     }
 }
 
+// ThumbnailBackground (#RRGGBB) is set only for pictures without the game's rarity background
+// (transparent renders); the overlay draws that colour over the item's grid footprint behind them.
 public sealed record ItemDefinition(string Id, string Name, bool IsGold, decimal? ReferenceValue = null,
     string? ValueSource = null, string? ValueDate = null, int GridWidth = 1, int GridHeight = 1,
-    string? Thumbnail = null, bool GridVerified = true, string? CatalogSource = null)
+    string? Thumbnail = null, bool GridVerified = true, string? CatalogSource = null, string? ThumbnailBackground = null)
 {
     public int Cells => GridVerified ? GridWidth * GridHeight : 0;
     [JsonIgnore] public string GridLabel => GridVerified ? $"{GridWidth}×{GridHeight}" : "格数待核实";
@@ -79,7 +81,8 @@ public sealed class SoundLibrary
         var ids = Items.Select(x => x.Id).ToHashSet();
         if (Items.Any(i => string.IsNullOrWhiteSpace(i.Id) || string.IsNullOrWhiteSpace(i.Name) || i.ReferenceValue < 0
             || i.GridWidth is < 1 or > 10 || i.GridHeight is < 1 or > 10
-            || (i.Thumbnail is not null && (Path.IsPathRooted(i.Thumbnail) || i.Thumbnail.Contains("..")))))
+            || (i.Thumbnail is not null && (Path.IsPathRooted(i.Thumbnail) || i.Thumbnail.Contains("..")))
+            || (i.ThumbnailBackground is not null && !System.Text.RegularExpressions.Regex.IsMatch(i.ThumbnailBackground, "^#[0-9A-Fa-f]{6}$"))))
             throw new InvalidDataException("物品资料不完整。");
         foreach (var group in Groups)
         {

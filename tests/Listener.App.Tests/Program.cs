@@ -63,6 +63,13 @@ internal static class Program
                 foreach (var item in library.Items)
                     Check(item.Thumbnail is not null && File.Exists(Path.Combine(root, item.Thumbnail)) && item.GridVerified && item.Cells > 0,
                         "catalog item lacks a thumbnail or verified grid: " + item.Name);
+                // The 情报站 renders are transparent; each carries the screenshot tiles' rarity colour
+                // (红 / 金 / 紫), and a 大红 item always the red one. Screenshot thumbnails carry none.
+                var rarityColours = new[] { "#321612", "#32220E", "#221A2F" };
+                Check(library.Items.All(item => item.CatalogSource == "aqintel-1.4.0"
+                        ? rarityColours.Contains(item.ThumbnailBackground) && (item.ThumbnailBackground == "#321612") == item.IsGold
+                        : item.ThumbnailBackground is null),
+                    "a transparent picture lacks its rarity background, or a screenshot thumbnail got a second one");
                 var panel = new CandidatePanel(root, new Settings { ShowNames = true });
                 var result = new RecognitionResult(1, RecognitionStatus.Matched, true,
                     library.Items.Select(item => new Candidate(item, 0, "catalog")).ToArray(), 0, "");

@@ -890,6 +890,7 @@
       "thumbnail": "images/aqintel140-fc98e09bd04747a39a2945171e95d798.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 4
     },
     {
@@ -904,6 +905,7 @@
       "thumbnail": "images/aqintel140-9bb2a3a923ed4db485fede5b6b207c65.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 4
     },
     {
@@ -918,6 +920,7 @@
       "thumbnail": "images/aqintel140-40c722a8eda840a5a297b2183f8a6664.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -932,6 +935,7 @@
       "thumbnail": "images/aqintel140-b77f70b9a5034176bc9656198fec2f61.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 1
     },
     {
@@ -946,6 +950,7 @@
       "thumbnail": "images/aqintel140-11c6830082b845aea42c4f5f2887ea23.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 2
     },
     {
@@ -960,6 +965,7 @@
       "thumbnail": "images/aqintel140-0c89b74c6deb4cf1a979d415445a2a25.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -974,6 +980,7 @@
       "thumbnail": "images/aqintel140-9a9169605dbc4cc2b8f677797ab40cad.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 8
     },
     {
@@ -988,6 +995,7 @@
       "thumbnail": "images/aqintel140-bfafd908d3cf4ab8a178ce5adb3cf9f9.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1002,6 +1010,7 @@
       "thumbnail": "images/aqintel140-ff2fc30e345d4c75803f2d64e895ba16.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1016,6 +1025,7 @@
       "thumbnail": "images/aqintel140-f61617901efe4800ac2ee5256899960f.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 2
     },
     {
@@ -1030,6 +1040,7 @@
       "thumbnail": "images/aqintel140-735b6247e776415db861edd9c22b6bc6.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1044,6 +1055,7 @@
       "thumbnail": "images/aqintel140-c26a716d6aa14b4cab709d9c39887d7a.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1058,6 +1070,7 @@
       "thumbnail": "images/aqintel140-fe007e232f464da1b442a3d4da7c1a5e.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 1
     },
     {
@@ -1072,6 +1085,7 @@
       "thumbnail": "images/aqintel140-66d1046116844bc79c23b9f606c0bfc7.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 1
     },
     {
@@ -1086,6 +1100,7 @@
       "thumbnail": "images/aqintel140-f9646a154dfa47cd8328ba57c5bc46fd.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 1
     },
     {
@@ -1100,6 +1115,7 @@
       "thumbnail": "images/aqintel140-a52091af158443b08fa7072a26b2933a.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1114,6 +1130,7 @@
       "thumbnail": "images/aqintel140-eb24b866bf654832a83e2a15315c142f.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1128,6 +1145,7 @@
       "thumbnail": "images/aqintel140-c4793ae62bb143729bf3a58baab60620.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 1
     },
     {
@@ -1142,6 +1160,7 @@
       "thumbnail": "images/aqintel140-559bdeb8bece4b78b6933ea051e07ab0.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 3
     },
     {
@@ -1156,6 +1175,7 @@
       "thumbnail": "images/aqintel140-58ae96dc5a904d6ca6184a31e12a25a5.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 2
     },
     {
@@ -1170,6 +1190,7 @@
       "thumbnail": "images/aqintel140-929c7e8782334cf4ae74a69977cfdea4.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#321612",
       "cells": 6
     },
     {
@@ -1184,6 +1205,7 @@
       "thumbnail": "images/aqintel140-ca62371b5f0449dba0fac4700f55aea6.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 3
     },
     {
@@ -1198,6 +1220,7 @@
       "thumbnail": "images/aqintel140-355e2daa3da24edca5d178717f97619c.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#321612",
       "cells": 4
     },
     {
@@ -1212,6 +1235,7 @@
       "thumbnail": "images/aqintel140-66753453763d4cbcbe30ab09d5c590f2.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 2
     },
     {
@@ -1226,6 +1250,7 @@
       "thumbnail": "images/aqintel140-4b6ae89262ee49bd9327bfbc8ceb3ec7.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 4
     },
     {
@@ -1240,6 +1265,7 @@
       "thumbnail": "images/aqintel140-6a85eb39a5c44d6599caada1477c4ab6.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1254,6 +1280,7 @@
       "thumbnail": "images/aqintel140-15d83b68f2a24b26aa26133c18356b37.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 4
     },
     {
@@ -1268,6 +1295,7 @@
       "thumbnail": "images/aqintel140-409c6a54c4a74e4488b9f9152829e15b.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 4
     },
     {
@@ -1282,6 +1310,7 @@
       "thumbnail": "images/aqintel140-e385d9107d644516a8fe06d4765b6488.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 4
     },
     {
@@ -1296,6 +1325,7 @@
       "thumbnail": "images/aqintel140-3fd5eae49e8e4da68353b869da12f2c0.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1310,6 +1340,7 @@
       "thumbnail": "images/aqintel140-c55e5147ea674b1a8a056304a9c10ba8.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 2
     },
     {
@@ -1324,6 +1355,7 @@
       "thumbnail": "images/aqintel140-fabcaad3f2e74d99bdea32778ff9d990.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 1
     },
     {
@@ -1338,6 +1370,7 @@
       "thumbnail": "images/aqintel140-39f385ccff7d4773b419c1d50f434709.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 1
     },
     {
@@ -1352,6 +1385,7 @@
       "thumbnail": "images/aqintel140-3f47ee8bbca740d99e5b126c310b43e6.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1366,6 +1400,7 @@
       "thumbnail": "images/aqintel140-85c67bebdcea485c9ce96a2b09bdb09c.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 2
     },
     {
@@ -1380,6 +1415,7 @@
       "thumbnail": "images/aqintel140-0626b556ff5d4aca8e9aa1f1ce81bf08.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1394,6 +1430,7 @@
       "thumbnail": "images/aqintel140-7b1cc43177ae425197e6b20fd34a05ab.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#321612",
       "cells": 4
     },
     {
@@ -1408,6 +1445,7 @@
       "thumbnail": "images/aqintel140-87951a37e4324e21af64b878982d7d3a.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 4
     },
     {
@@ -1422,6 +1460,7 @@
       "thumbnail": "images/aqintel140-eba0ac0d864b4974a56b8c216186b8e5.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 6
     },
     {
@@ -1436,6 +1475,7 @@
       "thumbnail": "images/aqintel140-892e05192aca435993a3f42bee092e2b.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 1
     },
     {
@@ -1450,6 +1490,7 @@
       "thumbnail": "images/aqintel140-906ce39750644fe393bd09de70e8a882.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 3
     },
     {
@@ -1464,6 +1505,7 @@
       "thumbnail": "images/aqintel140-6e09531f5f6d4aac829204f3dd505c10.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#321612",
       "cells": 2
     },
     {
@@ -1478,6 +1520,7 @@
       "thumbnail": "images/aqintel140-e9b9a811d8514a38a027a2c443d9d558.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 4
     },
     {
@@ -1492,6 +1535,7 @@
       "thumbnail": "images/aqintel140-cb33439ec2194da699909cea198dc5a2.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 4
     },
     {
@@ -1506,6 +1550,7 @@
       "thumbnail": "images/aqintel140-0c653353cfc34a2e9ab91d1938808636.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 4
     },
     {
@@ -1520,6 +1565,7 @@
       "thumbnail": "images/aqintel140-57e9c5710ffc47b093b70d24f7e928ac.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 4
     },
     {
@@ -1534,6 +1580,7 @@
       "thumbnail": "images/aqintel140-f8a9006ac4cd4edc8581d3e3e496bbaa.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1548,6 +1595,7 @@
       "thumbnail": "images/aqintel140-549e878cef8e427ab904a0e7e5d6e1ae.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1562,6 +1610,7 @@
       "thumbnail": "images/aqintel140-b1a730c3da80463382770d69cd2f31bc.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1576,6 +1625,7 @@
       "thumbnail": "images/aqintel140-88d5430c58de492ea0bdff30241515f3.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1590,6 +1640,7 @@
       "thumbnail": "images/aqintel140-534b14cd62534ecba257100a9af1e199.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 6
     },
     {
@@ -1604,6 +1655,7 @@
       "thumbnail": "images/aqintel140-58977ab0209f4262a9514a1fd4a6b4dd.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1618,6 +1670,7 @@
       "thumbnail": "images/aqintel140-60911863e0a7497ca84eb74df2012793.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1632,6 +1685,7 @@
       "thumbnail": "images/aqintel140-3b8b14635e204fe4b0ecafaf8ef527dd.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1646,6 +1700,7 @@
       "thumbnail": "images/aqintel140-5e97aab4b1ab4898b74296a8e6c308d9.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1660,6 +1715,7 @@
       "thumbnail": "images/aqintel140-5bfa7134cf2d45ba8b4e748d56911312.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1674,6 +1730,7 @@
       "thumbnail": "images/aqintel140-94e1e61648b741c1a5036590688ac332.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1688,6 +1745,7 @@
       "thumbnail": "images/aqintel140-aadcb02f1aa94fa2a80ae6cc1da7685b.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 6
     },
     {
@@ -1702,6 +1760,7 @@
       "thumbnail": "images/aqintel140-f32de0089065435aafcd52055319313a.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1716,6 +1775,7 @@
       "thumbnail": "images/aqintel140-7ab8b826b0a347f392e97d078669a1c3.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1730,6 +1790,7 @@
       "thumbnail": "images/aqintel140-d51acc6052fe442a82c4f1aeb7e052e2.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1744,6 +1805,7 @@
       "thumbnail": "images/aqintel140-a8ef4a5077a94e3294843f703e78a6b7.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 1
     },
     {
@@ -1758,6 +1820,7 @@
       "thumbnail": "images/aqintel140-bb4e6c10021a433298d66dd018cad8c9.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 4
     },
     {
@@ -1772,6 +1835,7 @@
       "thumbnail": "images/aqintel140-5733d0437168446c859d1f76ed4093cc.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 6
     },
     {
@@ -1786,6 +1850,7 @@
       "thumbnail": "images/aqintel140-04638e00eb5e4a619dd78730f5c5635e.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1800,6 +1865,7 @@
       "thumbnail": "images/aqintel140-dd24f9c4742e4971abd7e7e66de5d2a6.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1814,6 +1880,7 @@
       "thumbnail": "images/aqintel140-ee9939dc95bc4efcaa3d76997a0f45e0.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1828,6 +1895,7 @@
       "thumbnail": "images/aqintel140-8a8a0895485744aebdcb792b4420657b.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 4
     },
     {
@@ -1842,6 +1910,7 @@
       "thumbnail": "images/aqintel140-f4021122a7ae42e99ef365037f05fe74.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1856,6 +1925,7 @@
       "thumbnail": "images/aqintel140-ef95a83abf594ad38bc0923495d81d2c.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 4
     },
     {
@@ -1870,6 +1940,7 @@
       "thumbnail": "images/aqintel140-77b50e138a92422bb2910b4eb32d3fe4.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 2
     },
     {
@@ -1884,6 +1955,7 @@
       "thumbnail": "images/aqintel140-2748e8d34a2546f7ba4a5c1095429de2.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1898,6 +1970,7 @@
       "thumbnail": "images/aqintel140-e3ac754684b64893a5d77fbb2140044e.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1912,6 +1985,7 @@
       "thumbnail": "images/aqintel140-fa1c6c5aa2814f07ab036da0a2fb181d.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -1926,6 +2000,7 @@
       "thumbnail": "images/aqintel140-5d27e4deabe64c2f8451234ba7fbd7e5.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 6
     },
     {
@@ -1940,6 +2015,7 @@
       "thumbnail": "images/aqintel140-68242d995c6445edafef2fb9caad18b1.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 4
     },
     {
@@ -1954,6 +2030,7 @@
       "thumbnail": "images/aqintel140-69c3641bffc54a419b26814680821970.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 4
     },
     {
@@ -1968,6 +2045,7 @@
       "thumbnail": "images/aqintel140-26b9ff6d3ccd4f1b8975482f254969cd.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 4
     },
     {
@@ -1982,6 +2060,7 @@
       "thumbnail": "images/aqintel140-6725fdf8860c472c8a6cc83a19c9df8c.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -1996,6 +2075,7 @@
       "thumbnail": "images/aqintel140-ce5f263fe52941fab2fa523049e79b50.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -2010,6 +2090,7 @@
       "thumbnail": "images/aqintel140-fb26d0c71b4847daa892395f71d75681.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 1
     },
     {
@@ -2024,6 +2105,7 @@
       "thumbnail": "images/aqintel140-2d616f324bd245ca9c53286a51acab64.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 6
     },
     {
@@ -2038,6 +2120,7 @@
       "thumbnail": "images/aqintel140-d924937b69c64a889572aa08081edbba.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 6
     },
     {
@@ -2052,6 +2135,7 @@
       "thumbnail": "images/aqintel140-c05741f0c496429e91d42d3d16f92dfe.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -2066,6 +2150,7 @@
       "thumbnail": "images/aqintel140-4691e086403a49d7aacdfed362bd95d7.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 1
     },
     {
@@ -2080,6 +2165,7 @@
       "thumbnail": "images/aqintel140-8ec9d0a594ac439084572974f859f2e3.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#221A2F",
       "cells": 2
     },
     {
@@ -2094,6 +2180,7 @@
       "thumbnail": "images/aqintel140-e727882c-c9d7-4c62-b4a5-a30c6476e7e7.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 2
     },
     {
@@ -2108,6 +2195,7 @@
       "thumbnail": "images/aqintel140-deb60c203b8d41c2a57d4b4f63de7016.png",
       "gridVerified": true,
       "catalogSource": "aqintel-1.4.0",
+      "thumbnailBackground": "#32220E",
       "cells": 4
     }
   ],

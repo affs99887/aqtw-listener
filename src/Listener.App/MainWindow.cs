@@ -831,6 +831,16 @@ internal sealed partial class MainWindow : Window
         var catalogImages = Descendants<Border>(allTiles).Count(card => card.Tag is Candidate && Descendants<Image>(card).Any());
         imagesKeepAspect &= catalogImages == library.Items.Count &&
             new[] { catalogTiles, resultTiles, allTiles }.All(tiles => ImagesKeepAspect(Descendants<Border>(tiles).Where(card => card.Tag is Candidate)));
+        // Pictures without a rarity background get it over their grid footprint, in their rarity colour.
+        var backgroundItems = library.Items.Count(item => item.ThumbnailBackground is not null);
+        var rarityBackgrounds = Descendants<Border>(allTiles).Where(card => card.Tag is Candidate { Item.ThumbnailBackground: not null }).Count(card =>
+        {
+            var item = ((Candidate)card.Tag).Item;
+            var footprint = Descendants<Viewbox>(card).Select(box => box.Child).OfType<Border>().SingleOrDefault();
+            return footprint?.Background is SolidColorBrush brush && brush.Color == (Color)ColorConverter.ConvertFromString(item.ThumbnailBackground!) &&
+                Math.Abs(footprint.Width / footprint.Height - item.GridWidth / (double)item.GridHeight) < .001 && footprint.Child is Image;
+        });
+        var backgroundsShown = backgroundItems > 0 && rarityBackgrounds == backgroundItems;
         var tileButtonsRight = new[] { catalogTiles, resultTiles }.All(tiles => Descendants<Border>(tiles).Where(card => card.Tag is Candidate).All(card =>
         {
             var candidate = (Candidate)card.Tag;
@@ -845,7 +855,7 @@ internal sealed partial class MainWindow : Window
         var adaptivePassed = largeWidth >= smallWidth && overflowHeight <= maximumHeight + 1 &&
             !paginationPresent && allCandidatesReachable && allHistoryReachable && settingsFit.Values.All(fit => fit) &&
             shrunkAgain && historyOnScreen && centered && topAnchored && staysInGame && !overflowNeedsScroll;
-        var passed = adaptivePassed && comparisonFits && listeningDesignVisible && waitingViewVisible && liveThirteen && liveReplayPausesSampling && listeningThirteen && groupedFifteen && listeningOnePage && tileButtonsRight && imagesKeepAspect && commonGroupFits && bottomRowRightGap <= 32 && largestGroupFits && editorFontPreservesText && operationFit.Values.All(fit => fit) && samePin && unlocked &&
+        var passed = adaptivePassed && comparisonFits && listeningDesignVisible && waitingViewVisible && liveThirteen && liveReplayPausesSampling && listeningThirteen && groupedFifteen && listeningOnePage && tileButtonsRight && imagesKeepAspect && backgroundsShown && commonGroupFits && bottomRowRightGap <= 32 && largestGroupFits && editorFontPreservesText && operationFit.Values.All(fit => fit) && samePin && unlocked &&
             nearControlRemoved && replayStarted && replayStopped && referenceStarted && referenceStopped && capturePausedDuringReplay &&
             stopFollowsPlayback && liveFresh && liveStale && followUpMarked && menusStyled &&
             (liveStyles & (0x20 | 0x08000000)) == 0x08000000 && preserved &&
@@ -857,7 +867,7 @@ internal sealed partial class MainWindow : Window
             clickThrough = (liveStyles & 0x20) != 0, noActivate = (liveStyles & 0x08000000) != 0,
             layered = (liveStyles & 0x80000) != 0, topmost = overlay.Topmost,
             foregroundPreserved = preserved,
-            operation = new { operationFit, unlocked, samePin, fontChecks, comparisonFits, listeningDesignVisible, waitingViewVisible, liveThirteen, liveReplayPausesSampling, listeningThirteen, listeningThirteenDetails, groupedFifteen, groupedFifteenDetails, listeningOnePage, listeningOnePageDetails, tileButtonsRight, imagesKeepAspect, catalogImages, stretchedImages, nearControlRemoved, editorFontPreservesText,
+            operation = new { operationFit, unlocked, samePin, fontChecks, comparisonFits, listeningDesignVisible, waitingViewVisible, liveThirteen, liveReplayPausesSampling, listeningThirteen, listeningThirteenDetails, groupedFifteen, groupedFifteenDetails, listeningOnePage, listeningOnePageDetails, tileButtonsRight, imagesKeepAspect, catalogImages, stretchedImages, backgroundsShown, backgroundItems, rarityBackgrounds, nearControlRemoved, editorFontPreservesText,
                 replayStarted, replayStopped, referenceStarted, referenceStopped, capturePausedDuringReplay,
                 stopFollowsPlayback, liveFresh, liveStale, followUpMarked, menusStyled,
                 enabledInteraction = (interactiveStyles & (0x20 | 0x08000000)) == 0,

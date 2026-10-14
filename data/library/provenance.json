@@ -1392,7 +1392,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/冈格尼尔残页__fc98e09bd04747a39a2945171e95d798.png",
         "sourceImageSha256": "7c9c837bc30002eeaafcf7fc33acdfa86cbfeaba011f5fafa5460baeadf42841",
-        "thumbnail": "images/aqintel140-fc98e09bd04747a39a2945171e95d798.png"
+        "thumbnail": "images/aqintel140-fc98e09bd04747a39a2945171e95d798.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(30), 0, np.int64(462), np.int64(487)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "44e8bf33b58324413fb219ea82df8cb959270a350dc893fdcdc6019f02da4fcf"
       },
       {
         "incomingId": "9bb2a3a923ed4db485fede5b6b207c65",
@@ -1411,7 +1414,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/人工心脏__9bb2a3a923ed4db485fede5b6b207c65.png",
         "sourceImageSha256": "743078f2ed43ae6fc60610c13fc7f1f86d5b061fdb3e3e621f27d00ef754b117",
-        "thumbnail": "images/aqintel140-9bb2a3a923ed4db485fede5b6b207c65.png"
+        "thumbnail": "images/aqintel140-9bb2a3a923ed4db485fede5b6b207c65.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(16), 0, np.int64(361), 374) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "f0612fa4df7445eb58c14975b4f757d5b2d68899c3e70d4295d7a661b24948a8"
       },
       {
         "incomingId": "2cbceafac6dc432c966cd2506c2790bd",
@@ -1530,7 +1536,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/电容分析仪__40c722a8eda840a5a297b2183f8a6664.png",
         "sourceImageSha256": "63bd578886f45c80888075a81596bca2bef26e336b58737040ee257cffe6e280",
-        "thumbnail": "images/aqintel140-40c722a8eda840a5a297b2183f8a6664.png"
+        "thumbnail": "images/aqintel140-40c722a8eda840a5a297b2183f8a6664.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(104), np.int64(63), np.int64(383), np.int64(449)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "a6e116734bedf9eb90bcc37345159783a67f1998fdeed9d410c1518e2e8615b3"
       },
       {
         "incomingId": "b77f70b9a5034176bc9656198fec2f61",
@@ -1549,7 +1558,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/镁条打火石__b77f70b9a5034176bc9656198fec2f61.png",
         "sourceImageSha256": "3b051dd3d60a32c1fe6f002dad652e4ece5d7b5de2cdc17b77fac17e24cc9691",
-        "thumbnail": "images/aqintel140-b77f70b9a5034176bc9656198fec2f61.png"
+        "thumbnail": "images/aqintel140-b77f70b9a5034176bc9656198fec2f61.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(69), np.int64(129), np.int64(454), np.int64(389)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "7f0c93b0078e6ff9eaf2d064b05c9c86665b7790a6dd2ba1b5603edfa0d837e3"
       },
       {
         "incomingId": "11c6830082b845aea42c4f5f2887ea23",
@@ -1568,7 +1580,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/维塞尔日记__11c6830082b845aea42c4f5f2887ea23.png",
         "sourceImageSha256": "54f80b8d53c1632c7a806189b1b53be591a00a085ef624f243d056c72ead485c",
-        "thumbnail": "images/aqintel140-11c6830082b845aea42c4f5f2887ea23.png"
+        "thumbnail": "images/aqintel140-11c6830082b845aea42c4f5f2887ea23.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(102), np.int64(71), np.int64(338), np.int64(368)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "eaff990eff677b9032f06f9c2aa614d67677abe5f25727779b4b6fea715870e9"
       },
       {
         "incomingId": "0c89b74c6deb4cf1a979d415445a2a25",
@@ -1587,7 +1602,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/行星之子__0c89b74c6deb4cf1a979d415445a2a25.png",
         "sourceImageSha256": "4a66aafe7819e1b8906ffee93157466af8a82142d003ee13334ee9c0e4cc99ff",
-        "thumbnail": "images/aqintel140-0c89b74c6deb4cf1a979d415445a2a25.png"
+        "thumbnail": "images/aqintel140-0c89b74c6deb4cf1a979d415445a2a25.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(107), np.int64(73), np.int64(356), np.int64(389)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "8ac0cef099144f5ab40768f73eed34c8fb1d56218e4a5667dbe184a450802e04"
       },
       {
         "incomingId": "9a9169605dbc4cc2b8f677797ab40cad",
@@ -1606,7 +1624,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/未来滑板__9a9169605dbc4cc2b8f677797ab40cad.png",
         "sourceImageSha256": "7d83d393d86fceb9454b582488bcd0763574e2694f326ccdd901b002cf669487",
-        "thumbnail": "images/aqintel140-9a9169605dbc4cc2b8f677797ab40cad.png"
+        "thumbnail": "images/aqintel140-9a9169605dbc4cc2b8f677797ab40cad.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(179), 609, np.int64(434)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "0b8046b1935ad50f24b72466f3a9280b734a9691325df81d31c106815b3761d9"
       },
       {
         "incomingId": "bfafd908d3cf4ab8a178ce5adb3cf9f9",
@@ -1625,7 +1646,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/发条小汽车__bfafd908d3cf4ab8a178ce5adb3cf9f9.png",
         "sourceImageSha256": "0aaaafca85cb28b452e7d5778083cce7801b3450df4a46dac19cfd566ea20d6d",
-        "thumbnail": "images/aqintel140-bfafd908d3cf4ab8a178ce5adb3cf9f9.png"
+        "thumbnail": "images/aqintel140-bfafd908d3cf4ab8a178ce5adb3cf9f9.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(25), 128, np.int64(103)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "e9ff303e284af9ca10b36f8e54c8b1edb4dd2c9d17bfb641a3daac4274681804"
       },
       {
         "incomingId": "ff2fc30e345d4c75803f2d64e895ba16",
@@ -1644,7 +1668,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/腕表__ff2fc30e345d4c75803f2d64e895ba16.png",
         "sourceImageSha256": "84dc2c622fea7bde18d05f734fc9a6ac45a8d930d5da3544f3448c09b1287c4d",
-        "thumbnail": "images/aqintel140-ff2fc30e345d4c75803f2d64e895ba16.png"
+        "thumbnail": "images/aqintel140-ff2fc30e345d4c75803f2d64e895ba16.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(6), 0, np.int64(123), 128) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "865b7f0eee8566c6843e6af249abd3bf047c3b653ddd98e1e1c09b1a5039176d"
       },
       {
         "incomingId": "f61617901efe4800ac2ee5256899960f",
@@ -1663,7 +1690,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/血糖仪套装__f61617901efe4800ac2ee5256899960f.png",
         "sourceImageSha256": "592f5b374ba930c2fd178d89078612b362d1fdb41e6885799dc85fb30fe500c0",
-        "thumbnail": "images/aqintel140-f61617901efe4800ac2ee5256899960f.png"
+        "thumbnail": "images/aqintel140-f61617901efe4800ac2ee5256899960f.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(137), np.int64(83), np.int64(577), np.int64(511)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "c3c7d249060d331404893a61f8f2108e575a54f2d64cc70294f0777ba47286b5"
       },
       {
         "incomingId": "735b6247e776415db861edd9c22b6bc6",
@@ -1682,7 +1712,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/电子听诊器__735b6247e776415db861edd9c22b6bc6.png",
         "sourceImageSha256": "27eeba911e04d3728a851c7513e80594d024f320af3edebeee10bb0a0467e276",
-        "thumbnail": "images/aqintel140-735b6247e776415db861edd9c22b6bc6.png"
+        "thumbnail": "images/aqintel140-735b6247e776415db861edd9c22b6bc6.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(165), np.int64(24), np.int64(340), np.int64(440)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "0edc35a3ba3e78f7a23851787a71a1a892f160fa7b8dcfed7c1fed16db805492"
       },
       {
         "incomingId": "c26a716d6aa14b4cab709d9c39887d7a",
@@ -1701,7 +1734,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/手持分析仪__c26a716d6aa14b4cab709d9c39887d7a.png",
         "sourceImageSha256": "b9563db9dfefd5800bef7acb62294581de78877a09607549410daab93387047c",
-        "thumbnail": "images/aqintel140-c26a716d6aa14b4cab709d9c39887d7a.png"
+        "thumbnail": "images/aqintel140-c26a716d6aa14b4cab709d9c39887d7a.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(164), np.int64(32), np.int64(325), np.int64(456)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "93438428c328ad5155fd7cd1abb7ca29b52e469dfc9caef9defc0c515be59be7"
       },
       {
         "incomingId": "fe007e232f464da1b442a3d4da7c1a5e",
@@ -1720,7 +1756,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/金制钢笔__fe007e232f464da1b442a3d4da7c1a5e.png",
         "sourceImageSha256": "17e886f0215bf887932c45c4de07b740c60932b723df271a53ff1d05ef02b6eb",
-        "thumbnail": "images/aqintel140-fe007e232f464da1b442a3d4da7c1a5e.png"
+        "thumbnail": "images/aqintel140-fe007e232f464da1b442a3d4da7c1a5e.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(81), 256, np.int64(175)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "5a0f07498088d68e4049ac8c724c8ca4bb30c1c11e2ed565be1904d65c0491de"
       },
       {
         "incomingId": "66d1046116844bc79c23b9f606c0bfc7",
@@ -1739,7 +1778,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/玉制手串__66d1046116844bc79c23b9f606c0bfc7.png",
         "sourceImageSha256": "909f39b4a7771f196f7b8eaf0ee7d823a0c0a53dbfead44ce89b049af2058295",
-        "thumbnail": "images/aqintel140-66d1046116844bc79c23b9f606c0bfc7.png"
+        "thumbnail": "images/aqintel140-66d1046116844bc79c23b9f606c0bfc7.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(30), 256, np.int64(227)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "ae7fd244c748e8237d5135b8b3beb97baa811f29e026532bae27a19ac44d82f4"
       },
       {
         "incomingId": "f9646a154dfa47cd8328ba57c5bc46fd",
@@ -1758,7 +1800,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/金手表__f9646a154dfa47cd8328ba57c5bc46fd.png",
         "sourceImageSha256": "a46a17bd577434cc2034ecbce580377810770835816cfa01bf71d1c4b186a896",
-        "thumbnail": "images/aqintel140-f9646a154dfa47cd8328ba57c5bc46fd.png"
+        "thumbnail": "images/aqintel140-f9646a154dfa47cd8328ba57c5bc46fd.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(7), 0, np.int64(122), 128) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "7131886b081a9658dadeac0824505741a9e822d1322430b6f830e9fd4f476c4b"
       },
       {
         "incomingId": "a52091af158443b08fa7072a26b2933a",
@@ -1777,7 +1822,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/个人数字助理__a52091af158443b08fa7072a26b2933a.png",
         "sourceImageSha256": "9048c0ec46cb3b4ecd8aebaf9c16c5e498a231c8d742796534b577310a4b2ab4",
-        "thumbnail": "images/aqintel140-a52091af158443b08fa7072a26b2933a.png"
+        "thumbnail": "images/aqintel140-a52091af158443b08fa7072a26b2933a.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(126), np.int64(28), np.int64(364), np.int64(460)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "40d73e7998cf3dbd9b89518a2ef25080a81914582444aea603660fea7e0832f9"
       },
       {
         "incomingId": "eb24b866bf654832a83e2a15315c142f",
@@ -1796,7 +1844,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/宠物蛋__eb24b866bf654832a83e2a15315c142f.png",
         "sourceImageSha256": "2935f370c3ce0cc54b5432e1866c6365df6d3f56bbcf3e8441719363971e1b30",
-        "thumbnail": "images/aqintel140-eb24b866bf654832a83e2a15315c142f.png"
+        "thumbnail": "images/aqintel140-eb24b866bf654832a83e2a15315c142f.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(14), 256, np.int64(242)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "fdd60b1e3726a722f7772a65a6c27f9c44d960d2c111deae5680b31dc74de397"
       },
       {
         "incomingId": "c4793ae62bb143729bf3a58baab60620",
@@ -1815,7 +1866,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/托兰德工卡__c4793ae62bb143729bf3a58baab60620.png",
         "sourceImageSha256": "dfe40e5c0c61d0f282c8082ee63489fd96bbda911239dae6241a04a2a75baa06",
-        "thumbnail": "images/aqintel140-c4793ae62bb143729bf3a58baab60620.png"
+        "thumbnail": "images/aqintel140-c4793ae62bb143729bf3a58baab60620.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(67), np.int64(35), np.int64(395), np.int64(433)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "62e84decfa7de0544a598c2c2c756d4bf168a409b3457bf5aa8e0d2629eb7426"
       },
       {
         "incomingId": "559bdeb8bece4b78b6933ea051e07ab0",
@@ -1834,7 +1888,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/非线性探测器__559bdeb8bece4b78b6933ea051e07ab0.png",
         "sourceImageSha256": "4fc7efb5bf5528ffb4e302c9fe5098300a68b487ecb92a7acaaceb1eb173ad3f",
-        "thumbnail": "images/aqintel140-559bdeb8bece4b78b6933ea051e07ab0.png"
+        "thumbnail": "images/aqintel140-559bdeb8bece4b78b6933ea051e07ab0.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(54), np.int64(18), np.int64(671), np.int64(207)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "3de0d4f8efe77016bd440a7d08a5749eb2a0e853d89bf0b515a95a3deab03e53"
       },
       {
         "incomingId": "58ae96dc5a904d6ca6184a31e12a25a5",
@@ -1853,7 +1910,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/单兵通讯装置__58ae96dc5a904d6ca6184a31e12a25a5.png",
         "sourceImageSha256": "15cb6b4a8ddc13867381657c320c1fa32bae352a79ccafac6a059b63aaaf375f",
-        "thumbnail": "images/aqintel140-58ae96dc5a904d6ca6184a31e12a25a5.png"
+        "thumbnail": "images/aqintel140-58ae96dc5a904d6ca6184a31e12a25a5.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(181), np.int64(73), np.int64(573), np.int64(700)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "e1d35117e3ec5c65d6174556e074129c19aa84c42b0fed6b0efc3aedc347ceff"
       },
       {
         "incomingId": "5faaede022fd4187b22d035f621e42ca",
@@ -1887,7 +1947,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/天命泥板__929c7e8782334cf4ae74a69977cfdea4.png",
         "sourceImageSha256": "466ca93522a64c9d891b3c8ddbba6a77b316439be829d03636ffaacab69cc209",
-        "thumbnail": "images/aqintel140-929c7e8782334cf4ae74a69977cfdea4.png"
+        "thumbnail": "images/aqintel140-929c7e8782334cf4ae74a69977cfdea4.png",
+        "thumbnailBackground": "#321612",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(38), np.int64(66), np.int64(457), np.int64(437)) of the original, scaled to ≤192 px with the same proportions; the app draws the 红 rarity background #321612 over the grid footprint behind it",
+        "thumbnailSha256": "79765c2c3a5e7e5af860f2356413fa3856a074a29023d58e697bc9a490214c7a"
       },
       {
         "incomingId": "7e8c49a372ac4c778cab128941eb1afa",
@@ -1948,7 +2011,10 @@
         "gridHeight": 3,
         "sourceImage": "物品图片/钢管__ca62371b5f0449dba0fac4700f55aea6.png",
         "sourceImageSha256": "20d8d61c36c2ac269398fe8df74d927e3be3cd57b090e2f1391c5da26c82970f",
-        "thumbnail": "images/aqintel140-ca62371b5f0449dba0fac4700f55aea6.png"
+        "thumbnail": "images/aqintel140-ca62371b5f0449dba0fac4700f55aea6.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(119), np.int64(10), np.int64(265), np.int64(374)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "8126839a721c779762debdff1ca17842624f5c67c581cadcbb206a12ca75b097"
       },
       {
         "incomingId": "6360e7dbf7ad46df9ed9ef3041bc2c1e",
@@ -2086,7 +2152,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/混沌质__355e2daa3da24edca5d178717f97619c.png",
         "sourceImageSha256": "f60f949d5c08a7d97fed139ce9c08c56f72391440c40dcb1b05dec5eababec7b",
-        "thumbnail": "images/aqintel140-355e2daa3da24edca5d178717f97619c.png"
+        "thumbnail": "images/aqintel140-355e2daa3da24edca5d178717f97619c.png",
+        "thumbnailBackground": "#321612",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(45), np.int64(52), np.int64(445), np.int64(468)) of the original, scaled to ≤192 px with the same proportions; the app draws the 红 rarity background #321612 over the grid footprint behind it",
+        "thumbnailSha256": "f48123d386b60749122484eb00a78d13c58e023ac4baa2810d53c0e6b7f3b7c1"
       },
       {
         "incomingId": "da76168b3d7844cea01639478a432eae",
@@ -2119,7 +2188,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/钻石原矿__66753453763d4cbcbe30ab09d5c590f2.png",
         "sourceImageSha256": "d91c1f434e2ea654bab9f2e44717d9d57e29fe7fb53eb348a721bf97396a5bb8",
-        "thumbnail": "images/aqintel140-66753453763d4cbcbe30ab09d5c590f2.png"
+        "thumbnail": "images/aqintel140-66753453763d4cbcbe30ab09d5c590f2.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(121), np.int64(120), np.int64(392), np.int64(393)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "d81c24ae8b83f1e9b2cda4cdd64dc3382ebc5e09d72c7a4263108ff2a9ba59c1"
       },
       {
         "incomingId": "f5e5af272a8b4d2e8e098fe538eb3708",
@@ -2152,7 +2224,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/宫廷银器__4b6ae89262ee49bd9327bfbc8ceb3ec7.png",
         "sourceImageSha256": "f779382f8737a625ec94bf216aaaee9d3bcea857dea2c3801d09767dab3d3460",
-        "thumbnail": "images/aqintel140-4b6ae89262ee49bd9327bfbc8ceb3ec7.png"
+        "thumbnail": "images/aqintel140-4b6ae89262ee49bd9327bfbc8ceb3ec7.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, 0, 243, 243) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "396894c2ca37513b8ad49e5d2fd287f9db47c02e2beb216efdc6608dc8e6ddc5"
       },
       {
         "incomingId": "1e09e406abfc40989204e6d5105c0556",
@@ -2185,7 +2260,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/手持接收机__6a85eb39a5c44d6599caada1477c4ab6.png",
         "sourceImageSha256": "5ef0b24030a7548448c6750d24e724722cf27f5ecbea0fd5bf8a46649fef1ba9",
-        "thumbnail": "images/aqintel140-6a85eb39a5c44d6599caada1477c4ab6.png"
+        "thumbnail": "images/aqintel140-6a85eb39a5c44d6599caada1477c4ab6.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(149), np.int64(34), np.int64(347), np.int64(492)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "b259ef05d36993802571bf6fa782b51c617126bef30c6649f3072a41212a74f4"
       },
       {
         "incomingId": "15d83b68f2a24b26aa26133c18356b37",
@@ -2204,7 +2282,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/鼓风机__15d83b68f2a24b26aa26133c18356b37.png",
         "sourceImageSha256": "200d49353ffa774c47d4ffd14d01e0345658b93814ee2a5244e883400c95cc62",
-        "thumbnail": "images/aqintel140-15d83b68f2a24b26aa26133c18356b37.png"
+        "thumbnail": "images/aqintel140-15d83b68f2a24b26aa26133c18356b37.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(7), 0, np.int64(250), 256) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "a32b2ed11a95c9ef8ef2b12660276c2741344c6ffc592eb5298d884c65487755"
       },
       {
         "incomingId": "409c6a54c4a74e4488b9f9152829e15b",
@@ -2223,7 +2304,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/工具套件__409c6a54c4a74e4488b9f9152829e15b.png",
         "sourceImageSha256": "f8ab8f004128f345b7732a511697c3a77b2eebf08c1f86479725a17ff9b510dd",
-        "thumbnail": "images/aqintel140-409c6a54c4a74e4488b9f9152829e15b.png"
+        "thumbnail": "images/aqintel140-409c6a54c4a74e4488b9f9152829e15b.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(29), np.int64(127), np.int64(473), np.int64(386)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "65e8b2096f1f8b28650bc6206e5247b281c9342f939d84603161ce7d3729f73f"
       },
       {
         "incomingId": "e385d9107d644516a8fe06d4765b6488",
@@ -2242,7 +2326,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/电钻__e385d9107d644516a8fe06d4765b6488.png",
         "sourceImageSha256": "017246e2d5cc8ae171bcaf1c50de35e82d604c0f5118ab57a67c61036362c295",
-        "thumbnail": "images/aqintel140-e385d9107d644516a8fe06d4765b6488.png"
+        "thumbnail": "images/aqintel140-e385d9107d644516a8fe06d4765b6488.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, 0, 256, 256) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "ece57410e78a64424264fea1d607c57a9856d5a120e33e9aa051840e83cac682"
       },
       {
         "incomingId": "3fd5eae49e8e4da68353b869da12f2c0",
@@ -2261,7 +2348,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/炮弹__3fd5eae49e8e4da68353b869da12f2c0.png",
         "sourceImageSha256": "8801786c23c034987023051d74299c2d8bf6cc6edd76f9fbacff288123409615",
-        "thumbnail": "images/aqintel140-3fd5eae49e8e4da68353b869da12f2c0.png"
+        "thumbnail": "images/aqintel140-3fd5eae49e8e4da68353b869da12f2c0.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(79), 0, np.int64(178), 256) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "a003a08cc86413e686c617bf5119c32e89177f0989778ec296ba6747fea9743c"
       },
       {
         "incomingId": "c55e5147ea674b1a8a056304a9c10ba8",
@@ -2280,7 +2370,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/液压扳手__c55e5147ea674b1a8a056304a9c10ba8.png",
         "sourceImageSha256": "db87d73de3d26ea9fbf0e4d8d1cea46d01726be1b6bd04a90621481e1b12a406",
-        "thumbnail": "images/aqintel140-c55e5147ea674b1a8a056304a9c10ba8.png"
+        "thumbnail": "images/aqintel140-c55e5147ea674b1a8a056304a9c10ba8.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(61), 256, np.int64(196)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "9fc9d12ee54c053f5c88319041cd46e4adfcaa86818dbb657b8f0594114b9cdd"
       },
       {
         "incomingId": "fabcaad3f2e74d99bdea32778ff9d990",
@@ -2299,7 +2392,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/镍镉电池组__fabcaad3f2e74d99bdea32778ff9d990.png",
         "sourceImageSha256": "4b2d9f4f9fb95487a44e254e2fe6b73caf92d5ee0cefe8581ca7bbc323d4f49c",
-        "thumbnail": "images/aqintel140-fabcaad3f2e74d99bdea32778ff9d990.png"
+        "thumbnail": "images/aqintel140-fabcaad3f2e74d99bdea32778ff9d990.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(93), np.int64(76), np.int64(398), np.int64(400)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "a5e46ff2c407e8862fda3f22d6f293c8a282be443b2cf7e726014c1b6ce50196"
       },
       {
         "incomingId": "39f385ccff7d4773b419c1d50f434709",
@@ -2318,7 +2414,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/太阳能充电器__39f385ccff7d4773b419c1d50f434709.png",
         "sourceImageSha256": "249bd09cebe7e2718bde33485ab34783078c8f40d1f586d8273aacd8c4bd46d9",
-        "thumbnail": "images/aqintel140-39f385ccff7d4773b419c1d50f434709.png"
+        "thumbnail": "images/aqintel140-39f385ccff7d4773b419c1d50f434709.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(96), np.int64(63), np.int64(414), np.int64(422)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "d7ae8da2328815f191c902c654a446816f6f475e63e523a6915ade7d710270a3"
       },
       {
         "incomingId": "3f47ee8bbca740d99e5b126c310b43e6",
@@ -2337,7 +2436,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/缓降器__3f47ee8bbca740d99e5b126c310b43e6.png",
         "sourceImageSha256": "38d1b49cc5ea95c5235ce9f9ac0904c7340dd0dfa818e28d7ddcc05d3a79b5c6",
-        "thumbnail": "images/aqintel140-3f47ee8bbca740d99e5b126c310b43e6.png"
+        "thumbnail": "images/aqintel140-3f47ee8bbca740d99e5b126c310b43e6.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(10), 0, np.int64(119), 128) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "35f819d02a193529db87daa8aff008ef1e5d4685673fecd02c349adad20b189a"
       },
       {
         "incomingId": "85c67bebdcea485c9ce96a2b09bdb09c",
@@ -2356,7 +2458,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/卫星模型__85c67bebdcea485c9ce96a2b09bdb09c.png",
         "sourceImageSha256": "731aa9db6c21e6f9ca7c5dd0054fa020396eb469735d8da10236e603174a4de7",
-        "thumbnail": "images/aqintel140-85c67bebdcea485c9ce96a2b09bdb09c.png"
+        "thumbnail": "images/aqintel140-85c67bebdcea485c9ce96a2b09bdb09c.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(72), np.int64(119), np.int64(441), np.int64(394)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "a2dde4c2722d6742f84473cb978afcc2aa829ed3e5a0528064fcbbe0830203b7"
       },
       {
         "incomingId": "2181394f880243668135d173f956e572",
@@ -2389,7 +2494,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/手持计算器__0626b556ff5d4aca8e9aa1f1ce81bf08.png",
         "sourceImageSha256": "a1aaa17f645169cf181095c8ea0daaab9acea418e8126e775dea10e75d177cfe",
-        "thumbnail": "images/aqintel140-0626b556ff5d4aca8e9aa1f1ce81bf08.png"
+        "thumbnail": "images/aqintel140-0626b556ff5d4aca8e9aa1f1ce81bf08.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(131), np.int64(49), np.int64(367), np.int64(475)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "8f11a8c69aa21f818bfeb8336186c4088dbc7f68eb03da8a6a9261f8c7ffcb19"
       },
       {
         "incomingId": "e51b3370e9ec435d8e0bee1690c0713a",
@@ -2422,7 +2530,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/光电模型__7b1cc43177ae425197e6b20fd34a05ab.png",
         "sourceImageSha256": "3592e735dd780a1a122018b0c989680986f0e5e776d766397d8ecc0bf0ad130f",
-        "thumbnail": "images/aqintel140-7b1cc43177ae425197e6b20fd34a05ab.png"
+        "thumbnail": "images/aqintel140-7b1cc43177ae425197e6b20fd34a05ab.png",
+        "thumbnailBackground": "#321612",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(37), np.int64(86), np.int64(469), np.int64(451)) of the original, scaled to ≤192 px with the same proportions; the app draws the 红 rarity background #321612 over the grid footprint behind it",
+        "thumbnailSha256": "c14a1a9e7954183038a716dbff73b3814f1b8f9a0f743b016a51ccaba1e786d6"
       },
       {
         "incomingId": "43323953427d43cda6c1dc1761b2e1b2",
@@ -2455,7 +2566,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/K7-L密码机__87951a37e4324e21af64b878982d7d3a.png",
         "sourceImageSha256": "d09b8d324211857eae2c47ef49cdd242fbab3007134e44d01646ad03c7d05c22",
-        "thumbnail": "images/aqintel140-87951a37e4324e21af64b878982d7d3a.png"
+        "thumbnail": "images/aqintel140-87951a37e4324e21af64b878982d7d3a.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(73), np.int64(88), np.int64(433), np.int64(415)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "bee83843fc2cb3207df47a583f44f64ac4969bc64f27d375162bfb41f92e3ed0"
       },
       {
         "incomingId": "eba0ac0d864b4974a56b8c216186b8e5",
@@ -2474,7 +2588,10 @@
         "gridHeight": 3,
         "sourceImage": "物品图片/石膏雕像__eba0ac0d864b4974a56b8c216186b8e5.png",
         "sourceImageSha256": "284019a269b58a664844995b6d695c39a6e753ad456664839bcfe02cc8775825",
-        "thumbnail": "images/aqintel140-eba0ac0d864b4974a56b8c216186b8e5.png"
+        "thumbnail": "images/aqintel140-eba0ac0d864b4974a56b8c216186b8e5.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(94), 0, np.int64(366), 456) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "0e3339a7a15bdb294df8c0cd7f0bad3a58089d714c5462f02f43a5a47904dac8"
       },
       {
         "incomingId": "892e05192aca435993a3f42bee092e2b",
@@ -2493,7 +2610,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/金魔方__892e05192aca435993a3f42bee092e2b.png",
         "sourceImageSha256": "7c340e43a7e6770d6313607488bf65e923ed6520c251cb1d0ae82902a1b3e395",
-        "thumbnail": "images/aqintel140-892e05192aca435993a3f42bee092e2b.png"
+        "thumbnail": "images/aqintel140-892e05192aca435993a3f42bee092e2b.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(5), 256, np.int64(252)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "396be2dee52b3d76c0987a82b0442a38df31fbaad829625071fcad44340387ee"
       },
       {
         "incomingId": "906ce39750644fe393bd09de70e8a882",
@@ -2512,7 +2632,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/工艺品猎刀__906ce39750644fe393bd09de70e8a882.png",
         "sourceImageSha256": "9375523d1fd56d00abd1cb504a198daf145b9a7d012556bfa46796abdd82d0a8",
-        "thumbnail": "images/aqintel140-906ce39750644fe393bd09de70e8a882.png"
+        "thumbnail": "images/aqintel140-906ce39750644fe393bd09de70e8a882.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(36), np.int64(202), np.int64(624), np.int64(457)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "7572e6501d733e077c1a35d7d031ecdec34591340f6f7610bb31247133ac5faa"
       },
       {
         "incomingId": "a20459c64546400193b633fcd7d518e0",
@@ -2545,7 +2668,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/机密文件__6e09531f5f6d4aac829204f3dd505c10.png",
         "sourceImageSha256": "e4c7fe4b6127e76f89435fdbeeef33730401dc8b808ca60c58733aca9801a6a6",
-        "thumbnail": "images/aqintel140-6e09531f5f6d4aac829204f3dd505c10.png"
+        "thumbnail": "images/aqintel140-6e09531f5f6d4aac829204f3dd505c10.png",
+        "thumbnailBackground": "#321612",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(92), np.int64(109), np.int64(370), np.int64(354)) of the original, scaled to ≤192 px with the same proportions; the app draws the 红 rarity background #321612 over the grid footprint behind it",
+        "thumbnailSha256": "2ed7d1aedfdd73f75209d1488f86953830ce0006e21f5864de723bd3cc2c55ee"
       },
       {
         "incomingId": "582ddba3677b454eabb6f0f294e82155",
@@ -2606,7 +2732,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/水平仪__e9b9a811d8514a38a027a2c443d9d558.png",
         "sourceImageSha256": "d42852e350b304b0a6519108443e61b43d59d6fe5bc909971249315559594053",
-        "thumbnail": "images/aqintel140-e9b9a811d8514a38a027a2c443d9d558.png"
+        "thumbnail": "images/aqintel140-e9b9a811d8514a38a027a2c443d9d558.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(80), 256, np.int64(177)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "8a8e89ff10b0f6b9774515c6f15d8f5e6919884818890afda036d5758b5136e4"
       },
       {
         "incomingId": "cb33439ec2194da699909cea198dc5a2",
@@ -2625,7 +2754,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/笔记本电脑__cb33439ec2194da699909cea198dc5a2.png",
         "sourceImageSha256": "7fa82d8fb950e99af543524ba2466c6810fe69c66ef894cbc949bb3d3d77640c",
-        "thumbnail": "images/aqintel140-cb33439ec2194da699909cea198dc5a2.png"
+        "thumbnail": "images/aqintel140-cb33439ec2194da699909cea198dc5a2.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(32), 256, np.int64(223)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "57bec5ede2816df0cea8aa0a463c58c66a1e4b0fb63607f7eb0c59bc7b0163d3"
       },
       {
         "incomingId": "0c653353cfc34a2e9ab91d1938808636",
@@ -2644,7 +2776,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/摄影机__0c653353cfc34a2e9ab91d1938808636.png",
         "sourceImageSha256": "22ae751a746f3faefb0546d18cfbc1f47e431ebc1c8e8e87f9a3e159b6274c23",
-        "thumbnail": "images/aqintel140-0c653353cfc34a2e9ab91d1938808636.png"
+        "thumbnail": "images/aqintel140-0c653353cfc34a2e9ab91d1938808636.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(26), 337, np.int64(314)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "2500b64bfb725bd6a25badfcc94ad1cc4628f8094ce96aaa42bf3ca0f161e41d"
       },
       {
         "incomingId": "4b7bc031db264ea0a61879fbb4887b3d",
@@ -2692,7 +2827,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/钯金线材__57e9c5710ffc47b093b70d24f7e928ac.png",
         "sourceImageSha256": "5afe9b3fab46496c5b9a4d871184a75c711c2e29eb890c04674781d3cc9a97ae",
-        "thumbnail": "images/aqintel140-57e9c5710ffc47b093b70d24f7e928ac.png"
+        "thumbnail": "images/aqintel140-57e9c5710ffc47b093b70d24f7e928ac.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(5), 256, np.int64(251)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "3ebd507b7819419a1debcf6fba09cbf6a40a3649007380c390b978e91e80b947"
       },
       {
         "incomingId": "f8a9006ac4cd4edc8581d3e3e496bbaa",
@@ -2711,7 +2849,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/数据链接线__f8a9006ac4cd4edc8581d3e3e496bbaa.png",
         "sourceImageSha256": "60d073f82132174275e3a2eeceb5427ff7dc0bc67b816362925beab9eac77dd7",
-        "thumbnail": "images/aqintel140-f8a9006ac4cd4edc8581d3e3e496bbaa.png"
+        "thumbnail": "images/aqintel140-f8a9006ac4cd4edc8581d3e3e496bbaa.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(9), np.int64(64), np.int64(248), np.int64(193)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "88092e430ab1a2dc9ed93d0b39424b17096ad263fcf45d37a4a243fb6fa78363"
       },
       {
         "incomingId": "549e878cef8e427ab904a0e7e5d6e1ae",
@@ -2730,7 +2871,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/示波器__549e878cef8e427ab904a0e7e5d6e1ae.png",
         "sourceImageSha256": "0f57a618578ebafcef01d511f848ab5edb04798502454de6a20ddae7031733e4",
-        "thumbnail": "images/aqintel140-549e878cef8e427ab904a0e7e5d6e1ae.png"
+        "thumbnail": "images/aqintel140-549e878cef8e427ab904a0e7e5d6e1ae.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(36), np.int64(100), np.int64(404), np.int64(339)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "cc61bfbfea5f97f4c99d3bd9032fc233c608abd5cf3c08d360cbd34fd8559bd9"
       },
       {
         "incomingId": "b1a730c3da80463382770d69cd2f31bc",
@@ -2749,7 +2893,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/电台__b1a730c3da80463382770d69cd2f31bc.png",
         "sourceImageSha256": "dc2a0340cc4c446a6b0c7c00a73f73f9bb5455de9e6b54db6750e590ae9fb482",
-        "thumbnail": "images/aqintel140-b1a730c3da80463382770d69cd2f31bc.png"
+        "thumbnail": "images/aqintel140-b1a730c3da80463382770d69cd2f31bc.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(14), np.int64(59), np.int64(242), np.int64(198)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "87bd13834ca93fc1731f4e5f557a8c3d076fced233a967b51580bef96b5c4bd2"
       },
       {
         "incomingId": "88d5430c58de492ea0bdff30241515f3",
@@ -2768,7 +2915,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/检测仪__88d5430c58de492ea0bdff30241515f3.png",
         "sourceImageSha256": "4193e2866fe26d5899267b8d38dcf2092d2ce9397f89f08702ce515aac57e51a",
-        "thumbnail": "images/aqintel140-88d5430c58de492ea0bdff30241515f3.png"
+        "thumbnail": "images/aqintel140-88d5430c58de492ea0bdff30241515f3.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(108), np.int64(121), np.int64(404), np.int64(391)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "a22d0efb8d82a2fd326afb2752f1687fe0bacdac1b048353a10af7177be7ed52"
       },
       {
         "incomingId": "534b14cd62534ecba257100a9af1e199",
@@ -2787,7 +2937,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/USP电源__534b14cd62534ecba257100a9af1e199.png",
         "sourceImageSha256": "8e6c34387c4ed2f1016d58e4030229762b3ca6e2924c097cc82ae48909c0556c",
-        "thumbnail": "images/aqintel140-534b14cd62534ecba257100a9af1e199.png"
+        "thumbnail": "images/aqintel140-534b14cd62534ecba257100a9af1e199.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(29), np.int64(56), np.int64(355), np.int64(328)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "5fa33c7f3576f698732017f568e7b69bb4be3d7fce205baecbd95e06880e5401"
       },
       {
         "incomingId": "58977ab0209f4262a9514a1fd4a6b4dd",
@@ -2806,7 +2959,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/芯片处理器__58977ab0209f4262a9514a1fd4a6b4dd.png",
         "sourceImageSha256": "f52bbf5ef7968c0d6fd8445e3ae8e4cf5130c831e8b652d51d8f77866709ffcd",
-        "thumbnail": "images/aqintel140-58977ab0209f4262a9514a1fd4a6b4dd.png"
+        "thumbnail": "images/aqintel140-58977ab0209f4262a9514a1fd4a6b4dd.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(18), 128, np.int64(110)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "f1fd944f61cd83a1d8f81c113370b4852f824f0704bf3a27917cd6929dd16f74"
       },
       {
         "incomingId": "60911863e0a7497ca84eb74df2012793",
@@ -2825,7 +2981,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/平衡仪__60911863e0a7497ca84eb74df2012793.png",
         "sourceImageSha256": "55149182cb4fb6c0eb6dca97ccceb5d8ad384fd0427e97fb36eb27d78c102d56",
-        "thumbnail": "images/aqintel140-60911863e0a7497ca84eb74df2012793.png"
+        "thumbnail": "images/aqintel140-60911863e0a7497ca84eb74df2012793.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(11), 256, np.int64(246)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "3860d8973651c4cbd0409fb467cda26a77ae481c48dc20fa8b1136d4c446a759"
       },
       {
         "incomingId": "3b8b14635e204fe4b0ecafaf8ef527dd",
@@ -2844,7 +3003,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/测光表__3b8b14635e204fe4b0ecafaf8ef527dd.png",
         "sourceImageSha256": "fb130526a81c9285f151f921a6347367e2ef4d890e1dc706bbb1d8b8cfbc9b84",
-        "thumbnail": "images/aqintel140-3b8b14635e204fe4b0ecafaf8ef527dd.png"
+        "thumbnail": "images/aqintel140-3b8b14635e204fe4b0ecafaf8ef527dd.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(30), 0, np.int64(226), 256) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "a0935378d0ec3caf8ccf121502c747ecf473c1f3308b456f2441396ab63e7722"
       },
       {
         "incomingId": "5e97aab4b1ab4898b74296a8e6c308d9",
@@ -2863,7 +3025,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/内存条__5e97aab4b1ab4898b74296a8e6c308d9.png",
         "sourceImageSha256": "f2f56af76cf22036628a4d9b7a87657f6e3fd82a5ae645c75f39a198b53be447",
-        "thumbnail": "images/aqintel140-5e97aab4b1ab4898b74296a8e6c308d9.png"
+        "thumbnail": "images/aqintel140-5e97aab4b1ab4898b74296a8e6c308d9.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(14), 128, np.int64(115)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "fc5c834078ab0347be7e3a4ab85da8587d960f380db4551862720d1d03112090"
       },
       {
         "incomingId": "5bfa7134cf2d45ba8b4e748d56911312",
@@ -2882,7 +3047,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/专用电路板__5bfa7134cf2d45ba8b4e748d56911312.png",
         "sourceImageSha256": "9be6e82826651e0ff21f33059042bb061194eac2ce6cedb0fc7020511bc1c367",
-        "thumbnail": "images/aqintel140-5bfa7134cf2d45ba8b4e748d56911312.png"
+        "thumbnail": "images/aqintel140-5bfa7134cf2d45ba8b4e748d56911312.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, 0, 64, 64) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "0f94af9d8b60b4a1995d40dd5c50a357a9a5cb12827f06da3285143e0054a274"
       },
       {
         "incomingId": "94e1e61648b741c1a5036590688ac332",
@@ -2901,7 +3069,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/气体分析仪__94e1e61648b741c1a5036590688ac332.png",
         "sourceImageSha256": "f6976bda15ffeca96d65870333c4a61f06e9659e96734d0930d8a4a848287f5f",
-        "thumbnail": "images/aqintel140-94e1e61648b741c1a5036590688ac332.png"
+        "thumbnail": "images/aqintel140-94e1e61648b741c1a5036590688ac332.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(84), 0, np.int64(172), 256) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "b5fab041b9d9d57df030ed4ca8597d4f767c20001f3c5e7130791866c33bf3f7"
       },
       {
         "incomingId": "aadcb02f1aa94fa2a80ae6cc1da7685b",
@@ -2920,7 +3091,10 @@
         "gridHeight": 3,
         "sourceImage": "物品图片/向量处理器__aadcb02f1aa94fa2a80ae6cc1da7685b.png",
         "sourceImageSha256": "5688476d3ad8327c9ceec1e5307e9fc72a843b13332261ff5df71783a53ba297",
-        "thumbnail": "images/aqintel140-aadcb02f1aa94fa2a80ae6cc1da7685b.png"
+        "thumbnail": "images/aqintel140-aadcb02f1aa94fa2a80ae6cc1da7685b.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(53), np.int64(86), np.int64(436), np.int64(434)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "d34ba93260e7b0348199b542b24dd804f1bf72863f17d1025bf8e74e24c003f8"
       },
       {
         "incomingId": "b9a4574a36f54ee5bdfd99b95f030b15",
@@ -2953,7 +3127,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/游戏卡带__f32de0089065435aafcd52055319313a.png",
         "sourceImageSha256": "29bcc94949407164298d6094b21c32070438113cfa5b0ba834c0765a78900e3d",
-        "thumbnail": "images/aqintel140-f32de0089065435aafcd52055319313a.png"
+        "thumbnail": "images/aqintel140-f32de0089065435aafcd52055319313a.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(21), 128, np.int64(108)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "b1e750e1d6b1d25e93de4209a0068de0ea0b8fbd57275ce93a74714d66abd1ff"
       },
       {
         "incomingId": "5250ab6695af4c0cab0cccc21222cfaf",
@@ -3028,7 +3205,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/银片手链__7ab8b826b0a347f392e97d078669a1c3.png",
         "sourceImageSha256": "6a6e4acffaa9a5803f5f561d8cce89c22ea19aa6c8426f8eb989efaa5ea085cb",
-        "thumbnail": "images/aqintel140-7ab8b826b0a347f392e97d078669a1c3.png"
+        "thumbnail": "images/aqintel140-7ab8b826b0a347f392e97d078669a1c3.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(9), 128, np.int64(120)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "d7eea4b0094970e281b94fca2017c5c7683311abdfb5663d2fcc7a1745a25ef5"
       },
       {
         "incomingId": "d51acc6052fe442a82c4f1aeb7e052e2",
@@ -3047,7 +3227,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/怀表__d51acc6052fe442a82c4f1aeb7e052e2.png",
         "sourceImageSha256": "dd342f83424e8581a96537e276a9bfa719c67396a7e89ad84caafa236cba2450",
-        "thumbnail": "images/aqintel140-d51acc6052fe442a82c4f1aeb7e052e2.png"
+        "thumbnail": "images/aqintel140-d51acc6052fe442a82c4f1aeb7e052e2.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(17), 0, np.int64(111), 128) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "8fdc8711189a480746276a0abec67b97f8889793a5400cf19b31cf07da7a26ab"
       },
       {
         "incomingId": "e2ee910017c54a14a7764336b635b17d",
@@ -3080,7 +3263,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/胸针__a8ef4a5077a94e3294843f703e78a6b7.png",
         "sourceImageSha256": "2a8e9cfef209ea93bcf7c71547e5e29f895e138ddd134fb4b3b5a35ea1a099fb",
-        "thumbnail": "images/aqintel140-a8ef4a5077a94e3294843f703e78a6b7.png"
+        "thumbnail": "images/aqintel140-a8ef4a5077a94e3294843f703e78a6b7.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(16), 0, np.int64(113), 128) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "41c5075f13d8050d57e02c9299003c2e49e28219c95279d770695f7d6c503b22"
       },
       {
         "incomingId": "273cebdbee29400297736ca3efb2181c",
@@ -3174,7 +3360,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/波纹钢板__bb4e6c10021a433298d66dd018cad8c9.png",
         "sourceImageSha256": "2c97ce5f3c8b757e0662fe001f2b108bbd047da62d5044fbc27e3a5cf97eb116",
-        "thumbnail": "images/aqintel140-bb4e6c10021a433298d66dd018cad8c9.png"
+        "thumbnail": "images/aqintel140-bb4e6c10021a433298d66dd018cad8c9.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(12), np.int64(87), np.int64(477), np.int64(424)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "1ba3b499bf341f5d5201d3e847dc1dcdc6fa0fd7a017a2de6f88bfbe0af72720"
       },
       {
         "incomingId": "5733d0437168446c859d1f76ed4093cc",
@@ -3193,7 +3382,10 @@
         "gridHeight": 3,
         "sourceImage": "物品图片/正极模块__5733d0437168446c859d1f76ed4093cc.png",
         "sourceImageSha256": "97b7f2ab2511633b556113562baaf72763f29463a70b395d7bd37a193450f028",
-        "thumbnail": "images/aqintel140-5733d0437168446c859d1f76ed4093cc.png"
+        "thumbnail": "images/aqintel140-5733d0437168446c859d1f76ed4093cc.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(11), np.int64(80), np.int64(475), np.int64(427)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "c9e06439a219402ee34a5ab22ce01f2197fa8a0caff8d26643f2e227961dbb80"
       },
       {
         "incomingId": "d64fd45bc61b4b339efd7b06511223be",
@@ -3227,7 +3419,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/通枪工具组__04638e00eb5e4a619dd78730f5c5635e.png",
         "sourceImageSha256": "bf531b3c1b9141ccdc0427368b9d684ec42be9a4ca78c814236013071e0d3aa4",
-        "thumbnail": "images/aqintel140-04638e00eb5e4a619dd78730f5c5635e.png"
+        "thumbnail": "images/aqintel140-04638e00eb5e4a619dd78730f5c5635e.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(61), np.int64(54), np.int64(196), np.int64(203)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "5316a6250298db7ba8016b16e567b387cc4fe2e3a5c2dda673b8f0c333f6a6dc"
       },
       {
         "incomingId": "dd24f9c4742e4971abd7e7e66de5d2a6",
@@ -3246,7 +3441,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/千斤顶__dd24f9c4742e4971abd7e7e66de5d2a6.png",
         "sourceImageSha256": "1ee6316ebddd04436050d63614c94d522ddfd7e64650e92311862d75148cf17c",
-        "thumbnail": "images/aqintel140-dd24f9c4742e4971abd7e7e66de5d2a6.png"
+        "thumbnail": "images/aqintel140-dd24f9c4742e4971abd7e7e66de5d2a6.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(59), np.int64(61), np.int64(197), np.int64(195)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "21f4c80ed94a74a41b59665a42bf3462316659de87d610054a42e445c9753eaf"
       },
       {
         "incomingId": "ee9939dc95bc4efcaa3d76997a0f45e0",
@@ -3265,7 +3463,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/机油壶__ee9939dc95bc4efcaa3d76997a0f45e0.png",
         "sourceImageSha256": "10c1cdd2633c685cfee68df65f315f9b795710835ba6002b9c66f2c89bdbfcde",
-        "thumbnail": "images/aqintel140-ee9939dc95bc4efcaa3d76997a0f45e0.png"
+        "thumbnail": "images/aqintel140-ee9939dc95bc4efcaa3d76997a0f45e0.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(42), np.int64(60), np.int64(215), np.int64(197)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "2a7c059f5c3db5f36a49bfcc319f4475f7931b4d8c6035469382f31825034ccd"
       },
       {
         "incomingId": "8a8a0895485744aebdcb792b4420657b",
@@ -3284,7 +3485,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/酒精炉__8a8a0895485744aebdcb792b4420657b.png",
         "sourceImageSha256": "cfbc259fe89613918d28b3d9ecdddad910836d5e5f978108d42496db12cc641a",
-        "thumbnail": "images/aqintel140-8a8a0895485744aebdcb792b4420657b.png"
+        "thumbnail": "images/aqintel140-8a8a0895485744aebdcb792b4420657b.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(20), 0, np.int64(237), 256) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "e1aca58f72ccff54760ee0c1788060f5e338884e5b3fbc4979726e91b0c63426"
       },
       {
         "incomingId": "f4021122a7ae42e99ef365037f05fe74",
@@ -3303,7 +3507,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/手持补光灯__f4021122a7ae42e99ef365037f05fe74.png",
         "sourceImageSha256": "d3f4dca0c9ec13f0d3040e0c0d2cf799679243ecaab2aa9ce04b894c715230cb",
-        "thumbnail": "images/aqintel140-f4021122a7ae42e99ef365037f05fe74.png"
+        "thumbnail": "images/aqintel140-f4021122a7ae42e99ef365037f05fe74.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(61), np.int64(2), np.int64(196), np.int64(254)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "1b5c56b31195c564e10fc93079e14d9e9f2307b6af0807ddf3e91e11337967a4"
       },
       {
         "incomingId": "ef95a83abf594ad38bc0923495d81d2c",
@@ -3322,7 +3529,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/PSU电源__ef95a83abf594ad38bc0923495d81d2c.png",
         "sourceImageSha256": "b211bd08557690ee2c740a186bf6831bb977fee8022e85054d55f888f5a6102c",
-        "thumbnail": "images/aqintel140-ef95a83abf594ad38bc0923495d81d2c.png"
+        "thumbnail": "images/aqintel140-ef95a83abf594ad38bc0923495d81d2c.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(4), 256, np.int64(253)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "c0486f4a058221fb8dc5df806c1b5664a3679519cf430e78dff8e37a2cdf35c4"
       },
       {
         "incomingId": "77b50e138a92422bb2910b4eb32d3fe4",
@@ -3341,7 +3551,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/显卡__77b50e138a92422bb2910b4eb32d3fe4.png",
         "sourceImageSha256": "7becf6b33397a0c9aff6a7af5e15ba97640f4c05dbd9730be008234f7dc9cace",
-        "thumbnail": "images/aqintel140-77b50e138a92422bb2910b4eb32d3fe4.png"
+        "thumbnail": "images/aqintel140-77b50e138a92422bb2910b4eb32d3fe4.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(68), 256, np.int64(189)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "0e0709d0371cfbbc69cf1e297d4feb4eed178a1d0598dd4bcf80c78e20bb0129"
       },
       {
         "incomingId": "2748e8d34a2546f7ba4a5c1095429de2",
@@ -3360,7 +3573,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/固态硬盘__2748e8d34a2546f7ba4a5c1095429de2.png",
         "sourceImageSha256": "e0f615f57c8d6e590bed9e06c77eba1a92081a4ccfa260175f37015a14b75c62",
-        "thumbnail": "images/aqintel140-2748e8d34a2546f7ba4a5c1095429de2.png"
+        "thumbnail": "images/aqintel140-2748e8d34a2546f7ba4a5c1095429de2.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(13), 0, np.int64(115), 128) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "fc6294ca6b6146010b1bd6009225242ef57484576f6fea16f3f516e40b2c1ca3"
       },
       {
         "incomingId": "e3ac754684b64893a5d77fbb2140044e",
@@ -3379,7 +3595,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/CPU__e3ac754684b64893a5d77fbb2140044e.png",
         "sourceImageSha256": "7644f2b7f8d756fadbbc3559ca523bd17d6f7ab9095cb2645c5152314edd622b",
-        "thumbnail": "images/aqintel140-e3ac754684b64893a5d77fbb2140044e.png"
+        "thumbnail": "images/aqintel140-e3ac754684b64893a5d77fbb2140044e.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, 0, 128, 128) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "351561e27075325803602edbc295ac2edc39b07d913e5abceabcd962bc892d2c"
       },
       {
         "incomingId": "fa1c6c5aa2814f07ab036da0a2fb181d",
@@ -3398,7 +3617,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/机械硬盘__fa1c6c5aa2814f07ab036da0a2fb181d.png",
         "sourceImageSha256": "83dfad8811ca7bdef271490176d1858f9a0dd2c6948ad15f16803c340d05c07c",
-        "thumbnail": "images/aqintel140-fa1c6c5aa2814f07ab036da0a2fb181d.png"
+        "thumbnail": "images/aqintel140-fa1c6c5aa2814f07ab036da0a2fb181d.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(8), 128, np.int64(120)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "28058f2b9948193acc4a18e76d4b9e190854f98243884a191b5bb86d81c6dd3c"
       },
       {
         "incomingId": "d30b3a1630e54090b306875ec66e297e",
@@ -3431,7 +3653,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/火药发射包__5d27e4deabe64c2f8451234ba7fbd7e5.png",
         "sourceImageSha256": "a6eaef6d0d2ad703e943beb77dd10a756286ed5cd6f3c61ce171943d6cc36982",
-        "thumbnail": "images/aqintel140-5d27e4deabe64c2f8451234ba7fbd7e5.png"
+        "thumbnail": "images/aqintel140-5d27e4deabe64c2f8451234ba7fbd7e5.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(97), np.int64(54), np.int64(653), np.int64(439)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "cb134c2d6dd8c2227407bfed56ceafe2f615d6771d709b34502907a6b7f8422c"
       },
       {
         "incomingId": "974f39b97de845c1900eaf6070fad5c4",
@@ -3465,7 +3690,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/高能燃料__68242d995c6445edafef2fb9caad18b1.png",
         "sourceImageSha256": "96b7d9a4d9cd799ab4fe745c59ae85453e9a3c8a353a0c9b2581718505e8d01a",
-        "thumbnail": "images/aqintel140-68242d995c6445edafef2fb9caad18b1.png"
+        "thumbnail": "images/aqintel140-68242d995c6445edafef2fb9caad18b1.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(32), 0, np.int64(326), 355) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "deef79249b420b0fe2fea04b748a7d9979b3a41ef1ff02c2a47dc52ee810f4d0"
       },
       {
         "incomingId": "69c3641bffc54a419b26814680821970",
@@ -3484,7 +3712,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/油桶__69c3641bffc54a419b26814680821970.png",
         "sourceImageSha256": "739ea020d126226904920ddf3185dbd5bcc974dfb3e23c5e68a1a5504d6ef842",
-        "thumbnail": "images/aqintel140-69c3641bffc54a419b26814680821970.png"
+        "thumbnail": "images/aqintel140-69c3641bffc54a419b26814680821970.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, 0, 256, 256) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "a83d1fae10374386f7dfbe671cbe4d46c8b70a2d7c8f48ec564794d7a122634a"
       },
       {
         "incomingId": "26b9ff6d3ccd4f1b8975482f254969cd",
@@ -3503,7 +3734,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/丙烷罐__26b9ff6d3ccd4f1b8975482f254969cd.png",
         "sourceImageSha256": "00e557d7aed0c16cf4daf0c577c8df98984f3a7ebb62afaface67a4cc889a870",
-        "thumbnail": "images/aqintel140-26b9ff6d3ccd4f1b8975482f254969cd.png"
+        "thumbnail": "images/aqintel140-26b9ff6d3ccd4f1b8975482f254969cd.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(44), 0, np.int64(213), 256) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "f3c9a388e3fae55380ec8eb4c749cff4412d270d7cdfcd971b97156a21a12261"
       },
       {
         "incomingId": "6725fdf8860c472c8a6cc83a19c9df8c",
@@ -3522,7 +3756,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/扁气罐__6725fdf8860c472c8a6cc83a19c9df8c.png",
         "sourceImageSha256": "e1685ce103d90e48aee323070f2be0782325255f66c9196a32247af4ddfe0d58",
-        "thumbnail": "images/aqintel140-6725fdf8860c472c8a6cc83a19c9df8c.png"
+        "thumbnail": "images/aqintel140-6725fdf8860c472c8a6cc83a19c9df8c.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(112), np.int64(98), np.int64(378), np.int64(396)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "e1c58bf45456b15290bbb2c9795f23a2321e812dc5aac07ddf31728a05304d7d"
       },
       {
         "incomingId": "c3a4998e2ca447c78942bec416129f50",
@@ -3555,7 +3792,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/香水__ce5f263fe52941fab2fa523049e79b50.png",
         "sourceImageSha256": "647ec219e9906614e3508c291dc7c77fa39547f2080e12dbbd36e09ece9af325",
-        "thumbnail": "images/aqintel140-ce5f263fe52941fab2fa523049e79b50.png"
+        "thumbnail": "images/aqintel140-ce5f263fe52941fab2fa523049e79b50.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(27), 0, np.int64(101), 128) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "30be126478d34e72a10e3ba7248480384399f3378bad1f90bb5474568b65f8c2"
       },
       {
         "incomingId": "fb26d0c71b4847daa892395f71d75681",
@@ -3574,7 +3814,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/阻断剂注射枪__fb26d0c71b4847daa892395f71d75681.png",
         "sourceImageSha256": "21fa05a17d8b63d4fe66fdfd651e76593005ea4f84cd502b366421d33c9728f4",
-        "thumbnail": "images/aqintel140-fb26d0c71b4847daa892395f71d75681.png"
+        "thumbnail": "images/aqintel140-fb26d0c71b4847daa892395f71d75681.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(69), np.int64(56), np.int64(413), np.int64(415)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "146fd3f84a23de317aef100ef76eb29df67829dfadb757c6666f5d3842e171dc"
       },
       {
         "incomingId": "2d616f324bd245ca9c53286a51acab64",
@@ -3593,7 +3836,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/信息素试剂盒__2d616f324bd245ca9c53286a51acab64.png",
         "sourceImageSha256": "2efbacc22610e621f377b2c7b3a3c000869fc8215a79ac7ead805695d8d4bea9",
-        "thumbnail": "images/aqintel140-2d616f324bd245ca9c53286a51acab64.png"
+        "thumbnail": "images/aqintel140-2d616f324bd245ca9c53286a51acab64.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(23), np.int64(49), np.int64(439), np.int64(453)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "1ee51ac6fc343f4337f4f03653c546492fbf51474bae60c1ecfb7276632b8a6b"
       },
       {
         "incomingId": "d924937b69c64a889572aa08081edbba",
@@ -3612,7 +3858,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/隔音棉__d924937b69c64a889572aa08081edbba.png",
         "sourceImageSha256": "601c802b24a819e8d4b5e1d61f21d4535c42b891a55b4c2deae2f0eba2f0cc7f",
-        "thumbnail": "images/aqintel140-d924937b69c64a889572aa08081edbba.png"
+        "thumbnail": "images/aqintel140-d924937b69c64a889572aa08081edbba.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(96), 384, np.int64(289)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "fe385f78bd5ff94ce8203d2cbc483485ad48162f4afa6d3a7ab3ba9740f8dc07"
       },
       {
         "incomingId": "c05741f0c496429e91d42d3d16f92dfe",
@@ -3631,7 +3880,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/助听器__c05741f0c496429e91d42d3d16f92dfe.png",
         "sourceImageSha256": "22e26247bce41df64c6b83433751716db3baebab431d65a5305298c5d328b49f",
-        "thumbnail": "images/aqintel140-c05741f0c496429e91d42d3d16f92dfe.png"
+        "thumbnail": "images/aqintel140-c05741f0c496429e91d42d3d16f92dfe.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(13), 128, np.int64(114)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "09f1b1651d92ea5a3abb9ed31a8ba93240cce53da3bc3d54db1f9c52d02ea169"
       },
       {
         "incomingId": "4691e086403a49d7aacdfed362bd95d7",
@@ -3650,7 +3902,10 @@
         "gridHeight": 1,
         "sourceImage": "物品图片/生物样本__4691e086403a49d7aacdfed362bd95d7.png",
         "sourceImageSha256": "65c4eeb0726cb79ba551b70e0055339586c8c316aae11c5ed94e0951cc0ee542",
-        "thumbnail": "images/aqintel140-4691e086403a49d7aacdfed362bd95d7.png"
+        "thumbnail": "images/aqintel140-4691e086403a49d7aacdfed362bd95d7.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(11), 128, np.int64(118)) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "566159809d1960c09de160e737a0e04bdd50b375104702f1ac0c12bdc91cce47"
       },
       {
         "incomingId": "8ec9d0a594ac439084572974f859f2e3",
@@ -3669,7 +3924,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/无线对讲机__8ec9d0a594ac439084572974f859f2e3.png",
         "sourceImageSha256": "5554fc94418b348d77137a6bff3406f5455f0f7ac1bd45c85c845fda88d92933",
-        "thumbnail": "images/aqintel140-8ec9d0a594ac439084572974f859f2e3.png"
+        "thumbnail": "images/aqintel140-8ec9d0a594ac439084572974f859f2e3.png",
+        "thumbnailBackground": "#221A2F",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(170), 0, np.int64(341), 512) of the original, scaled to ≤192 px with the same proportions; the app draws the 紫 rarity background #221A2F over the grid footprint behind it",
+        "thumbnailSha256": "cec13fcd2b05ec91f63216338d8ede325a5e68e283a047c786e7310e5518470f"
       },
       {
         "incomingId": "e727882c-c9d7-4c62-b4a5-a30c6476e7e7",
@@ -3688,7 +3946,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/火焰喷灯__e727882c-c9d7-4c62-b4a5-a30c6476e7e7.png",
         "sourceImageSha256": "b356152e829149c6e09cfc76e636c9c8fb91f443c3bec85eb5ceaa696017af58",
-        "thumbnail": "images/aqintel140-e727882c-c9d7-4c62-b4a5-a30c6476e7e7.png"
+        "thumbnail": "images/aqintel140-e727882c-c9d7-4c62-b4a5-a30c6476e7e7.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (np.int64(106), np.int64(27), np.int64(372), np.int64(486)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "6123773838d1cea252192ae0e623bde64fb3f2581a6ffbafc7cfdbcf1c958af0"
       },
       {
         "incomingId": "deb60c203b8d41c2a57d4b4f63de7016",
@@ -3707,7 +3968,10 @@
         "gridHeight": 2,
         "sourceImage": "物品图片/唱片机__deb60c203b8d41c2a57d4b4f63de7016.png",
         "sourceImageSha256": "2709699821fdac4ad37755ba3befb4713265bb5503fa36b84e2e8abb0074d9ea",
-        "thumbnail": "images/aqintel140-deb60c203b8d41c2a57d4b4f63de7016.png"
+        "thumbnail": "images/aqintel140-deb60c203b8d41c2a57d4b4f63de7016.png",
+        "thumbnailBackground": "#32220E",
+        "thumbnailEdit": "transparent margins cropped to (0, np.int64(47), 394, np.int64(349)) of the original, scaled to ≤192 px with the same proportions; the app draws the 金 rarity background #32220E over the grid footprint behind it",
+        "thumbnailSha256": "3e3af3a69f5057521752574f35fe629f5388d9b8f8e2195d4840ed7d0fee0234"
       }
     ],
     "sounds": [
@@ -5009,6 +5273,14 @@
         "gridHeight": 2,
         "evidence": "原 2×3；本库缩略图物品底色 1:1（与 2×2 的古董茶壶相同），情报站 2×2"
       }
+    },
+    "thumbnailBackgrounds": {
+      "colours": {
+        "红": "#321612",
+        "金": "#32220E",
+        "紫": "#221A2F"
+      },
+      "source": "本库截图缩略图中同稀有度物品底色的中位数（两库共有的 50 件：红 29、金 18、紫 3）"
     }
   }
 }

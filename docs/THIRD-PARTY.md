@@ -20,7 +20,7 @@
 ## 暗区情报站小助手 1.4.0 素材
 
 - 来源：用户提供的安装包 `暗区情报站小助手-Setup-1.4.0.exe`（SHA-256 `de01d901ac6142db82b09697e4dd71935cc46b946af659163550ac44d16cb0ca`），本地静态解包，未运行安装器或其程序，未采用其代码、识别算法或界面。逐文件哈希见 `artifacts/暗区情报站-1.4.0-素材库/来源与校验.json`（本地资料，不随仓库发布）。
-- `data/library/images/aqintel140-*.png`：88 件新增物品的图片，由包内原图等比缩到不超过 192 像素。
+- `data/library/images/aqintel140-*.png`：88 件新增物品的图片，由包内透明底原图裁掉四周透明边后等比缩到不超过 192 像素。显示时的稀有度底色由本程序绘制，颜色取自本库截图，不属于对方素材。
 - `data/library/audio/aqintel140-sound-{06,11,14,16}.wav`：识别参考。包内 48 kHz 双声道 WAV 取两声道平均转为单声道，只裁掉起点前的空白，未改音量、未滤波、未重采样（逐样本核对见 `docs/measurements/merge-aqintel-audio-impact-20261014.json` 所在的复核说明）。
 - `data/library/playback/aqintel140-sound-{10,11,12,14,15,16}.wav`：逐字节复制的包内试听 WAV，只给没有 SoundRadar 原始录音的音效组试听，并在 `playback.json` 的 `processing` 字段注明：它们不是原始录音——与同一段原始游戏录音相比音量整体不同，约 18 kHz 以上被截去。
 - 物品名称、格数（包内 行×列 转为 宽×高）、稀有度与价格文字按原包记录在 `data/library/provenance.json` 的 `aqintel140` 段；价格不进入 `referenceValue`。

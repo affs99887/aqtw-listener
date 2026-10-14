@@ -659,6 +659,31 @@ internal sealed class CandidatePanel : Border
         return rows;
     }
 
+    // The item picture, always scaled uniformly. A picture without the game's rarity background
+    // (情报站 renders) sits on that colour drawn over the item's grid footprint, like the
+    // screenshot thumbnails, so every card shows rarity and size the same way.
+    private UIElement ItemPicture(ItemDefinition item, double margin, int decodeWidth, double labelSize)
+    {
+        if (item.Thumbnail is null) return Theme.Label("暂无图片", labelSize * FontScale, Theme.Muted);
+        try
+        {
+            var path = Path.Combine(libraryRoot, item.Thumbnail);
+            if (!images.TryGetValue(path, out var image))
+            {
+                image = new BitmapImage(); image.BeginInit(); image.CacheOption = BitmapCacheOption.OnLoad;
+                image.DecodePixelWidth = decodeWidth; image.UriSource = new Uri(path); image.EndInit(); image.Freeze(); images[path] = image;
+            }
+            var picture = new Image { Source = image, Stretch = Stretch.Uniform, Margin = new Thickness(margin) };
+            if (item.ThumbnailBackground is not { } colour) return picture;
+            const double cell = 100;
+            picture.Margin = new Thickness(cell * .06);
+            var footprint = new Border { Width = item.GridWidth * cell, Height = item.GridHeight * cell, Background = Theme.Brush(colour), Child = picture };
+            return new Viewbox { Child = footprint, Stretch = Stretch.Uniform, Margin = new Thickness(margin) };
+        }
+        catch (Exception ex) when (ex is IOException or NotSupportedException or FileFormatException or ArgumentException)
+        { return Theme.Label("暂无图片", labelSize * FontScale, Theme.Muted); }
+    }
+
     private UIElement DenseDesignCard(Candidate candidate, double thumbnail, double width, double height, int rowSize = 0,
         double nameSize = 0, bool differenceOnPicture = false)
     {
@@ -675,22 +700,7 @@ internal sealed class CandidatePanel : Border
         grid.ColumnDefinitions.Add(new ColumnDefinition());
         if (previewButtons) grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(playWidth + 8 * FontScale) });
         var picture = new Grid { Width = thumbnail, Height = thumbnail, Background = Theme.Background };
-        if (item.Thumbnail is not null)
-        {
-            try
-            {
-                var path = Path.Combine(libraryRoot, item.Thumbnail);
-                if (!images.TryGetValue(path, out var image))
-                {
-                    image = new BitmapImage(); image.BeginInit(); image.CacheOption = BitmapCacheOption.OnLoad;
-                    image.DecodePixelWidth = 180; image.UriSource = new Uri(path); image.EndInit(); image.Freeze(); images[path] = image;
-                }
-                picture.Children.Add(new Image { Source = image, Stretch = Stretch.Uniform, Margin = new Thickness(2) });
-            }
-            catch (Exception ex) when (ex is IOException or NotSupportedException or FileFormatException or ArgumentException)
-            { picture.Children.Add(Theme.Label("暂无图片", 9 * FontScale, Theme.Muted)); }
-        }
-        else picture.Children.Add(Theme.Label("暂无图片", 9 * FontScale, Theme.Muted));
+        picture.Children.Add(ItemPicture(item, 2, 180, 9));
         if (TagBadge(candidate) is { } badge) picture.Children.Add(badge);
         // Dense cards have no spare text line: the 差异率 rides on the picture's bottom edge.
         if ((!prominent || differenceOnPicture) && !catalogView)
@@ -765,22 +775,7 @@ internal sealed class CandidatePanel : Border
         name.FontWeight = FontWeights.SemiBold; name.Margin = new Thickness(0); name.TextTrimming = TextTrimming.None;
         name.TextWrapping = TextWrapping.Wrap; heading.Children.Add(name); stack.Children.Add(heading);
         var picture = new Grid { Height = thumbnail, Background = Theme.Background, Margin = new Thickness(0, 0, 0, 3) };
-        if (item.Thumbnail is not null)
-        {
-            try
-            {
-                var path = Path.Combine(libraryRoot, item.Thumbnail);
-                if (!images.TryGetValue(path, out var image))
-                {
-                    image = new BitmapImage(); image.BeginInit(); image.CacheOption = BitmapCacheOption.OnLoad;
-                    image.DecodePixelWidth = 180; image.UriSource = new Uri(path); image.EndInit(); image.Freeze(); images[path] = image;
-                }
-                picture.Children.Add(new Image { Source = image, Stretch = Stretch.Uniform, Margin = new Thickness(4) });
-            }
-            catch (Exception ex) when (ex is IOException or NotSupportedException or FileFormatException or ArgumentException)
-            { picture.Children.Add(Theme.Label("暂无图片", 10 * FontScale, Theme.Muted)); }
-        }
-        else picture.Children.Add(Theme.Label("暂无图片", 10 * FontScale, Theme.Muted));
+        picture.Children.Add(ItemPicture(item, 4, 180, 10));
         if (TagBadge(candidate) is { } pictureBadge) picture.Children.Add(pictureBadge);
         stack.Children.Add(picture);
         var dimensions = Theme.Label($"◇ {item.GridLabel}", 10 * FontScale, Theme.Muted);
@@ -858,22 +853,7 @@ internal sealed class CandidatePanel : Border
             stack.Children.Add(name);
         }
         var tile = new Grid { Height = thumbnail, Background = Theme.Background };
-        if (item.Thumbnail is not null)
-        {
-            try
-            {
-                var path = Path.Combine(libraryRoot, item.Thumbnail);
-                if (!images.TryGetValue(path, out var image))
-                {
-                    image = new BitmapImage(); image.BeginInit(); image.CacheOption = BitmapCacheOption.OnLoad;
-                    image.DecodePixelWidth = 200; image.UriSource = new Uri(path); image.EndInit(); image.Freeze(); images[path] = image;
-                }
-                tile.Children.Add(new Image { Source = image, Stretch = Stretch.Uniform, Margin = new Thickness(2) });
-            }
-            catch (Exception ex) when (ex is IOException or NotSupportedException or FileFormatException or ArgumentException)
-            { tile.Children.Add(Theme.Label("暂无图片", 10 * FontScale, Theme.Muted)); }
-        }
-        else tile.Children.Add(Theme.Label("暂无图片", 10 * FontScale, Theme.Muted));
+        tile.Children.Add(ItemPicture(item, 2, 200, 10));
         if (TagBadge(candidate) is { } tileBadge) tile.Children.Add(tileBadge);
         stack.Children.Add(tile);
         var metadata = new DockPanel { Margin = new Thickness(0, 3, 0, 0), LastChildFill = false };

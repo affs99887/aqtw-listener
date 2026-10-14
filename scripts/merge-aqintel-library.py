@@ -83,8 +83,18 @@ def to_mono_wav(src: Path, dst: Path):
         h.writeframes(np.clip(np.round(pcm), -32768, 32767).astype("<i2").tobytes())
 
 
+# The package's renders are transparent, without the game's rarity background. The app draws this
+# colour over the item's grid footprint behind them (ItemDefinition.ThumbnailBackground): the median
+# background of our screenshot tiles of the same rarity, over the 50 items both libraries share.
+RARITY_BACKGROUND = {"红": "#321612", "金": "#32220E", "紫": "#221A2F"}
+
+
 def thumbnail(src: Path, dst: Path, size=192):
+    """Crop the transparent margins (3% padding kept) and scale to ≤ size; proportions unchanged."""
     im = Image.open(src).convert("RGBA")
+    ys, xs = np.nonzero(np.asarray(im)[:, :, 3] > 8)
+    pad = round(.03 * max(xs.max() - xs.min() + 1, ys.max() - ys.min() + 1))
+    im = im.crop((max(0, xs.min() - pad), max(0, ys.min() - pad), min(im.width, xs.max() + 1 + pad), min(im.height, ys.max() + 1 + pad)))
     if max(im.size) > size:
         im.thumbnail((size, size), Image.LANCZOS)
     im.save(dst, optimize=True)
@@ -137,7 +147,8 @@ def main(staging: Path):
                 image = f"images/{ours}.png"
                 thumbnail(SRC / it["image"], staging / image)
                 items[ours] = {"id": ours, "name": name, "isGold": it["rarity"] == "红", "referenceValue": None, "valueSource": None, "valueDate": None,
-                               "gridWidth": w, "gridHeight": h, "thumbnail": image, "gridVerified": True, "catalogSource": "aqintel-1.4.0"}
+                               "gridWidth": w, "gridHeight": h, "thumbnail": image, "gridVerified": True, "catalogSource": "aqintel-1.4.0",
+                               "thumbnailBackground": RARITY_BACKGROUND[it["rarity"]]}
                 lib["items"].append(items[ours]); by_name[name] = ours
                 entry.update(action="new", ourId=ours, isGold=it["rarity"] == "红", gridWidth=w, gridHeight=h,
                              sourceImage=it["image"], sourceImageSha256=sha256(SRC / it["image"]), thumbnail=image)
