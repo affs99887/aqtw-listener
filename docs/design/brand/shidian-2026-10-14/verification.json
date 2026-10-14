@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "iconSizes": [
+    16,
+    20,
+    24,
+    32,
+    40,
+    48,
+    64,
+    128,
+    256
+  ],
+  "previewKind": "Rendered application UI with simulated recognition results",
+  "settingsNote": "The active app wrote settings after UI smoke completion; current live settings were preserved.",
+  "report": "../../../measurements/shidian-logo-ui-smoke.json"
+}

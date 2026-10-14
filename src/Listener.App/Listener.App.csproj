@@ -11,6 +11,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="Assets/listener-mark.png" />
+    <Resource Include="Assets/listener-app.png" />
     <Resource Include="Assets/listener.ico" />
     <InternalsVisibleTo Include="Listener.App.Tests" />
     <ProjectReference Include="../Listener.Core/Listener.Core.csproj" />

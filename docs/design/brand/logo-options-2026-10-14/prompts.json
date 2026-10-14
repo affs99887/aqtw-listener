@@ -1,0 +1,48 @@
+{
+  "project": "行商听音助手",
+  "date": "2026-10-14",
+  "tool": "built-in image_gen",
+  "stage": "供选择的 Logo 概念图，深色背景；尚未制作透明图标或接入程序。",
+  "concepts": [
+    {
+      "id": "A",
+      "name": "声纹货箱",
+      "filename": "A-waveform-crate.png",
+      "prompt": "Use case: logo-brand.\nAsset type: original logo concept for a Windows desktop application called 行商听音助手 (a local sound recognition assistant for identifying a travelling merchant's mystery loot in a tactical extraction game).\nOutput: one polished square 1024 by 1024 logo presentation image, ONE centered symbol occupying about 60 percent of the canvas, generous clear margins, on an absolutely uniform near-black #101116 background.\nStyle: precise flat vector-like brand design, strong distinctive silhouette, substantial strokes and balanced negative space, angular industrial forms with restrained chamfers, clear enough for a small desktop or tray icon. Premium, calm, intelligent, tactical utility rather than a sports-team badge.\nExisting project palette: off-white #E6ECE7, desaturated gray-sage #99AAA1, muted loot-red #EE6259 and warm gold #E6C879. Use only the specified subset for this concept.\nNo words, letters outside the designed symbol, labels, watermarks, photo mockups, 3D, shadows, glow, gradients, texture, decorative UI, tiny lines, multiple variations, official game logo or copied third-party brand marks.\nConcept A — WAVEFORM CRATE. Reimagine a compact merchant cargo case as a unified sound-recognition mark. Use a simple front-facing chamfered rectangular crate silhouette with one integrated carrying handle and a bold off-white outline; within it three substantial vertical equalizer bars are cleverly integrated into the crate construction, the central tall bar muted loot-red and the two side bars desaturated gray-sage. Treat the bars and case as one coherent designed emblem, not pasted clipart. No locks, corner screws, tiny feet, repeated double outlines or extra decorations. A stable slightly wider-than-tall compact silhouette. This should communicate both goods and listening at a glance. Off-white plus gray-sage plus one muted red accent.",
+      "subtitle": "货箱 × 声纹",
+      "desc": "用行商货箱包住三段声纹，第一眼就能联想到“听声音识别货物”。",
+      "tag": "推荐 · 功能表达清晰",
+      "source": "C:\\Users\\Dexin\\.codex\\generated_images\\01a13a3b-d921-7ee0-b7cd-dbd8e11dfee4\\exec-fd91b7e9-013f-45a5-9e26-66f2e2a84c15.png"
+    },
+    {
+      "id": "B",
+      "name": "回声雷达",
+      "filename": "B-echo-radar.png",
+      "prompt": "Use case: logo-brand.\nAsset type: original logo concept for a Windows desktop application called 行商听音助手 (a local sound recognition assistant for identifying a travelling merchant's mystery loot in a tactical extraction game).\nOutput: one polished square 1024 by 1024 logo presentation image, ONE centered symbol occupying about 60 percent of the canvas, generous clear margins, on an absolutely uniform near-black #101116 background.\nStyle: precise flat vector-like brand design, strong distinctive silhouette, substantial strokes and balanced negative space, angular industrial forms with restrained chamfers, clear enough for a small desktop or tray icon. Premium, calm, intelligent, tactical utility rather than a sports-team badge.\nExisting project palette: off-white #E6ECE7, desaturated gray-sage #99AAA1, muted loot-red #EE6259 and warm gold #E6C879. Use only the specified subset for this concept.\nNo words, letters outside the designed symbol, labels, watermarks, photo mockups, 3D, shadows, glow, gradients, texture, decorative UI, tiny lines, multiple variations, official game logo or copied third-party brand marks.\nConcept B — ECHO RADAR. A radically simple circular sound-detection emblem built around a small solid muted-red tilted square representing an identified loot item. Two bold asymmetric incomplete concentric echo arcs in off-white and desaturated gray-sage curl around the square to create a distinctive open circular silhouette. Give the arcs square chamfered terminals and large clean gaps; slightly offset the central square for an intentional optical balance. The design should look like a memorable sonic pulse/radar identity, not a generic wifi icon or target reticle. Only two arcs and the central square, no crosshairs, ticks, grid, shields or extra bars. Off-white plus gray-sage plus muted red.",
+      "subtitle": "声波 × 目标",
+      "desc": "开放的回声圆环围绕红色物品，轮廓简洁，偏向监听与探测的科技感。",
+      "tag": "简洁 · 科技感",
+      "source": "C:\\Users\\Dexin\\.codex\\generated_images\\01a13a3b-d921-7ee0-b7cd-dbd8e11dfee4\\exec-94e98196-1de7-407f-bd35-44ca7daf7a88.png"
+    },
+    {
+      "id": "C",
+      "name": "行字声标",
+      "filename": "C-xing-sound-monogram.png",
+      "prompt": "Use case: logo-brand.\nAsset type: original logo concept for a Windows desktop application called 行商听音助手 (a local sound recognition assistant for identifying a travelling merchant's mystery loot in a tactical extraction game).\nOutput: one polished square 1024 by 1024 logo presentation image, ONE centered symbol occupying about 60 percent of the canvas, generous clear margins, on an absolutely uniform near-black #101116 background.\nStyle: precise flat vector-like brand design, strong distinctive silhouette, substantial strokes and balanced negative space, angular industrial forms with restrained chamfers, clear enough for a small desktop or tray icon. Premium, calm, intelligent, tactical utility rather than a sports-team badge.\nExisting project palette: off-white #E6ECE7, desaturated gray-sage #99AAA1, muted loot-red #EE6259 and warm gold #E6C879. Use only the specified subset for this concept.\nNo words, letters outside the designed symbol, labels, watermarks, photo mockups, 3D, shadows, glow, gradients, texture, decorative UI, tiny lines, multiple variations, official game logo or copied third-party brand marks.\nConcept C — XING SOUND MONOGRAM. Create a custom iconic Chinese logomark based on the single Chinese character “行”, the merchant/travelling part of the product name. Preserve recognizable 行 structure: the left 彳 radical and the right component's two horizontal strokes with hooked vertical. Reconstruct the strokes as exceptionally bold angular stencil-like geometric forms with carefully open counters and subtle chamfered ends. Integrate an audio rhythm into the left component's three strokes through differing lengths and clean rising stepped geometry; do not add a separate waveform or enclosing frame. Use off-white for the left component and muted loot-red for the right component to unite sound and trade. The result should be a singular compact expressive typographic symbol, not ordinary font text or calligraphy. Solid fills, robust silhouette, no tiny cuts, no brush texture, no additional characters.",
+      "subtitle": "行商 × 字标",
+      "desc": "把“行”字化成硬朗的几何笔画，红白分色，强化项目自己的名称与辨识度。",
+      "tag": "品牌感 · 辨识度",
+      "source": "C:\\Users\\Dexin\\.codex\\generated_images\\01a13a3b-d921-7ee0-b7cd-dbd8e11dfee4\\exec-e72a0af5-47e7-487b-926f-bf77c7bd7577.png"
+    },
+    {
+      "id": "D",
+      "name": "红晶回响",
+      "filename": "D-ruby-echo.png",
+      "prompt": "Use case: logo-brand.\nAsset type: original logo concept for a Windows desktop application called 行商听音助手 (a local sound recognition assistant for identifying a travelling merchant's mystery loot in a tactical extraction game).\nOutput: one polished square 1024 by 1024 logo presentation image, ONE centered symbol occupying about 60 percent of the canvas, generous clear margins, on an absolutely uniform near-black #101116 background.\nStyle: precise flat vector-like brand design, strong distinctive silhouette, substantial strokes and balanced negative space, angular industrial forms with restrained chamfers, clear enough for a small desktop or tray icon. Premium, calm, intelligent, tactical utility rather than a sports-team badge.\nExisting project palette: off-white #E6ECE7, desaturated gray-sage #99AAA1, muted loot-red #EE6259 and warm gold #E6C879. Use only the specified subset for this concept.\nNo words, letters outside the designed symbol, labels, watermarks, photo mockups, 3D, shadows, glow, gradients, texture, decorative UI, tiny lines, multiple variations, official game logo or copied third-party brand marks.\nConcept D — RUBY ECHO. Create a premium minimal emblem expressing a valuable red loot item revealed by sound. Main form: a bold simple upright red gem/diamond with a wide angular upper shoulder and pointed bottom, made from just two solid muted-red planes separated by one substantial dark negative-space diagonal. On its right, two short broad off-white angular sound-wave chevrons radiate outward, echoing the gem facets; the gem and two chevrons must form a compact integrated balanced silhouette. No ring, shield, box, radar or waveform bars. A very restrained small warm-gold facet near the upper-left can add rarity, but keep the red gem dominant and the whole shape simple enough to recognize at 24px. Flat vector-like graphic with hard clean edges, memorable and confident.",
+      "subtitle": "大红 × 回响",
+      "desc": "以红色晶体、金色切面和回声箭头表达高价值物品，视觉更醒目。",
+      "tag": "醒目 · 游戏感",
+      "source": "C:\\Users\\Dexin\\.codex\\generated_images\\01a13a3b-d921-7ee0-b7cd-dbd8e11dfee4\\exec-5398e84e-864f-44aa-80fa-466c809f07cd.png"
+    }
+  ]
+}

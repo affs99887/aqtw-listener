@@ -1,5 +1,17 @@
 # 当前接续状态 · 2026-10-14
 
+**v0.5.2 · 发布版本（最新）**：候选最小宽度为格数栏加两张卡片，每行最多四件，名称在各卡片入口均显式左对齐；排满行右侧仅 3 逻辑像素边框余量。中字号、880 候选面板高度预算下：1 件 576×135，6 件两列 / 582×325，13 件三列 / 740×552，31 件四列 / 824×732（不含标题栏）。小试听按钮、两行长名称、88 / 80 / 56 图片与分组概率保持；空间不足可在操作模式滚动查看。包含首次启动快捷键恢复与拾点新图标，说明见 docs/releases/v0.5.2.md。
+
+后台应用回归 63/63、24 个无窗口渲染组合通过，记录见 docs/measurements/candidate-two-card-left-*-20261014.json；截图见 docs/screenshots/two-card-left-*-20261014.png。对照网页 artifacts/candidate-width-study/preview.html 已更新，默认显示最新左对齐与两件最小宽度；历史两版明确标为历史，12 个版本与 36 个缩放切换检查通过。本轮未做新版完整窗口或游戏内覆盖验证。
+
+用户已授权打包 0.5.2、同步 portable、提交并发布 GitHub Release。构建目录 .tools/release/v0.5.2；压缩包 artifacts/AqtwListener-v0.5.2-win-x64.zip，不包含个人 local-data。按发布提交构建成品并同步 portable，旧文件保存在 .tools/rollback/v0.5.2。发布目标：https://github.com/affs99887/aqtw-listener/releases/tag/v0.5.2；成品与发布的核验记录保存在 artifacts/release-v0.5.2-validation.json。打包与发布操作不启动、关闭或重启助手。
+
+**测试约束**：用户正在打游戏，明确反馈反复弹出的测试界面会干扰游戏。后续保持后台构建、无窗口检查与内存渲染；不要自动运行 --ui-smoke、弹出窗口、打开/切换预览页或关闭、重启其正在使用的助手。置顶、焦点、完整窗口与游戏内遮挡测试留待用户方便时再做。
+
+**本地试用 · 拾点 Logo**：用户选择极简方案 04。`Assets/listener-mark.svg` 是透明浅色界面标志，`listener-app.svg` 是深底系统图标；`scripts/export-icon.ps1` 逐尺寸渲染 PNG 与九帧 ICO，`draw-logo.py` 仅保留兼容入口。主窗口、浮窗使用 `BrandAssets.Mark`，窗口与任务栏使用 `WindowIcon`，托盘使用 ICO。预览见 `docs/design/brand/shidian-2026-10-14/index.html`。此项是 v0.5.1 之后的本地修改。
+
+便携版已更新，`--ui-smoke` 通过；记录见 `docs/measurements/shidian-logo-ui-smoke.json`。预览中的主窗口与浮窗来自程序的模拟界面检查。
+
 **v0.5.1**（已发布 GitHub Release）：`ItemDefinition.Rarity`（红/金/紫/蓝，红 ⇔ IsGold，`Validate` 检查）与 `RarityRank`；四处候选排序改为格数内按稀有度。150 件的稀有度：情报站资料 138 件，其余 12 件按目录大红与截图底色（`provenance.json` 的 `rarity`，`merge-aqintel-library.py` 的 `RARITY_FROM_TILES`）。新图标由 `scripts/draw-logo.py` 按尺寸矢量绘制（物品格 + 声波、正中大红），生成 `listener-mark.png` 与 `listener.ico`，预览 `docs/design/brand/listener-mark-preview.png`；旧的 `export-icon.ps1` 不再需要。
 
 以下为 v0.5.0 时的状态记录。

@@ -1,0 +1,365 @@
+{
+  "passed": true,
+  "images": 150,
+  "clickThrough": false,
+  "noActivate": true,
+  "layered": true,
+  "topmost": true,
+  "foregroundPreserved": true,
+  "operation": {
+    "operationFit": {
+      "sound": true,
+      "candidates": true,
+      "personal": true,
+      "learn": true,
+      "new-item": true
+    },
+    "unlocked": true,
+    "samePin": true,
+    "fontChecks": {
+      "two-small": {
+        "scale": 0.9,
+        "actualWidth": 930,
+        "actualHeight": 630,
+        "noWindowScale": true,
+        "candidates": 27,
+        "needsScroll": false,
+        "thumbnailSize": 64,
+        "contentHeight": 553,
+        "sampleButtonsFit": true,
+        "toolbarButtonsFit": true,
+        "namesOneLine": true,
+        "playButtonsRight": true
+      },
+      "two-medium": {
+        "scale": 1,
+        "actualWidth": 986,
+        "actualHeight": 645,
+        "noWindowScale": true,
+        "candidates": 27,
+        "needsScroll": false,
+        "thumbnailSize": 64,
+        "contentHeight": 559,
+        "sampleButtonsFit": true,
+        "toolbarButtonsFit": true,
+        "namesOneLine": true,
+        "playButtonsRight": true
+      },
+      "two-large": {
+        "scale": 1.15,
+        "actualWidth": 1070,
+        "actualHeight": 737,
+        "noWindowScale": true,
+        "candidates": 27,
+        "needsScroll": false,
+        "thumbnailSize": 64,
+        "contentHeight": 639,
+        "sampleButtonsFit": true,
+        "toolbarButtonsFit": true,
+        "namesOneLine": true,
+        "playButtonsRight": true
+      },
+      "six-small": {
+        "scale": 0.9,
+        "actualWidth": 702,
+        "actualHeight": 438,
+        "noWindowScale": true,
+        "candidates": 6,
+        "needsScroll": false,
+        "thumbnailSize": 112,
+        "contentHeight": 357,
+        "sampleButtonsFit": true,
+        "toolbarButtonsFit": true,
+        "namesOneLine": true,
+        "playButtonsRight": true
+      },
+      "six-medium": {
+        "scale": 1,
+        "actualWidth": 736,
+        "actualHeight": 447,
+        "noWindowScale": true,
+        "candidates": 6,
+        "needsScroll": false,
+        "thumbnailSize": 112,
+        "contentHeight": 357,
+        "sampleButtonsFit": true,
+        "toolbarButtonsFit": true,
+        "namesOneLine": true,
+        "playButtonsRight": true
+      },
+      "six-large": {
+        "scale": 1.15,
+        "actualWidth": 790,
+        "actualHeight": 460,
+        "noWindowScale": true,
+        "candidates": 6,
+        "needsScroll": false,
+        "thumbnailSize": 112,
+        "contentHeight": 357,
+        "sampleButtonsFit": true,
+        "toolbarButtonsFit": true,
+        "namesOneLine": true,
+        "playButtonsRight": true
+      }
+    },
+    "comparisonFits": true,
+    "listeningDesignVisible": true,
+    "waitingViewVisible": true,
+    "liveThirteen": true,
+    "liveReplayPausesSampling": true,
+    "listeningThirteen": true,
+    "listeningThirteenDetails": {
+      "actualWidth": 831,
+      "actualHeight": 698,
+      "thumbnailSize": 96,
+      "groups": [
+        "2 格",
+        "3 格",
+        "4 格",
+        "6 格"
+      ],
+      "cards": 13,
+      "thirteenNamesFit": true,
+      "thirteenButtonsRight": true,
+      "thirteenMissingLabels": [],
+      "needsScroll": false
+    },
+    "groupedFifteen": true,
+    "groupedFifteenDetails": {
+      "actualWidth": 831,
+      "actualHeight": 595,
+      "thumbnailSize": 96,
+      "contentHeight": 505,
+      "rows": 5,
+      "cards": 15,
+      "unevenButtonsRight": true,
+      "needsScroll": false
+    },
+    "listeningOnePage": true,
+    "listeningOnePageDetails": {
+      "actualWidth": 1261,
+      "actualHeight": 719,
+      "needsScroll": false,
+      "thumbnailSize": 64,
+      "contentHeight": 633,
+      "cards": 31,
+      "allItemCardsFit": true,
+      "allItemNamesOneLine": true,
+      "allItemButtonsRight": true,
+      "maxRight": 1249,
+      "maxBottom": 711
+    },
+    "tileButtonsRight": true,
+    "cardsCompact": true,
+    "compactGaps": [
+      6.2,
+      6,
+      6.2,
+      7,
+      6,
+      7.5,
+      6,
+      6,
+      6
+    ],
+    "imagesKeepAspect": true,
+    "catalogImages": 150,
+    "stretchedImages": [],
+    "backgroundsShown": true,
+    "backgroundItems": 88,
+    "rarityBackgrounds": 88,
+    "nearControlRemoved": true,
+    "editorFontPreservesText": true,
+    "replayStarted": true,
+    "replayStopped": true,
+    "referenceStarted": true,
+    "referenceStopped": true,
+    "capturePausedDuringReplay": true,
+    "stopFollowsPlayback": true,
+    "liveFresh": true,
+    "liveStale": true,
+    "followUpMarked": true,
+    "menusStyled": true,
+    "enabledInteraction": true,
+    "restoredListeningControls": true,
+    "recognitionRemainedOff": true
+  },
+  "placement": {
+    "mode": "GameTopCenter",
+    "viewport": {
+      "isEmpty": false,
+      "location": {
+        "x": 0,
+        "y": 0
+      },
+      "size": {
+        "isEmpty": false,
+        "width": 1920,
+        "height": 1032
+      },
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1032,
+      "left": 0,
+      "top": 0,
+      "right": 1920,
+      "bottom": 1032,
+      "topLeft": {
+        "x": 0,
+        "y": 0
+      },
+      "topRight": {
+        "x": 1920,
+        "y": 0
+      },
+      "bottomLeft": {
+        "x": 0,
+        "y": 1032
+      },
+      "bottomRight": {
+        "x": 1920,
+        "y": 1032
+      }
+    },
+    "smallBounds": {
+      "isEmpty": false,
+      "location": {
+        "x": 650,
+        "y": 12
+      },
+      "size": {
+        "isEmpty": false,
+        "width": 620,
+        "height": 209
+      },
+      "x": 650,
+      "y": 12,
+      "width": 620,
+      "height": 209,
+      "left": 650,
+      "top": 12,
+      "right": 1270,
+      "bottom": 221,
+      "topLeft": {
+        "x": 650,
+        "y": 12
+      },
+      "topRight": {
+        "x": 1270,
+        "y": 12
+      },
+      "bottomLeft": {
+        "x": 650,
+        "y": 221
+      },
+      "bottomRight": {
+        "x": 1270,
+        "y": 221
+      }
+    },
+    "largeBounds": {
+      "isEmpty": false,
+      "location": {
+        "x": 532,
+        "y": 12
+      },
+      "size": {
+        "isEmpty": false,
+        "width": 856,
+        "height": 698
+      },
+      "x": 532,
+      "y": 12,
+      "width": 856,
+      "height": 698,
+      "left": 532,
+      "top": 12,
+      "right": 1388,
+      "bottom": 710,
+      "topLeft": {
+        "x": 532,
+        "y": 12
+      },
+      "topRight": {
+        "x": 1388,
+        "y": 12
+      },
+      "bottomLeft": {
+        "x": 532,
+        "y": 710
+      },
+      "bottomRight": {
+        "x": 1388,
+        "y": 710
+      }
+    },
+    "centered": true,
+    "topAnchored": true,
+    "staysInGame": true
+  },
+  "layout": {
+    "thumbnailSize": 88,
+    "smallHeight": 209,
+    "smallWidth": 620,
+    "largeHeight": 698,
+    "largeWidth": 856,
+    "overflowHeight": 719,
+    "overflowWidth": 911,
+    "maximumHeight": 1012,
+    "allCandidatesReachable": true,
+    "allCardsFit": true,
+    "shrunkAgain": true,
+    "overflowNeedsScroll": false,
+    "paginationPresent": false,
+    "commonGroupFits": true,
+    "widestRowRightGap": 1,
+    "largestGroupFits": true,
+    "historySmallHeight": 371,
+    "historyLargeHeight": 860,
+    "historyOnScreen": true,
+    "allHistoryReachable": true,
+    "settingsFit": {
+      "监听": true,
+      "采音": true,
+      "位置": true,
+      "浮窗": true,
+      "音效库": true,
+      "诊断": true
+    },
+    "adaptivePassed": true
+  },
+  "inputMode": null,
+  "inputError": "",
+  "diagnostics": {
+    "enabled": false,
+    "targetProcess": "UAGame",
+    "foregroundProcess": "UAGame",
+    "state": "监听已关闭",
+    "capturing": false,
+    "captureSource": "",
+    "capturedProcessId": 0,
+    "previewDeviceId": "",
+    "audio": {
+      "packets": 0,
+      "lastPacketAgeSeconds": null,
+      "rms": 0,
+      "lastSoundAgeSeconds": null,
+      "timelineLagSeconds": null
+    },
+    "triggerCount": 0,
+    "lastTriggerSource": "尚未触发",
+    "lastTriggerAt": null,
+    "lastIgnoredReason": "",
+    "lastRecognition": "尚未识别",
+    "manualTestStatus": "",
+    "automaticRecognition": true,
+    "automaticScans": 0,
+    "automaticStatus": "等待开启监听",
+    "automaticWindowRms": 0,
+    "skippedPutdowns": 0,
+    "recentSounds": [],
+    "recentInput": []
+  },
+  "note": "仅桌面浮窗属性与渲染检查，未在游戏中测试输入或独占全屏覆盖"
+}

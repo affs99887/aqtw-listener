@@ -9,11 +9,12 @@ namespace Listener.App;
 internal static class BrandAssets
 {
     private static readonly Uri IconUri = new("pack://application:,,,/AqtwListener;component/Assets/listener.ico");
-    public static BitmapImage Mark { get; } = LoadMark();
+    public static BitmapImage Mark { get; } = LoadImage("listener-mark.png");
+    public static BitmapImage WindowIcon { get; } = LoadImage("listener-app.png");
     public static Drawing.Icon TrayIcon { get; } = LoadIcon();
-    private static BitmapImage LoadMark()
+    private static BitmapImage LoadImage(string name)
     {
-        var image = new BitmapImage(new Uri("pack://application:,,,/AqtwListener;component/Assets/listener-mark.png"));
+        var image = new BitmapImage(new Uri($"pack://application:,,,/AqtwListener;component/Assets/{name}"));
         image.Freeze(); return image;
     }
     private static Drawing.Icon LoadIcon()
@@ -41,7 +42,7 @@ internal static class BrandAssets
     }
     public static void StyleWindow(Window window)
     {
-        window.Icon = Mark;
+        window.Icon = WindowIcon;
         window.UseLayoutRounding = true;
         window.SourceInitialized += (_, _) =>
         {

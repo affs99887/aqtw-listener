@@ -33,6 +33,7 @@ internal sealed partial class MainWindow : Window
     private readonly ComboBox positionMode = new();
     private readonly ComboBox fontScale = new();
     private readonly TextBox interactionHotkey = new();
+    private readonly TextBlock hotkeyStatus = Theme.Label("正在注册快捷键…", 11, Theme.Muted);
     private readonly Grid settingsPage = new();
     private readonly Dictionary<string, (Button Button, UIElement Content)> sections = new();
     private readonly Slider opacity = new() { Minimum = .35, Maximum = 1, TickFrequency = .05 };
@@ -47,7 +48,7 @@ internal sealed partial class MainWindow : Window
         Title = "行商听音助手"; Width = Math.Min(900, SystemParameters.WorkArea.Width); MinWidth = Math.Min(760, Width);
         Height = Math.Min(720, SystemParameters.WorkArea.Height); MinHeight = Math.Min(560, Height);
         MaxHeight = SystemParameters.WorkArea.Height;
-        Icon = BrandAssets.Mark;
+        Icon = BrandAssets.WindowIcon;
         UseLayoutRounding = true; SnapsToDevicePixels = true;
         Background = Theme.Background; Foreground = Theme.Text; FontFamily = new FontFamily("Microsoft YaHei UI");
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -196,6 +197,7 @@ internal sealed partial class MainWindow : Window
         captureConfig.Children.Add(Theme.Button("刷新播放设备", (_, _) => RefreshDevices()));
         Field(captureConfig, "启停快捷键", hotkey); hotkey.Text = settings.Hotkey;
         Field(captureConfig, "浮窗操作快捷键", interactionHotkey); interactionHotkey.Text = settings.InteractionHotkey;
+        captureConfig.Children.Add(hotkeyStatus);
         captureConfig.Children.Add(Theme.Button("保存设置", SaveSettings, true));
         var placement = new StackPanel();
         placement.Children.Add(Theme.Label("浮窗位置与移动", 18));
@@ -270,18 +272,21 @@ internal sealed partial class MainWindow : Window
     }
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        RefreshDevices();
+        Loaded -= OnLoaded;
         // UI checks may run beside the user's listener without installing input hooks or hotkeys.
-        if (Environment.GetCommandLineArgs().Contains("--ui-smoke")) { _ = RunScreenshotSmoke(); return; }
+        if (Environment.GetCommandLineArgs().Contains("--ui-smoke")) { RefreshDevices(); _ = RunScreenshotSmoke(); return; }
         overlay.SetWorkspace(workspace);
         try
         {
             input = new(this); input.Toggle += async () => await controller.Toggle(); input.MouseDown += controller.Click; input.MouseUp += controller.Release;
             input.ForegroundChanged += controller.ForegroundChanged;
             input.InteractionToggle += async () => { if (controller.Mode == AssistantMode.Interaction) await ExitInteraction(); else await EnterInteraction(); };
-            input.SetHotkey(settings.Hotkey); input.SetInteractionHotkey(settings.InteractionHotkey);
+            input.InitializeHotkeys(settings.Hotkey, settings.InteractionHotkey);
+            if (!input.HotkeysReady) status.Text = "部分快捷键未就绪，请查看采音页；也可使用主窗口按钮。";
         }
         catch (Exception ex) { inputError = ex.Message; status.Text = ex.Message; }
+        // Playback device enumeration must not delay registration of the global shortcuts.
+        RefreshDevices();
         UpdateDiagnostics();
         var menu = BrandAssets.TrayMenu();
         menu.Items.Add("打开设置", null, (_, _) => Dispatcher.Invoke(() => { Show(); WindowState = WindowState.Normal; Activate(); }));
@@ -307,7 +312,7 @@ internal sealed partial class MainWindow : Window
             }
             var nx = Number(x, -10000, 10000); var ny = Number(y, -10000, 10000);
             var nw = Number(width, 300, 900);
-            input?.SetHotkey(hotkey.Text.Trim()); input?.SetInteractionHotkey(interactionHotkey.Text.Trim());
+            input?.SetHotkeys(hotkey.Text.Trim(), interactionHotkey.Text.Trim());
             var resume = controller.Enabled;
             await controller.Disable();
             settings.DeviceId = (devices.SelectedItem as OutputDevice)?.Id ?? ""; settings.Hotkey = hotkey.Text.Trim();
@@ -327,6 +332,8 @@ internal sealed partial class MainWindow : Window
     private void UpdateDiagnostics()
     {
         RefreshListeningPresentation();
+        hotkeyStatus.Text = input?.HotkeyStatus ?? (inputError.Length == 0 ? "正在注册快捷键…" : "快捷键未就绪：" + inputError);
+        hotkeyStatus.Foreground = input?.HotkeysReady == false ? Theme.Gold : Theme.Muted;
         var d = controller.Diagnostics();
         var audio = !d.Capturing ? "未采集（仅游戏前台采集）" :
             d.Audio.LastPacketAgeSeconds is null or > 2 ? "暂未收到游戏进程音频包，请在游戏内播放声音" :
@@ -334,7 +341,7 @@ internal sealed partial class MainWindow : Window
         var inputState = input is null ? "输入未就绪" : $"鼠标事件 {input.HookPresses} / 备用触发 {input.PollTriggers}";
         var lag = d.Audio.TimelineLagSeconds is { } seconds ? $" · 音频时间偏差 {seconds * 1000:+0;-0} ms" : "";
         diagnostics.Text = $"前台：{(d.ForegroundProcess.Length == 0 ? "无法读取" : d.ForegroundProcess)} · 目标：{d.TargetProcess}\n" +
-            $"{inputState} · 已接受 {d.TriggerCount} 次\n音频：{audio}{lag}\n声音分析 {d.AutomaticScans} 次 · 放下声不识别 {d.SkippedPutdowns} 次 · {d.AutomaticStatus}\n最近识别：{d.LastRecognition}" +
+            $"{inputState} · 已接受 {d.TriggerCount} 次\n{hotkeyStatus.Text}\n音频：{audio}{lag}\n声音分析 {d.AutomaticScans} 次 · 放下声不识别 {d.SkippedPutdowns} 次 · {d.AutomaticStatus}\n最近识别：{d.LastRecognition}" +
             (d.RecentSounds.Count > 0 ? "\n最近声音：\n" + string.Join("\n", d.RecentSounds.Reverse().Take(5)) : "");
         if (inputError.Length != 0) diagnostics.Text += "\n输入提示：" + inputError;
         else if (input?.HookStatus.StartsWith("鼠标事件注册失败", StringComparison.Ordinal) == true) diagnostics.Text += "\n" + input.HookStatus;
@@ -348,7 +355,8 @@ internal sealed partial class MainWindow : Window
             JsonFile.Write(path, new
             {
                 createdAt = DateTimeOffset.Now, listening = controller.Diagnostics(),
-                input = new { mode = input?.HookStatus, hookPresses = input?.HookPresses, fallbackTriggers = input?.PollTriggers, error = inputError },
+                input = new { mode = input?.HookStatus, hookPresses = input?.HookPresses, fallbackTriggers = input?.PollTriggers, error = inputError,
+                    hotkeys = input?.HotkeyDiagnostics },
                 note = "仅状态与计数，不包含录音。切回助手时暂停采音，最近识别结果、最近声音与鼠标边沿仍保留。"
             });
             MessageBox.Show(this, "诊断已保存，可将此文件提供给开发者：\n" + path, "导出诊断");
@@ -450,9 +458,11 @@ internal sealed partial class MainWindow : Window
         var largeWidth = overlay.ActualWidth;
         var commonGroupFits = !overlay.Panel.NeedsScroll;
         var commonCards = Descendants<Border>(overlay.Panel).Where(card => card.Tag is Candidate).ToArray();
-        // The window is no wider than its widest row of cards.
+        // The toolbar's minimum width may leave a partial column of spare space,
+        // but the window must not reserve another whole unused candidate column.
         var widestRowRightGap = overlay.Panel.ActualWidth - commonCards.Max(card =>
             card.TransformToAncestor(overlay.Panel).TransformBounds(new Rect(card.RenderSize)).Right);
+        var noUnusedColumn = widestRowRightGap < commonCards.Max(card => card.ActualWidth) + 2;
         RenderSmoke(overlay, "overlay-smoke.png");
         var largest = library.Groups.OrderByDescending(g => g.ItemIds.Length).First();
         overlay.Panel.ShowResult(new(998, RecognitionStatus.Matched, true, largest.ItemIds.Select(id =>
@@ -630,9 +640,13 @@ internal sealed partial class MainWindow : Window
                 var name = Descendants<TextBlock>(card).First(label => label.Text == candidate.Item.Name);
                 var difference = Descendants<TextBlock>(card).FirstOrDefault(label => label.Text.StartsWith("差异率", StringComparison.Ordinal));
                 var play = Descendants<Button>(card).First(button => ReferenceEquals(button.Tag, candidate));
-                var nameBounds = name.TransformToAncestor(card).TransformBounds(new Rect(name.RenderSize));
-                var content = Math.Min(nameBounds.Width, Math.Max(Measured(name), difference is null ? 0 : Measured(difference)));
-                return play.TransformToAncestor(card).TransformBounds(new Rect(play.RenderSize)).Left - (nameBounds.Left + content);
+                double Right(TextBlock label)
+                {
+                    var bounds = label.TransformToAncestor(card).TransformBounds(new Rect(label.RenderSize));
+                    return bounds.Left + Math.Min(bounds.Width, Measured(label));
+                }
+                var contentRight = Math.Max(Right(name), difference is null ? 0 : Right(difference));
+                return play.TransformToAncestor(card).TransformBounds(new Rect(play.RenderSize)).Left - contentRight;
             }).ToArray();
             compactGaps.Add(Math.Round(gaps.Min(), 1));
             return cards.Select(card => Math.Round(card.ActualWidth)).Distinct().Count() == 1 && gaps.Min() <= 20 * settings.FontScale;
@@ -675,7 +689,7 @@ internal sealed partial class MainWindow : Window
             cardsCompact &= CardsCompact(Descendants<Border>(panel).Where(card => card.Tag is Candidate).ToArray());
             imagesKeepAspect &= ImagesKeepAspect(Descendants<Border>(panel).Where(card => card.Tag is Candidate));
             comparisonFits &= !panel.NeedsScroll && sampleButtonsFit && toolbarButtonsFit && namesOneLine && playButtonsRight &&
-                (scenario != "six" || panel.ThumbnailSize >= 104);
+                (scenario != "six" || panel.ThumbnailSize >= 88);
             fontChecks[scenario + "-" + label] = new { scale = settings.FontScale, overlay.ActualWidth, overlay.ActualHeight,
                 noWindowScale = overlay.LayoutTransform.Value.IsIdentity,
                 candidates = panel.RenderedIds.Count, panel.NeedsScroll, panel.ThumbnailSize, panel.ContentHeight, sampleButtonsFit, toolbarButtonsFit, namesOneLine, playButtonsRight };
@@ -739,10 +753,10 @@ internal sealed partial class MainWindow : Window
         var unevenButtonsRight = PlayButtonsRight(unevenCards);
         cardsCompact &= CardsCompact(unevenCards);
         imagesKeepAspect &= ImagesKeepAspect(unevenCards);
-        var groupedFifteen = unevenCards.Length == 15 && unevenRows == 5 && !unevenPanel.NeedsScroll && unevenButtonsRight &&
+        var groupedFifteen = unevenCards.Length == 15 && unevenRows is >= 5 and <= 9 && !unevenPanel.NeedsScroll && unevenButtonsRight &&
             unevenBands[0].Max(bounds => bounds.Bottom) <= unevenBands[1].Min(bounds => bounds.Top) + 1 &&
             unevenBands[1].Max(bounds => bounds.Bottom) <= unevenBands[2].Min(bounds => bounds.Top) + 1 &&
-            unevenPanel.ThumbnailSize >= 96 && overlay.ActualWidth <= 930 && overlay.ActualHeight <= 760;
+            unevenPanel.ThumbnailSize >= 80 && overlay.ActualWidth <= 930 && overlay.ActualHeight <= Math.Min(900, overlay.MaxHeight);
         var groupedFifteenDetails = new { overlay.ActualWidth, overlay.ActualHeight,
             unevenPanel.ThumbnailSize, unevenPanel.ContentHeight, rows = unevenRows,
             cards = unevenCards.Length, unevenButtonsRight, unevenPanel.NeedsScroll };
@@ -761,29 +775,30 @@ internal sealed partial class MainWindow : Window
             .TransformBounds(new Rect(card.RenderSize))).ToArray();
         var allItemCardsFit = allItemCardBounds.All(rect => rect.Right <= overlay.ActualWidth + 1 &&
             rect.Bottom <= overlay.ActualHeight + 1);
-        var allItemNamesOneLine = allItemCards.All(card =>
+        var allItemNamesFit = allItemCards.All(card =>
         {
             var name = Descendants<TextBlock>(card).First(label => label.Text == ((Candidate)card.Tag).Item.Name);
-            var line = new TextBlock { Text = name.Text, FontSize = name.FontSize, FontWeight = name.FontWeight, FontFamily = name.FontFamily };
-            line.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            return name.ActualHeight <= line.DesiredSize.Height + 1;
+            var text = new TextBlock { Text = name.Text, FontSize = name.FontSize, FontWeight = name.FontWeight,
+                FontFamily = name.FontFamily, TextWrapping = TextWrapping.Wrap };
+            text.Measure(new Size(name.ActualWidth, double.PositiveInfinity));
+            return name.TextTrimming == TextTrimming.None && text.DesiredSize.Height <= name.ActualHeight + 1;
         });
         var allItemButtonsRight = PlayButtonsRight(allItemCards);
         cardsCompact &= CardsCompact(allItemCards);
         imagesKeepAspect &= ImagesKeepAspect(allItemCards);
         var listeningOnePage = !allItemPanel.NeedsScroll && allItemPanel.ThumbnailSize >= (indexedCandidates.Length > CandidatePanel.LargeClass ? 56 : 80) &&
-            !Descendants<ScrollViewer>(allItemPanel).Any() && allItemCards.Length == indexedCandidates.Length && allItemCardsFit && allItemNamesOneLine && allItemButtonsRight;
+            !Descendants<ScrollViewer>(allItemPanel).Any() && allItemCards.Length == indexedCandidates.Length && allItemCardsFit && allItemNamesFit && allItemButtonsRight;
         var listeningOnePageDetails = new { overlay.ActualWidth, overlay.ActualHeight,
             allItemPanel.NeedsScroll, allItemPanel.ThumbnailSize, allItemPanel.ContentHeight,
-            cards = allItemCards.Length, allItemCardsFit, allItemNamesOneLine, allItemButtonsRight,
+            cards = allItemCards.Length, allItemCardsFit, allItemNamesFit, allItemButtonsRight,
             maxRight = allItemCardBounds.Max(rect => rect.Right), maxBottom = allItemCardBounds.Max(rect => rect.Bottom) };
         RenderSmoke(overlay, "listening-all-smoke.png");
         workspace.Select(demoSnapshot); await Task.Delay(80); overlay.UpdateLayout();
         var listeningSurface = Descendants<CandidatePanel>(workspace).FirstOrDefault(panel => panel.IsVisible);
         var listeningDesignVisible = listeningSurface is not null && listeningSurface.RenderedIds.Count == demoCandidates.Length &&
             Descendants<Button>(listeningSurface).Count(button => button.Tag is Candidate) == demoCandidates.Length &&
-            overlay.ActualWidth >= 700 && overlay.ActualWidth <= 800 && !listeningSurface.NeedsScroll &&
-            listeningSurface.ThumbnailSize >= 104;
+            overlay.ActualWidth >= 450 && overlay.ActualWidth <= 620 && !listeningSurface.NeedsScroll &&
+            listeningSurface.ThumbnailSize >= 88;
         RenderSmoke(overlay, "listening-design-smoke.png");
         await ExitInteraction();
         // The live view as it looks in a raid: a pickup heard a moment ago, listening on.
@@ -884,7 +899,7 @@ internal sealed partial class MainWindow : Window
         var adaptivePassed = largeWidth >= smallWidth && overflowHeight <= maximumHeight + 1 &&
             !paginationPresent && allCandidatesReachable && allHistoryReachable && settingsFit.Values.All(fit => fit) &&
             shrunkAgain && historyOnScreen && centered && topAnchored && staysInGame && !overflowNeedsScroll;
-        var passed = adaptivePassed && comparisonFits && listeningDesignVisible && waitingViewVisible && liveThirteen && liveReplayPausesSampling && listeningThirteen && groupedFifteen && listeningOnePage && tileButtonsRight && imagesKeepAspect && backgroundsShown && commonGroupFits && widestRowRightGap <= 32 && cardsCompact && largestGroupFits && editorFontPreservesText && operationFit.Values.All(fit => fit) && samePin && unlocked &&
+        var passed = adaptivePassed && comparisonFits && listeningDesignVisible && waitingViewVisible && liveThirteen && liveReplayPausesSampling && listeningThirteen && groupedFifteen && listeningOnePage && tileButtonsRight && imagesKeepAspect && backgroundsShown && commonGroupFits && noUnusedColumn && cardsCompact && largestGroupFits && editorFontPreservesText && operationFit.Values.All(fit => fit) && samePin && unlocked &&
             nearControlRemoved && replayStarted && replayStopped && referenceStarted && referenceStopped && capturePausedDuringReplay &&
             stopFollowsPlayback && liveFresh && liveStale && followUpMarked && menusStyled &&
             (liveStyles & (0x20 | 0x08000000)) == 0x08000000 && preserved &&
@@ -906,7 +921,7 @@ internal sealed partial class MainWindow : Window
                 centered, topAnchored, staysInGame },
             layout = new { thumbnailSize = settings.ThumbnailSize, smallHeight, smallWidth, largeHeight, largeWidth,
                 overflowHeight, overflowWidth, maximumHeight, allCandidatesReachable, allCardsFit, shrunkAgain, overflowNeedsScroll, paginationPresent,
-                commonGroupFits, widestRowRightGap, largestGroupFits,
+                commonGroupFits, widestRowRightGap, noUnusedColumn, largestGroupFits,
                 historySmallHeight, historyLargeHeight, historyOnScreen,
                 allHistoryReachable, settingsFit,
                 adaptivePassed },

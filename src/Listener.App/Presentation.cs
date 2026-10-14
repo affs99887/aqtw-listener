@@ -84,19 +84,15 @@ internal sealed class CandidatePanel : Border
     public event Action? LayoutChanged;
     public event Action<Candidate>? ReferenceRequested;
     private double FontScale => double.IsFinite(settings.FontScale) ? Math.Clamp(settings.FontScale, .9, 1.15) : 1;
-    // Merged classes reach 31 items (高概率类): six compact cards per row keep every name on one line.
+    // Merged classes reach 31 items (高概率类); larger results use compact pictures and text.
     public const int LargeClass = 20;
     // Beyond this many candidates the size sections give way to packed rows.
     private const int PackedCandidates = 48;
+    private const int MaximumDesignColumns = 4;
     private bool Large => design && CandidateCount is > LargeClass and <= PackedCandidates;
-    // The 听样本 button always has its own column at the card's right edge; it is never
-    // placed under the text or stretched across the card. Rows of three or more use a
-    // stacked ▶/听样本 button so the name keeps its width. Unscaled DIPs.
-    private static bool StackedPlay(int rowSize, bool large, bool prominent) => prominent && !large && rowSize >= 3;
-    private static double PlayWidth(int rowSize, bool large, bool prominent) =>
-        !prominent ? 26 : rowSize == 1 ? 96 : rowSize == 2 ? 76 : large ? 60 : 42;
-    private double PlayColumn(int rowSize, bool large, bool prominent) =>
-        previewButtons ? (PlayWidth(rowSize, large, prominent) + 8) * FontScale : 0;
+    // A small, labelled-for-accessibility playback icon keeps its own right-hand column.
+    private static double PlayWidth(bool prominent) => prominent ? 28 : 26;
+    private double PlayColumn => previewButtons ? (PlayWidth(true) + 8) * FontScale : 0;
     private static double NominalNameSize(int rowSize, bool large, bool prominent) =>
         !prominent ? 11 : rowSize == 1 ? 18 : rowSize == 2 ? 15 : large ? 12 : 13;
     private static double DifferenceSize(int rowSize, bool large) => rowSize == 1 ? 14 : rowSize == 2 ? 12 : large ? 10 : 11;
@@ -115,7 +111,7 @@ internal sealed class CandidatePanel : Border
             best = Math.Min(best, Math.Max(TextWidth(string.Concat(tokens[..split]), size), TextWidth(string.Concat(tokens[split..]), size)));
         return best + 2;
     }
-    private double PreferredThumbnail => design ? Large ? 64 : CandidateCount > 6 ? 96 : 112
+    private double PreferredThumbnail => design ? Large ? 56 : CandidateCount > 6 ? 80 : 88
         : double.IsFinite(settings.ThumbnailSize) ? Math.Clamp(settings.ThumbnailSize, 60, 120) : 88;
     // 100% minus the similarity to the reference that candidate matched: lower is closer.
     internal static string DifferenceText(double score) => "差异率 " + (double.IsFinite(score)
@@ -151,7 +147,8 @@ internal sealed class CandidatePanel : Border
         design = compact && !minimal;
         // A large class whose size sections exceed a small screen's height packs its rows instead.
         layout = new(BuildGroups, () => PreferredThumbnail, () => design && !Large ? 80 : 56,
-            (candidates, width, thumbnail) => Large ? BuildDenseDesignGroups(candidates, width, thumbnail) : null);
+            (candidates, width, thumbnail) => Large ? BuildDenseDesignGroups(candidates, width, thumbnail) : null,
+            scrollOverflow: design);
         layout.Changed += () => LayoutChanged?.Invoke();
         Background = Theme.Background; BorderBrush = Theme.Line; BorderThickness = design ? new Thickness(0) : new Thickness(1);
         Padding = new Thickness(OuterPadding);
@@ -380,8 +377,7 @@ internal sealed class CandidatePanel : Border
         LayoutChanged?.Invoke();
     }
 
-    // A readable card width sets the upper bound for ordinary recognition
-    // results. Those results may use more rows before they occupy more game width.
+    // Balance width and height using whole cards, with at most four per row.
     public double GetPreferredWidth(double maxWidth, double maxHeight)
     {
         var limit = double.IsFinite(maxWidth) ? Math.Max(1, maxWidth) : 1200;
@@ -389,21 +385,24 @@ internal sealed class CandidatePanel : Border
         {
             var shown = primary.Concat(near.Where(c => !primary.Any(p => p.Item.Id == c.Item.Id))).ToArray();
             if (shown.Length == 0) return Math.Min(limit, MinimumDesignWidth);
-            if (shown.Length > PackedCandidates) return Math.Min(limit, 1600);
-            // The narrowest landscape window that still shows every card on one page: the fewest
-            // equal columns whose rows fit about 720 DIP even at the smallest picture size, while
-            // the window stays at least 1.2 times as wide as it is tall over the game. A row never
-            // holds more cards than the largest grid-size section has.
+            if (shown.Length > PackedCandidates)
+                return Math.Min(limit,
+                    SectionLabelWidth + MaximumDesignColumns * DesignCardWidth(shown, PreferredThumbnail) + 4);
+            // Prefer a modest landscape shape rather than the narrowest possible column
+            // count. The four-column limit wins when that shape cannot fit naturally.
             var sizes = shown.GroupBy(c => (Reference: nearIds.Contains(c.Item.Id), c.Item.Cells)).Select(g => g.Count()).ToArray();
             var chrome = (summaryBar?.Height ?? 40 * FontScale) + 8;
-            var budget = (double.IsFinite(maxHeight) ? Math.Min(maxHeight, 720 * FontScale) : 720 * FontScale) - chrome;
+            var budget = (double.IsFinite(maxHeight) ? Math.Min(maxHeight, 840) : 840) - chrome;
             double Height(int columns, double picture) => sizes.Sum(n => Math.Max(Math.Ceiling(n / (double)columns) *
                 Math.Max(picture + 2, Large ? 66 * FontScale : 0), 74 * FontScale) + 5);
             var designCard = DesignCardWidth(shown, PreferredThumbnail);
-            double Width(int columns) => Math.Max(MinimumDesignWidth, SectionLabelWidth + 2 + columns * designCard + 2);
-            var most = Math.Max(1, Math.Min(sizes.Max(), (int)((Math.Min(limit, 1600) - SectionLabelWidth - 4) / designCard)));
-            var columns = Enumerable.Range(1, most).FirstOrDefault(c => Height(c, Large ? 56 : 80) <= budget &&
-                Width(c) >= 1.2 * (Math.Min(Height(c, PreferredThumbnail), budget) + chrome));
+            // The minimum is exactly two card slots plus the size label. Controls do not
+            // add a fractional third slot that would stay empty beside every full row.
+            double Width(int columns) => SectionLabelWidth + Math.Max(2, columns) * designCard + 4;
+            var most = Math.Max(1, Math.Min(MaximumDesignColumns,
+                Math.Min(sizes.Max(), (int)((limit - SectionLabelWidth - 4) / designCard))));
+            var columns = Enumerable.Range(1, most).FirstOrDefault(c =>
+                Height(c, PreferredThumbnail) <= budget && Width(c) >= 1.2 * (Height(c, PreferredThumbnail) + chrome));
             return Math.Min(limit, Width(columns == 0 ? most : columns));
         }
         var cardWidth = CardWidth(PreferredThumbnail);
@@ -504,19 +503,29 @@ internal sealed class CandidatePanel : Border
         return sections;
     }
 
-    // Every card of a result has one compact width, the picture, the longest name, the 差异率 and
-    // the 听样本 button; cards are never stretched to fill a row. Up to six candidates use the
-    // large card style, a large class the compact one. Names up to eight characters stay on one
-    // line; a longer name may take two.
-    private const double SectionLabelWidth = 112, MinimumDesignWidth = 620;
+    // Equal card widths align the sections without stretching sparse rows. Long names use
+    // two balanced lines; short names, each candidate's difference and playback stay readable.
+    private const double SectionLabelWidth = 112;
+    private double MinimumDesignWidth
+    {
+        get
+        {
+            // Reserve only what the visible summary and controls actually need. A fixed
+            // minimum would leave an empty strip after otherwise compact candidate rows.
+            if (summaryBar is null) return 0;
+            summaryBar.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            return Math.Ceiling(summaryBar.DesiredSize.Width) + 2;
+        }
+    }
     private int CardStyle => CandidateCount <= 6 ? 2 : 3;
     private double DesignCardWidth(IEnumerable<Candidate> candidates, double thumbnail)
     {
         var style = CardStyle;
         var nameSize = NominalNameSize(style, Large, true) * FontScale;
-        var name = candidates.Max(candidate => NameWidth(candidate.Item.Name, nameSize, candidate.Item.Name.Length > 8 ? 2 : 1));
-        var difference = TextWidth("差异率 10.0%", DifferenceSize(style, Large) * FontScale) + 2;
-        return Math.Ceiling(2 + thumbnail + 2 + (!Large && style <= 2 ? 11 : 3) + 2 + Math.Max(name, difference) + PlayColumn(style, Large, true));
+        var name = candidates.Max(candidate => NameWidth(candidate.Item.Name, nameSize, candidate.Item.Name.Length > 6 ? 2 : 1));
+        // Include the metadata margin so the percentage itself does not wrap.
+        var difference = candidates.Max(candidate => TextWidth(DifferenceText(candidate.Score), DifferenceSize(style, Large) * FontScale)) + 12;
+        return Math.Ceiling(2 + thumbnail + 2 + (!Large && style <= 2 ? 11 : 3) + 2 + Math.Max(name, difference) + PlayColumn);
     }
 
     private FrameworkElement BuildSizeSection(
@@ -529,7 +538,7 @@ internal sealed class CandidatePanel : Border
             .ThenByDescending(candidate => candidate.Item.ReferenceValue).ToArray();
         // Rows hold as many equal cards as the width allows, filled in order, so the columns
         // of all sections line up.
-        var columns = Math.Max(1, (int)Math.Floor((cardAreaWidth + 1) / cardWidth));
+        var columns = Math.Max(1, Math.Min(MaximumDesignColumns, (int)Math.Floor((cardAreaWidth + 1) / cardWidth)));
         var style = CardStyle;
         var rowHeight = Math.Max(thumbnail + 2, Large ? 66 * FontScale : 0);
         var nameSize = NominalNameSize(style, Large, true);
@@ -600,7 +609,8 @@ internal sealed class CandidatePanel : Border
         {
             var entries = group.OrderBy(candidate => candidate.Item.RarityRank)
                 .ThenByDescending(candidate => candidate.Item.ReferenceValue).ToArray();
-            if (usedWidth > 0 && usedWidth + categoryWidth + targetCardWidth > usableWidth) AddRow();
+            if (usedWidth > 0 && (usedWidth + categoryWidth + targetCardWidth > usableWidth ||
+                pending.Count(entry => entry.Item is not null) >= MaximumDesignColumns)) AddRow();
             var category = group.Key.Cells == 0 ? "格数待核实" : group.Key.Reference
                 ? $"参考 {group.Key.Cells} 格"
                 : $"{group.Key.Cells} 格\n大红概率 {entries.Count(candidate => candidate.Item.IsGold) / (double)entries.Length:P0}";
@@ -608,14 +618,15 @@ internal sealed class CandidatePanel : Border
             usedWidth += categoryWidth;
             foreach (var candidate in entries)
             {
-                if (pending.Any(entry => entry.Item is not null) && usedWidth + targetCardWidth > usableWidth)
+                if (pending.Count(entry => entry.Item is not null) >= MaximumDesignColumns ||
+                    pending.Any(entry => entry.Item is not null) && usedWidth + targetCardWidth > usableWidth)
                     AddRow();
                 pending.Add((candidate, null)); usedWidth += targetCardWidth;
             }
         }
         AddRow();
         static int ItemCount(List<(Candidate? Item, string? Category)> row) => row.Count(entry => entry.Item is not null);
-        var balancedCount = Math.Max(2, candidates.Count / packedRows.Count);
+        var balancedCount = Math.Min(MaximumDesignColumns, Math.Max(2, candidates.Count / packedRows.Count));
         for (var index = packedRows.Count - 1; index > 0; index--)
         {
             var row = packedRows[index]; var previous = packedRows[index - 1];
@@ -711,13 +722,12 @@ internal sealed class CandidatePanel : Border
         double nameSize = 0)
     {
         var item = candidate.Item;
-        // Every sectioned card (rowSize > 0) shows name, 差异率 and grid size; a large class
-        // shrinks them so six fit a row with every name on one line. Packed cards pass 0.
+        // Sectioned cards show name, difference and grid size. Packed cards pass rowSize 0.
         var prominent = design && rowSize > 0;
         var large = Large;
         var wide = prominent && !large && rowSize is 1 or 2;
         // Picture | name and details | 听样本 button: the button column is fixed on the right.
-        var playWidth = PlayWidth(rowSize, large, prominent) * FontScale;
+        var playWidth = PlayWidth(prominent) * FontScale;
         var grid = new Grid { Height = height - 2 };
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(thumbnail + 2) });
         grid.ColumnDefinitions.Add(new ColumnDefinition());
@@ -741,6 +751,11 @@ internal sealed class CandidatePanel : Border
             item.IsGold ? Theme.Collectible : Theme.Text);
         name.FontWeight = FontWeights.SemiBold; name.Margin = new Thickness(0); name.TextWrapping = TextWrapping.Wrap;
         name.TextTrimming = TextTrimming.None; name.ToolTip = item.Name;
+        name.TextAlignment = TextAlignment.Left; name.HorizontalAlignment = HorizontalAlignment.Left;
+        if (prominent)
+        {
+            name.MaxWidth = NameWidth(item.Name, name.FontSize, item.Name.Length > 6 ? 2 : 1);
+        }
         details.Children.Add(name);
         details.Children.Add(new Border { Height = 2 });
         if (prominent)
@@ -767,11 +782,8 @@ internal sealed class CandidatePanel : Border
         }
         if (previewButtons)
         {
-            // Packed cards beyond 48 candidates only have room for the glyph; the tooltip names the action.
-            var stacked = StackedPlay(rowSize, large, prominent);
-            var play = Theme.Button(prominent ? "▶ 听样本" : "▶", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
-            if (stacked) play.Content = new TextBlock { Text = "▶\n听样本", TextAlignment = TextAlignment.Center, Margin = new Thickness(0) };
-            play.Width = playWidth; play.Height = Math.Round((rowSize == 1 ? 30 : rowSize == 2 ? 28 : stacked ? 38 : 22) * FontScale);
+            var play = Theme.Button("▶", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
+            play.Width = playWidth; play.Height = Math.Round(28 * FontScale);
             play.Padding = new Thickness(0); play.Margin = new Thickness(2 * FontScale, 0, 6 * FontScale, 0);
             play.VerticalAlignment = VerticalAlignment.Center; play.HorizontalAlignment = HorizontalAlignment.Right;
             play.FontSize = (wide ? 10 : 9) * FontScale;
@@ -796,6 +808,7 @@ internal sealed class CandidatePanel : Border
         DockPanel.SetDock(dot, Dock.Right); heading.Children.Add(dot);
         var name = Theme.Label(item.Name, 14 * FontScale, item.IsGold ? Theme.Collectible : Theme.Text);
         name.FontWeight = FontWeights.SemiBold; name.Margin = new Thickness(0); name.TextTrimming = TextTrimming.None;
+        name.TextAlignment = TextAlignment.Left; name.HorizontalAlignment = HorizontalAlignment.Left;
         name.TextWrapping = TextWrapping.Wrap; heading.Children.Add(name); stack.Children.Add(heading);
         var picture = new Grid { Height = thumbnail, Background = Theme.Background, Margin = new Thickness(0, 0, 0, 3) };
         picture.Children.Add(ItemPicture(item, 4, 180, 10));
@@ -872,6 +885,7 @@ internal sealed class CandidatePanel : Border
         {
             name = new TextBlock { Text = item.Name, Foreground = item.IsGold ? Theme.Collectible : Theme.Text,
                 FontWeight = FontWeights.SemiBold, FontSize = 11 * FontScale, TextWrapping = TextWrapping.Wrap,
+                TextAlignment = TextAlignment.Left, HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 0, 0, 3) };
             stack.Children.Add(name);
         }

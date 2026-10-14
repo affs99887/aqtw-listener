@@ -3,11 +3,13 @@ namespace Listener.App;
 // Every candidate stays on one surface. The host grows to the required size;
 // images only shrink to a readable floor while the new size is calculated. When
 // the primary arrangement still overflows, an optional denser one is tried.
+// Oversized candidate sets can scroll after the four-column limit is reached.
 internal sealed class CandidateLayout(
     Func<IReadOnlyList<Candidate>, double, double, FrameworkElement> build,
     Func<double> preferredThumbnail,
     Func<double> minimumThumbnail,
-    Func<IReadOnlyList<Candidate>, double, double, FrameworkElement?>? fallback = null) : Decorator
+    Func<IReadOnlyList<Candidate>, double, double, FrameworkElement?>? fallback = null,
+    bool scrollOverflow = false) : Decorator
 {
     private IReadOnlyList<Candidate> items = [];
     private Size lastConstraint = new(double.PositiveInfinity, double.PositiveInfinity);
@@ -62,6 +64,15 @@ internal sealed class CandidateLayout(
                 else view = MeasureItems(build, width, size)!;
             }
             NeedsScroll = view.DesiredSize.Height > height + .5;
+            if (NeedsScroll && scrollOverflow)
+            {
+                // Rebuild inside the scrollbar so it cannot cover the last playback button.
+                view = MeasureItems(build, Math.Max(1, width - SystemParameters.VerticalScrollBarWidth), size)!;
+                Child = null;
+                Child = new ScrollViewer { Content = view, CanContentScroll = false,
+                    HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Visible };
+            }
             ContentHeight = view.DesiredSize.Height; ThumbnailSize = size;
             RenderedIds = items.Select(c => c.Item.Id).ToArray();
             dirty = false; lastConstraint = constraint;
@@ -71,13 +82,13 @@ internal sealed class CandidateLayout(
                 _ = Dispatcher.BeginInvoke(new Action(() => { notificationPending = false; Changed?.Invoke(); }));
             }
         }
-        Child?.Measure(new Size(width, double.PositiveInfinity));
+        Child?.Measure(new Size(width, NeedsScroll && scrollOverflow ? height : double.PositiveInfinity));
         return new Size(width, Math.Min(height, ContentHeight));
     }
 
     protected override Size ArrangeOverride(Size size)
     {
-        Child?.Arrange(new Rect(0, 0, size.Width, ContentHeight));
+        Child?.Arrange(new Rect(0, 0, size.Width, NeedsScroll && scrollOverflow ? size.Height : ContentHeight));
         return size;
     }
 }

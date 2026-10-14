@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-14",
+  "selection": "04 拾点",
+  "concept": "../logo-minimal-2026-10-14/04-finding-point.png",
+  "conceptPrompts": "../logo-minimal-2026-10-14/prompts.json",
+  "production": "按照已选轮廓整理为 SVG，透明界面标志与深底系统图标从矢量路径逐尺寸渲染；生成图的透明边缘试稿未用于程序。",
+  "tool": "built-in GPT Image for concept and adaptation trials; WPF SVG path rendering for production assets",
+  "applicationAssets": "../../../../src/Listener.App/Assets",
+  "sizes": [
+    16,
+    20,
+    24,
+    32,
+    40,
+    48,
+    64,
+    128,
+    256
+  ],
+  "adaptationTrials": [
+    {
+      "id": "mark",
+      "filename": "shidian-mark.png",
+      "prompt": "Use case: precise-object-edit / background-extraction.\nImage 1 is the exact selected logo edit target, not merely inspiration. Produce a production PNG of this same \"拾点\" logo for a dark Windows application UI.\nPreserve the exact distinctive geometry and proportions of the reference: the single rounded-square C-like outline with its top-right section open, the small rounded square aligned in that opening, the original relative gap widths, stroke widths and corner radii. Do not redesign or add anything.\nOnly change these three things: remove the warm-white background to genuine alpha transparency everywhere (also the central void and the two gaps); recolor the black mark to uniform flat warm off-white #E6ECE7; enlarge and center the whole mark so its total bounds occupy 84% of a square canvas, with 8% transparent safety margin on each side.\nThe mark must be flat single-color vector-like artwork, clean antialiased edges, and absolutely NO texture, tonal variation, glow, shadow, extrusions, black tile, white background or checkerboard painted into the image. Output one square transparent image, one logo, no text."
+    },
+    {
+      "id": "app",
+      "filename": "shidian-app.png",
+      "prompt": "Use case: precise-object-edit.\nImage 1 is the exact selected logo edit target. Make a restrained production Windows application icon using the EXACT same selected \"拾点\" symbol.\nPreserve the reference's original symbol geometry exactly: one rounded-square C-like outline with a top-right opening and one separate small rounded square aligned in that opening, same relative proportions, original stroke thickness, gaps and radii. No redesign, text, decoration, added parts, or color accents.\nRecolor the symbol uniform flat warm off-white #E6ECE7 and center it, symbol bounds at 66% of total square canvas width and height. Place it on ONE solid flat charcoal #181A1B rounded-square tile; tile occupies 94% of canvas, tile corner radius 15% of tile width. The outer canvas beyond the tile must be genuinely transparent alpha. There must be NO opaque canvas outside the tile.\nPerfectly flat two-color 2D vector-like artwork with crisp antialiasing. The charcoal tile is uniform and has no border, shadow, gradients, lighting, gloss, bevels, texture or simulated materials. One icon only, no wordmark, no label, no mockup."
+    }
+  ],
+  "cleanupTrialPrompt": "Edit target: the supplied light-colored logo on transparent alpha. This is a precise edge cleanup and padding correction, NOT a redesign.\nPreserve the existing exact two-part symbol, its rounded square outline with opening at upper right and its separate square in that opening. Preserve all relative proportions.\nRemove every speck, wisp, fringe, rough masking fragment and stray pixel around the silhouette and inside the central void. Rebuild only the silhouette edges as exceptionally smooth clean antialiased curves. The interior of the white symbol must be a single perfectly uniform fully opaque #E6ECE7 fill. Everything outside the exact clean symbol boundary must be genuinely zero-alpha transparent, including the central hole and both gaps. No black or white background, no haze or shadow.\nTightly frame the cleaned mark with only 6% transparent padding on each of the four sides, symbol bounds exactly 88% of the square image. Output just one pristine production app pictogram. No texture, no lighting, no soft shadows, no new shapes or text."
+}

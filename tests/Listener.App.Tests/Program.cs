@@ -541,8 +541,10 @@ internal static class Program
                         var bounds = OverlayPlacement.TopCenter(new System.Windows.Rect(0, 0, pixelWidth, pixelHeight), scale, scale, preferred);
                         Layout(panel, bounds.Width, bounds.MaximumHeight);
                         CheckCandidateCoverage(panel, result);
-                        Check(!panel.NeedsScroll && panel.ContentHeight <= bounds.MaximumHeight + 1,
-                            "DPI one-page layout exceeds game height: " + panel.LayoutInfo);
+                        Check(count > 48
+                                ? panel.NeedsScroll && Descendants<System.Windows.Controls.ScrollViewer>(panel).Any()
+                                : !panel.NeedsScroll && panel.ContentHeight <= bounds.MaximumHeight + 1,
+                            "DPI candidate layout exceeds the available space without a scroll fallback: " + panel.LayoutInfo);
                         Check(settings.ThumbnailSize == 120 && panel.LayoutTransform.Value.IsIdentity, "font or adaptive layout changed image preference or scaled whole UI");
                     }
                 }
@@ -581,7 +583,7 @@ internal static class Program
                     panel.ShowResult(result); Layout(panel, 780, 460);
                     CheckCandidateCoverage(panel, result);
                     Layout(panel, 780, 520);
-                    Check(!panel.NeedsScroll && panel.ThumbnailSize >= 104,
+                    Check(!panel.NeedsScroll && panel.ThumbnailSize >= 88,
                         "six candidates have unreadably small pictures: " + panel.LayoutInfo);
                     var sections = Descendants<System.Windows.Controls.Border>(panel)
                         .Where(border => border.Child is System.Windows.Controls.Grid grid &&
@@ -617,7 +619,7 @@ internal static class Program
                     }
                 }
             }),
-            ("新目录多候选在对应空间预算内一页展示，保留图片，共享分数只在汇总行显示一次", () =>
+            ("候选每行最多四件，超大目录保留全部图片并可滚动查看", () =>
             {
                 var root = Path.Combine(AppContext.BaseDirectory, "library");
                 var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
@@ -637,15 +639,26 @@ internal static class Program
                     var cards = Descendants<System.Windows.Controls.Border>(panel)
                         .Where(border => border.Tag is Candidate).ToArray();
                     // A class above CandidatePanel.LargeClass (the merged 高概率类 has 31) uses compact
-                    // 56–64 px pictures so six cards with one-line names fit a row.
-                    Check(!panel.NeedsScroll && panel.ThumbnailSize >= (count is > CandidatePanel.LargeClass and <= 48 ? 56 : 80) &&
-                        !Descendants<System.Windows.Controls.ScrollViewer>(panel).Any(),
+                    // 56 px pictures with long names allowed two lines.
+                    Check(panel.ThumbnailSize >= (count is > CandidatePanel.LargeClass and <= 48 ? 56 : 80) &&
+                        (count > 48 ? panel.NeedsScroll && Descendants<System.Windows.Controls.ScrollViewer>(panel).Any() :
+                            !panel.NeedsScroll && !Descendants<System.Windows.Controls.ScrollViewer>(panel).Any()),
                         $"{width}×{viewportHeight}, 字号{scale}: " + panel.LayoutInfo);
                     Check(cards.All(card =>
                     {
                         var bounds = card.TransformToAncestor(panel).TransformBounds(new System.Windows.Rect(card.RenderSize));
-                        return bounds.Right <= panel.ActualWidth + 1 && bounds.Bottom <= panel.ActualHeight + 1;
+                        return bounds.Right <= panel.ActualWidth + 1 && (panel.NeedsScroll || bounds.Bottom <= panel.ActualHeight + 1);
                     }), $"{width}×{viewportHeight}, 字号{scale}: a candidate lies outside the listening surface");
+                    Check(cards.GroupBy(card => Math.Round(card.TranslatePoint(new System.Windows.Point(), panel).Y, 1))
+                        .All(row => row.Count() <= 4), "a candidate row exceeds four items");
+                    if (panel.NeedsScroll)
+                    {
+                        var scroll = Descendants<System.Windows.Controls.ScrollViewer>(panel).Single();
+                        scroll.ScrollToEnd(); panel.UpdateLayout();
+                        var last = cards.Last().TransformToAncestor(panel).TransformBounds(new System.Windows.Rect(cards.Last().RenderSize));
+                        Check(scroll.VerticalOffset > 0 && last.Top >= 0 && last.Bottom <= panel.ActualHeight + 1,
+                            "the last candidate cannot be reached by scrolling");
+                    }
                     Check(cards.All(card => ShowsDifference(card, "差异率 10.0%")) && NoSummaryScore(panel),
                         $"{width}×{viewportHeight}, 字号{scale}: a card lacks its own 差异率 or a shared score remains");
                     var clipped = cards.Where(card => !ContentInside(card)).Select(card => ((Candidate)card.Tag).Item.Name).ToArray();
@@ -665,8 +678,8 @@ internal static class Program
                         interactive: true, compact: true);
                     System.Windows.Documents.TextElement.SetFontFamily(panel, new System.Windows.Media.FontFamily("Microsoft YaHei UI"));
                     panel.SetAudioPreview(_ => { }, _ => true); panel.ShowResult(result);
-                    var width = panel.GetPreferredWidth(1600, 720);
                     var height = 720 - 24 - 48 * font - 40;
+                    var width = panel.GetPreferredWidth(1600, height);
                     Layout(panel, width, height);
                     Check(width <= 900 && !panel.NeedsScroll && panel.ThumbnailSize >= 80,
                         "thirteen candidates are too wide or tall: " + panel.LayoutInfo);
@@ -739,7 +752,7 @@ internal static class Program
                         shownRatios.SequenceEqual(expectedRatios) &&
                         bandBounds[0].Max(bounds => bounds.Bottom) <= bandBounds[1].Min(bounds => bounds.Top) + 1 &&
                         bandBounds[1].Max(bounds => bounds.Bottom) <= bandBounds[2].Min(bounds => bounds.Top) + 1 &&
-                        !panel.NeedsScroll && panel.ThumbnailSize >= 96 && panel.ContentHeight <= 530 &&
+                        !panel.NeedsScroll && panel.ThumbnailSize >= 80 && panel.ContentHeight <= 530 &&
                         !Descendants<System.Windows.Controls.Border>(panel).Any(border =>
                             border.Height == 5 && ReferenceEquals(border.Background, Theme.Gold)),
                         "uneven groups mix hierarchy, waste space or retain the ratio bar: " + panel.LayoutInfo);
@@ -812,10 +825,10 @@ internal static class Program
                         // The button keeps its own column at the right edge in every density.
                         Check(name.TextTrimming == System.Windows.TextTrimming.None &&
                             name.DesiredSize.Height <= name.ActualHeight + 1 && ShowsDifference(card, "差异率 4.0%") &&
-                            image.Parent is System.Windows.Controls.Grid { ActualWidth: >= 80, ActualHeight: >= 80 } && play.ActualWidth >= 36 &&
+                            image.Parent is System.Windows.Controls.Grid { ActualWidth: >= 80, ActualHeight: >= 80 } && play.ActualWidth >= 24 * font &&
                             playBounds.Left >= nameBounds.Right - 1 && play.ActualHeight <= 44 * font &&
                             playBounds.Right <= card.ActualWidth + 1 && playBounds.Bottom <= card.ActualHeight + 1 &&
-                            play.ActualWidth <= 158 && ContentInside(card),
+                            play.ActualWidth <= 32 * font && Equals(play.Content, "▶") && ContentInside(card),
                             "one-to-four card clips text, shrinks image or misplaces/stretches its button: " + candidate.Item.Name);
                     }
                     if (font != 1.0) continue;
@@ -1026,7 +1039,7 @@ internal static class Program
             })
         };
         var report = new List<object>(); var failed = 0;
-        foreach (var (name, run) in tests.Concat(PersonalLibraryTests.Cases()))
+        foreach (var (name, run) in tests.Concat(PersonalLibraryTests.Cases()).Concat(HotkeyTests.Cases()).Concat(CandidateWidthTests.Cases()))
         {
             try { run(); report.Add(new { name, passed = true }); Console.WriteLine("PASS " + name); }
             catch (Exception ex) { failed++; report.Add(new { name, passed = false, error = ex.ToString() }); Console.WriteLine("FAIL " + name + ": " + ex); }

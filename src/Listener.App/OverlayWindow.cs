@@ -282,7 +282,18 @@ internal sealed class OverlayWindow : Window
         }
         finally { positioning = false; }
     }
-    private double PreferredWidth(double maximumWidth, double maximumHeight) => workspaceActive && workspace is OverlayWorkspace view
-        ? view.GetPreferredWidth(maximumWidth, Math.Max(1, maximumHeight - (Interactive ? chrome.Height : 0)))
-        : Panel.GetPreferredWidth(maximumWidth, maximumHeight);
+    private double PreferredWidth(double maximumWidth, double maximumHeight)
+    {
+        var preferred = workspaceActive && workspace is OverlayWorkspace view
+            ? view.GetPreferredWidth(maximumWidth, Math.Max(1, maximumHeight - (Interactive ? chrome.Height : 0)))
+            : Panel.GetPreferredWidth(maximumWidth, maximumHeight);
+        if (chrome.Visibility == Visibility.Visible)
+        {
+            chrome.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            // Keep the title, size choices, pin and close button; the status can trim.
+            var controls = chrome.DesiredSize.Width - headerStatus.DesiredSize.Width + headerStatus.Margin.Left + headerStatus.Margin.Right;
+            preferred = Math.Max(preferred, Math.Ceiling(controls) + 2);
+        }
+        return Math.Min(maximumWidth, preferred);
+    }
 }

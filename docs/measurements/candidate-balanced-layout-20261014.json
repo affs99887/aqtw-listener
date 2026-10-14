@@ -1,0 +1,418 @@
+[
+  {
+    "scenario": "one",
+    "count": 1,
+    "variant": "compact",
+    "font": 0.9,
+    "viewport": 880,
+    "width": 412,
+    "height": 131,
+    "picture": 88,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      219
+    ]
+  },
+  {
+    "scenario": "one",
+    "count": 1,
+    "variant": "compact",
+    "font": 0.9,
+    "viewport": 600,
+    "width": 412,
+    "height": 131,
+    "picture": 88,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      219
+    ]
+  },
+  {
+    "scenario": "one",
+    "count": 1,
+    "variant": "compact",
+    "font": 1,
+    "viewport": 880,
+    "width": 439,
+    "height": 135,
+    "picture": 88,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      230
+    ]
+  },
+  {
+    "scenario": "one",
+    "count": 1,
+    "variant": "compact",
+    "font": 1,
+    "viewport": 600,
+    "width": 439,
+    "height": 135,
+    "picture": 88,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      230
+    ]
+  },
+  {
+    "scenario": "one",
+    "count": 1,
+    "variant": "compact",
+    "font": 1.15,
+    "viewport": 880,
+    "width": 481,
+    "height": 141,
+    "picture": 88,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      247
+    ]
+  },
+  {
+    "scenario": "one",
+    "count": 1,
+    "variant": "compact",
+    "font": 1.15,
+    "viewport": 600,
+    "width": 481,
+    "height": 141,
+    "picture": 88,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      247
+    ]
+  },
+  {
+    "scenario": "six",
+    "count": 6,
+    "variant": "compact",
+    "font": 0.9,
+    "viewport": 880,
+    "width": 558,
+    "height": 321,
+    "picture": 88,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      221
+    ]
+  },
+  {
+    "scenario": "six",
+    "count": 6,
+    "variant": "compact",
+    "font": 0.9,
+    "viewport": 600,
+    "width": 558,
+    "height": 321,
+    "picture": 88,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      221
+    ]
+  },
+  {
+    "scenario": "six",
+    "count": 6,
+    "variant": "compact",
+    "font": 1,
+    "viewport": 880,
+    "width": 582,
+    "height": 325,
+    "picture": 88,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      233
+    ]
+  },
+  {
+    "scenario": "six",
+    "count": 6,
+    "variant": "compact",
+    "font": 1,
+    "viewport": 600,
+    "width": 582,
+    "height": 325,
+    "picture": 88,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      233
+    ]
+  },
+  {
+    "scenario": "six",
+    "count": 6,
+    "variant": "compact",
+    "font": 1.15,
+    "viewport": 880,
+    "width": 620,
+    "height": 331,
+    "picture": 88,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      252
+    ]
+  },
+  {
+    "scenario": "six",
+    "count": 6,
+    "variant": "compact",
+    "font": 1.15,
+    "viewport": 600,
+    "width": 620,
+    "height": 331,
+    "picture": 88,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      252
+    ]
+  },
+  {
+    "scenario": "thirteen",
+    "count": 13,
+    "variant": "compact",
+    "font": 0.9,
+    "viewport": 880,
+    "width": 707,
+    "height": 548,
+    "picture": 80,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      197
+    ]
+  },
+  {
+    "scenario": "thirteen",
+    "count": 13,
+    "variant": "compact",
+    "font": 0.9,
+    "viewport": 600,
+    "width": 707,
+    "height": 548,
+    "picture": 80,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      197
+    ]
+  },
+  {
+    "scenario": "thirteen",
+    "count": 13,
+    "variant": "compact",
+    "font": 1,
+    "viewport": 880,
+    "width": 740,
+    "height": 552,
+    "picture": 80,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      208
+    ]
+  },
+  {
+    "scenario": "thirteen",
+    "count": 13,
+    "variant": "compact",
+    "font": 1,
+    "viewport": 600,
+    "width": 740,
+    "height": 552,
+    "picture": 80,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      208
+    ]
+  },
+  {
+    "scenario": "thirteen",
+    "count": 13,
+    "variant": "compact",
+    "font": 1.15,
+    "viewport": 880,
+    "width": 785,
+    "height": 558,
+    "picture": 80,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      223
+    ]
+  },
+  {
+    "scenario": "thirteen",
+    "count": 13,
+    "variant": "compact",
+    "font": 1.15,
+    "viewport": 600,
+    "width": 785,
+    "height": 558,
+    "picture": 80,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      223
+    ]
+  },
+  {
+    "scenario": "largest",
+    "count": 31,
+    "variant": "compact",
+    "font": 0.9,
+    "viewport": 880,
+    "width": 784,
+    "height": 663.22,
+    "picture": 56,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      167
+    ]
+  },
+  {
+    "scenario": "largest",
+    "count": 31,
+    "variant": "compact",
+    "font": 0.9,
+    "viewport": 600,
+    "width": 784,
+    "height": 496,
+    "picture": 56,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      174.5,
+      195,
+      205.33333333333334
+    ]
+  },
+  {
+    "scenario": "largest",
+    "count": 31,
+    "variant": "compact",
+    "font": 1,
+    "viewport": 880,
+    "width": 824,
+    "height": 732.46,
+    "picture": 56,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      177
+    ]
+  },
+  {
+    "scenario": "largest",
+    "count": 31,
+    "variant": "compact",
+    "font": 1,
+    "viewport": 600,
+    "width": 824,
+    "height": 500,
+    "picture": 56,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      184.5,
+      205,
+      164,
+      246
+    ]
+  },
+  {
+    "scenario": "largest",
+    "count": 31,
+    "variant": "compact",
+    "font": 1.15,
+    "viewport": 880,
+    "width": 884,
+    "height": 835.3333333333333,
+    "picture": 56,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      192
+    ]
+  },
+  {
+    "scenario": "largest",
+    "count": 31,
+    "variant": "compact",
+    "font": 1.15,
+    "viewport": 600,
+    "width": 884,
+    "height": 505,
+    "picture": 56,
+    "overflow": false,
+    "clipped": [],
+    "toolbarFits": true,
+    "summaryFits": true,
+    "cardWidths": [
+      199.5,
+      220,
+      179,
+      266
+    ]
+  }
+]

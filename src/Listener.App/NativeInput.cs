@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
 
@@ -43,9 +42,12 @@ internal sealed class NativeInput : IDisposable
     private static IntPtr overlayHandle;
     private readonly Dispatcher dispatcher;
     private readonly DispatcherTimer mousePoll;
+    private readonly DispatcherTimer hotkeyRetry;
+    private readonly GlobalHotkeys hotkeys;
     private bool disposed;
-    private string registeredHotkey = "";
-    private string registeredInteractionHotkey = "";
+    public bool HotkeysReady => hotkeys.Ready;
+    public string HotkeyStatus => hotkeys.StatusText;
+    public IReadOnlyList<HotkeyStatus> HotkeyDiagnostics => hotkeys.Status;
     public long HookPresses { get; private set; }
     public long PollTriggers { get; private set; }
     public string HookStatus { get; }
@@ -60,6 +62,8 @@ internal sealed class NativeInput : IDisposable
     {
         dispatcher = window.Dispatcher;
         source = HwndSource.FromHwnd(new WindowInteropHelper(window).EnsureHandle());
+        hotkeys = new((id, gesture) => RegisterHotKey(source.Handle, id, gesture.Modifiers, gesture.VirtualKey)
+            ? 0 : Marshal.GetLastWin32Error(), id => UnregisterHotKey(source.Handle, id));
         source.AddHook(WindowProc);
         callback = MouseProc;
         mouseHook = SetWindowsHookEx(14, callback, GetModuleHandle(null), 0);
@@ -73,42 +77,18 @@ internal sealed class NativeInput : IDisposable
         };
         foregroundHook = SetWinEventHook(3, 3, IntPtr.Zero, foregroundCallback, 0, 0, 0);
         mousePoll = new DispatcherTimer(TimeSpan.FromMilliseconds(25), DispatcherPriority.Input, (_, _) => PollMouse(), dispatcher);
+        hotkeyRetry = new DispatcherTimer(TimeSpan.FromSeconds(2), DispatcherPriority.Background, (_, _) => hotkeys.Retry(), dispatcher);
     }
-    public void SetHotkey(string text)
-    {
-        if (string.Equals(text, registeredHotkey, StringComparison.OrdinalIgnoreCase)) return;
-        var parts = text.Split('+', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        uint modifiers = 0x4000;
-        foreach (var part in parts.SkipLast(1)) modifiers |= part.ToLowerInvariant() switch
-        { "ctrl" => 2u, "alt" => 1u, "shift" => 4u, "win" => 8u, _ => throw new ArgumentException("快捷键示例：Ctrl+Alt+L") };
-        if (parts.Length < 2 || !Enum.TryParse<Key>(parts[^1], true, out var key) || key == Key.None)
-            throw new ArgumentException("请输入包含组合键的快捷键，例如 Ctrl+Alt+L。");
-        // Trial registration preserves the previous shortcut if the replacement conflicts.
-        if (!RegisterHotKey(source.Handle, 72, modifiers, (uint)KeyInterop.VirtualKeyFromKey(key)))
-            throw new InvalidOperationException("快捷键已被其他程序占用，请更换组合键。");
-        UnregisterHotKey(source.Handle, 71); UnregisterHotKey(source.Handle, 72);
-        if (!RegisterHotKey(source.Handle, 71, modifiers, (uint)KeyInterop.VirtualKeyFromKey(key)))
-            throw new InvalidOperationException("快捷键注册失败，请重新设置。");
-        registeredHotkey = text;
-    }
+    public void InitializeHotkeys(string toggle, string interaction) => hotkeys.Initialize(toggle, interaction);
+    public void SetHotkeys(string toggle, string interaction) => hotkeys.Apply(toggle, interaction);
     private IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wp, IntPtr lp, ref bool handled)
     {
-        if (msg == 0x312 && wp.ToInt32() == 71) { Toggle?.Invoke(); handled = true; }
-        else if (msg == 0x312 && wp.ToInt32() == 75) { InteractionToggle?.Invoke(); handled = true; }
+        if (msg == 0x312 && hotkeys.TakeMessage(wp.ToInt32()) is { } action)
+        {
+            handled = true;
+            if (action == 0) Toggle?.Invoke(); else InteractionToggle?.Invoke();
+        }
         return IntPtr.Zero;
-    }
-    public void SetInteractionHotkey(string text)
-    {
-        if (text == registeredInteractionHotkey) return;
-        var parts = text.Split('+', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        uint modifiers = 0x4000;
-        foreach (var part in parts.SkipLast(1)) modifiers |= part.ToLowerInvariant() switch
-        { "ctrl" => 2u, "alt" => 1u, "shift" => 4u, "win" => 8u, _ => throw new ArgumentException("快捷键格式无效") };
-        if (parts.Length < 2 || !Enum.TryParse<Key>(parts[^1], true, out var key) || key == Key.None) throw new ArgumentException("请输入有效的组合键");
-        if (!RegisterHotKey(source.Handle, 76, modifiers, (uint)KeyInterop.VirtualKeyFromKey(key))) throw new InvalidOperationException("操作快捷键被占用，可从主窗口或托盘打开浮窗操作");
-        UnregisterHotKey(source.Handle, 75); UnregisterHotKey(source.Handle, 76);
-        if (!RegisterHotKey(source.Handle, 75, modifiers, (uint)KeyInterop.VirtualKeyFromKey(key))) throw new InvalidOperationException("操作快捷键注册失败");
-        registeredInteractionHotkey = text;
     }
     private IntPtr MouseProc(int code, IntPtr message, IntPtr data)
     {
@@ -230,9 +210,7 @@ internal sealed class NativeInput : IDisposable
     public void Dispose()
     {
         if (disposed) return;
-        disposed = true; mousePoll.Stop();
-        UnregisterHotKey(source.Handle, 71); UnregisterHotKey(source.Handle, 72);
-        UnregisterHotKey(source.Handle, 75); UnregisterHotKey(source.Handle, 76);
+        disposed = true; mousePoll.Stop(); hotkeyRetry.Stop(); hotkeys.Dispose();
         if (mouseHook != IntPtr.Zero) UnhookWindowsHookEx(mouseHook);
         source.RemoveHook(WindowProc);
         if (foregroundHook != IntPtr.Zero) UnhookWinEvent(foregroundHook);
