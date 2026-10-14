@@ -70,6 +70,7 @@ internal sealed class CandidatePanel : Border
     private Action<Candidate>? playReference;
     private Func<Candidate, bool>? referenceAvailable;
     private Func<Candidate, ContextMenu?>? referenceChoices;
+    private Func<Candidate, string?>? referenceProcessing;
     private readonly ProgressBar progress = new() { Width = 110, Height = 5, Visibility = Visibility.Collapsed,
         Margin = new Thickness(10, 0, 0, 0), Foreground = Theme.Accent };
     internal string Summary => primary.Count > 0 ? $"{headline.Text} · {primary.Count} 件候选" : headline.Text;
@@ -83,7 +84,46 @@ internal sealed class CandidatePanel : Border
     public event Action? LayoutChanged;
     public event Action<Candidate>? ReferenceRequested;
     private double FontScale => double.IsFinite(settings.FontScale) ? Math.Clamp(settings.FontScale, .9, 1.15) : 1;
-    private double PreferredThumbnail => design ? CandidateCount > 6 ? 96 : 112
+    // Merged classes reach 31 items (高概率类): six compact cards per row keep every name on one line.
+    public const int LargeClass = 20;
+    // Beyond this many candidates the size sections give way to packed rows.
+    private const int PackedCandidates = 48;
+    private bool Large => design && CandidateCount is > LargeClass and <= PackedCandidates;
+    // The 听样本 button always has its own column at the card's right edge; it is never
+    // placed under the text or stretched across the card. Rows of three or more use a
+    // stacked ▶/听样本 button so the name keeps its width. Unscaled DIPs.
+    private static bool StackedPlay(int rowSize, bool large, bool prominent) => prominent && !large && rowSize >= 3;
+    private static double PlayWidth(int rowSize, bool large, bool prominent) =>
+        !prominent ? 26 : rowSize == 1 ? 96 : rowSize == 2 ? 76 : large ? 60 : 42;
+    private double PlayColumn(int rowSize, bool large, bool prominent) =>
+        previewButtons ? (PlayWidth(rowSize, large, prominent) + 8) * FontScale : 0;
+    private static double NominalNameSize(int rowSize, bool large, bool prominent) =>
+        !prominent ? 11 : rowSize == 1 ? 18 : rowSize == 2 ? 15 : large ? 12 : 13;
+    private static double DifferenceSize(int rowSize, bool large) => rowSize == 1 ? 14 : rowSize == 2 ? 12 : large ? 10 : 11;
+    private static readonly Typeface NameTypeface = new(new FontFamily("Microsoft YaHei UI"), FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal);
+    private double TextWidth(string text, double size) => new FormattedText(text, System.Globalization.CultureInfo.CurrentUICulture,
+        FlowDirection.LeftToRight, NameTypeface, size, Brushes.Black, VisualTreeHelper.GetDpi(this).PixelsPerDip).WidthIncludingTrailingWhitespace;
+    // Width a name needs on the given number of lines: Chinese breaks between characters,
+    // a Latin or digit run such as "F2000" only as a whole.
+    private double NameWidth(string name, double size, int lines)
+    {
+        if (lines <= 1) return TextWidth(name, size) + 2;
+        var tokens = System.Text.RegularExpressions.Regex.Matches(name, @"[A-Za-z0-9\-]+|.").Select(m => m.Value).ToArray();
+        // The narrowest two-line split.
+        var best = TextWidth(name, size);
+        for (var split = 1; split < tokens.Length; split++)
+            best = Math.Min(best, Math.Max(TextWidth(string.Concat(tokens[..split]), size), TextWidth(string.Concat(tokens[split..]), size)));
+        return best + 2;
+    }
+    // The largest font from the nominal size down to the floor at which every name in the row
+    // stays on one line; below the floor the name wraps instead of shrinking further.
+    private double FitNameSize(IEnumerable<string> names, double budget, double nominal, double floor)
+    {
+        var size = nominal;
+        while (size > floor && names.Max(name => NameWidth(name, size * FontScale, 1)) > budget) size -= 1;
+        return size;
+    }
+    private double PreferredThumbnail => design ? Large ? 64 : CandidateCount > 6 ? 96 : 112
         : double.IsFinite(settings.ThumbnailSize) ? Math.Clamp(settings.ThumbnailSize, 60, 120) : 88;
     // 100% minus the similarity to the reference that candidate matched: lower is closer.
     internal static string DifferenceText(double score) => "差异率 " + (double.IsFinite(score)
@@ -117,7 +157,9 @@ internal sealed class CandidatePanel : Border
         // The live, click-through overlay and the paused operation view share
         // one candidate layout. Only the latter exposes playback controls.
         design = compact && !minimal;
-        layout = new(BuildGroups, () => PreferredThumbnail, () => design ? 80 : 56);
+        // A large class whose size sections exceed a small screen's height packs its rows instead.
+        layout = new(BuildGroups, () => PreferredThumbnail, () => design && !Large ? 80 : 56,
+            (candidates, width, thumbnail) => Large ? BuildDenseDesignGroups(candidates, width, thumbnail) : null);
         layout.Changed += () => LayoutChanged?.Invoke();
         Background = Theme.Background; BorderBrush = Theme.Line; BorderThickness = design ? new Thickness(0) : new Thickness(1);
         Padding = new Thickness(OuterPadding);
@@ -287,8 +329,10 @@ internal sealed class CandidatePanel : Border
             ((SolidColorBrush)Theme.Panel).Color, TimeSpan.FromMilliseconds(900))
         { EasingFunction = new System.Windows.Media.Animation.QuadraticEase() });
     }
-    public void SetAudioPreview(Action<Candidate> play, Func<Candidate, bool> available)
-    { playReference = play; referenceAvailable = available; layout.Refresh(); }
+    public void SetAudioPreview(Action<Candidate> play, Func<Candidate, bool> available, Func<Candidate, string?>? processing = null)
+    { playReference = play; referenceAvailable = available; referenceProcessing = processing; layout.Refresh(); }
+    private string PlayTip(Candidate candidate) => referenceProcessing?.Invoke(candidate) is { } processing
+        ? $"听样本：试听 {candidate.Item.Name}（{processing}）" : $"听样本：试听 {candidate.Item.Name} 的原声（未经处理的游戏录音）";
     public void SetReferenceChoices(Func<Candidate, ContextMenu?> choices)
     { referenceChoices = choices; layout.Refresh(); }
     public void SetNearCandidates(IReadOnlyList<Candidate> candidates)
@@ -354,8 +398,9 @@ internal sealed class CandidatePanel : Border
             var designGroups = primary.Concat(near.Where(c => !primary.Any(p => p.Item.Id == c.Item.Id)))
                 .GroupBy(c => (Reference: nearIds.Contains(c.Item.Id), c.Item.Cells)).ToArray();
             var candidateCount = designGroups.Sum(group => group.Count());
+            // Two cards per row keep a one-line name beside the 听样本 button from 760 DIP.
             var designWidth = candidateCount > 20 ? 1600 : candidateCount > 12 ? 900 :
-                candidateCount > 6 ? 820 : designGroups.Length >= 3 || candidateCount >= 5 ? 738 :
+                candidateCount > 6 ? 820 : designGroups.Length >= 3 || candidateCount >= 5 ? 760 :
                 designGroups.Length == 2 || candidateCount >= 3 ? 660 : 620;
             return Math.Min(limit, designWidth);
         }
@@ -439,7 +484,9 @@ internal sealed class CandidatePanel : Border
     {
         if (candidates.Count == 0)
             return new Border { Padding = new Thickness(18), Child = Theme.Label("物品声音出现后，在这里查看候选并试听原声", 12 * FontScale, Theme.Muted) };
-        if (candidates.Count > 20) return BuildDenseDesignGroups(candidates, availableWidth, thumbnail);
+        // Sections per grid size up to the largest merged class; the packed layout only
+        // remains for a hypothetical personal library beyond that.
+        if (candidates.Count > PackedCandidates) return BuildDenseDesignGroups(candidates, availableWidth, thumbnail);
         return BuildSectionedDesignGroups(candidates, availableWidth, thumbnail);
     }
 
@@ -463,10 +510,21 @@ internal sealed class CandidatePanel : Border
             .ThenByDescending(candidate => candidate.Item.ReferenceValue).ToArray();
         // Fill the section with balanced rows: five items become 3+2 and nine
         // become 3+3+3, instead of stretching a lone last card across the row.
-        var fourImage = Math.Max(80, Math.Min(thumbnail, cardAreaWidth / 4 - 96 * FontScale));
-        var maxColumns = cardAreaWidth >= 4 * (fourImage + 96 * FontScale) ? 4
-            : cardAreaWidth >= 3 * (thumbnail + 96 * FontScale) ? 3
-            : cardAreaWidth >= 2 * (thumbnail + 112 * FontScale) ? 2 : 1;
+        // Each card holds picture, name and the 听样本 button column; the row takes as many
+        // cards as the section's longest name allows at the floor font size: on one line in a
+        // large class, on at most two lines otherwise.
+        var names = ordered.Select(candidate => candidate.Item.Name).ToArray();
+        var floor = Large ? 11 : 13;
+        var oneLine = names.Max(name => NameWidth(name, floor * FontScale, 1));
+        var longest = names.Max(name => NameWidth(name, floor * FontScale, Large ? 1 : 2));
+        double Image(int columns, double cardWidth) => Large ? thumbnail
+            : columns == 4 ? Math.Max(80, Math.Min(thumbnail, cardWidth - oneLine - PlayColumn(4, false, true) - 12))
+            : thumbnail >= 96 && columns == 1 ? thumbnail + 16 : thumbnail;
+        double Needed(int columns) => Image(columns, cardAreaWidth / columns) + 2 + (columns <= 2 && !Large ? 11 : 3) + 2 +
+            longest + PlayColumn(columns, Large, true) + 2;
+        var maxColumns = 1;
+        for (var columns = Large ? 6 : 4; columns > 1; columns--)
+            if (cardAreaWidth / columns >= Needed(columns)) { maxColumns = columns; break; }
         var rowCount = (int)Math.Ceiling(ordered.Length / (double)maxColumns);
         var baseCount = ordered.Length / rowCount;
         var extra = ordered.Length % rowCount;
@@ -477,12 +535,16 @@ internal sealed class CandidatePanel : Border
             var rowItems = ordered.Skip(offset).Take(rowSize).ToArray();
             offset += rowSize;
             var cardWidth = cardAreaWidth / rowSize;
-            var imageSize = rowSize == 4 ? Math.Max(80, Math.Min(thumbnail, cardWidth - 96 * FontScale))
-                : thumbnail >= 96 && rowSize == 1 ? thumbnail + 16 : thumbnail;
-            var rowHeight = Math.Max(imageSize + 2, rowSize == 4 ? 96 * FontScale : 0);
+            var imageSize = Image(rowSize, cardWidth);
+            var rowHeight = Math.Max(imageSize + 2, Large ? 66 * FontScale : 0);
+            var wide = !Large && rowSize is 1 or 2;
+            var budget = cardWidth - (imageSize + 2) - (wide ? 11 : 3) - 2 - PlayColumn(rowSize, Large, true) - 2;
+            var nameSize = FitNameSize(rowItems.Select(candidate => candidate.Item.Name), budget, NominalNameSize(rowSize, Large, true), floor);
+            // A column too narrow for "差异率 10.0%" on one line moves it onto the picture's bottom edge.
+            var differenceOnPicture = TextWidth("差异率 10.0%", DifferenceSize(rowSize, Large) * FontScale) + 2 > budget;
             var row = new StackPanel { Orientation = Orientation.Horizontal, Height = rowHeight };
             foreach (var candidate in rowItems)
-                row.Children.Add(DenseDesignCard(candidate, imageSize, cardWidth, rowHeight, rowSize));
+                row.Children.Add(DenseDesignCard(candidate, imageSize, cardWidth, rowHeight, rowSize, nameSize, differenceOnPicture));
             cardRows.Children.Add(row);
         }
         var title = Theme.Label(group.Key.Reference ? $"参考 · {group.Key.Cells} 格" :
@@ -529,7 +591,8 @@ internal sealed class CandidatePanel : Border
         var grouped = candidates.GroupBy(c => (Reference: nearIds.Contains(c.Item.Id), c.Item.Cells))
             .OrderBy(group => group.Key.Reference).ThenBy(group => group.Key.Cells).ToArray();
         var categoryWidth = grouped.Any(group => group.Key.Reference) ? 96d : 82d;
-        var targetCardWidth = availableWidth < 1300 ? 128d : 145d;
+        // Room for the picture, a two-line name and the compact 听样本 button on the right.
+        var targetCardWidth = availableWidth < 1300 ? 156d : 172d;
         var rowHeight = Math.Max(thumbnail + 2, 58);
         var packedRows = new List<List<(Candidate? Item, string? Category)>>();
         var pending = new List<(Candidate? Item, string? Category)>();
@@ -596,18 +659,21 @@ internal sealed class CandidatePanel : Border
         return rows;
     }
 
-    private UIElement DenseDesignCard(Candidate candidate, double thumbnail, double width, double height, int rowSize = 0)
+    private UIElement DenseDesignCard(Candidate candidate, double thumbnail, double width, double height, int rowSize = 0,
+        double nameSize = 0, bool differenceOnPicture = false)
     {
         var item = candidate.Item;
-        var prominent = design && CandidateCount <= 20;
-        var wide = prominent && rowSize is 1 or 2;
-        // Only a lone card has room for a button column beside the name; in
-        // pairs the button goes under the name so the name stays on one line.
-        var sideButton = wide && rowSize == 1 && previewButtons;
+        // Every sectioned card (rowSize > 0) shows name, 差异率 and grid size; a large class
+        // shrinks them so six fit a row with every name on one line. Packed cards pass 0.
+        var prominent = design && rowSize > 0;
+        var large = Large;
+        var wide = prominent && !large && rowSize is 1 or 2;
+        // Picture | name and details | 听样本 button: the button column is fixed on the right.
+        var playWidth = PlayWidth(rowSize, large, prominent) * FontScale;
         var grid = new Grid { Height = height - 2 };
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(thumbnail + 2) });
         grid.ColumnDefinitions.Add(new ColumnDefinition());
-        if (sideButton) grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(96 * FontScale) });
+        if (previewButtons) grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(playWidth + 8 * FontScale) });
         var picture = new Grid { Width = thumbnail, Height = thumbnail, Background = Theme.Background };
         if (item.Thumbnail is not null)
         {
@@ -627,7 +693,7 @@ internal sealed class CandidatePanel : Border
         else picture.Children.Add(Theme.Label("暂无图片", 9 * FontScale, Theme.Muted));
         if (TagBadge(candidate) is { } badge) picture.Children.Add(badge);
         // Dense cards have no spare text line: the 差异率 rides on the picture's bottom edge.
-        if (!prominent && !catalogView)
+        if ((!prominent || differenceOnPicture) && !catalogView)
         {
             var strip = Theme.Label(DifferenceText(candidate.Score), 9 * FontScale, Theme.Text);
             strip.Margin = new Thickness(0); strip.TextWrapping = TextWrapping.NoWrap; strip.TextAlignment = TextAlignment.Center;
@@ -636,10 +702,9 @@ internal sealed class CandidatePanel : Border
         }
         grid.Children.Add(picture);
         var details = new StackPanel { Margin = new Thickness(wide ? 11 : 3, 0, 2, 0),
-            VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = wide ? HorizontalAlignment.Left : HorizontalAlignment.Stretch,
-            MaxWidth = wide ? rowSize == 1 ? 360 : 225 : double.PositiveInfinity };
+            VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Stretch };
         // Red names mark red items; the card needs no second marker for that.
-        var name = Theme.Label(item.Name, (wide ? rowSize == 1 ? 18 : 15 : prominent ? 13 : 11) * FontScale,
+        var name = Theme.Label(item.Name, (nameSize > 0 ? nameSize : NominalNameSize(rowSize, large, prominent)) * FontScale,
             item.IsGold ? Theme.Collectible : Theme.Text);
         name.FontWeight = FontWeights.SemiBold; name.Margin = new Thickness(0); name.TextWrapping = TextWrapping.Wrap;
         name.TextTrimming = TextTrimming.None; name.ToolTip = item.Name;
@@ -649,9 +714,9 @@ internal sealed class CandidatePanel : Border
         {
             // One row with the grid size keeps the card's original line count; it wraps only when narrow.
             var meta = new WrapPanel();
-            if (!catalogView)
+            if (!catalogView && !differenceOnPicture)
             {
-                var difference = Theme.Label(DifferenceText(candidate.Score), (wide ? rowSize == 1 ? 14 : 12 : 11) * FontScale, Theme.Muted);
+                var difference = Theme.Label(DifferenceText(candidate.Score), DifferenceSize(rowSize, large) * FontScale, Theme.Muted);
                 difference.FontWeight = FontWeights.SemiBold; difference.Margin = new Thickness(0, 0, 10, 0); difference.TextWrapping = TextWrapping.Wrap;
                 difference.TextTrimming = TextTrimming.None; difference.VerticalAlignment = VerticalAlignment.Center;
                 difference.ToolTip = DifferenceHelp; meta.Children.Add(difference);
@@ -669,17 +734,19 @@ internal sealed class CandidatePanel : Border
         }
         if (previewButtons)
         {
-            var play = Theme.Button("▶ 听样本", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
-            play.Height = sideButton ? 30 : wide ? 26 : 20; play.Padding = new Thickness(0);
-            play.Margin = sideButton ? new Thickness(0, 0, 8, 0) : wide ? new Thickness(0, 6, 0, 0) : new Thickness(0);
-            if (wide && !sideButton) { play.Width = 96 * FontScale; play.HorizontalAlignment = HorizontalAlignment.Left; }
+            // Packed cards beyond 48 candidates only have room for the glyph; the tooltip names the action.
+            var stacked = StackedPlay(rowSize, large, prominent);
+            var play = Theme.Button(prominent ? "▶ 听样本" : "▶", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
+            if (stacked) play.Content = new TextBlock { Text = "▶\n听样本", TextAlignment = TextAlignment.Center, Margin = new Thickness(0) };
+            play.Width = playWidth; play.Height = Math.Round((rowSize == 1 ? 30 : rowSize == 2 ? 28 : stacked ? 38 : 22) * FontScale);
+            play.Padding = new Thickness(0); play.Margin = new Thickness(2 * FontScale, 0, 6 * FontScale, 0);
+            play.VerticalAlignment = VerticalAlignment.Center; play.HorizontalAlignment = HorizontalAlignment.Right;
             play.FontSize = (wide ? 10 : 9) * FontScale;
             play.Tag = candidate; play.IsEnabled = referenceAvailable?.Invoke(candidate) ?? (playReference is not null || ReferenceRequested is not null);
-            play.ToolTip = play.IsEnabled ? $"试听 {item.Name} 的原声（未经处理的游戏录音）" : NoPlayback;
+            play.ToolTip = play.IsEnabled ? PlayTip(candidate) : NoPlayback;
             play.ContextMenu = referenceChoices?.Invoke(candidate); ToolTipService.SetShowOnDisabled(play, true);
             AutomationProperties.SetName(play, $"试听{item.Name}的原声");
-            if (sideButton) { Grid.SetColumn(play, 2); grid.Children.Add(play); }
-            else details.Children.Add(play);
+            Grid.SetColumn(play, 2); grid.Children.Add(play);
         }
         Grid.SetColumn(details, 1); grid.Children.Add(details);
         return new Border { Child = grid, Width = width, Height = height, Background = Theme.Panel,
@@ -731,7 +798,7 @@ internal sealed class CandidatePanel : Border
             play = Theme.Button("▶  听样本", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
             play.Height = 32; play.Padding = new Thickness(0); play.Margin = new Thickness(0); play.FontSize = 11 * FontScale;
             play.Tag = candidate; play.IsEnabled = referenceAvailable?.Invoke(candidate) ?? (playReference is not null || ReferenceRequested is not null);
-            play.ToolTip = play.IsEnabled ? $"试听 {item.Name} 的原声（未经处理的游戏录音）" : NoPlayback;
+            play.ToolTip = play.IsEnabled ? PlayTip(candidate) : NoPlayback;
             play.ContextMenu = referenceChoices?.Invoke(candidate);
             ToolTipService.SetShowOnDisabled(play, true); AutomationProperties.SetName(play, $"试听{item.Name}的原声");
             stack.Children.Add(play);
@@ -775,7 +842,7 @@ internal sealed class CandidatePanel : Border
         // Listening cards without names only need room for the picture and
         // dimensions. Reserving the interaction controls' text width here
         // would stop image compaction from making dense results fit.
-        var textWidth = interactive ? 92 : ShowNames ? 72 : 44;
+        var textWidth = interactive ? 100 : ShowNames ? 72 : 44;
         return Math.Ceiling(Math.Max(textWidth * FontScale, thumbnail + 10));
     }
     private UIElement Card(Candidate candidate, bool highest, bool best, double thumbnail, double width)
@@ -809,30 +876,47 @@ internal sealed class CandidatePanel : Border
         else tile.Children.Add(Theme.Label("暂无图片", 10 * FontScale, Theme.Muted));
         if (TagBadge(candidate) is { } tileBadge) tile.Children.Add(tileBadge);
         stack.Children.Add(tile);
-        var metadata = new DockPanel { Margin = new Thickness(0, 3, 0, previewButtons ? 4 : 0) };
+        var metadata = new DockPanel { Margin = new Thickness(0, 3, 0, 0), LastChildFill = false };
         var dimensions = Theme.Label(item.GridLabel, 10 * FontScale, Theme.Muted);
         dimensions.Margin = new Thickness(0); dimensions.TextWrapping = TextWrapping.NoWrap;
         DockPanel.SetDock(dimensions, Dock.Left); metadata.Children.Add(dimensions);
+        Button? play = null;
+        if (previewButtons)
+        {
+            play = Theme.Button("▶ 听样本", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
+            play.Padding = new Thickness(0); play.Margin = new Thickness(4, 0, 0, 0); play.FontSize = 9 * FontScale;
+            play.Width = 56 * FontScale; play.Height = Math.Round(22 * FontScale); play.VerticalAlignment = VerticalAlignment.Center;
+            play.Tag = candidate; play.IsEnabled = referenceAvailable?.Invoke(candidate) ?? (playReference is not null || ReferenceRequested is not null);
+            play.ToolTip = play.IsEnabled ? PlayTip(candidate) : NoPlayback;
+            play.ContextMenu = referenceChoices?.Invoke(candidate);
+            ToolTipService.SetShowOnDisabled(play, true);
+            AutomationProperties.SetName(play, $"试听{item.Name}的原声");
+        }
+        if (play is not null && thumbnail > 48)
+        {
+            // The button takes the right end of the grid row, never a bar under the tile;
+            // the 差异率 then rides on the picture's bottom edge as in the overlay's packed cards.
+            DockPanel.SetDock(play, Dock.Right); metadata.Children.Add(play);
+            if (!catalogView)
+            {
+                var strip = Theme.Label(DifferenceText(candidate.Score), 9 * FontScale, Theme.Text);
+                strip.Margin = new Thickness(0); strip.TextWrapping = TextWrapping.NoWrap; strip.TextAlignment = TextAlignment.Center;
+                tile.Children.Add(new Border { Child = strip, Background = Theme.Brush("#CC111212"), VerticalAlignment = VerticalAlignment.Bottom,
+                    Padding = new Thickness(2, 0, 2, 1), Margin = new Thickness(2), ToolTip = DifferenceHelp });
+            }
+        }
         // Below 48 DIP the grid row moves into a picture-wide column with no room left.
-        if (!catalogView && !(previewButtons && thumbnail <= 48))
+        else if (!catalogView && play is null)
         {
             // Shares the grid row so dense layouts keep their card height.
             var difference = Theme.Label(DifferenceText(candidate.Score), 10 * FontScale, Theme.Muted);
             difference.Margin = new Thickness(6, 0, 0, 0); difference.TextWrapping = TextWrapping.NoWrap;
             difference.TextTrimming = TextTrimming.CharacterEllipsis; difference.TextAlignment = TextAlignment.Right;
-            difference.ToolTip = DifferenceHelp; metadata.Children.Add(difference);
+            difference.ToolTip = DifferenceHelp; DockPanel.SetDock(difference, Dock.Right); metadata.Children.Add(difference);
         }
         stack.Children.Add(metadata);
-        if (previewButtons)
+        if (play is not null)
         {
-            var play = Theme.Button("▶ 听样本", (_, _) => { playReference?.Invoke(candidate); ReferenceRequested?.Invoke(candidate); });
-            play.Padding = new Thickness(2, 3, 2, 3); play.Margin = new Thickness(0); play.FontSize = 10 * FontScale;
-            play.Tag = candidate; play.IsEnabled = referenceAvailable?.Invoke(candidate) ?? (playReference is not null || ReferenceRequested is not null);
-            play.ToolTip = play.IsEnabled ? $"试听 {item.Name} 的原声（未经处理的游戏录音）" : NoPlayback;
-            play.ContextMenu = referenceChoices?.Invoke(candidate);
-            ToolTipService.SetShowOnDisabled(play, true);
-            AutomationProperties.SetName(play, $"试听{item.Name}的原声");
-            stack.Children.Add(play);
             if (thumbnail <= 48)
             {
                 // In a shallow game strip, put the same image and controls side
@@ -847,7 +931,8 @@ internal sealed class CandidatePanel : Border
                 picture.Children.Add(tile); picture.Children.Add(metadata); dense.Children.Add(picture);
                 var actions = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
                 if (name is not null) { name.Margin = new Thickness(0, 0, 0, 1); actions.Children.Add(name); }
-                play.Content = "▶ 试听"; play.Padding = new Thickness(1, 1, 1, 1); actions.Children.Add(play);
+                play.Content = "▶ 试听"; play.Padding = new Thickness(1, 1, 1, 1); play.Margin = new Thickness(0);
+                play.HorizontalAlignment = HorizontalAlignment.Left; actions.Children.Add(play);
                 Grid.SetColumn(actions, 1); dense.Children.Add(actions); stack.Children.Add(dense);
             }
         }

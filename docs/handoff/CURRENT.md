@@ -1,4 +1,15 @@
-# 当前接续状态 · 2026-09-25
+# 当前接续状态 · 2026-10-14
+
+当前版本为 **v0.4.6（合并暗区情报站素材库）**，本地提交，未推送、未发布。用户提供 `暗区情报站小助手-Setup-1.4.0.exe`（静态解包结果在 `artifacts/暗区情报站-1.4.0-素材库`，ChatGPT 交接在 `artifacts/material-merge-handoff-20261013`，均不入库）。研究脚本在 `.tools/research/merge-aqintel`（gitignored）。报告见 [素材合并报告](../MATERIAL-MERGE-AQINTEL-20261014.md)。
+
+- 合并：`scripts/merge-aqintel-library.py`（只能在合并前的库上运行，`provenance.json` 已有 `aqintel140` 段时退出）按名称与 7 组图片确认的别名对应物品，按 `baseline-audio-probe.json` 把对方 17 个声音归入本库声音类；新物品 ID `aqintel140-<对方ID>`，加入该类所有拿起组与放下声组（只加新物品，不把类内已有物品互相加入，否则候选去重会合并组）。声音 11/14/16 新建组 `aqintel140-sound-NN`（门限 0.82），声音 06 加到宝石类；四段 WAV 经 `trim_refs.py` 裁到起振帧后用 CLI `add-reference` 入库。库版本 `0.4.6-aqintel-merge-20261014`，150 件、65 组、95 条样本。
+- 试听：`PlaybackClip.Processing`（可空）标记非原始录音；`fix_playback.py` 只给没有 SoundRadar 原始录音的组保留对方 WAV（声音 10/11/12/14/15/16）。`OverlayWorkspace` 把 `Processing` 传给 `CandidatePanel.SetAudioPreview` 的第三个参数，提示与播放状态据此写明。
+- 布局：`CandidatePanel.LargeClass`（20）到 `PackedCandidates`（48）之间按格数分区、每行最多 6 张、名称单行；`CandidateLayout` 新增可选 fallback，分区布局超高时改用 `BuildDenseDesignGroups`。`DenseDesignCard` 的「听样本」固定在第三列：`PlayWidth` 一行 1 件 96、2 件 76、大类 60、3 件以上 42（`StackedPlay` 两行文字）、密集 26；`prominent` 改为 `rowSize > 0`（密集卡片传 0）。名称宽度按 `NameWidth`（两行时取最窄切分）选列数，非大类最小 13 号字、可两行；文字列放不下「差异率 10.0%」时移到缩略图底边。`Card()`（图鉴、离线结果）按钮在格数行右端，差异率放到缩略图底边。冒烟新增 `PlayButtonsRight`、`tileButtonsRight`，全候选场景改为最大声音类（31 件）。
+- 验证：`raids.py` 解码 26 场录像为 500 s 分段并以两库扫描，`raid_diff.py`/`raid_clusters.py` 对比；`provenance.py`/`fir_provenance.py`/`impact_probe.py` 复核对方音频；`frames_sheet.py`/`frames_zoom.py` 取画面。结果见报告第 3、4 节。
+- 格数：胶囊电视 2×3、花瓶 2×2 按本库缩略图底色与对方资料更正（`GRID_CORRECTIONS`、`provenance.json` 的 `aqintel140.gridCorrected`）；燃料桶保留 3×2。冒烟 `ImagesKeepAspect` 检查所有物品图 `Stretch.Uniform` 且显示比例与位图一致，含全部 150 张图鉴图。
+- 待办：新物品格数与两件更正的实机核对；电脑硬件类模板在非目标声音上偏高（0.78–0.84 共 137 次），若后续出现误报，先把该组门限提到 0.90。
+
+以下为 v0.4.5 时的状态记录。
 
 当前版本为 **v0.4.5（多锚点对齐与多变体参考）**，发布为 GitHub Release。用户提供一段 B 站听声教学视频（`tests/9d769840a1f45598d0a5ab3cb125a96e.mp4`，未入库，gitignored；仅含拾取音效、无杂音、9 类 42 次播放）并反馈"仓库里也识别不到"。研究脚本在 `.tools/research/pickup10`（gitignored）：`features.py` 是 C# 特征的 Python 移植，`bench.py`/`sweep.py` 用 `dataset.json`（视频 42 + 9 月 24 日行商 45 + 9 月 22 日行商 10 个正样本，行商空闲 158 个负样本）跑特征对照。
 

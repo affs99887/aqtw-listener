@@ -1,0 +1,71 @@
+{
+ "recordings": 26,
+ "hours": 7.05,
+ "source": "C:\\Users\\Dexin\\Videos\\aqtw-highlight\\17293822637845621439\\record (2026-10-05..13)",
+ "libraries": {
+  "merged": "data/library 0.4.6-aqintel-merge-20261014 (95 reference samples)",
+  "v045": "v0.4.5 data/library snapshot (89 reference samples)"
+ },
+ "analysedSounds": 58696,
+ "eventOutcomes": {
+  "both-none": 58006,
+  "same-sound-more-items": 598,
+  "new-output": 60,
+  "identical": 31,
+  "lost-output": 1
+ },
+ "pickupsWithOutput": {
+  "v045": 482,
+  "merged": 516
+ },
+ "pickupsLost": [],
+ "pickupsGained": 33,
+ "pickupsGainedByClass": {
+  "PSU电源等5件": 20,
+  "奢华茶具等4件": 11,
+  "火焰喷灯": 2
+ },
+ "pickupsGainedScores": [
+  0.876,
+  0.882,
+  0.896,
+  0.898,
+  0.902,
+  0.904,
+  0.908,
+  0.911,
+  0.912,
+  0.914,
+  0.921,
+  0.924,
+  0.932,
+  0.937,
+  0.938,
+  0.949,
+  0.952,
+  0.958,
+  0.96,
+  0.961,
+  0.961,
+  0.963,
+  0.964,
+  0.964,
+  0.966,
+  0.967,
+  0.967,
+  0.969,
+  0.969,
+  0.979,
+  0.979,
+  0.98,
+  0.981
+ ],
+ "videoChecked": "10 gained pickups viewed in the recording: PSU电源 in a 专用主机 container (popup names it), perfume and 阻断剂注射枪 in drawers, 喷灯 in a 专业工具箱, drive-like parts in a computer container, and four trader hidden items whose repeated drags gave the same class every time; none was a false alarm.",
+ "nearThresholdNewGroup": "电脑硬件类 (情报站 sound 11) tops 3977 sounds, 137 of them at 0.78–0.84 and none output; every output from it scored ≥ 0.86.",
+ "lostDuplicate": "v0.4.5 output twice for the 液压扩张器 floor pickup at record20261008-213925 874.85 s and 875.03 s; merged rejects the first (lead over 电脑硬件类 0.152 < 0.20) and outputs the second, so the pickup is still recognised.",
+ "scanCost": {
+  "v045": "26.2 s per 1000 s of raid audio",
+  "merged": "27.2 s per 1000 s (+4 %, ≈ 0.4 ms more per analysed sound)"
+ },
+ "limits": "Scores are compared on the same recordings the references were not tuned on, but the item identity behind trader hidden goods cannot be confirmed from video."
+}

@@ -2,11 +2,12 @@ namespace Listener.Core;
 
 // What 听样本 plays. Matching references are processed (the bundled peer
 // references are normalised to 0 dBFS and gated to silence), so they sound unlike
-// the game. Playback clips are original captures: copied byte for byte and played
-// as a time window, never filtered, normalised or resampled. A group without one
-// has nothing to audition.
+// the game. Playback clips are copied byte for byte and played as a time window,
+// never filtered, normalised or resampled by us. Original captures leave Processing
+// empty; a clip someone else already altered says what was done, and is only bundled
+// for a group that has no original capture. A group without any clip has nothing to audition.
 public sealed record PlaybackClip(string Id, string Label, string Action, string File, string Sha256,
-    double StartSeconds, double? EndSeconds, string[] GroupIds, string Source = "");
+    double StartSeconds, double? EndSeconds, string[] GroupIds, string Source = "", string? Processing = null);
 
 public sealed class PlaybackAudio
 {

@@ -55,8 +55,14 @@ internal static class Program
                 var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
                 library.Validate();
                 var unlinked = library.Items.Where(item => !library.Groups.Any(group => group.ItemIds.Contains(item.Id))).ToArray();
-                Check(library.Items.Count == 62 && unlinked.Length == 0,
-                    "unverified items entered the runtime catalog");
+                // 62 original items plus the 88 the 暗区情报站 1.4.0 merge added; every item must belong to a
+                // pickup group with a reference, and every image must exist and decode.
+                var withoutPickup = library.Items.Where(item => !library.Groups.Any(group => group.Action == "pickup" && group.Templates.Count > 0 && group.ItemIds.Contains(item.Id))).ToArray();
+                Check(library.Items.Count == 150 && unlinked.Length == 0 && withoutPickup.Length == 0,
+                    "unverified items entered the runtime catalog: " + string.Join("、", withoutPickup.Select(i => i.Name)));
+                foreach (var item in library.Items)
+                    Check(item.Thumbnail is not null && File.Exists(Path.Combine(root, item.Thumbnail)) && item.GridVerified && item.Cells > 0,
+                        "catalog item lacks a thumbnail or verified grid: " + item.Name);
                 var panel = new CandidatePanel(root, new Settings { ShowNames = true });
                 var result = new RecognitionResult(1, RecognitionStatus.Matched, true,
                     library.Items.Select(item => new Candidate(item, 0, "catalog")).ToArray(), 0, "");
@@ -94,9 +100,9 @@ internal static class Program
             {
                 var root = Path.Combine(AppContext.BaseDirectory, "library");
                 var references = ReferenceAudio.Load(root).Samples;
-                // 62 groups each keep their original reference; classes the game plays in several
-                // variants carry extra templates (guide video, in-match capture).
-                Check(references.Select(s => s.GroupId).Distinct().Count() == 62 && references.Count >= 62, "reference archive is incomplete");
+                // 62 original groups each keep their reference, three groups came with the 暗区情报站 merge;
+                // classes the game plays in several variants carry extra templates (guide video, in-match capture).
+                Check(references.Select(s => s.GroupId).Distinct().Count() == 65 && references.Count >= 65, "reference archive is incomplete");
                 foreach (var reference in references)
                 {
                     var clip = WaveAudio.Read(ReferenceAudio.VerifiedPath(root, reference));
@@ -548,7 +554,7 @@ internal static class Program
                 foreach (var font in new[] { 1.0, 1.15 })
                 {
                     var panel = new CandidatePanel(root, new Settings { FontScale = font, ThumbnailSize = 120, ShowNames = true }, interactive: true, compact: true);
-                    var names = new[] { "热成像模块", "金豹雕像", "古董茶壶", "激光指示模块", "金狮雕像", "花瓶" };
+                    var names = new[] { "热成像模块", "金豹雕像", "古董茶壶", "激光指示模块", "金狮雕像", "胶囊电视" };
                     var candidates = names.Select(name => library.Items.Single(item => item.Name == name))
                         .Select(item => new Candidate(item, .9, library.Groups.First(group => group.ItemIds.Contains(item.Id)).Id)).ToArray();
                     var result = new RecognitionResult(1, RecognitionStatus.Matched, true, candidates, 1, "design");
@@ -610,7 +616,9 @@ internal static class Program
                     Layout(panel, width, height); CheckCandidateCoverage(panel, result);
                     var cards = Descendants<System.Windows.Controls.Border>(panel)
                         .Where(border => border.Tag is Candidate).ToArray();
-                    Check(!panel.NeedsScroll && panel.ThumbnailSize >= 80 &&
+                    // A class above CandidatePanel.LargeClass (the merged 高概率类 has 31) uses compact
+                    // 56–64 px pictures so six cards with one-line names fit a row.
+                    Check(!panel.NeedsScroll && panel.ThumbnailSize >= (count is > CandidatePanel.LargeClass and <= 48 ? 56 : 80) &&
                         !Descendants<System.Windows.Controls.ScrollViewer>(panel).Any(),
                         $"{width}×{viewportHeight}, 字号{scale}: " + panel.LayoutInfo);
                     Check(cards.All(card =>
@@ -778,12 +786,15 @@ internal static class Program
                         var image = Descendants<System.Windows.Controls.Image>(card).Single();
                         var playBounds = play.TransformToAncestor(card)
                             .TransformBounds(new System.Windows.Rect(play.RenderSize));
+                        var nameBounds = name.TransformToAncestor(card).TransformBounds(new System.Windows.Rect(name.RenderSize));
+                        // The button keeps its own column at the right edge in every density.
                         Check(name.TextTrimming == System.Windows.TextTrimming.None &&
                             name.DesiredSize.Height <= name.ActualHeight + 1 && ShowsDifference(card, "差异率 4.0%") &&
-                            image.Parent is System.Windows.Controls.Grid { ActualWidth: >= 80, ActualHeight: >= 80 } && play.ActualWidth > 60 &&
+                            image.Parent is System.Windows.Controls.Grid { ActualWidth: >= 80, ActualHeight: >= 80 } && play.ActualWidth >= 36 &&
+                            playBounds.Left >= nameBounds.Right - 1 && play.ActualHeight <= 44 * font &&
                             playBounds.Right <= card.ActualWidth + 1 && playBounds.Bottom <= card.ActualHeight + 1 &&
-                            (candidate.Item.Cells is not (2 or 3) || play.ActualWidth <= 158),
-                            "one-to-four card clips text, shrinks image or stretches its button: " + candidate.Item.Name);
+                            play.ActualWidth <= 158 && ContentInside(card),
+                            "one-to-four card clips text, shrinks image or misplaces/stretches its button: " + candidate.Item.Name);
                     }
                     if (font != 1.0) continue;
                     var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(900,
@@ -896,11 +907,11 @@ internal static class Program
                         "red-item shares are not the most prominent, clip, or ignore their value at font " + font);
                 }
             }),
-            ("两件一行时试听按钮在名称下方，名称保持一行", () =>
+            ("两件一行时试听按钮在名称右侧，不拉长，名称保持一行", () =>
             {
                 var root = Path.Combine(AppContext.BaseDirectory, "library");
                 var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
-                var candidates = new[] { "热成像模块", "金豹雕像", "古董茶壶", "激光指示模块", "金狮雕像", "花瓶" }
+                var candidates = new[] { "热成像模块", "金豹雕像", "古董茶壶", "激光指示模块", "金狮雕像", "胶囊电视" }
                     .Select(name => new Candidate(library.Items.Single(item => item.Name == name), .9, "g")).ToArray();
                 foreach (var font in new[] { .9, 1.0, 1.15 })
                 {
@@ -919,8 +930,9 @@ internal static class Program
                         line.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
                         var nameBounds = name.TransformToAncestor(card).TransformBounds(new System.Windows.Rect(name.RenderSize));
                         var playBounds = play.TransformToAncestor(card).TransformBounds(new System.Windows.Rect(play.RenderSize));
-                        Check(name.ActualHeight <= line.DesiredSize.Height + 1 && playBounds.Top >= nameBounds.Bottom &&
-                            playBounds.Width <= 120 * font && playBounds.Bottom <= card.ActualHeight + 1,
+                        Check(name.ActualHeight <= line.DesiredSize.Height + 1 && playBounds.Left >= nameBounds.Right - 1 &&
+                            playBounds.Right >= card.ActualWidth - 16 * font && playBounds.Width <= 120 * font && playBounds.Height <= 36 * font &&
+                            playBounds.Top >= 0 && playBounds.Bottom <= card.ActualHeight + 1,
                             $"paired card wraps its name or misplaces its button at font {font}: {item.Name}");
                     }
                 }

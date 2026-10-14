@@ -1,0 +1,122 @@
+{
+ "01": {
+  "raw": "playback/sr-ae5a6ebc-0002.wav",
+  "correlation": 0.9848,
+  "samples": 14052,
+  "gainDb": -9.51,
+  "residualGainOnlyDb": -15.2,
+  "residualLinearFilterDb": -15.5,
+  "quantisationFloorDb": -62.5,
+  "responseSpreadDb": 1.68,
+  "responseMedianDb": -9.54,
+  "bandHz": [
+   210,
+   17296
+  ]
+ },
+ "02": {
+  "raw": "playback/sr-cb1c0d1d-0004.wav",
+  "correlation": 0.9991,
+  "samples": 16231,
+  "gainDb": 4.92,
+  "residualGainOnlyDb": -27.4,
+  "residualLinearFilterDb": -27.9,
+  "quantisationFloorDb": -63.7,
+  "responseSpreadDb": 0.27,
+  "responseMedianDb": 4.91,
+  "bandHz": [
+   210,
+   9703
+  ]
+ },
+ "03": {
+  "raw": "playback/sr-0c5ac384-0001.wav",
+  "correlation": 0.9948,
+  "samples": 10366,
+  "gainDb": 4.84,
+  "residualGainOnlyDb": -19.8,
+  "residualLinearFilterDb": -26.6,
+  "quantisationFloorDb": -61.7,
+  "responseSpreadDb": 0.29,
+  "responseMedianDb": 4.9,
+  "bandHz": [
+   210,
+   17566
+  ]
+ },
+ "04": {
+  "raw": "playback/sr-9e7e9e83-0001.wav",
+  "correlation": 0.9552,
+  "samples": 11481,
+  "gainDb": -15.3,
+  "residualGainOnlyDb": -10.6,
+  "residualLinearFilterDb": -15.7,
+  "quantisationFloorDb": -64.1,
+  "responseSpreadDb": 2.83,
+  "responseMedianDb": -14.92,
+  "bandHz": [
+   210,
+   14753
+  ]
+ },
+ "05": {
+  "raw": "playback/sr-99d97932-0001.wav",
+  "correlation": 0.9725,
+  "samples": 7301,
+  "gainDb": 4.49,
+  "residualGainOnlyDb": -12.7,
+  "residualLinearFilterDb": -14.1,
+  "quantisationFloorDb": -61.4,
+  "responseSpreadDb": 2.63,
+  "responseMedianDb": 4.73,
+  "bandHz": [
+   234,
+   17906
+  ]
+ },
+ "07": {
+  "raw": "playback/sr-56dfb35b-0001.wav",
+  "correlation": 0.9995,
+  "samples": 15481,
+  "gainDb": 4.96,
+  "residualGainOnlyDb": -29.8,
+  "residualLinearFilterDb": -30.8,
+  "quantisationFloorDb": -58.1,
+  "responseSpreadDb": 0.13,
+  "responseMedianDb": 4.95,
+  "bandHz": [
+   222,
+   6632
+  ]
+ },
+ "08": {
+  "raw": "playback/sr-388e122c-0001.wav",
+  "correlation": 0.9582,
+  "samples": 12496,
+  "gainDb": -15.29,
+  "residualGainOnlyDb": -10.9,
+  "residualLinearFilterDb": -13.8,
+  "quantisationFloorDb": -61.5,
+  "responseSpreadDb": 3.67,
+  "responseMedianDb": -15.28,
+  "bandHz": [
+   210,
+   17941
+  ]
+ },
+ "09": {
+  "raw": "playback/sr-983e0b90-0001.wav",
+  "correlation": 0.9981,
+  "samples": 17031,
+  "gainDb": -9.53,
+  "residualGainOnlyDb": -24.3,
+  "residualLinearFilterDb": -24.6,
+  "quantisationFloorDb": -62.0,
+  "responseSpreadDb": 0.49,
+  "responseMedianDb": -9.47,
+  "bandHz": [
+   210,
+   4757
+  ]
+ }
+}

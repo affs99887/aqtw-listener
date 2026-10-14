@@ -462,9 +462,19 @@ internal sealed partial class MainWindow : Window
         RenderSmoke(overlay, "overlay-largest-group-smoke.png");
         var one = new RecognitionResult(999, RecognitionStatus.Matched, true,
             [new(library.Items[0], .9, "smoke")], 1, "布局测试 · 模拟结果");
-        var indexedCandidates = library.Groups
-            .SelectMany(group => group.ItemIds.Select(id => new Candidate(
-                library.Items.Single(item => item.Id == id), .9, group.Id)))
+        // The most candidates one sound can produce: the largest class of pickup groups that
+        // share items (高概率类 after the 暗区情报站 merge: 31 items), scored like a real match.
+        var pickupGroups = library.Groups.Where(g => g.Action == "pickup").ToList();
+        var seed = pickupGroups.OrderByDescending(g => g.ItemIds.Length).First();
+        var classItems = new HashSet<string>(seed.ItemIds);
+        for (var grew = true; grew;)
+        {
+            grew = false;
+            foreach (var g in pickupGroups.Where(g => g.ItemIds.Any(classItems.Contains)))
+                foreach (var id in g.ItemIds) grew |= classItems.Add(id);
+        }
+        var indexedCandidates = pickupGroups.Where(g => g.ItemIds.Any(classItems.Contains))
+            .SelectMany(group => group.ItemIds.Select(id => new Candidate(library.Items.Single(item => item.Id == id), .9, group.Id)))
             .GroupBy(candidate => candidate.Item.Id)
             .Select(group => group.First()).ToArray();
         overlay.Panel.ShowResult(one, true); await Task.Delay(100);
@@ -577,13 +587,42 @@ internal sealed partial class MainWindow : Window
         overlay.ToggleLock(); var unlocked = !settings.PositionLocked;
         var samePin = ReferenceEquals(pinVisual, pinButton.Content); overlay.ToggleLock();
         workspace.Select(snapshot);
-        var demoNames = new[] { "热成像模块", "金豹雕像", "古董茶壶", "激光指示模块", "金狮雕像", "花瓶" };
+        var demoNames = new[] { "热成像模块", "金豹雕像", "古董茶壶", "激光指示模块", "金狮雕像", "胶囊电视" };
         var demoCandidates = demoNames.Select(name => library.Items.Single(i => i.Name == name))
             .Select(item => new Candidate(item, .9, library.Groups.First(g => g.ItemIds.Contains(item.Id)).Id)).ToArray();
         var demoResult = new RecognitionResult(1001, RecognitionStatus.Matched, true, demoCandidates, 0, "布局演示 · 非识别结果");
         var demoSnapshot = controller.Audio.Add(sound, new(demoResult, analysis.Scores), "六件布局演示", library, libraryRoot);
         var fontChecks = new Dictionary<string, object>();
         var comparisonFits = true;
+        var imagesKeepAspect = true;
+        // Every 听样本 button sits in its own column at the card's right edge, beside the
+        // name rather than under it, and never stretches across the card.
+        // Every item picture keeps its file's aspect ratio: scaled uniformly, never stretched to its box.
+        var stretchedImages = new List<string>();
+        bool ImagesKeepAspect(IEnumerable<Border> cards)
+        {
+            var before = stretchedImages.Count;
+            foreach (var card in cards)
+                foreach (var image in Descendants<Image>(card))
+                {
+                    if (image.Source is not System.Windows.Media.Imaging.BitmapSource bitmap || bitmap.PixelHeight == 0) continue;
+                    var aspect = bitmap.PixelWidth / (double)bitmap.PixelHeight;
+                    if (image.Stretch != Stretch.Uniform || Math.Abs(image.ActualWidth - image.ActualHeight * aspect) > 1.5)
+                        stretchedImages.Add($"{((Candidate)card.Tag).Item.Name} {image.ActualWidth:0.#}×{image.ActualHeight:0.#} vs {bitmap.PixelWidth}×{bitmap.PixelHeight}");
+                }
+            return stretchedImages.Count == before;
+        }
+        bool PlayButtonsRight(IEnumerable<Border> cards) => cards.All(card =>
+        {
+            var candidate = (Candidate)card.Tag;
+            var play = Descendants<Button>(card).FirstOrDefault(button => ReferenceEquals(button.Tag, candidate));
+            if (play is null) return false;
+            var name = Descendants<TextBlock>(card).First(label => label.Text == candidate.Item.Name);
+            var playBounds = play.TransformToAncestor(card).TransformBounds(new Rect(play.RenderSize));
+            var nameBounds = name.TransformToAncestor(card).TransformBounds(new Rect(name.RenderSize));
+            return playBounds.Left >= nameBounds.Right - 1 && playBounds.Width <= card.ActualWidth * .45 &&
+                playBounds.Right <= card.ActualWidth + 1 && playBounds.Bottom <= card.ActualHeight + 1;
+        });
         foreach (var (scenario, clip) in new[] { ("two", snapshot), ("six", demoSnapshot) })
         foreach (var (label, scale) in new[] { ("small", .9), ("medium", 1.0), ("large", 1.15) })
         {
@@ -607,11 +646,13 @@ internal sealed partial class MainWindow : Window
                 line.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                 return name.ActualHeight <= line.DesiredSize.Height + 1;
             });
-            comparisonFits &= !panel.NeedsScroll && sampleButtonsFit && toolbarButtonsFit && namesOneLine &&
+            var playButtonsRight = PlayButtonsRight(Descendants<Border>(panel).Where(card => card.Tag is Candidate));
+            imagesKeepAspect &= ImagesKeepAspect(Descendants<Border>(panel).Where(card => card.Tag is Candidate));
+            comparisonFits &= !panel.NeedsScroll && sampleButtonsFit && toolbarButtonsFit && namesOneLine && playButtonsRight &&
                 (scenario != "six" || panel.ThumbnailSize >= 104);
             fontChecks[scenario + "-" + label] = new { scale = settings.FontScale, overlay.ActualWidth, overlay.ActualHeight,
                 noWindowScale = overlay.LayoutTransform.Value.IsIdentity,
-                candidates = panel.RenderedIds.Count, panel.NeedsScroll, panel.ThumbnailSize, panel.ContentHeight, sampleButtonsFit, toolbarButtonsFit, namesOneLine };
+                candidates = panel.RenderedIds.Count, panel.NeedsScroll, panel.ThumbnailSize, panel.ContentHeight, sampleButtonsFit, toolbarButtonsFit, namesOneLine, playButtonsRight };
             RenderSmoke(overlay, $"comparison-{scenario}-{label}-smoke.png");
         }
         overlay.SetFontScale(1); await Task.Delay(100); overlay.UpdateLayout();
@@ -637,7 +678,9 @@ internal sealed partial class MainWindow : Window
                 difference[0].Text == "差异率 1.0%" && differenceBounds.Bottom <= card.ActualHeight + 1 &&
                 bounds.Right <= overlay.ActualWidth + 1 && bounds.Bottom <= overlay.ActualHeight + 1;
         }) && !Descendants<TextBlock>(thirteenPanel).Any(label => label.Text.Contains("匹配", StringComparison.Ordinal));
-        var listeningThirteen = overlay.ActualWidth <= 930 && !thirteenPanel.NeedsScroll && thirteenNamesFit &&
+        var thirteenButtonsRight = PlayButtonsRight(thirteenCards);
+        imagesKeepAspect &= ImagesKeepAspect(thirteenCards);
+        var listeningThirteen = overlay.ActualWidth <= 930 && !thirteenPanel.NeedsScroll && thirteenNamesFit && thirteenButtonsRight &&
             thirteenHeadings.Length == 4 &&
             Descendants<TextBlock>(thirteenPanel).Count(label => System.Windows.Automation.AutomationProperties.GetName(label)
                 .StartsWith("大红概率 ", StringComparison.Ordinal)) == 4 &&
@@ -647,7 +690,7 @@ internal sealed partial class MainWindow : Window
             .Select(card => ((Candidate)card.Tag).Item.Name).ToArray();
         var listeningThirteenDetails = new { overlay.ActualWidth, overlay.ActualHeight,
             thirteenPanel.ThumbnailSize, groups = thirteenHeadings.Select(label => label.Text).ToArray(),
-            cards = thirteenCards.Length, thirteenNamesFit, thirteenMissingLabels, thirteenPanel.NeedsScroll };
+            cards = thirteenCards.Length, thirteenNamesFit, thirteenButtonsRight, thirteenMissingLabels, thirteenPanel.NeedsScroll };
         RenderSmoke(overlay, "listening-thirteen-smoke.png");
         var unevenCandidates = new[] { (Cells: 2, Count: 3), (Cells: 4, Count: 9), (Cells: 6, Count: 3) }
             .SelectMany(group => library.Items.Where(item => item.Cells == group.Cells).Take(group.Count))
@@ -666,13 +709,15 @@ internal sealed partial class MainWindow : Window
             .Where(card => ((Candidate)card.Tag).Item.Cells == cells)
             .Select(card => card.TransformToAncestor(overlay).TransformBounds(new Rect(card.RenderSize)))
             .ToArray()).ToArray();
-        var groupedFifteen = unevenCards.Length == 15 && unevenRows == 5 && !unevenPanel.NeedsScroll &&
+        var unevenButtonsRight = PlayButtonsRight(unevenCards);
+        imagesKeepAspect &= ImagesKeepAspect(unevenCards);
+        var groupedFifteen = unevenCards.Length == 15 && unevenRows == 5 && !unevenPanel.NeedsScroll && unevenButtonsRight &&
             unevenBands[0].Max(bounds => bounds.Bottom) <= unevenBands[1].Min(bounds => bounds.Top) + 1 &&
             unevenBands[1].Max(bounds => bounds.Bottom) <= unevenBands[2].Min(bounds => bounds.Top) + 1 &&
             unevenPanel.ThumbnailSize >= 96 && overlay.ActualWidth <= 930 && overlay.ActualHeight <= 760;
         var groupedFifteenDetails = new { overlay.ActualWidth, overlay.ActualHeight,
             unevenPanel.ThumbnailSize, unevenPanel.ContentHeight, rows = unevenRows,
-            cards = unevenCards.Length, unevenPanel.NeedsScroll };
+            cards = unevenCards.Length, unevenButtonsRight, unevenPanel.NeedsScroll };
         RenderSmoke(overlay, "listening-fifteen-grouped-smoke.png");
         workspace.Select(demoSnapshot); await Task.Delay(100); overlay.UpdateLayout();
         var nearControlRemoved = !Descendants<CheckBox>(workspace).Any(b => Equals(b.Content, "展开相近音效"));
@@ -688,11 +733,20 @@ internal sealed partial class MainWindow : Window
             .TransformBounds(new Rect(card.RenderSize))).ToArray();
         var allItemCardsFit = allItemCardBounds.All(rect => rect.Right <= overlay.ActualWidth + 1 &&
             rect.Bottom <= overlay.ActualHeight + 1);
-        var listeningOnePage = !allItemPanel.NeedsScroll && allItemPanel.ThumbnailSize >= 80 &&
-            !Descendants<ScrollViewer>(allItemPanel).Any() && allItemCards.Length == indexedCandidates.Length && allItemCardsFit;
+        var allItemNamesOneLine = allItemCards.All(card =>
+        {
+            var name = Descendants<TextBlock>(card).First(label => label.Text == ((Candidate)card.Tag).Item.Name);
+            var line = new TextBlock { Text = name.Text, FontSize = name.FontSize, FontWeight = name.FontWeight, FontFamily = name.FontFamily };
+            line.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            return name.ActualHeight <= line.DesiredSize.Height + 1;
+        });
+        var allItemButtonsRight = PlayButtonsRight(allItemCards);
+        imagesKeepAspect &= ImagesKeepAspect(allItemCards);
+        var listeningOnePage = !allItemPanel.NeedsScroll && allItemPanel.ThumbnailSize >= (indexedCandidates.Length > CandidatePanel.LargeClass ? 56 : 80) &&
+            !Descendants<ScrollViewer>(allItemPanel).Any() && allItemCards.Length == indexedCandidates.Length && allItemCardsFit && allItemNamesOneLine && allItemButtonsRight;
         var listeningOnePageDetails = new { overlay.ActualWidth, overlay.ActualHeight,
             allItemPanel.NeedsScroll, allItemPanel.ThumbnailSize, allItemPanel.ContentHeight,
-            cards = allItemCards.Length, allItemCardsFit,
+            cards = allItemCards.Length, allItemCardsFit, allItemNamesOneLine, allItemButtonsRight,
             maxRight = allItemCardBounds.Max(rect => rect.Right), maxBottom = allItemCardBounds.Max(rect => rect.Bottom) };
         RenderSmoke(overlay, "listening-all-smoke.png");
         workspace.Select(demoSnapshot); await Task.Delay(80); overlay.UpdateLayout();
@@ -760,10 +814,38 @@ internal sealed partial class MainWindow : Window
             overlay.ActualWidth <= 900;
         RenderSmoke(overlay, "listening-waiting-smoke.png");
         var restoredStyles = NativeInput.OverlayStyles(overlay);
+        // 物品图鉴 and offline-result tiles: the 听样本 button takes the right end of the grid
+        // row beside the size label, not a bar under the tile.
+        var tileItems = library.Items.Take(16).ToArray();
+        var catalogTiles = new CandidatePanel(libraryRoot, new Settings { ShowNames = true });
+        catalogTiles.ShowResult(new(0, RecognitionStatus.Matched, true, tileItems.Select(i => new Candidate(i, 0, "catalog")).ToArray(), 0, ""), true);
+        RenderSmoke(catalogTiles, "catalog-tiles-smoke.png");
+        var resultTiles = new CandidatePanel(libraryRoot, settings);
+        resultTiles.ShowResult(new(0, RecognitionStatus.Matched, true, tileItems.Take(6).Select(i =>
+            new Candidate(i, .93, library.Groups.First(g => g.ItemIds.Contains(i.Id)).Id)).ToArray(), 0, ""));
+        RenderSmoke(resultTiles, "result-tiles-smoke.png");
+        // The whole 物品图鉴 (every catalogue picture once) for the aspect check.
+        var allTiles = new CandidatePanel(libraryRoot, new Settings { ShowNames = true });
+        allTiles.ShowResult(new(0, RecognitionStatus.Matched, true, library.Items.Select(i => new Candidate(i, 0, "catalog")).ToArray(), 0, ""), true);
+        allTiles.Measure(new Size(880, double.PositiveInfinity)); allTiles.Arrange(new Rect(allTiles.DesiredSize)); allTiles.UpdateLayout();
+        var catalogImages = Descendants<Border>(allTiles).Count(card => card.Tag is Candidate && Descendants<Image>(card).Any());
+        imagesKeepAspect &= catalogImages == library.Items.Count &&
+            new[] { catalogTiles, resultTiles, allTiles }.All(tiles => ImagesKeepAspect(Descendants<Border>(tiles).Where(card => card.Tag is Candidate)));
+        var tileButtonsRight = new[] { catalogTiles, resultTiles }.All(tiles => Descendants<Border>(tiles).Where(card => card.Tag is Candidate).All(card =>
+        {
+            var candidate = (Candidate)card.Tag;
+            var play = Descendants<Button>(card).FirstOrDefault(button => ReferenceEquals(button.Tag, candidate));
+            var size = Descendants<TextBlock>(card).FirstOrDefault(label => label.Text == candidate.Item.GridLabel);
+            if (play is null || size is null) return false;
+            var playBounds = play.TransformToAncestor(card).TransformBounds(new Rect(play.RenderSize));
+            var sizeBounds = size.TransformToAncestor(card).TransformBounds(new Rect(size.RenderSize));
+            return playBounds.Left >= sizeBounds.Right - 1 && playBounds.Right >= card.ActualWidth - 12 &&
+                playBounds.Width <= card.ActualWidth * .7 && Math.Abs(playBounds.Top + playBounds.Height / 2 - (sizeBounds.Top + sizeBounds.Height / 2)) <= 4;
+        }));
         var adaptivePassed = largeWidth >= smallWidth && overflowHeight <= maximumHeight + 1 &&
             !paginationPresent && allCandidatesReachable && allHistoryReachable && settingsFit.Values.All(fit => fit) &&
             shrunkAgain && historyOnScreen && centered && topAnchored && staysInGame && !overflowNeedsScroll;
-        var passed = adaptivePassed && comparisonFits && listeningDesignVisible && waitingViewVisible && liveThirteen && liveReplayPausesSampling && listeningThirteen && groupedFifteen && listeningOnePage && commonGroupFits && bottomRowRightGap <= 32 && largestGroupFits && editorFontPreservesText && operationFit.Values.All(fit => fit) && samePin && unlocked &&
+        var passed = adaptivePassed && comparisonFits && listeningDesignVisible && waitingViewVisible && liveThirteen && liveReplayPausesSampling && listeningThirteen && groupedFifteen && listeningOnePage && tileButtonsRight && imagesKeepAspect && commonGroupFits && bottomRowRightGap <= 32 && largestGroupFits && editorFontPreservesText && operationFit.Values.All(fit => fit) && samePin && unlocked &&
             nearControlRemoved && replayStarted && replayStopped && referenceStarted && referenceStopped && capturePausedDuringReplay &&
             stopFollowsPlayback && liveFresh && liveStale && followUpMarked && menusStyled &&
             (liveStyles & (0x20 | 0x08000000)) == 0x08000000 && preserved &&
@@ -775,7 +857,7 @@ internal sealed partial class MainWindow : Window
             clickThrough = (liveStyles & 0x20) != 0, noActivate = (liveStyles & 0x08000000) != 0,
             layered = (liveStyles & 0x80000) != 0, topmost = overlay.Topmost,
             foregroundPreserved = preserved,
-            operation = new { operationFit, unlocked, samePin, fontChecks, comparisonFits, listeningDesignVisible, waitingViewVisible, liveThirteen, liveReplayPausesSampling, listeningThirteen, listeningThirteenDetails, groupedFifteen, groupedFifteenDetails, listeningOnePage, listeningOnePageDetails, nearControlRemoved, editorFontPreservesText,
+            operation = new { operationFit, unlocked, samePin, fontChecks, comparisonFits, listeningDesignVisible, waitingViewVisible, liveThirteen, liveReplayPausesSampling, listeningThirteen, listeningThirteenDetails, groupedFifteen, groupedFifteenDetails, listeningOnePage, listeningOnePageDetails, tileButtonsRight, imagesKeepAspect, catalogImages, stretchedImages, nearControlRemoved, editorFontPreservesText,
                 replayStarted, replayStopped, referenceStarted, referenceStopped, capturePausedDuringReplay,
                 stopFollowsPlayback, liveFresh, liveStale, followUpMarked, menusStyled,
                 enabledInteraction = (interactiveStyles & (0x20 | 0x08000000)) == 0,

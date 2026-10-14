@@ -498,22 +498,28 @@ Test("基础库：琥珀天心类、定位组的拿起声给出整类候选，�
 {
     var library = BaseLibrary();
     using var recognizer = new InMatchRecognizer(library, baseRoot);
-    foreach (var (pickupGroup, putdownGroup, members, item, relabelled) in new[]
-             { ("peer-024", "peer-047", 13, "胶囊电视", "红外线理疗灯"), ("peer-000", "peer-051", 9, "激光指示模块", "天线") })
+    // The putdown group's itemIds list the class: 13 and 9 items from the original catalogue, plus the
+    // items the 暗区情报站 1.4.0 merge added to the class (they share the sound, not a reference of their own).
+    foreach (var (pickupGroup, putdownGroup, item, relabelled) in new[]
+             { ("peer-024", "peer-047", "胶囊电视", "红外线理疗灯"), ("peer-000", "peer-051", "激光指示模块", "天线") })
     {
-        Check(library.Groups.Single(g => g.Id == putdownGroup).Action == "putdown", putdownGroup + " is not a putdown-sound group");
+        var putdownClass = library.Groups.Single(g => g.Id == putdownGroup);
+        Check(putdownClass.Action == "putdown", putdownGroup + " is not a putdown-sound group");
+        var members = putdownClass.ItemIds.Length;
+        var ownGroups = library.Groups.Count(g => g.Action == "pickup" && g.ItemIds.Intersect(putdownClass.ItemIds).Any());
+        Check(members >= (putdownGroup == "peer-047" ? 13 : 9) && ownGroups >= (putdownGroup == "peer-047" ? 12 : 8), $"{item}: class lost members");
         var pickup = recognizer.AnalyzeAt(Raid(BaseReference(pickupGroup), .5, clickGain: .05), 48000, .5);
         var putdown = recognizer.AnalyzeAt(Raid(BaseReference(putdownGroup), .5, clickGain: .05), 48000, .5);
         Check(pickup.Result is { Status: RecognitionStatus.Matched, BestMatch.Score: >= .9 } && pickup.Putdown is null,
             $"{item}: pickup unmatched or taken for a putdown: {pickup.Result.BestMatch?.Score:F3}");
         Check(pickup.Result.CandidateCount == members && Names(pickup.Result).Contains(item) && Names(pickup.Result).Contains(relabelled) &&
-            pickup.Result.Candidates.Select(c => c.GroupId).Distinct().Count() == members - 1, $"{item}: pickup did not return the whole class per item");
+            pickup.Result.Candidates.Select(c => c.GroupId).Distinct().Count() == ownGroups, $"{item}: pickup did not return the whole class per item: {pickup.Result.CandidateCount}/{members}");
         Check(putdown.Putdown is { } veto && veto.GroupId == putdownGroup && veto.Score >= .9 && putdown.Result.Status == RecognitionStatus.Unknown &&
             putdown.Result.CandidateCount == 0, $"{relabelled}: putdown sound was not vetoed: {putdown.Result.Status} {putdown.Putdown?.GroupId}");
         Check(!putdown.Scores.Any(s => s.GroupId != putdownGroup && s.Score >= .8), $"{relabelled}: putdown sound resembles a pickup reference");
     }
 });
-Test("基础库「听样本」只放原始录音：不是处理过的识别参考，未归一化，匹配器把每段识别为所关联的音效组", () =>
+Test("基础库「听样本」原始录音优先：非原始的情报站试听只给没有原始录音的组并写明差异，不是识别参考，未归一化，匹配器把每段识别为所关联的音效组", () =>
 {
     var library = BaseLibrary();
     var playback = PlaybackAudio.Load(baseRoot);
@@ -521,13 +527,18 @@ Test("基础库「听样本」只放原始录音：不是处理过的识别参�
     var groups = library.Groups.Select(g => g.Id).ToHashSet();
     var processed = ReferenceAudio.Load(baseRoot).Samples.Select(s => s.Sha256.ToUpperInvariant()).ToHashSet();
     Check(playback.Clips.Count > 0 && playback.Clips.Select(c => c.Id).Distinct().Count() == playback.Clips.Count, "playback manifest empty or duplicated");
+    var originalGroups = playback.Clips.Where(c => c.Processing is null).SelectMany(c => c.GroupIds).ToHashSet();
+    var altered = playback.Clips.Where(c => c.Processing is not null).ToArray();
+    Check(altered.All(c => c.Processing!.Length > 0 && c.Label.Contains("非原始录音") && !c.GroupIds.Any(originalGroups.Contains)),
+        "a non-original clip is unlabelled or shadows a group that has an original recording");
     foreach (var clip in playback.Clips)
     {
         var whole = WaveAudio.Read(PlaybackAudio.VerifiedPath(baseRoot, clip));
         var window = PlaybackAudio.Read(baseRoot, clip);
         var duration = whole.Samples.Length / (double)whole.SampleRate;
         Check(!processed.Contains(clip.Sha256.ToUpperInvariant()), $"{clip.Id} reuses a processed matching reference");
-        Check(clip.StartSeconds >= 0 && (clip.EndSeconds ?? duration) <= duration + 1e-6 && window.Samples.Length >= whole.SampleRate * .3,
+        // The shortest complete pickup sound in the catalogue (情报站 sound 10, 液压扩张器 class) lasts 235 ms.
+        Check(clip.StartSeconds >= 0 && (clip.EndSeconds ?? duration) <= duration + 1e-6 && window.Samples.Length >= whole.SampleRate * .2,
             $"{clip.Id}: play window outside the recording or too short");
         Check(window.Samples.Max(v => Math.Abs(v)) < .95, $"{clip.Id}: normalised to full scale");
         Check(clip.GroupIds.Length > 0 && clip.GroupIds.All(groups.Contains), $"{clip.Id}: unknown groups");
@@ -560,11 +571,12 @@ Test("基础库：拖动胶囊电视后放下、单独快速转移都判为放�
         if (!pickup.IsPutdown) history.Remember(pickup.Analysis.Result, "自动", true, historyAt.AddSeconds(now), audioSeconds: window.OnsetSeconds);
     }
     Check(events.Count == 3, "expected pickup, putdown and transfer events: " + string.Join(",", events.Select(s => s.Onset.ToString("F2"))));
-    Check(!events[0].Pickup.IsPutdown && Names(events[0].Pickup.Analysis.Result).Contains("胶囊电视") && events[0].Pickup.Analysis.Result.CandidateCount == 13,
-        "the pickup did not show the whole class");
+    var classSize = BaseLibrary().Groups.Single(g => g.Id == "peer-047").ItemIds.Length;
+    Check(!events[0].Pickup.IsPutdown && Names(events[0].Pickup.Analysis.Result).Contains("胶囊电视") && events[0].Pickup.Analysis.Result.CandidateCount == classSize,
+        $"the pickup did not show the whole class: {events[0].Pickup.Analysis.Result.CandidateCount}/{classSize}");
     Check(events.Skip(1).All(e => e.Pickup.IsPutdown && e.Pickup.Analysis.Putdown!.GroupId == "peer-047" && e.Pickup.Analysis.Result.CandidateCount == 0),
         "a putdown or transfer sound was not judged a putdown");
-    Check(history.Entries.Count == 1 && history.Latest?.Result.CandidateCount == 13, "a putdown sound reached the history");
+    Check(history.Entries.Count == 1 && history.Latest?.Result.CandidateCount == classSize, "a putdown sound reached the history");
 });
 Test("拿起声领先库内其他类 0.20 以上时，0.80 以上即可自动接受；差距小的仍需 0.86", () =>
 {

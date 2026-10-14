@@ -1,5 +1,5 @@
 {
-  "note": "听样本只播放这些原始游戏录音：逐字节复制自 SoundRadar 固定版本的 library.srz，仅按时间窗口播放，未做滤波、归一化或重采样。识别用参考经过归一化与裁剪，不用于试听。",
+  "note": "听样本优先播放原始游戏录音：逐字节复制自 SoundRadar 固定版本的 library.srz，仅按时间窗口播放，未做滤波、归一化或重采样。没有原始录音的音效组才附暗区情报站的试听 WAV，标为非原始录音（processing 字段写明差异）。识别用参考经过归一化与裁剪，不用于试听。",
   "clips": [
     {
       "id": "sr-0c5ac384-0001",
@@ -289,6 +289,92 @@
         "peer-039"
       ],
       "source": "https://github.com/blood77458/soundradar/blob/4f8289d5bb32813cd7c15922df1a2a769128740a/soundradar/data/library.srz items/ae5a6ebc/samples/0003.wav (脑电接收装置-拖动, upload, 脑电接收装置-拖动.wav)"
+    },
+    {
+      "id": "aqintel140-sound-10",
+      "label": "情报站试听 · 波纹钢板等 8 件（非原始录音）",
+      "action": "pickup",
+      "file": "playback/aqintel140-sound-10.wav",
+      "sha256": "E0AD0830AC0DCD3E5D7A6E8CD86C852BCB304E5A869C06CD05FB596210CA3EF8",
+      "startSeconds": 0,
+      "endSeconds": null,
+      "groupIds": [
+        "peer-003"
+      ],
+      "source": "暗区情报站小助手 1.4.0 内置素材（安装包静态解包；未附许可证，原权利保留）",
+      "processing": "暗区情报站安装包内的试听 WAV，不是原始录音：与同一段原始游戏录音相比音量整体不同（约 +5 dB），约 18 kHz 以上被截去（疑似有损编码）。"
+    },
+    {
+      "id": "aqintel140-sound-11",
+      "label": "情报站试听 · PSU电源等 5 件（非原始录音）",
+      "action": "pickup",
+      "file": "playback/aqintel140-sound-11.wav",
+      "sha256": "60D8AE324D667E641EB04944E4D1FA26B5D02A1A6CEFFBB560C892E3F740FB0C",
+      "startSeconds": 0,
+      "endSeconds": null,
+      "groupIds": [
+        "aqintel140-sound-11"
+      ],
+      "source": "暗区情报站小助手 1.4.0 内置素材（安装包静态解包；未附许可证，原权利保留）",
+      "processing": "暗区情报站安装包内的试听 WAV，不是原始录音：与同一段原始游戏录音相比音量整体不同（约 +5 dB），约 18 kHz 以上被截去（疑似有损编码）。"
+    },
+    {
+      "id": "aqintel140-sound-12",
+      "label": "情报站试听 · 硝化棉等 2 件（非原始录音）",
+      "action": "pickup",
+      "file": "playback/aqintel140-sound-12.wav",
+      "sha256": "7AD3E355628007BDC896732C0137BB9687C1C1AFDF04E677842F762E5A96C3F9",
+      "startSeconds": 0,
+      "endSeconds": null,
+      "groupIds": [
+        "peer-061"
+      ],
+      "source": "暗区情报站小助手 1.4.0 内置素材（安装包静态解包；未附许可证，原权利保留）",
+      "processing": "暗区情报站安装包内的试听 WAV，不是原始录音：与同一段原始游戏录音相比音量整体不同（约 +5 dB），约 18 kHz 以上被截去（疑似有损编码）。"
+    },
+    {
+      "id": "aqintel140-sound-14",
+      "label": "情报站试听 · 奢华茶具等 4 件（非原始录音）",
+      "action": "pickup",
+      "file": "playback/aqintel140-sound-14.wav",
+      "sha256": "531C450096AC62283012C65BF731EA865F3A5A05EE93BB9B01A2FA315A8BE55F",
+      "startSeconds": 0,
+      "endSeconds": null,
+      "groupIds": [
+        "aqintel140-sound-14"
+      ],
+      "source": "暗区情报站小助手 1.4.0 内置素材（安装包静态解包；未附许可证，原权利保留）",
+      "processing": "暗区情报站安装包内的试听 WAV，不是原始录音：与同一段原始游戏录音相比音量整体不同（约 +5 dB），约 18 kHz 以上被截去（疑似有损编码）。"
+    },
+    {
+      "id": "aqintel140-sound-15",
+      "label": "情报站试听 · 隔音棉等 4 件（非原始录音）",
+      "action": "pickup",
+      "file": "playback/aqintel140-sound-15.wav",
+      "sha256": "16616674E5058922017FFE24C8B811593613B08CFCFA0214F2B73AA34219C27D",
+      "startSeconds": 0,
+      "endSeconds": null,
+      "groupIds": [
+        "peer-056",
+        "peer-058",
+        "peer-059"
+      ],
+      "source": "暗区情报站小助手 1.4.0 内置素材（安装包静态解包；未附许可证，原权利保留）",
+      "processing": "暗区情报站安装包内的试听 WAV，不是原始录音：与同一段原始游戏录音相比音量整体不同（约 +5 dB），约 18 kHz 以上被截去（疑似有损编码）。"
+    },
+    {
+      "id": "aqintel140-sound-16",
+      "label": "情报站试听 · 火焰喷灯（非原始录音）",
+      "action": "pickup",
+      "file": "playback/aqintel140-sound-16.wav",
+      "sha256": "F13036EA446CE6CBB8E8B68902473F5E51D437AACA04B11B7004D3E99963C9EB",
+      "startSeconds": 0,
+      "endSeconds": null,
+      "groupIds": [
+        "aqintel140-sound-16"
+      ],
+      "source": "暗区情报站小助手 1.4.0 内置素材（安装包静态解包；未附许可证，原权利保留）",
+      "processing": "暗区情报站安装包内的试听 WAV，不是原始录音：与同一段原始游戏录音相比音量整体不同（约 +5 dB），约 18 kHz 以上被截去（疑似有损编码）。"
     }
   ]
 }

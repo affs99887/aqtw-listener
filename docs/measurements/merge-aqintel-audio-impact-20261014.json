@@ -1,0 +1,370 @@
+{
+ "01": {
+  "raw": "playback/sr-ae5a6ebc-0002.wav",
+  "gainDb": -9.24,
+  "templateCosine": 0.9902,
+  "inRaidQueryScore": {
+   "templateFromIncoming": 0.9623,
+   "templateFromRaw": 0.9721
+  },
+  "bands": {
+   "0-900": {
+    "incomingVsRawDb": -0.5,
+    "rawShareOfEnergyDb": -14.9,
+    "residualVsRawDb": -18.9
+   },
+   "900-4000": {
+    "incomingVsRawDb": -0.5,
+    "rawShareOfEnergyDb": -10.7,
+    "residualVsRawDb": -12.0
+   },
+   "4000-11000": {
+    "incomingVsRawDb": -0.1,
+    "rawShareOfEnergyDb": -1.9,
+    "residualVsRawDb": -16.0
+   },
+   "11000-16000": {
+    "incomingVsRawDb": -0.1,
+    "rawShareOfEnergyDb": -6.4,
+    "residualVsRawDb": -15.1
+   },
+   "16000-17500": {
+    "incomingVsRawDb": 5.9,
+    "rawShareOfEnergyDb": -30.4,
+    "residualVsRawDb": 4.6
+   },
+   "17500-19000": {
+    "incomingVsRawDb": 40.6,
+    "rawShareOfEnergyDb": -70.4,
+    "residualVsRawDb": 40.6
+   },
+   "19000-24000": {
+    "incomingVsRawDb": 6.1,
+    "rawShareOfEnergyDb": -72.5,
+    "residualVsRawDb": 7.2
+   }
+  }
+ },
+ "02": {
+  "raw": "playback/sr-cb1c0d1d-0004.wav",
+  "gainDb": 4.93,
+  "templateCosine": 0.9992,
+  "inRaidQueryScore": {
+   "templateFromIncoming": 0.9988,
+   "templateFromRaw": 0.9994
+  },
+  "bands": {
+   "0-900": {
+    "incomingVsRawDb": 0.0,
+    "rawShareOfEnergyDb": -0.9,
+    "residualVsRawDb": -31.9
+   },
+   "900-4000": {
+    "incomingVsRawDb": -0.0,
+    "rawShareOfEnergyDb": -8.6,
+    "residualVsRawDb": -22.9
+   },
+   "4000-11000": {
+    "incomingVsRawDb": -0.0,
+    "rawShareOfEnergyDb": -12.6,
+    "residualVsRawDb": -20.5
+   },
+   "11000-16000": {
+    "incomingVsRawDb": -0.1,
+    "rawShareOfEnergyDb": -31.2,
+    "residualVsRawDb": -12.9
+   },
+   "16000-17500": {
+    "incomingVsRawDb": 0.4,
+    "rawShareOfEnergyDb": -41.7,
+    "residualVsRawDb": -8.4
+   },
+   "17500-19000": {
+    "incomingVsRawDb": -4.4,
+    "rawShareOfEnergyDb": -44.4,
+    "residualVsRawDb": -1.6
+   },
+   "19000-24000": {
+    "incomingVsRawDb": -26.7,
+    "rawShareOfEnergyDb": -40.3,
+    "residualVsRawDb": 0.0
+   }
+  }
+ },
+ "03": {
+  "raw": "playback/sr-0c5ac384-0001.wav",
+  "gainDb": 4.93,
+  "templateCosine": 0.9994,
+  "inRaidQueryScore": {
+   "templateFromIncoming": 0.9691,
+   "templateFromRaw": 0.9698
+  },
+  "bands": {
+   "0-900": {
+    "incomingVsRawDb": -0.0,
+    "rawShareOfEnergyDb": -7.4,
+    "residualVsRawDb": -29.2
+   },
+   "900-4000": {
+    "incomingVsRawDb": -0.0,
+    "rawShareOfEnergyDb": -5.0,
+    "residualVsRawDb": -26.8
+   },
+   "4000-11000": {
+    "incomingVsRawDb": -0.0,
+    "rawShareOfEnergyDb": -3.8,
+    "residualVsRawDb": -27.5
+   },
+   "11000-16000": {
+    "incomingVsRawDb": 0.0,
+    "rawShareOfEnergyDb": -12.0,
+    "residualVsRawDb": -22.9
+   },
+   "16000-17500": {
+    "incomingVsRawDb": 0.0,
+    "rawShareOfEnergyDb": -23.5,
+    "residualVsRawDb": -18.8
+   },
+   "17500-19000": {
+    "incomingVsRawDb": -2.6,
+    "rawShareOfEnergyDb": -24.3,
+    "residualVsRawDb": -3.4
+   },
+   "19000-24000": {
+    "incomingVsRawDb": -45.0,
+    "rawShareOfEnergyDb": -21.3,
+    "residualVsRawDb": -0.0
+   }
+  }
+ },
+ "04": {
+  "raw": "playback/sr-9e7e9e83-0001.wav",
+  "gainDb": -14.51,
+  "templateCosine": 0.991,
+  "inRaidQueryScore": {
+   "templateFromIncoming": 0.9242,
+   "templateFromRaw": 0.9337
+  },
+  "bands": {
+   "0-900": {
+    "incomingVsRawDb": -0.6,
+    "rawShareOfEnergyDb": -3.4,
+    "residualVsRawDb": -20.3
+   },
+   "900-4000": {
+    "incomingVsRawDb": -0.3,
+    "rawShareOfEnergyDb": -5.0,
+    "residualVsRawDb": -12.8
+   },
+   "4000-11000": {
+    "incomingVsRawDb": -0.0,
+    "rawShareOfEnergyDb": -6.8,
+    "residualVsRawDb": -6.4
+   },
+   "11000-16000": {
+    "incomingVsRawDb": -1.7,
+    "rawShareOfEnergyDb": -17.0,
+    "residualVsRawDb": -1.6
+   },
+   "16000-17500": {
+    "incomingVsRawDb": 2.7,
+    "rawShareOfEnergyDb": -35.2,
+    "residualVsRawDb": 4.3
+   },
+   "17500-19000": {
+    "incomingVsRawDb": 36.2,
+    "rawShareOfEnergyDb": -75.1,
+    "residualVsRawDb": 36.2
+   },
+   "19000-24000": {
+    "incomingVsRawDb": 7.6,
+    "rawShareOfEnergyDb": -77.6,
+    "residualVsRawDb": 8.5
+   }
+  }
+ },
+ "05": {
+  "raw": "playback/sr-99d97932-0001.wav",
+  "gainDb": 4.98,
+  "templateCosine": 0.9945,
+  "inRaidQueryScore": {
+   "templateFromIncoming": 0.9582,
+   "templateFromRaw": 0.9644
+  },
+  "bands": {
+   "0-900": {
+    "incomingVsRawDb": 0.1,
+    "rawShareOfEnergyDb": -15.3,
+    "residualVsRawDb": -19.5
+   },
+   "900-4000": {
+    "incomingVsRawDb": -0.1,
+    "rawShareOfEnergyDb": -3.2,
+    "residualVsRawDb": -19.5
+   },
+   "4000-11000": {
+    "incomingVsRawDb": -0.3,
+    "rawShareOfEnergyDb": -3.7,
+    "residualVsRawDb": -10.8
+   },
+   "11000-16000": {
+    "incomingVsRawDb": -0.3,
+    "rawShareOfEnergyDb": -13.2,
+    "residualVsRawDb": -8.9
+   },
+   "16000-17500": {
+    "incomingVsRawDb": -0.5,
+    "rawShareOfEnergyDb": -23.0,
+    "residualVsRawDb": -6.9
+   },
+   "17500-19000": {
+    "incomingVsRawDb": -4.8,
+    "rawShareOfEnergyDb": -25.4,
+    "residualVsRawDb": -1.6
+   },
+   "19000-24000": {
+    "incomingVsRawDb": -44.3,
+    "rawShareOfEnergyDb": -23.0,
+    "residualVsRawDb": -0.0
+   }
+  }
+ },
+ "07": {
+  "raw": "playback/sr-56dfb35b-0001.wav",
+  "gainDb": 4.97,
+  "templateCosine": 0.9999,
+  "inRaidQueryScore": {
+   "templateFromIncoming": 0.9996,
+   "templateFromRaw": 0.9996
+  },
+  "bands": {
+   "0-900": {
+    "incomingVsRawDb": 0.0,
+    "rawShareOfEnergyDb": -13.5,
+    "residualVsRawDb": -25.5
+   },
+   "900-4000": {
+    "incomingVsRawDb": -0.0,
+    "rawShareOfEnergyDb": -0.4,
+    "residualVsRawDb": -32.8
+   },
+   "4000-11000": {
+    "incomingVsRawDb": -0.0,
+    "rawShareOfEnergyDb": -13.6,
+    "residualVsRawDb": -23.0
+   },
+   "11000-16000": {
+    "incomingVsRawDb": -0.1,
+    "rawShareOfEnergyDb": -31.6,
+    "residualVsRawDb": -13.5
+   },
+   "16000-17500": {
+    "incomingVsRawDb": 0.1,
+    "rawShareOfEnergyDb": -39.4,
+    "residualVsRawDb": -11.9
+   },
+   "17500-19000": {
+    "incomingVsRawDb": -4.7,
+    "rawShareOfEnergyDb": -40.8,
+    "residualVsRawDb": -1.8
+   },
+   "19000-24000": {
+    "incomingVsRawDb": -26.0,
+    "rawShareOfEnergyDb": -38.5,
+    "residualVsRawDb": 0.0
+   }
+  }
+ },
+ "08": {
+  "raw": "playback/sr-388e122c-0001.wav",
+  "gainDb": -14.54,
+  "templateCosine": 0.9849,
+  "inRaidQueryScore": {
+   "templateFromIncoming": 0.9477,
+   "templateFromRaw": 0.9553
+  },
+  "bands": {
+   "0-900": {
+    "incomingVsRawDb": -0.4,
+    "rawShareOfEnergyDb": -2.4,
+    "residualVsRawDb": -21.1
+   },
+   "900-4000": {
+    "incomingVsRawDb": -0.5,
+    "rawShareOfEnergyDb": -11.1,
+    "residualVsRawDb": -9.2
+   },
+   "4000-11000": {
+    "incomingVsRawDb": -0.3,
+    "rawShareOfEnergyDb": -5.2,
+    "residualVsRawDb": -8.8
+   },
+   "11000-16000": {
+    "incomingVsRawDb": -0.4,
+    "rawShareOfEnergyDb": -13.9,
+    "residualVsRawDb": -3.1
+   },
+   "16000-17500": {
+    "incomingVsRawDb": 1.3,
+    "rawShareOfEnergyDb": -28.9,
+    "residualVsRawDb": 0.6
+   },
+   "17500-19000": {
+    "incomingVsRawDb": 36.4,
+    "rawShareOfEnergyDb": -68.9,
+    "residualVsRawDb": 36.4
+   },
+   "19000-24000": {
+    "incomingVsRawDb": 7.7,
+    "rawShareOfEnergyDb": -76.3,
+    "residualVsRawDb": 8.4
+   }
+  }
+ },
+ "09": {
+  "raw": "playback/sr-983e0b90-0001.wav",
+  "gainDb": -9.49,
+  "templateCosine": 0.9963,
+  "inRaidQueryScore": {
+   "templateFromIncoming": 0.9817,
+   "templateFromRaw": 0.9846
+  },
+  "bands": {
+   "0-900": {
+    "incomingVsRawDb": -0.0,
+    "rawShareOfEnergyDb": -0.7,
+    "residualVsRawDb": -27.7
+   },
+   "900-4000": {
+    "incomingVsRawDb": 0.1,
+    "rawShareOfEnergyDb": -8.8,
+    "residualVsRawDb": -18.7
+   },
+   "4000-11000": {
+    "incomingVsRawDb": 0.1,
+    "rawShareOfEnergyDb": -19.7,
+    "residualVsRawDb": -11.3
+   },
+   "11000-16000": {
+    "incomingVsRawDb": -1.4,
+    "rawShareOfEnergyDb": -34.9,
+    "residualVsRawDb": -3.0
+   },
+   "16000-17500": {
+    "incomingVsRawDb": 2.9,
+    "rawShareOfEnergyDb": -47.9,
+    "residualVsRawDb": 2.0
+   },
+   "17500-19000": {
+    "incomingVsRawDb": 27.2,
+    "rawShareOfEnergyDb": -77.5,
+    "residualVsRawDb": 27.2
+   },
+   "19000-24000": {
+    "incomingVsRawDb": 3.0,
+    "rawShareOfEnergyDb": -72.5,
+    "residualVsRawDb": 4.7
+   }
+  }
+ }
+}

@@ -622,6 +622,48 @@
       "file": "audio/guide-jewel-class.wav",
       "sha256": "F549E0C83C1B385B05BB19F1125050D1FA6BBDF4A3203B98BB72D114A1E449D5",
       "recordingId": "guide-video-20260925"
+    },
+    {
+      "groupId": "peer-029",
+      "templateId": "peer-029-3",
+      "file": "audio/aqintel140-sound-06.wav",
+      "sha256": "0DEB6636E68655E4449A39AC988A0A4DB54B4C1F56233CB83DF38B1DCF4AC1A6",
+      "recordingId": "aqintel140-sound-06"
+    },
+    {
+      "groupId": "peer-036",
+      "templateId": "peer-036-3",
+      "file": "audio/aqintel140-sound-06.wav",
+      "sha256": "0DEB6636E68655E4449A39AC988A0A4DB54B4C1F56233CB83DF38B1DCF4AC1A6",
+      "recordingId": "aqintel140-sound-06"
+    },
+    {
+      "groupId": "peer-045",
+      "templateId": "peer-045-3",
+      "file": "audio/aqintel140-sound-06.wav",
+      "sha256": "0DEB6636E68655E4449A39AC988A0A4DB54B4C1F56233CB83DF38B1DCF4AC1A6",
+      "recordingId": "aqintel140-sound-06"
+    },
+    {
+      "groupId": "aqintel140-sound-11",
+      "templateId": "aqintel140-sound-11-1",
+      "file": "audio/aqintel140-sound-11.wav",
+      "sha256": "6948847FA0A4A9525AB6B7BBC9E41730FE8DCA9B460CF1CAE3EE429385AA2202",
+      "recordingId": "aqintel140-sound-11"
+    },
+    {
+      "groupId": "aqintel140-sound-14",
+      "templateId": "aqintel140-sound-14-1",
+      "file": "audio/aqintel140-sound-14.wav",
+      "sha256": "D2CCCABB5DD56ABCC01D64510784D1562A4425751F323A9519E8B1B571A94BC4",
+      "recordingId": "aqintel140-sound-14"
+    },
+    {
+      "groupId": "aqintel140-sound-16",
+      "templateId": "aqintel140-sound-16-1",
+      "file": "audio/aqintel140-sound-16.wav",
+      "sha256": "99EC0BEB8E5DF7AA30F45B23437F403F9628978910D54223F1DA0972EA9AEEA1",
+      "recordingId": "aqintel140-sound-16"
     }
   ]
 }

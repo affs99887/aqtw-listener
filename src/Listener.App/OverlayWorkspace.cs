@@ -232,12 +232,16 @@ internal sealed class OverlayWorkspace : Border, IDisposable
                 if (clips.Length == 0) throw new InvalidOperationException("该物品暂无未经处理的原声样本");
                 index = Math.Clamp(index, 0, clips.Length - 1); chosenVersions[ChoiceKey(candidate)] = index;
                 await Play(PlaybackAudio.Read(playbackRoot, clips[index]));
-                Message($"试听原声 · {candidate.Item.Name} · {clips[index].Label} · {index + 1}/{clips.Length} · 未经处理，采音已暂停");
+                Message($"试听原声 · {candidate.Item.Name} · {clips[index].Label} · {index + 1}/{clips.Length} · " +
+                    (clips[index].Processing is null ? "未经处理" : "情报站试听音效，非原始录音") + "，采音已暂停");
             }
             catch (Exception ex) { Message(ex.Message); }
         }
         panel.SetAudioPreview(candidate => PreviewReference(candidate, chosenVersions.GetValueOrDefault(ChoiceKey(candidate))),
-            candidate => ClipsFor(candidate).Length > 0);
+            candidate => ClipsFor(candidate).Length > 0,
+            candidate => ClipsFor(candidate) is { Length: > 0 } clips &&
+                clips[Math.Clamp(chosenVersions.GetValueOrDefault(ChoiceKey(candidate)), 0, clips.Length - 1)].Processing is { } processing
+                ? "情报站试听音效，非原始录音：" + processing : null);
         panel.SetReferenceChoices(candidate =>
         {
             var clips = ClipsFor(candidate);
