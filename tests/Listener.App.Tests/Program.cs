@@ -70,6 +70,19 @@ internal static class Program
                         ? rarityColours.Contains(item.ThumbnailBackground) && (item.ThumbnailBackground == "#321612") == item.IsGold
                         : item.ThumbnailBackground is null),
                     "a transparent picture lacks its rarity background, or a screenshot thumbnail got a second one");
+                Check(library.Items.All(item => item.Rarity is not null && (item.Rarity == "红") == item.IsGold),
+                    "an item lacks its rarity tier, or 红 and 大红 disagree");
+                // Within a grid size the cards run 红, 金, 紫, 蓝, whatever order the matches arrive in.
+                var mixed = library.Items.Where(item => item.Cells == 4).GroupBy(item => item.Rarity).SelectMany(tier => tier.Take(2))
+                    .OrderBy(item => item.Name.GetHashCode(StringComparison.Ordinal)).Select(item => new Candidate(item, .9, "order")).ToArray();
+                var ordering = new CandidatePanel(root, new Settings { ShowNames = true }, interactive: true, compact: true);
+                ordering.SetAudioPreview(_ => { }, _ => true);
+                ordering.ShowResult(new(1, RecognitionStatus.Matched, true, mixed, 1, "test")); Layout(ordering, 900, 700);
+                var shownOrder = Descendants<System.Windows.Controls.Border>(ordering).Where(card => card.Tag is Candidate)
+                    .Select(card => (Bounds: card.TransformToAncestor(ordering).TransformBounds(new System.Windows.Rect(card.RenderSize)), ((Candidate)card.Tag).Item))
+                    .OrderBy(entry => Math.Round(entry.Bounds.Top)).ThenBy(entry => entry.Bounds.Left).Select(entry => entry.Item.RarityRank).ToArray();
+                Check(mixed.Select(c => c.Item.Rarity).Distinct().Count() >= 3 && shownOrder.SequenceEqual(shownOrder.Order()),
+                    "a grid-size section is not ordered 红 → 金 → 紫 → 蓝: " + string.Join(",", shownOrder));
                 var panel = new CandidatePanel(root, new Settings { ShowNames = true });
                 var result = new RecognitionResult(1, RecognitionStatus.Matched, true,
                     library.Items.Select(item => new Candidate(item, 0, "catalog")).ToArray(), 0, "");

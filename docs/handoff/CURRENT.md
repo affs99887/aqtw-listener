@@ -1,5 +1,9 @@
 # 当前接续状态 · 2026-10-14
 
+**v0.5.1**（已发布 GitHub Release）：`ItemDefinition.Rarity`（红/金/紫/蓝，红 ⇔ IsGold，`Validate` 检查）与 `RarityRank`；四处候选排序改为格数内按稀有度。150 件的稀有度：情报站资料 138 件，其余 12 件按目录大红与截图底色（`provenance.json` 的 `rarity`，`merge-aqintel-library.py` 的 `RARITY_FROM_TILES`）。新图标由 `scripts/draw-logo.py` 按尺寸矢量绘制（物品格 + 声波、正中大红），生成 `listener-mark.png` 与 `listener.ico`，预览 `docs/design/brand/listener-mark-preview.png`；旧的 `export-icon.ps1` 不再需要。
+
+以下为 v0.5.0 时的状态记录。
+
 当前版本为 **v0.5.0（合并暗区情报站素材库）**，已合入 `main`、打标签 `v0.5.0` 并发布为 GitHub Release（附件 `AqtwListener-v0.5.0-win-x64.zip`），`portable` 已更新。用户提供 `暗区情报站小助手-Setup-1.4.0.exe`（静态解包结果在 `artifacts/暗区情报站-1.4.0-素材库`，ChatGPT 交接在 `artifacts/material-merge-handoff-20261013`，均不入库）。研究脚本在 `.tools/research/merge-aqintel`（gitignored）。报告见 [素材合并报告](../MATERIAL-MERGE-AQINTEL-20261014.md)。
 
 - 合并：`scripts/merge-aqintel-library.py`（只能在合并前的库上运行，`provenance.json` 已有 `aqintel140` 段时退出）按名称与 7 组图片确认的别名对应物品，按 `baseline-audio-probe.json` 把对方 17 个声音归入本库声音类；新物品 ID `aqintel140-<对方ID>`，加入该类所有拿起组与放下声组（只加新物品，不把类内已有物品互相加入，否则候选去重会合并组）。声音 11/14/16 新建组 `aqintel140-sound-NN`（门限 0.82），声音 06 加到宝石类；四段 WAV 经 `trim_refs.py` 裁到起振帧后用 CLI `add-reference` 入库。库版本 `0.5.0-aqintel-merge-20261014`，150 件、65 组、95 条样本。

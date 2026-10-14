@@ -26,11 +26,17 @@ public static class JsonFile
 
 // ThumbnailBackground (#RRGGBB) is set only for pictures without the game's rarity background
 // (transparent renders); the overlay draws that colour over the item's grid footprint behind them.
+// Rarity is the game's colour tier (红 / 金 / 紫 / 蓝 …); 红 is the 大红 that IsGold marks.
 public sealed record ItemDefinition(string Id, string Name, bool IsGold, decimal? ReferenceValue = null,
     string? ValueSource = null, string? ValueDate = null, int GridWidth = 1, int GridHeight = 1,
-    string? Thumbnail = null, bool GridVerified = true, string? CatalogSource = null, string? ThumbnailBackground = null)
+    string? Thumbnail = null, bool GridVerified = true, string? CatalogSource = null, string? ThumbnailBackground = null,
+    string? Rarity = null)
 {
+    public static readonly string[] RarityOrder = ["红", "金", "紫", "蓝", "绿", "白"];
     public int Cells => GridVerified ? GridWidth * GridHeight : 0;
+    // Display order within a grid size: 红, 金, 紫, 蓝, …; an item without a recorded tier sorts by IsGold.
+    [JsonIgnore] public int RarityRank => Rarity is { } tier && Array.IndexOf(RarityOrder, tier) is >= 0 and var index
+        ? index : IsGold ? 0 : RarityOrder.Length;
     [JsonIgnore] public string GridLabel => GridVerified ? $"{GridWidth}×{GridHeight}" : "格数待核实";
 }
 
@@ -82,7 +88,8 @@ public sealed class SoundLibrary
         if (Items.Any(i => string.IsNullOrWhiteSpace(i.Id) || string.IsNullOrWhiteSpace(i.Name) || i.ReferenceValue < 0
             || i.GridWidth is < 1 or > 10 || i.GridHeight is < 1 or > 10
             || (i.Thumbnail is not null && (Path.IsPathRooted(i.Thumbnail) || i.Thumbnail.Contains("..")))
-            || (i.ThumbnailBackground is not null && !System.Text.RegularExpressions.Regex.IsMatch(i.ThumbnailBackground, "^#[0-9A-Fa-f]{6}$"))))
+            || (i.ThumbnailBackground is not null && !System.Text.RegularExpressions.Regex.IsMatch(i.ThumbnailBackground, "^#[0-9A-Fa-f]{6}$"))
+            || (i.Rarity is not null && (!ItemDefinition.RarityOrder.Contains(i.Rarity) || (i.Rarity == "红") != i.IsGold))))
             throw new InvalidDataException("物品资料不完整。");
         foreach (var group in Groups)
         {

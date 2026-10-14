@@ -375,7 +375,7 @@ internal sealed class CandidatePanel : Border
             summaryBar!.Height = Math.Round((CandidateCount > 20 ? 36 : 40) * FontScale);
             RefreshFreshness();
         }
-        layout.SetItems(primary.OrderBy(c => c.Item.Cells).ThenByDescending(c => c.Item.IsGold)
+        layout.SetItems(primary.OrderBy(c => c.Item.Cells).ThenBy(c => c.Item.RarityRank)
             .ThenByDescending(c => c.Item.ReferenceValue).Concat(references.OrderBy(c => c.Item.Cells)).ToArray());
         LayoutChanged?.Invoke();
     }
@@ -465,7 +465,7 @@ internal sealed class CandidatePanel : Border
                 label.FontWeight = FontWeights.SemiBold; label.Margin = new Thickness(0); label.TextWrapping = TextWrapping.NoWrap;
                 row.Children.Add(label); section.Children.Add(row);
                 var wrap = new WrapPanel(); section.Children.Add(wrap);
-                foreach (var candidate in group.OrderByDescending(c => c.Item.IsGold).ThenByDescending(c => c.Item.ReferenceValue))
+                foreach (var candidate in group.OrderBy(c => c.Item.RarityRank).ThenByDescending(c => c.Item.ReferenceValue))
                     wrap.Children.Add(Card(candidate, highest?.Item.Id == candidate.Item.Id,
                         !group.Key.Reference && candidate.Score >= (lastResult?.BestMatch?.Score ?? 1) - .00001, thumbnail,
                         Math.Min(rowCardWidth, Math.Max(1, section.Width - 4))));
@@ -524,7 +524,8 @@ internal sealed class CandidatePanel : Border
     {
         const double labelWidth = SectionLabelWidth;
         var cardAreaWidth = Math.Max(1, width - labelWidth - 2);
-        var ordered = group.OrderByDescending(candidate => candidate.Item.IsGold)
+        // Within a grid size: 红, 金, 紫, 蓝, then by known reference value.
+        var ordered = group.OrderBy(candidate => candidate.Item.RarityRank)
             .ThenByDescending(candidate => candidate.Item.ReferenceValue).ToArray();
         // Rows hold as many equal cards as the width allows, filled in order, so the columns
         // of all sections line up.
@@ -597,7 +598,7 @@ internal sealed class CandidatePanel : Border
         }
         foreach (var group in grouped)
         {
-            var entries = group.OrderByDescending(candidate => candidate.Item.IsGold)
+            var entries = group.OrderBy(candidate => candidate.Item.RarityRank)
                 .ThenByDescending(candidate => candidate.Item.ReferenceValue).ToArray();
             if (usedWidth > 0 && usedWidth + categoryWidth + targetCardWidth > usableWidth) AddRow();
             var category = group.Key.Cells == 0 ? "格数待核实" : group.Key.Reference

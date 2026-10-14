@@ -87,6 +87,9 @@ def to_mono_wav(src: Path, dst: Path):
 # colour over the item's grid footprint behind them (ItemDefinition.ThumbnailBackground): the median
 # background of our screenshot tiles of the same rarity, over the 50 items both libraries share.
 RARITY_BACKGROUND = {"红": "#321612", "金": "#32220E", "紫": "#221A2F"}
+# Rarity of our items the package does not list: 大红 = 红, otherwise the tile background colour.
+RARITY_FROM_TILES = {"老牌打字机": "金", "决胜奖杯": "红", "骏骊逐浪图": "红", "军用电台": "金", "干花书签": "金", "畸变组织块": "金",
+                     "耐冲击硬胶": "紫", "马刺": "蓝", "水壶": "蓝", "测距望远镜": "紫", "镜头": "紫", "照相机": "紫"}
 
 
 def thumbnail(src: Path, dst: Path, size=192):
@@ -137,15 +140,17 @@ def main(staging: Path):
                      "incomingGridRowsCols": [h, w]}
             if name in by_name:
                 ours = by_name[name]; entry.update(action="existing", ourId=ours, matchedBy="exact-name")
+                items[ours]["rarity"] = it["rarity"]
             elif name in ALIASES:
                 ours = by_name[ALIASES[name]]; entry.update(action="existing", ourId=ours, matchedBy="alias", ourName=ALIASES[name])
+                items[ours]["rarity"] = it["rarity"]
             else:
                 ours = f"aqintel140-{it['itemId']}"
                 image = f"images/{ours}.png"
                 thumbnail(SRC / it["image"], staging / image)
                 items[ours] = {"id": ours, "name": name, "isGold": it["rarity"] == "红", "referenceValue": None, "valueSource": None, "valueDate": None,
                                "gridWidth": w, "gridHeight": h, "thumbnail": image, "gridVerified": True, "catalogSource": "aqintel-1.4.0",
-                               "thumbnailBackground": RARITY_BACKGROUND[it["rarity"]]}
+                               "thumbnailBackground": RARITY_BACKGROUND[it["rarity"]], "rarity": it["rarity"]}
                 lib["items"].append(items[ours]); by_name[name] = ours
                 entry.update(action="new", ourId=ours, isGold=it["rarity"] == "红", gridWidth=w, gridHeight=h,
                              sourceImage=it["image"], sourceImageSha256=sha256(SRC / it["image"]), thumbnail=image)
@@ -157,6 +162,9 @@ def main(staging: Path):
                 entry["gridCorrected"] = {"gridWidth": gw, "gridHeight": gh, "evidence": why}
             incoming_to_ours[it["itemId"]] = ours
             plan["items"].append(entry)
+
+    for item in lib["items"]:
+        item.setdefault("rarity", RARITY_FROM_TILES.get(item["name"]))
 
     # ---- sound classes -----------------------------------------------------------------
     (staging / "playback").mkdir(exist_ok=True)
