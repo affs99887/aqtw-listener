@@ -90,11 +90,8 @@ RARITY_BACKGROUND = {"红": "#321612", "金": "#32220E", "紫": "#221A2F"}
 
 
 def thumbnail(src: Path, dst: Path, size=192):
-    """Crop the transparent margins (3% padding kept) and scale to ≤ size; proportions unchanged."""
+    """Scale the original uniformly to ≤ size; nothing else is changed (transparency kept)."""
     im = Image.open(src).convert("RGBA")
-    ys, xs = np.nonzero(np.asarray(im)[:, :, 3] > 8)
-    pad = round(.03 * max(xs.max() - xs.min() + 1, ys.max() - ys.min() + 1))
-    im = im.crop((max(0, xs.min() - pad), max(0, ys.min() - pad), min(im.width, xs.max() + 1 + pad), min(im.height, ys.max() + 1 + pad)))
     if max(im.size) > size:
         im.thumbnail((size, size), Image.LANCZOS)
     im.save(dst, optimize=True)

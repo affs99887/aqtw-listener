@@ -7,7 +7,7 @@
 - 布局：`CandidatePanel.LargeClass`（20）到 `PackedCandidates`（48）之间按格数分区、每行最多 6 张、名称单行；`CandidateLayout` 新增可选 fallback，分区布局超高时改用 `BuildDenseDesignGroups`。`DenseDesignCard` 的「听样本」固定在第三列：`PlayWidth` 一行 1 件 96、2 件 76、大类 60、3 件以上 42（`StackedPlay` 两行文字）、密集 26；`prominent` 改为 `rowSize > 0`（密集卡片传 0）。名称宽度按 `NameWidth`（两行时取最窄切分）选列数，非大类最小 13 号字、可两行；文字列放不下「差异率 10.0%」时移到缩略图底边。`Card()`（图鉴、离线结果）按钮在格数行右端，差异率放到缩略图底边。冒烟新增 `PlayButtonsRight`、`tileButtonsRight`，全候选场景改为最大声音类（31 件）。
 - 验证：`raids.py` 解码 26 场录像为 500 s 分段并以两库扫描，`raid_diff.py`/`raid_clusters.py` 对比；`provenance.py`/`fir_provenance.py`/`impact_probe.py` 复核对方音频；`frames_sheet.py`/`frames_zoom.py` 取画面。结果见报告第 3、4 节。
 - 格数：胶囊电视 2×3、花瓶 2×2 按本库缩略图底色与对方资料更正（`GRID_CORRECTIONS`、`provenance.json` 的 `aqintel140.gridCorrected`）；燃料桶保留 3×2。冒烟 `ImagesKeepAspect` 检查所有物品图 `Stretch.Uniform` 且显示比例与位图一致，含全部 150 张图鉴图。
-- 底色：`ItemDefinition.ThumbnailBackground`（#RRGGBB，可空）只给透明底的情报站图；`CandidatePanel.ItemPicture` 用 `Viewbox` 画按格数比例的底色块再放图，三种卡片共用。颜色为本库同稀有度截图底色中位数（红 #321612、金 #32220E、紫 #221A2F，`RARITY_BACKGROUND`）。新图裁掉透明边（`thumbnail()`）。冒烟 `backgroundsShown` 检查 88 件底色与格数比例，应用测试检查大红物品必为红底。
+- 底色：`ItemDefinition.ThumbnailBackground`（#RRGGBB，可空）只给透明底的情报站图；`CandidatePanel.ItemPicture` 用 `Viewbox` 画按格数比例的底色块再放图，三种卡片共用。颜色为本库同稀有度截图底色中位数（红 #321612、金 #32220E、紫 #221A2F，`RARITY_BACKGROUND`）。新图只整体等比缩小，不裁剪（用户要求不改图，只加底色）。冒烟 `backgroundsShown` 检查 88 件底色与格数比例，应用测试检查大红物品必为红底。
 - 待办：新物品格数与两件更正的实机核对；显卡（1×2）的原图是横向的，放在竖条底色里偏小，未旋转；电脑硬件类模板在非目标声音上偏高（0.78–0.84 共 137 次），若后续出现误报，先把该组门限提到 0.90。
 
 以下为 v0.4.5 时的状态记录。
