@@ -221,7 +221,7 @@ def main(staging: Path):
         plan["sounds"].append(entry)
 
     # ---- metadata ----------------------------------------------------------------------
-    lib["version"] = "0.4.6-aqintel-merge-20261014"
+    lib["version"] = "0.5.0-aqintel-merge-20261014"
     lib["validationStatus"] = "merged-aqintel-1.4.0-pending-raid-validation"
     lib["notes"] = ("合并暗区情报站小助手 1.4.0 素材库（138 件物品、17 段试听音效）：对方 17 个声音中 13 个经本库识别器确认与本库已有声音类相同"
                     "（9 个为同一段录音），其物品并入本库对应声音类的全部音效组；电脑硬件类、奢华茶具类、火焰喷灯为本库没有的声音，以对方试听 WAV 建组；"

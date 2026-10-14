@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "featureVersion": "logmel24k-48-v1",
-  "version": "0.4.6-aqintel-merge-20261014",
+  "version": "0.5.0-aqintel-merge-20261014",
   "gameVersion": "peer-v0.67 reference library; unverified game version",
   "validationStatus": "merged-aqintel-1.4.0-raid-replay-26-recordings-20261014",
   "primaryEngine": "inmatch",
