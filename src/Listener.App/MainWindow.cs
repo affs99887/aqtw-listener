@@ -450,10 +450,9 @@ internal sealed partial class MainWindow : Window
         var largeWidth = overlay.ActualWidth;
         var commonGroupFits = !overlay.Panel.NeedsScroll;
         var commonCards = Descendants<Border>(overlay.Panel).Where(card => card.Tag is Candidate).ToArray();
-        var bottomCardTop = commonCards.Max(card => card.TransformToAncestor(overlay.Panel).TransformBounds(new Rect(card.RenderSize)).Top);
-        var lastCardRight = commonCards.Where(card => Math.Abs(card.TransformToAncestor(overlay.Panel).TransformBounds(new Rect(card.RenderSize)).Top - bottomCardTop) < 2)
-            .Max(card => card.TransformToAncestor(overlay.Panel).TransformBounds(new Rect(card.RenderSize)).Right);
-        var bottomRowRightGap = overlay.Panel.ActualWidth - lastCardRight;
+        // The window is no wider than its widest row of cards.
+        var widestRowRightGap = overlay.Panel.ActualWidth - commonCards.Max(card =>
+            card.TransformToAncestor(overlay.Panel).TransformBounds(new Rect(card.RenderSize)).Right);
         RenderSmoke(overlay, "overlay-smoke.png");
         var largest = library.Groups.OrderByDescending(g => g.ItemIds.Length).First();
         overlay.Panel.ShowResult(new(998, RecognitionStatus.Matched, true, largest.ItemIds.Select(id =>
@@ -594,6 +593,7 @@ internal sealed partial class MainWindow : Window
         var demoSnapshot = controller.Audio.Add(sound, new(demoResult, analysis.Scores), "六件布局演示", library, libraryRoot);
         var fontChecks = new Dictionary<string, object>();
         var comparisonFits = true;
+        var cardsCompact = true;
         var imagesKeepAspect = true;
         // Every 听样本 button sits in its own column at the card's right edge, beside the
         // name rather than under it, and never stretches across the card.
@@ -611,6 +611,31 @@ internal sealed partial class MainWindow : Window
                         stretchedImages.Add($"{((Candidate)card.Tag).Item.Name} {image.ActualWidth:0.#}×{image.ActualHeight:0.#} vs {bitmap.PixelWidth}×{bitmap.PixelHeight}");
                 }
             return stretchedImages.Count == before;
+        }
+        // Cards are equally wide and not stretched: in the card with the widest name or 差异率
+        // the 听样本 button follows the text closely.
+        var compactGaps = new List<double>();
+        bool CardsCompact(IReadOnlyList<Border> cards)
+        {
+            if (cards.Count == 0) return true;
+            double Measured(TextBlock label)
+            {
+                var line = new TextBlock { Text = label.Text, FontSize = label.FontSize, FontWeight = label.FontWeight, FontFamily = label.FontFamily };
+                line.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                return line.DesiredSize.Width;
+            }
+            var gaps = cards.Select(card =>
+            {
+                var candidate = (Candidate)card.Tag;
+                var name = Descendants<TextBlock>(card).First(label => label.Text == candidate.Item.Name);
+                var difference = Descendants<TextBlock>(card).FirstOrDefault(label => label.Text.StartsWith("差异率", StringComparison.Ordinal));
+                var play = Descendants<Button>(card).First(button => ReferenceEquals(button.Tag, candidate));
+                var nameBounds = name.TransformToAncestor(card).TransformBounds(new Rect(name.RenderSize));
+                var content = Math.Min(nameBounds.Width, Math.Max(Measured(name), difference is null ? 0 : Measured(difference)));
+                return play.TransformToAncestor(card).TransformBounds(new Rect(play.RenderSize)).Left - (nameBounds.Left + content);
+            }).ToArray();
+            compactGaps.Add(Math.Round(gaps.Min(), 1));
+            return cards.Select(card => Math.Round(card.ActualWidth)).Distinct().Count() == 1 && gaps.Min() <= 20 * settings.FontScale;
         }
         bool PlayButtonsRight(IEnumerable<Border> cards) => cards.All(card =>
         {
@@ -647,6 +672,7 @@ internal sealed partial class MainWindow : Window
                 return name.ActualHeight <= line.DesiredSize.Height + 1;
             });
             var playButtonsRight = PlayButtonsRight(Descendants<Border>(panel).Where(card => card.Tag is Candidate));
+            cardsCompact &= CardsCompact(Descendants<Border>(panel).Where(card => card.Tag is Candidate).ToArray());
             imagesKeepAspect &= ImagesKeepAspect(Descendants<Border>(panel).Where(card => card.Tag is Candidate));
             comparisonFits &= !panel.NeedsScroll && sampleButtonsFit && toolbarButtonsFit && namesOneLine && playButtonsRight &&
                 (scenario != "six" || panel.ThumbnailSize >= 104);
@@ -679,6 +705,7 @@ internal sealed partial class MainWindow : Window
                 bounds.Right <= overlay.ActualWidth + 1 && bounds.Bottom <= overlay.ActualHeight + 1;
         }) && !Descendants<TextBlock>(thirteenPanel).Any(label => label.Text.Contains("匹配", StringComparison.Ordinal));
         var thirteenButtonsRight = PlayButtonsRight(thirteenCards);
+        cardsCompact &= CardsCompact(thirteenCards);
         imagesKeepAspect &= ImagesKeepAspect(thirteenCards);
         var listeningThirteen = overlay.ActualWidth <= 930 && !thirteenPanel.NeedsScroll && thirteenNamesFit && thirteenButtonsRight &&
             thirteenHeadings.Length == 4 &&
@@ -710,6 +737,7 @@ internal sealed partial class MainWindow : Window
             .Select(card => card.TransformToAncestor(overlay).TransformBounds(new Rect(card.RenderSize)))
             .ToArray()).ToArray();
         var unevenButtonsRight = PlayButtonsRight(unevenCards);
+        cardsCompact &= CardsCompact(unevenCards);
         imagesKeepAspect &= ImagesKeepAspect(unevenCards);
         var groupedFifteen = unevenCards.Length == 15 && unevenRows == 5 && !unevenPanel.NeedsScroll && unevenButtonsRight &&
             unevenBands[0].Max(bounds => bounds.Bottom) <= unevenBands[1].Min(bounds => bounds.Top) + 1 &&
@@ -741,6 +769,7 @@ internal sealed partial class MainWindow : Window
             return name.ActualHeight <= line.DesiredSize.Height + 1;
         });
         var allItemButtonsRight = PlayButtonsRight(allItemCards);
+        cardsCompact &= CardsCompact(allItemCards);
         imagesKeepAspect &= ImagesKeepAspect(allItemCards);
         var listeningOnePage = !allItemPanel.NeedsScroll && allItemPanel.ThumbnailSize >= (indexedCandidates.Length > CandidatePanel.LargeClass ? 56 : 80) &&
             !Descendants<ScrollViewer>(allItemPanel).Any() && allItemCards.Length == indexedCandidates.Length && allItemCardsFit && allItemNamesOneLine && allItemButtonsRight;
@@ -855,7 +884,7 @@ internal sealed partial class MainWindow : Window
         var adaptivePassed = largeWidth >= smallWidth && overflowHeight <= maximumHeight + 1 &&
             !paginationPresent && allCandidatesReachable && allHistoryReachable && settingsFit.Values.All(fit => fit) &&
             shrunkAgain && historyOnScreen && centered && topAnchored && staysInGame && !overflowNeedsScroll;
-        var passed = adaptivePassed && comparisonFits && listeningDesignVisible && waitingViewVisible && liveThirteen && liveReplayPausesSampling && listeningThirteen && groupedFifteen && listeningOnePage && tileButtonsRight && imagesKeepAspect && backgroundsShown && commonGroupFits && bottomRowRightGap <= 32 && largestGroupFits && editorFontPreservesText && operationFit.Values.All(fit => fit) && samePin && unlocked &&
+        var passed = adaptivePassed && comparisonFits && listeningDesignVisible && waitingViewVisible && liveThirteen && liveReplayPausesSampling && listeningThirteen && groupedFifteen && listeningOnePage && tileButtonsRight && imagesKeepAspect && backgroundsShown && commonGroupFits && widestRowRightGap <= 32 && cardsCompact && largestGroupFits && editorFontPreservesText && operationFit.Values.All(fit => fit) && samePin && unlocked &&
             nearControlRemoved && replayStarted && replayStopped && referenceStarted && referenceStopped && capturePausedDuringReplay &&
             stopFollowsPlayback && liveFresh && liveStale && followUpMarked && menusStyled &&
             (liveStyles & (0x20 | 0x08000000)) == 0x08000000 && preserved &&
@@ -867,7 +896,7 @@ internal sealed partial class MainWindow : Window
             clickThrough = (liveStyles & 0x20) != 0, noActivate = (liveStyles & 0x08000000) != 0,
             layered = (liveStyles & 0x80000) != 0, topmost = overlay.Topmost,
             foregroundPreserved = preserved,
-            operation = new { operationFit, unlocked, samePin, fontChecks, comparisonFits, listeningDesignVisible, waitingViewVisible, liveThirteen, liveReplayPausesSampling, listeningThirteen, listeningThirteenDetails, groupedFifteen, groupedFifteenDetails, listeningOnePage, listeningOnePageDetails, tileButtonsRight, imagesKeepAspect, catalogImages, stretchedImages, backgroundsShown, backgroundItems, rarityBackgrounds, nearControlRemoved, editorFontPreservesText,
+            operation = new { operationFit, unlocked, samePin, fontChecks, comparisonFits, listeningDesignVisible, waitingViewVisible, liveThirteen, liveReplayPausesSampling, listeningThirteen, listeningThirteenDetails, groupedFifteen, groupedFifteenDetails, listeningOnePage, listeningOnePageDetails, tileButtonsRight, cardsCompact, compactGaps, imagesKeepAspect, catalogImages, stretchedImages, backgroundsShown, backgroundItems, rarityBackgrounds, nearControlRemoved, editorFontPreservesText,
                 replayStarted, replayStopped, referenceStarted, referenceStopped, capturePausedDuringReplay,
                 stopFollowsPlayback, liveFresh, liveStale, followUpMarked, menusStyled,
                 enabledInteraction = (interactiveStyles & (0x20 | 0x08000000)) == 0,
@@ -877,7 +906,7 @@ internal sealed partial class MainWindow : Window
                 centered, topAnchored, staysInGame },
             layout = new { thumbnailSize = settings.ThumbnailSize, smallHeight, smallWidth, largeHeight, largeWidth,
                 overflowHeight, overflowWidth, maximumHeight, allCandidatesReachable, allCardsFit, shrunkAgain, overflowNeedsScroll, paginationPresent,
-                commonGroupFits, bottomRowRightGap, largestGroupFits,
+                commonGroupFits, widestRowRightGap, largestGroupFits,
                 historySmallHeight, historyLargeHeight, historyOnScreen,
                 allHistoryReachable, settingsFit,
                 adaptivePassed },

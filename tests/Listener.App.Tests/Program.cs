@@ -750,7 +750,7 @@ internal static class Program
                     png.Save(stream);
                 }
             }),
-            ("单行一至四件使用对应卡片布局且不拉长试听按钮", () =>
+            ("一至四件的分区卡片等宽紧凑、不拉伸，试听按钮在右侧不拉长", () =>
             {
                 var root = Path.Combine(AppContext.BaseDirectory, "library");
                 var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
@@ -771,11 +771,13 @@ internal static class Program
                         "one-to-four rows overflow or shrink images: " + panel.LayoutInfo);
                     var cards = Descendants<System.Windows.Controls.Border>(panel)
                         .Where(border => border.Tag is Candidate).ToArray();
-                    var widths = sizes.Select(group => cards
-                        .Where(card => ((Candidate)card.Tag).Item.Cells == group.Cells)
-                        .Select(card => card.ActualWidth).Distinct().Single()).ToArray();
-                    Check(widths[0] > widths[1] && widths[1] > widths[2] && widths[2] > widths[3],
-                        "row density did not change card proportions");
+                    // One compact card width for the whole result: a section with one item does not
+                    // stretch its card across the row, and rows fill with equal cards.
+                    var widths = cards.Select(card => Math.Round(card.ActualWidth)).Distinct().ToArray();
+                    var rowWidth = cards.GroupBy(card => Math.Round(card.TransformToAncestor(panel).TransformBounds(new System.Windows.Rect(card.RenderSize)).Top))
+                        .Max(row => row.Count()) * widths[0];
+                    Check(widths.Length == 1 && widths[0] < 300 * font && rowWidth <= panel.ActualWidth,
+                        "cards are stretched or differ in width: " + string.Join("/", widths));
                     var bands = sizes.OrderBy(group => group.Cells).Select(group => cards
                         .Where(card => ((Candidate)card.Tag).Item.Cells == group.Cells)
                         .Select(card => card.TransformToAncestor(panel)

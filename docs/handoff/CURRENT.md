@@ -8,6 +8,7 @@
 - 验证：`raids.py` 解码 26 场录像为 500 s 分段并以两库扫描，`raid_diff.py`/`raid_clusters.py` 对比；`provenance.py`/`fir_provenance.py`/`impact_probe.py` 复核对方音频；`frames_sheet.py`/`frames_zoom.py` 取画面。结果见报告第 3、4 节。
 - 格数：胶囊电视 2×3、花瓶 2×2 按本库缩略图底色与对方资料更正（`GRID_CORRECTIONS`、`provenance.json` 的 `aqintel140.gridCorrected`）；燃料桶保留 3×2。冒烟 `ImagesKeepAspect` 检查所有物品图 `Stretch.Uniform` 且显示比例与位图一致，含全部 150 张图鉴图。
 - 底色：`ItemDefinition.ThumbnailBackground`（#RRGGBB，可空）只给透明底的情报站图；`CandidatePanel.ItemPicture` 用 `Viewbox` 画按格数比例的底色块再放图，三种卡片共用。颜色为本库同稀有度截图底色中位数（红 #321612、金 #32220E、紫 #221A2F，`RARITY_BACKGROUND`）。新图只整体等比缩小，不裁剪（用户要求不改图，只加底色）。冒烟 `backgroundsShown` 检查 88 件底色与格数比例，应用测试检查大红物品必为红底。
+- 紧凑卡片：`DesignCardWidth` 按图片、最长名称（8 字以内单行）、「差异率 10.0%」和按钮列算出全结果统一的卡片宽，`BuildSizeSection` 按宽度放满整列、不拉伸；`GetPreferredWidth` 取约 720×字号高度内放得下且宽 ≥ 1.2×高的最少列数。`VisibleArea` 在显示时按透明图的不透明区域裁出 `CroppedBitmap`（文件不变）。冒烟 `cardsCompact`（等宽、最紧卡片名称到按钮 ≤ 20）与 `widestRowRightGap` 取代原 `bottomRowRightGap`。
 - 待办：新物品格数与两件更正的实机核对；显卡（1×2）的原图是横向的，放在竖条底色里偏小，未旋转；电脑硬件类模板在非目标声音上偏高（0.78–0.84 共 137 次），若后续出现误报，先把该组门限提到 0.90。
 
 以下为 v0.4.5 时的状态记录。

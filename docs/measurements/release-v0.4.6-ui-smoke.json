@@ -19,7 +19,7 @@
     "fontChecks": {
       "two-small": {
         "scale": 0.9,
-        "actualWidth": 1600,
+        "actualWidth": 930,
         "actualHeight": 630,
         "noWindowScale": true,
         "candidates": 27,
@@ -33,7 +33,7 @@
       },
       "two-medium": {
         "scale": 1,
-        "actualWidth": 1600,
+        "actualWidth": 986,
         "actualHeight": 645,
         "noWindowScale": true,
         "candidates": 27,
@@ -47,7 +47,7 @@
       },
       "two-large": {
         "scale": 1.15,
-        "actualWidth": 1600,
+        "actualWidth": 1070,
         "actualHeight": 737,
         "noWindowScale": true,
         "candidates": 27,
@@ -61,7 +61,7 @@
       },
       "six-small": {
         "scale": 0.9,
-        "actualWidth": 770,
+        "actualWidth": 702,
         "actualHeight": 438,
         "noWindowScale": true,
         "candidates": 6,
@@ -75,7 +75,7 @@
       },
       "six-medium": {
         "scale": 1,
-        "actualWidth": 770,
+        "actualWidth": 736,
         "actualHeight": 447,
         "noWindowScale": true,
         "candidates": 6,
@@ -89,7 +89,7 @@
       },
       "six-large": {
         "scale": 1.15,
-        "actualWidth": 770,
+        "actualWidth": 790,
         "actualHeight": 460,
         "noWindowScale": true,
         "candidates": 6,
@@ -109,8 +109,8 @@
     "liveReplayPausesSampling": true,
     "listeningThirteen": true,
     "listeningThirteenDetails": {
-      "actualWidth": 910,
-      "actualHeight": 730,
+      "actualWidth": 831,
+      "actualHeight": 698,
       "thumbnailSize": 96,
       "groups": [
         "2 格",
@@ -126,7 +126,7 @@
     },
     "groupedFifteen": true,
     "groupedFifteenDetails": {
-      "actualWidth": 910,
+      "actualWidth": 831,
       "actualHeight": 595,
       "thumbnailSize": 96,
       "contentHeight": 505,
@@ -137,7 +137,7 @@
     },
     "listeningOnePage": true,
     "listeningOnePageDetails": {
-      "actualWidth": 1600,
+      "actualWidth": 1261,
       "actualHeight": 719,
       "needsScroll": false,
       "thumbnailSize": 64,
@@ -146,10 +146,22 @@
       "allItemCardsFit": true,
       "allItemNamesOneLine": true,
       "allItemButtonsRight": true,
-      "maxRight": 1599,
+      "maxRight": 1249,
       "maxBottom": 711
     },
     "tileButtonsRight": true,
+    "cardsCompact": true,
+    "compactGaps": [
+      6.2,
+      6,
+      6.2,
+      7,
+      6,
+      7.5,
+      6,
+      6,
+      6
+    ],
     "imagesKeepAspect": true,
     "catalogImages": 150,
     "stretchedImages": [],
@@ -219,16 +231,16 @@
       "size": {
         "isEmpty": false,
         "width": 620,
-        "height": 225
+        "height": 209
       },
       "x": 650,
       "y": 12,
       "width": 620,
-      "height": 225,
+      "height": 209,
       "left": 650,
       "top": 12,
       "right": 1270,
-      "bottom": 237,
+      "bottom": 221,
       "topLeft": {
         "x": 650,
         "y": 12
@@ -239,47 +251,47 @@
       },
       "bottomLeft": {
         "x": 650,
-        "y": 237
+        "y": 221
       },
       "bottomRight": {
         "x": 1270,
-        "y": 237
+        "y": 221
       }
     },
     "largeBounds": {
       "isEmpty": false,
       "location": {
-        "x": 510,
+        "x": 532,
         "y": 12
       },
       "size": {
         "isEmpty": false,
-        "width": 900,
-        "height": 730
+        "width": 856,
+        "height": 698
       },
-      "x": 510,
+      "x": 532,
       "y": 12,
-      "width": 900,
-      "height": 730,
-      "left": 510,
+      "width": 856,
+      "height": 698,
+      "left": 532,
       "top": 12,
-      "right": 1410,
-      "bottom": 742,
+      "right": 1388,
+      "bottom": 710,
       "topLeft": {
-        "x": 510,
+        "x": 532,
         "y": 12
       },
       "topRight": {
-        "x": 1410,
+        "x": 1388,
         "y": 12
       },
       "bottomLeft": {
-        "x": 510,
-        "y": 742
+        "x": 532,
+        "y": 710
       },
       "bottomRight": {
-        "x": 1410,
-        "y": 742
+        "x": 1388,
+        "y": 710
       }
     },
     "centered": true,
@@ -288,12 +300,12 @@
   },
   "layout": {
     "thumbnailSize": 88,
-    "smallHeight": 225,
+    "smallHeight": 209,
     "smallWidth": 620,
-    "largeHeight": 730,
-    "largeWidth": 900,
+    "largeHeight": 698,
+    "largeWidth": 856,
     "overflowHeight": 719,
-    "overflowWidth": 1600,
+    "overflowWidth": 911,
     "maximumHeight": 1012,
     "allCandidatesReachable": true,
     "allCardsFit": true,
@@ -301,10 +313,10 @@
     "overflowNeedsScroll": false,
     "paginationPresent": false,
     "commonGroupFits": true,
-    "bottomRowRightGap": 1,
+    "widestRowRightGap": 1,
     "largestGroupFits": true,
-    "historySmallHeight": 387,
-    "historyLargeHeight": 892,
+    "historySmallHeight": 371,
+    "historyLargeHeight": 860,
     "historyOnScreen": true,
     "allHistoryReachable": true,
     "settingsFit": {
