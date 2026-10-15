@@ -86,7 +86,7 @@
     $('replay-band').hidden = !state.playing;
     $('replay-name').textContent = state.playing || '本次录音';
     $('freshness').textContent = state.phase === 'analyzing' ? '分析中' : '刚刚';
-    $('game-caption').textContent = state.playing ? '试听时，拾点先暂停监听。返回后继续等待下一件。' : state.mode === 'paused' ? '采音已暂停。点击「返回监听」，继续看下一件候选。' : '声音是线索。格数，让候选更清楚。';
+    $('game-caption').textContent = state.playing ? '试听时，行商助手先暂停监听。返回后继续等待下一件。' : state.mode === 'paused' ? '采音已暂停。点击「返回监听」，继续看下一件候选。' : '声音是线索。格数，让候选更清楚。';
     renderCandidates(); renderHistory(); renderAuto(); setTimeline(state.phase);
   }
   function pulseResult() {
