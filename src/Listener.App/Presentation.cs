@@ -53,7 +53,7 @@ internal sealed class CandidatePanel : Border
     private readonly TextBlock interactionHint = Theme.Label("", 10, Theme.Muted);
     private readonly TextBlock designCount = Theme.Label("0 件候选", 31);
     private readonly TextBlock age = Theme.Label("", 12, Theme.Live);
-    private readonly TextBlock title = Theme.Label("行商听音", 18);
+    private readonly TextBlock title = Theme.Label(BrandAssets.AppName, 18);
     private readonly ContentControl toolbarHost = new();
     private Border? summaryBar;
     private DateTimeOffset? resultAt;

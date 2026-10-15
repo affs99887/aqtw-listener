@@ -1,4 +1,8 @@
-# 当前接续状态 · 2026-10-14
+# 当前接续状态 · 2026-10-15
+
+**拾点 v0.5.2.1 · 软件更名（最新）**：用户要求将软件更名为“拾点”，改好后打包并发布 0.5.2.1。主窗口、侧栏、托盘、监听浮窗、提示与 Windows 产品元数据使用 BrandAssets.AppName“拾点”；便携启动文件为 拾点.exe。内部托管程序集继续使用 AqtwListener，以保持资源与数据兼容；单实例互斥标识保持兼容，查找已有窗口同时支持新旧进程名。设置、录音及个人库继续位于 portable/local-data。
+
+发布说明：docs/releases/v0.5.2.1.md；构建目录 .tools/release/v0.5.2.1；压缩包 artifacts/Shidian-v0.5.2.1-win-x64.zip；目标 Release：https://github.com/affs99887/aqtw-listener/releases/tag/v0.5.2.1。界面与产品属性检查使用更名后的启动文件运行。portable 同步更新；旧启动文件转存 .tools/rollback/v0.5.2.1，保留用户数据。
 
 **v0.5.2 · 发布版本（最新）**：候选最小宽度为格数栏加两张卡片，每行最多四件，名称在各卡片入口均显式左对齐；排满行右侧仅 3 逻辑像素边框余量。中字号、880 候选面板高度预算下：1 件 576×135，6 件两列 / 582×325，13 件三列 / 740×552，31 件四列 / 824×732（不含标题栏）。小试听按钮、两行长名称、88 / 80 / 56 图片与分组概率保持；空间不足可在操作模式滚动查看。包含首次启动快捷键恢复与拾点新图标，说明见 docs/releases/v0.5.2.md。
 
@@ -6,7 +10,7 @@
 
 用户已授权打包 0.5.2、同步 portable、提交并发布 GitHub Release。构建目录 .tools/release/v0.5.2；压缩包 artifacts/AqtwListener-v0.5.2-win-x64.zip，不包含个人 local-data。按发布提交构建成品并同步 portable，旧文件保存在 .tools/rollback/v0.5.2。发布目标：https://github.com/affs99887/aqtw-listener/releases/tag/v0.5.2；成品与发布的核验记录保存在 artifacts/release-v0.5.2-validation.json。打包与发布操作不启动、关闭或重启助手。
 
-**测试约束**：用户正在打游戏，明确反馈反复弹出的测试界面会干扰游戏。后续保持后台构建、无窗口检查与内存渲染；不要自动运行 --ui-smoke、弹出窗口、打开/切换预览页或关闭、重启其正在使用的助手。置顶、焦点、完整窗口与游戏内遮挡测试留待用户方便时再做。
+**测试约束**：用户游戏期间不要弹测试窗口或关闭、重启其正常助手。用户随后明确表示已经不在游戏中，允许窗口检查；v0.5.2 完整桌面检查已通过，记录在 artifacts/candidate-group-gallery/ui-smoke-v0.5.2.json，完整音效组预览已更新为 63 个组、23 个合并类。本次更名继续使用独立成品目录验证，不关闭正常助手。桌面检查不等同于游戏内独占全屏验证。
 
 **本地试用 · 拾点 Logo**：用户选择极简方案 04。`Assets/listener-mark.svg` 是透明浅色界面标志，`listener-app.svg` 是深底系统图标；`scripts/export-icon.ps1` 逐尺寸渲染 PNG 与九帧 ICO，`draw-logo.py` 仅保留兼容入口。主窗口、浮窗使用 `BrandAssets.Mark`，窗口与任务栏使用 `WindowIcon`，托盘使用 ICO。预览见 `docs/design/brand/shidian-2026-10-14/index.html`。此项是 v0.5.1 之后的本地修改。
 

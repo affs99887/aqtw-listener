@@ -1,4 +1,4 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using System.Windows.Automation;
@@ -18,7 +18,7 @@ internal sealed class OverlayWindow : Window
         Width = 15, Height = 20, Stretch = Stretch.Uniform
     };
     private readonly List<(Button Button, double Scale)> fontButtons = [];
-    private readonly TextBlock title = Theme.Label("行商听音助手", 13);
+    private readonly TextBlock title = Theme.Label(BrandAssets.AppName, 13);
     private readonly TextBlock headerStatus = Theme.Label("监听中 · 等待声音", 10, Theme.Muted);
     private readonly System.Windows.Shapes.Ellipse statusDot = new() { Width = 8, Height = 8, Fill = Theme.Faint,
         Margin = new Thickness(0, 0, 8, 0), VerticalAlignment = VerticalAlignment.Center };
@@ -38,7 +38,7 @@ internal sealed class OverlayWindow : Window
     public OverlayWindow(string root, Settings settings)
     {
         this.settings = settings;
-        Title = "行商听音助手 · 监听浮窗"; WindowStyle = WindowStyle.None; AllowsTransparency = true;
+        Title = BrandAssets.AppName + " · 监听浮窗"; WindowStyle = WindowStyle.None; AllowsTransparency = true;
         Background = Brushes.Transparent; ShowInTaskbar = false; ShowActivated = false;
         Topmost = true; ResizeMode = ResizeMode.NoResize;
         FontFamily = new FontFamily("Microsoft YaHei UI"); UseLayoutRounding = true; SnapsToDevicePixels = true;

@@ -45,7 +45,7 @@ internal sealed partial class MainWindow : Window
         this.settings = settings;
         personal = new(Path.Combine(AppContext.BaseDirectory, "library"), Path.Combine(AppContext.BaseDirectory, "local-data", "personal"));
         var active = personal.ResolveActive(); this.library = active.Library; libraryRoot = active.Root;
-        Title = "行商听音助手"; Width = Math.Min(900, SystemParameters.WorkArea.Width); MinWidth = Math.Min(760, Width);
+        Title = BrandAssets.AppName; Width = Math.Min(900, SystemParameters.WorkArea.Width); MinWidth = Math.Min(760, Width);
         Height = Math.Min(720, SystemParameters.WorkArea.Height); MinHeight = Math.Min(560, Height);
         MaxHeight = SystemParameters.WorkArea.Height;
         Icon = BrandAssets.WindowIcon;
@@ -296,7 +296,7 @@ internal sealed partial class MainWindow : Window
         menu.Items.Add("恢复顶部居中", null, (_, _) => Dispatcher.Invoke(overlay.RestoreTopCenter));
         menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
         menu.Items.Add("退出", null, (_, _) => Dispatcher.Invoke(Close));
-        tray = new System.Windows.Forms.NotifyIcon { Text = "行商听音助手 · 监听已关闭", Icon = BrandAssets.TrayIcon, ContextMenuStrip = menu, Visible = true };
+        tray = new System.Windows.Forms.NotifyIcon { Text = BrandAssets.AppName + " · 监听已关闭", Icon = BrandAssets.TrayIcon, ContextMenuStrip = menu, Visible = true };
         tray.DoubleClick += (_, _) => Dispatcher.Invoke(() => { Show(); WindowState = WindowState.Normal; Activate(); });
         if (Environment.GetCommandLineArgs().Contains("--performance-smoke"))
             _ = PerformanceSmoke();

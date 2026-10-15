@@ -9,10 +9,11 @@ internal static class Program
     public static int Main(string[] args)
     {
         var smoke = args.Contains("--ui-smoke") || args.Contains("--audio-smoke") || args.Contains("--audio-smoke-self");
+        // Keep the existing mutex so the renamed launcher also finds an older running copy.
         using var singleton = new Mutex(true, "AqtwListener-Desktop-v1" + (smoke ? $"-ui-smoke-{Environment.ProcessId}" : ""), out var first);
         if (!first)
         {
-            if (!ShowRunningWindow()) MessageBox.Show("听音助手已在运行，但无法找到它的窗口。请在任务管理器中结束 AqtwListener 后重试。");
+            if (!ShowRunningWindow()) MessageBox.Show($"{BrandAssets.AppName}已在运行，但无法找到它的窗口。请从托盘图标打开，或结束已有进程后重试。", BrandAssets.AppName);
             return 0;
         }
         try
@@ -35,13 +36,14 @@ internal static class Program
         {
             var message = "启动失败：" + ex.Message;
             if (smoke || args.Contains("--performance-smoke")) File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "smoke-error.txt"), ex.ToString());
-            else MessageBox.Show(message, "行商听音助手");
+            else MessageBox.Show(message, BrandAssets.AppName);
             return 1;
         }
     }
     private static bool ShowRunningWindow()
     {
-        foreach (var process in Process.GetProcessesByName("AqtwListener"))
+        foreach (var name in new[] { BrandAssets.AppName, "AqtwListener" })
+        foreach (var process in Process.GetProcessesByName(name))
         {
             using (process)
             {

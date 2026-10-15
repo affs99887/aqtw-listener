@@ -34,4 +34,6 @@ if (Test-Path -LiteralPath $engineOutput) { Remove-Item -LiteralPath $engineOutp
 Copy-Item -LiteralPath (Join-Path $root 'data/library') -Destination $libraryOutput -Recurse
 Copy-Item README.md (Join-Path $Output '使用说明.md') -Force
 Copy-Item LICENSE (Join-Path $Output 'LICENSE') -Force
-Write-Host "已更新便携程序：$(Join-Path $Output 'AqtwListener.exe')"
+# The apphost still loads AqtwListener.dll; its public launcher uses the product name.
+Move-Item -LiteralPath (Join-Path $Output 'AqtwListener.exe') -Destination (Join-Path $Output '拾点.exe') -Force
+Write-Host "已更新拾点便携程序：$(Join-Path $Output '拾点.exe')"

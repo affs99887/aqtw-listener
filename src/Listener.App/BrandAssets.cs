@@ -8,6 +8,7 @@ namespace Listener.App;
 
 internal static class BrandAssets
 {
+    public const string AppName = "拾点";
     private static readonly Uri IconUri = new("pack://application:,,,/AqtwListener;component/Assets/listener.ico");
     public static BitmapImage Mark { get; } = LoadImage("listener-mark.png");
     public static BitmapImage WindowIcon { get; } = LoadImage("listener-app.png");
