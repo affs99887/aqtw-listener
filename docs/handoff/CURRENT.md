@@ -1,5 +1,9 @@
 # 当前接续状态 · 2026-10-15
 
+**发布后同步介绍页与精简 README**：用户明确要求每次发版都同步介绍页，至少更新下载链接；README 大幅精简且不得包含来源或鸣谢。要求已写入根目录 `AGENTS.md`，现网版本与下载一致性检查为 `scripts/check-introduction-release.ps1`。README 从约 9,373 字符缩为 821 字符，仅保留下载、使用、快捷键、更新和反馈。
+
+介绍页本轮同步“行商助手”名称、透明头盔图标、v0.5.2.1 版本、托盘与自由定位说明，以及三个直达 `XingshangAssistant-v0.5.2.1-win-x64.zip` 的下载入口。`gh-pages` 发布提交为 `54ddda27665a7fda00f4f4f138c922dbe28f2868`，维护位置和验证方法见 [介绍页维护记录](WEBSITE-GITHUB-PAGES.md)。这属于网站与文档同步，程序 Release 和 v0.5.2.1 标签继续对应 `9f254174d0d1548c9225cc5cabf701d5c175594b`。
+
 **当前发布：行商助手 v0.5.2.1**。用户在图标清晰度、关闭到托盘与自由定位修正完成后，明确要求按 0.5.2.1 重新打包并发布。发布说明以 [v0.5.2.1](../releases/v0.5.2.1.md) 为准；发布构建目录为 `.tools/release/v0.5.2.1-xingshang-20261015/package`，便携附件为 `artifacts/XingshangAssistant-v0.5.2.1-win-x64.zip`，GitHub 目标为 https://github.com/affs99887/aqtw-listener/releases/tag/v0.5.2.1 。版本标签 v0.5.2.1 用于本轮发布提交，原拾点版本的提交保留在 Git 历史；先前的撤回与本地版记录均为历史。保留 portable/local-data，不关闭正常运行实例。
 
 本轮核心回归 44/44、应用回归 63/63，记录为 `docs/measurements/release-v0.5.2.1-xingshang-{core,app}-20261015.json`。最终发布提交构建后使用隔离目录运行窗口检查，完整复核记录和发布包校验保存在 `artifacts/release-v0.5.2.1-xingshang-validation.json`；公开附件包含便携 ZIP 与 SHA256SUMS.txt。
@@ -16,7 +20,7 @@
 
 验证：应用回归 63/63、完整桌面 `--ui-smoke` 通过；关闭/恢复/最小化/托盘退出、浮窗四边越界后定时定位和设置重载、主窗口越界以及历史窗口尺寸变化的定位检查均通过。记录见 `docs/measurements/xingshang-window-*-20261015.json`。图标、九档 ICO 尺寸和更新后的实际窗口截图见 [当前品牌预览](../design/brand/ind70-2026-10-15/index.html)。本地候选对照页 `artifacts/candidate-width-study/preview.html` 使用新名称和头盔图标，保留 63 组、23 类、150 件物品预览。桌面检查不等于游戏内独占全屏验证。
 
-**介绍网站交接**：侧会话已将拾点介绍页部署到 https://affs99887.github.io/aqtw-listener/ ，使用独立 `gh-pages` 分支。网页项目、发布检出、验证记录和维护流程见 [WEBSITE-GITHUB-PAGES.md](WEBSITE-GITHUB-PAGES.md)。交接时固定下载链接仍为 v0.5.2；软件现名为行商助手，v0.5.2.1 已安排重新发布，后续维护官网时需核对名称、图标和链接。本次没有重复部署或修改公网网站。
+**介绍网站交接（历史）**：原拾点介绍页采用独立 `gh-pages` 分支部署。当前已按用户要求同步为行商助手 v0.5.2.1，下载链接和维护方法以上文与 [维护记录](WEBSITE-GITHUB-PAGES.md) 为准。
 
 以下为此前的发布与设计记录。
 
