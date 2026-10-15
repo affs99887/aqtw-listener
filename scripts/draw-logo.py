@@ -1,8 +1,7 @@
-"""Compatibility entry point for exporting the selected Shidian logo.
+"""Package the exact user-approved transparent IND70 logo for 行商助手.
 
-Editable geometry lives in src/Listener.App/Assets/listener-{mark,app}.svg.
-The Windows exporter renders each ICO size from those paths and writes both
-PNG resources. This command no longer redraws the retired waveform logo.
+Source: src/Listener.App/Assets/listener-source.png. PNG resources are copied
+unchanged; the Windows exporter only resamples the required ICO frames.
 Usage: python scripts/draw-logo.py
 """
 from pathlib import Path
@@ -10,7 +9,8 @@ import subprocess
 
 if __name__ == "__main__":
     subprocess.run(
-        ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-STA", "-File",
+        ["powershell.exe", "-NoProfile", "-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass", "-STA", "-File",
          str(Path(__file__).with_name("export-icon.ps1"))],
         check=True,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
     )

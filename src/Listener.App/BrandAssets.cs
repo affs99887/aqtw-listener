@@ -8,15 +8,43 @@ namespace Listener.App;
 
 internal static class BrandAssets
 {
-    public const string AppName = "拾点";
+    public const string AppName = "行商助手";
     private static readonly Uri IconUri = new("pack://application:,,,/AqtwListener;component/Assets/listener.ico");
-    public static BitmapImage Mark { get; } = LoadImage("listener-mark.png");
+    private static readonly Dictionary<int, BitmapImage> marks = [];
+    public static Image CreateMark(double size) => new MarkImage(size);
     public static BitmapImage WindowIcon { get; } = LoadImage("listener-app.png");
     public static Drawing.Icon TrayIcon { get; } = LoadIcon();
-    private static BitmapImage LoadImage(string name)
+    private static BitmapImage LoadImage(string name, int pixelWidth = 0)
     {
-        var image = new BitmapImage(new Uri($"pack://application:,,,/AqtwListener;component/Assets/{name}"));
+        var image = new BitmapImage(); image.BeginInit();
+        image.UriSource = new Uri($"pack://application:,,,/AqtwListener;component/Assets/{name}");
+        image.CacheOption = BitmapCacheOption.OnLoad;
+        if (pixelWidth > 0) image.DecodePixelWidth = pixelWidth;
+        image.EndInit();
         image.Freeze(); return image;
+    }
+    private sealed class MarkImage : Image
+    {
+        public MarkImage(double size)
+        {
+            Width = Height = size; Stretch = Stretch.Uniform;
+            UseLayoutRounding = true; SnapsToDevicePixels = true;
+            RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.HighQuality);
+            Loaded += (_, _) => RefreshSource(VisualTreeHelper.GetDpi(this));
+            RefreshSource(VisualTreeHelper.GetDpi(this));
+        }
+        protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
+        {
+            base.OnDpiChanged(oldDpi, newDpi); RefreshSource(newDpi);
+        }
+        private void RefreshSource(DpiScale dpi)
+        {
+            // Decode the approved source once at the physical display size, avoiding
+            // a large bitmap being reduced again by the default render-time scaler.
+            var pixels = Math.Max(1, (int)Math.Round(Width * dpi.DpiScaleX));
+            if (!marks.TryGetValue(pixels, out var image)) marks[pixels] = image = LoadImage("listener-mark.png", pixels);
+            Source = image;
+        }
     }
     private static Drawing.Icon LoadIcon()
     {

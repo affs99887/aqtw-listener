@@ -21,8 +21,6 @@ internal static class WindowPlacement
         {
             if (!window.IsLoaded) return;
             var area = WorkArea(window); window.MaxHeight = Math.Min(window.MaxHeight, area.Height);
-            if (double.IsFinite(window.Top)) window.Top = Math.Clamp(window.Top, area.Top, Math.Max(area.Top, area.Bottom - window.ActualHeight));
-            if (double.IsFinite(window.Left)) window.Left = Math.Clamp(window.Left, area.Left, Math.Max(area.Left, area.Right - window.ActualWidth));
         }
         window.Loaded += (_, _) => { window.MaxHeight = WorkArea(window).Height; Fit(); };
         window.SizeChanged += (_, _) => Fit();

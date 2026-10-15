@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>行商助手 · IND70 透明 Logo</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#121816;color:#e7eee8;font:15px/1.65 "Microsoft YaHei UI",sans-serif}main{max-width:1200px;margin:auto;padding:32px}h1{font-size:27px;margin:0 0 8px}h2{font-size:19px;margin:26px 0 12px}p{color:#a8b8ae}.contexts{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.surface{padding:24px;display:grid;place-items:center;border-radius:8px;border:1px solid #53675d;min-height:260px}.surface img{width:200px;height:200px;object-fit:contain}.light{background:#f4f4ed}.dark{background:#111212}.checker{background:conic-gradient(#d9dfdb 25%,#f4f6f4 0 50%,#d9dfdb 0 75%,#f4f6f4 0) 0/24px 24px}.sizes{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}.sample{display:flex;flex-direction:column;align-items:center;gap:10px;color:#a8b8ae}.shots{display:grid;gap:20px}.shots img{max-width:100%;height:auto;border:1px solid #53675d}code{color:#c2e2cf}a{color:#b7d9c5}@media(max-width:760px){main{padding:18px}.contexts{grid-template-columns:1fr}}
+</style>
+<main><h1>行商助手 · 选定的 D 版 Logo</h1>
+<p>直接使用选定的透明成品：浅色 IND70 头盔、绿色拾取光点、深色轮廓描边。外部透明，镜片暗部保留。</p>
+<div class="contexts"><div class="surface light"><img src="logo.png" alt="浅色背景上的透明Logo"></div><div class="surface dark"><img src="logo.png" alt="深色背景上的透明Logo"></div><div class="surface checker"><img src="logo.png" alt="棋盘背景上的透明Logo"></div></div>
+<h2>应用图标尺寸</h2><div class="sizes" id="sizes"></div>
+<p>PNG 资源与选定原图逐字节一致；ICO 仅按需要的尺寸等比缩放，保留原图留边。</p>
+<h2>软件图标清晰度修正</h2><p>原图为 1254×1254。软件标志按当前屏幕的实际像素尺寸加载，并随显示器缩放更新，减少默认缩放造成的细线丢失。下列图标均为 72×72 原尺寸，左为旧显示方式，右为修正后的方式。</p><div class="sizes"><div class="sample"><img src="sharpness-before.png" width="72" height="72" alt="旧显示方式"><span>修正前</span></div><div class="sample"><img src="sharpness-after.png" width="72" height="72" alt="按实际像素加载"><span>修正后</span></div></div>
+<h2>实际软件窗口</h2><p>侧栏头盔放大至 72 逻辑像素；右上角关闭隐藏到托盘；自定义位置允许移出屏幕边界，可从托盘恢复顶部居中。</p><div class="shots"><img src="main-window.png" alt="行商助手主窗口"><img src="overlay.png" alt="行商助手监听浮窗"></div>
+<p>启动文件：<code>portable/行商助手.exe</code>。窗口中的物品和差异率为布局检查用模拟数据。</p>
+</main><script>document.getElementById('sizes').innerHTML=[16,20,24,32,40,48,64,128,256].map(size=>'<div class="sample"><img src="frames/icon-'+size+'.png" width="'+size+'" height="'+size+'" alt="'+size+'像素图标"><span>'+size+' px</span></div>').join('');</script></html>

@@ -25,13 +25,14 @@ internal sealed partial class MainWindow
         var windowActions = new StackPanel { Orientation = Orientation.Horizontal };
         var minimize = CaptionButton("\uE921", "最小化到托盘", () => WindowState = WindowState.Minimized);
         var maximize = CaptionButton("\uE922", "最大化 / 还原", () => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized);
-        var close = CaptionButton("\uE8BB", "退出拾点", Close);
+        var close = CaptionButton("\uE8BB", "关闭到托盘", Close);
         close.MouseEnter += (_, _) => close.Background = Theme.Brush("#813F4D");
         close.MouseLeave += (_, _) => close.Background = Brushes.Transparent;
         windowActions.Children.Add(minimize); windowActions.Children.Add(maximize); windowActions.Children.Add(close);
         DockPanel.SetDock(windowActions, Dock.Right); caption.Children.Add(windowActions);
         var identity = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(17, 0, 0, 0) };
-        identity.Children.Add(new Image { Source = BrandAssets.Mark, Width = 23, Height = 23, Margin = new Thickness(0, 0, 10, 0) });
+        var captionMark = BrandAssets.CreateMark(23); captionMark.Margin = new Thickness(0, 0, 10, 0);
+        identity.Children.Add(captionMark);
         var title = Theme.Label(BrandAssets.AppName, 12); title.Margin = new Thickness(0); title.VerticalAlignment = VerticalAlignment.Center; identity.Children.Add(title);
         caption.Children.Add(identity);
         var columns = new Grid(); columns.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(170) }); columns.ColumnDefinitions.Add(new ColumnDefinition());
@@ -40,7 +41,8 @@ internal sealed partial class MainWindow
         var sidebar = new Border { Background = Theme.Panel, BorderBrush = Theme.Line, BorderThickness = new Thickness(0, 0, 1, 0), Child = side };
         columns.Children.Add(sidebar);
         var brand = new StackPanel { Margin = new Thickness(9, 0, 0, 25) };
-        brand.Children.Add(new Image { Source = BrandAssets.Mark, Width = 47, Height = 47, HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 0, 0, 12) });
+        var sidebarMark = BrandAssets.CreateMark(72); sidebarMark.HorizontalAlignment = HorizontalAlignment.Left;
+        sidebarMark.Margin = new Thickness(0, 0, 0, 12); brand.Children.Add(sidebarMark);
         var name = Theme.Label(BrandAssets.AppName, 20); name.FontWeight = FontWeights.SemiBold; brand.Children.Add(name);
         brand.Children.Add(Theme.Label("听见更多可能", 11, Theme.Muted)); DockPanel.SetDock(brand, Dock.Top); side.Children.Add(brand);
         var footer = new StackPanel { Margin = new Thickness(10, 0, 0, 0) };

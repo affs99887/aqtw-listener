@@ -1,0 +1,264 @@
+{
+  "renders": [
+    {
+      "scale": 1,
+      "logicalSize": 23,
+      "mode": "Unspecified",
+      "image": "icon-23-1-Unspecified.png",
+      "pixels": 23
+    },
+    {
+      "scale": 1,
+      "logicalSize": 23,
+      "mode": "HighQuality",
+      "image": "icon-23-1-HighQuality.png",
+      "pixels": 23
+    },
+    {
+      "scale": 1,
+      "logicalSize": 23,
+      "mode": "Decode",
+      "image": "icon-23-1-Decode.png",
+      "pixels": 23
+    },
+    {
+      "scale": 1,
+      "logicalSize": 28,
+      "mode": "Unspecified",
+      "image": "icon-28-1-Unspecified.png",
+      "pixels": 28
+    },
+    {
+      "scale": 1,
+      "logicalSize": 28,
+      "mode": "HighQuality",
+      "image": "icon-28-1-HighQuality.png",
+      "pixels": 28
+    },
+    {
+      "scale": 1,
+      "logicalSize": 28,
+      "mode": "Decode",
+      "image": "icon-28-1-Decode.png",
+      "pixels": 28
+    },
+    {
+      "scale": 1,
+      "logicalSize": 72,
+      "mode": "Unspecified",
+      "image": "icon-72-1-Unspecified.png",
+      "pixels": 72
+    },
+    {
+      "scale": 1,
+      "logicalSize": 72,
+      "mode": "HighQuality",
+      "image": "icon-72-1-HighQuality.png",
+      "pixels": 72
+    },
+    {
+      "scale": 1,
+      "logicalSize": 72,
+      "mode": "Decode",
+      "image": "icon-72-1-Decode.png",
+      "pixels": 72
+    },
+    {
+      "scale": 1.25,
+      "logicalSize": 23,
+      "mode": "Unspecified",
+      "image": "icon-23-1.25-Unspecified.png",
+      "pixels": 29
+    },
+    {
+      "scale": 1.25,
+      "logicalSize": 23,
+      "mode": "HighQuality",
+      "image": "icon-23-1.25-HighQuality.png",
+      "pixels": 29
+    },
+    {
+      "scale": 1.25,
+      "logicalSize": 23,
+      "mode": "Decode",
+      "image": "icon-23-1.25-Decode.png",
+      "pixels": 29
+    },
+    {
+      "scale": 1.25,
+      "logicalSize": 28,
+      "mode": "Unspecified",
+      "image": "icon-28-1.25-Unspecified.png",
+      "pixels": 35
+    },
+    {
+      "scale": 1.25,
+      "logicalSize": 28,
+      "mode": "HighQuality",
+      "image": "icon-28-1.25-HighQuality.png",
+      "pixels": 35
+    },
+    {
+      "scale": 1.25,
+      "logicalSize": 28,
+      "mode": "Decode",
+      "image": "icon-28-1.25-Decode.png",
+      "pixels": 35
+    },
+    {
+      "scale": 1.25,
+      "logicalSize": 72,
+      "mode": "Unspecified",
+      "image": "icon-72-1.25-Unspecified.png",
+      "pixels": 90
+    },
+    {
+      "scale": 1.25,
+      "logicalSize": 72,
+      "mode": "HighQuality",
+      "image": "icon-72-1.25-HighQuality.png",
+      "pixels": 90
+    },
+    {
+      "scale": 1.25,
+      "logicalSize": 72,
+      "mode": "Decode",
+      "image": "icon-72-1.25-Decode.png",
+      "pixels": 90
+    },
+    {
+      "scale": 1.5,
+      "logicalSize": 23,
+      "mode": "Unspecified",
+      "image": "icon-23-1.5-Unspecified.png",
+      "pixels": 34
+    },
+    {
+      "scale": 1.5,
+      "logicalSize": 23,
+      "mode": "HighQuality",
+      "image": "icon-23-1.5-HighQuality.png",
+      "pixels": 34
+    },
+    {
+      "scale": 1.5,
+      "logicalSize": 23,
+      "mode": "Decode",
+      "image": "icon-23-1.5-Decode.png",
+      "pixels": 34
+    },
+    {
+      "scale": 1.5,
+      "logicalSize": 28,
+      "mode": "Unspecified",
+      "image": "icon-28-1.5-Unspecified.png",
+      "pixels": 42
+    },
+    {
+      "scale": 1.5,
+      "logicalSize": 28,
+      "mode": "HighQuality",
+      "image": "icon-28-1.5-HighQuality.png",
+      "pixels": 42
+    },
+    {
+      "scale": 1.5,
+      "logicalSize": 28,
+      "mode": "Decode",
+      "image": "icon-28-1.5-Decode.png",
+      "pixels": 42
+    },
+    {
+      "scale": 1.5,
+      "logicalSize": 72,
+      "mode": "Unspecified",
+      "image": "icon-72-1.5-Unspecified.png",
+      "pixels": 108
+    },
+    {
+      "scale": 1.5,
+      "logicalSize": 72,
+      "mode": "HighQuality",
+      "image": "icon-72-1.5-HighQuality.png",
+      "pixels": 108
+    },
+    {
+      "scale": 1.5,
+      "logicalSize": 72,
+      "mode": "Decode",
+      "image": "icon-72-1.5-Decode.png",
+      "pixels": 108
+    },
+    {
+      "scale": 2,
+      "logicalSize": 23,
+      "mode": "Unspecified",
+      "image": "icon-23-2-Unspecified.png",
+      "pixels": 46
+    },
+    {
+      "scale": 2,
+      "logicalSize": 23,
+      "mode": "HighQuality",
+      "image": "icon-23-2-HighQuality.png",
+      "pixels": 46
+    },
+    {
+      "scale": 2,
+      "logicalSize": 23,
+      "mode": "Decode",
+      "image": "icon-23-2-Decode.png",
+      "pixels": 46
+    },
+    {
+      "scale": 2,
+      "logicalSize": 28,
+      "mode": "Unspecified",
+      "image": "icon-28-2-Unspecified.png",
+      "pixels": 56
+    },
+    {
+      "scale": 2,
+      "logicalSize": 28,
+      "mode": "HighQuality",
+      "image": "icon-28-2-HighQuality.png",
+      "pixels": 56
+    },
+    {
+      "scale": 2,
+      "logicalSize": 28,
+      "mode": "Decode",
+      "image": "icon-28-2-Decode.png",
+      "pixels": 56
+    },
+    {
+      "scale": 2,
+      "logicalSize": 72,
+      "mode": "Unspecified",
+      "image": "icon-72-2-Unspecified.png",
+      "pixels": 144
+    },
+    {
+      "scale": 2,
+      "logicalSize": 72,
+      "mode": "HighQuality",
+      "image": "icon-72-2-HighQuality.png",
+      "pixels": 144
+    },
+    {
+      "scale": 2,
+      "logicalSize": 72,
+      "mode": "Decode",
+      "image": "icon-72-2-Decode.png",
+      "pixels": 144
+    }
+  ],
+  "sourceWidth": 1254,
+  "sourceHeight": 1254,
+  "solidBounds": {
+    "left": 196,
+    "height": 915,
+    "top": 158,
+    "width": 872
+  }
+}

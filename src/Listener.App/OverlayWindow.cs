@@ -69,8 +69,7 @@ internal sealed class OverlayWindow : Window
         DockPanel.SetDock(sizeLabel, Dock.Right); chrome.Children.Add(sizeLabel);
         title.Margin = new Thickness(0); title.FontWeight = FontWeights.Bold; title.VerticalAlignment = VerticalAlignment.Center;
         title.TextWrapping = TextWrapping.NoWrap; title.TextTrimming = TextTrimming.CharacterEllipsis;
-        var mark = new Image { Source = BrandAssets.Mark, Width = 28, Height = 28, Stretch = Stretch.Uniform,
-            Margin = new Thickness(10, 0, 7, 0) };
+        var mark = BrandAssets.CreateMark(28); mark.Margin = new Thickness(10, 0, 7, 0);
         var divider = new Border { Width = 1, Height = 18, Background = Theme.Line,
             Margin = new Thickness(12, 0, 14, 0), VerticalAlignment = VerticalAlignment.Center };
         headerStatus.Margin = new Thickness(0, 0, 10, 0); headerStatus.VerticalAlignment = VerticalAlignment.Center;
@@ -182,18 +181,21 @@ internal sealed class OverlayWindow : Window
             if (!IsActive) { NativeInput.PositionOverlay(this, origin.Left, origin.Top); return; }
             var moved = NativeInput.WindowPixels(this);
             if (Math.Abs(moved.Left - origin.Left) < 1 && Math.Abs(moved.Top - origin.Top) < 1) return;
-            var monitor = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(this).Handle);
-            var dpi = VisualTreeHelper.GetDpi(this);
-            settings.PositionMode = OverlayPositionMode.Manual; settings.MonitorName = monitor.DeviceName;
-            settings.MonitorOffsetX = Math.Clamp((moved.Left - monitor.WorkingArea.Left) / dpi.DpiScaleX, 0,
-                Math.Max(0, monitor.WorkingArea.Width / dpi.DpiScaleX - ActualWidth));
-            settings.MonitorOffsetY = Math.Clamp((moved.Top - monitor.WorkingArea.Top) / dpi.DpiScaleY, 0,
-                Math.Max(0, monitor.WorkingArea.Height / dpi.DpiScaleY - 160));
-            settings.Left = Left; settings.Top = Top;
-            PlacementChanged?.Invoke();
+            RememberManualPosition();
         }
         catch (InvalidOperationException) { NativeInput.PositionOverlay(this, origin.Left, origin.Top); }
         finally { dragging = false; SizeToContent = SizeToContent.Height; Height = double.NaN; RefreshPlacement(); }
+    }
+    internal void RememberManualPosition()
+    {
+        var moved = NativeInput.WindowPixels(this);
+        var monitor = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(this).Handle);
+        var dpi = VisualTreeHelper.GetDpi(this);
+        settings.PositionMode = OverlayPositionMode.Manual; settings.MonitorName = monitor.DeviceName;
+        settings.MonitorOffsetX = (moved.Left - monitor.WorkingArea.Left) / dpi.DpiScaleX;
+        settings.MonitorOffsetY = (moved.Top - monitor.WorkingArea.Top) / dpi.DpiScaleY;
+        settings.Left = Left; settings.Top = Top;
+        PlacementChanged?.Invoke();
     }
     public void Apply(Settings value)
     {
@@ -249,15 +251,15 @@ internal sealed class OverlayWindow : Window
                 var maximumWidth = Math.Min(1600, work.Width * .94 / dpi.DpiScaleX);
                 var left = settings.MonitorName is null ? settings.Left * dpi.DpiScaleX : work.Left + settings.MonitorOffsetX * dpi.DpiScaleX;
                 var top = settings.MonitorName is null ? settings.Top * dpi.DpiScaleY : work.Top + settings.MonitorOffsetY * dpi.DpiScaleY;
-                top = Math.Clamp(top, work.Top, Math.Max(work.Top, work.Bottom - 160 * dpi.DpiScaleY));
                 var candidateCount = workspaceActive && workspace is OverlayWorkspace view ? view.CandidateCount : Panel.CandidateCount;
-                var availableHeight = Math.Max(1, (work.Bottom - top - 8 * dpi.DpiScaleY) / dpi.DpiScaleY);
+                // Manual placement may extend outside the screen. Moving the window
+                // must not resize it or pull its saved coordinates back into view.
+                var availableHeight = Math.Max(1, work.Height / dpi.DpiScaleY - 24);
                 MaxHeight = candidateCount > 6 || candidateCount > 0 && availableHeight < 500
                     ? Math.Min(1000, availableHeight) : Math.Min(520, availableHeight);
                 var preferred = PreferredWidth(maximumWidth, MaxHeight);
                 Width = Math.Min(maximumWidth, workspaceActive && workspace is OverlayWorkspace sound && sound.CandidateCount > 0
                     ? preferred : Math.Max(settings.Width, preferred));
-                left = Math.Clamp(left, work.Left, Math.Max(work.Left, work.Right - Width * dpi.DpiScaleX));
                 NativeInput.PositionOverlay(this, left, top);
             }
             var cramped = MaxHeight < 90 || Width < 220;

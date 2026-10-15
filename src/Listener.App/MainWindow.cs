@@ -39,7 +39,7 @@ internal sealed partial class MainWindow : Window
     private readonly Slider opacity = new() { Minimum = .35, Maximum = 1, TickFrequency = .05 };
     private readonly CheckBox acceleration = new() { Content = "硬件加速（高分辨率卡顿时启用，重启生效）", Foreground = Theme.Muted, FontSize = 11, Margin = new Thickness(0, 4, 0, 8) };
     private readonly CheckBox automatic = new() { Content = "声音自动识别（推荐 UU 远程使用）", Foreground = Theme.Text, Margin = new Thickness(0, 6, 0, 8) };
-    private bool closing;
+    private bool closing, shutdownReady;
     public MainWindow(Settings settings, SoundLibrary library)
     {
         this.settings = settings;
@@ -91,13 +91,32 @@ internal sealed partial class MainWindow : Window
         diagnosticsTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Background,
             (_, _) => UpdateDiagnostics(), Dispatcher);
         Loaded += OnLoaded;
-        Closing += async (_, e) =>
+        Closing += (_, e) =>
         {
-            if (closing) return;
-            e.Cancel = true; closing = true; diagnosticsTimer.Stop(); input?.Dispose(); tray?.Dispose();
-            workspace.Dispose(); await controller.DisposeAsync(); historyWindow?.Close(); overlay.Close(); _ = Dispatcher.BeginInvoke(Close);
+            if (shutdownReady) return;
+            e.Cancel = true;
+            Hide();
         };
         StateChanged += (_, _) => { if (WindowState == WindowState.Minimized) Hide(); };
+    }
+    private void RestoreFromTray()
+    {
+        if (closing) return;
+        Show();
+        if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
+        Activate();
+    }
+    private async Task ExitApplication()
+    {
+        if (closing) return;
+        closing = true;
+        diagnosticsTimer.Stop(); input?.Dispose();
+        if (tray is not null) { tray.Visible = false; tray.Dispose(); }
+        try { workspace.Dispose(); await controller.DisposeAsync(); }
+        finally
+        {
+            historyWindow?.Close(); overlay.Close(); shutdownReady = true; Close();
+        }
     }
     private void RefreshOverlayVisibility()
     {
@@ -274,7 +293,7 @@ internal sealed partial class MainWindow : Window
     {
         Loaded -= OnLoaded;
         // UI checks may run beside the user's listener without installing input hooks or hotkeys.
-        if (Environment.GetCommandLineArgs().Contains("--ui-smoke")) { RefreshDevices(); _ = RunScreenshotSmoke(); return; }
+        if (Environment.GetCommandLineArgs().Contains("--ui-smoke")) { InitializeTray(); RefreshDevices(); _ = RunScreenshotSmoke(); return; }
         overlay.SetWorkspace(workspace);
         try
         {
@@ -288,18 +307,22 @@ internal sealed partial class MainWindow : Window
         // Playback device enumeration must not delay registration of the global shortcuts.
         RefreshDevices();
         UpdateDiagnostics();
+        InitializeTray();
+        if (Environment.GetCommandLineArgs().Contains("--performance-smoke"))
+            _ = PerformanceSmoke();
+    }
+    private void InitializeTray()
+    {
         var menu = BrandAssets.TrayMenu();
-        menu.Items.Add("打开设置", null, (_, _) => Dispatcher.Invoke(() => { Show(); WindowState = WindowState.Normal; Activate(); }));
+        menu.Items.Add("打开设置", null, (_, _) => Dispatcher.Invoke(RestoreFromTray));
         menu.Items.Add("开启 / 关闭监听", null, (_, _) => Dispatcher.InvokeAsync(async () => await controller.Toggle()));
         menu.Items.Add("打开监听浮窗", null, (_, _) => Dispatcher.InvokeAsync(async () => await EnterInteraction()));
         menu.Items.Add("移动浮窗", null, (_, _) => Dispatcher.InvokeAsync(async () => await EnterInteraction(move: true)));
         menu.Items.Add("恢复顶部居中", null, (_, _) => Dispatcher.Invoke(overlay.RestoreTopCenter));
         menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
-        menu.Items.Add("退出", null, (_, _) => Dispatcher.Invoke(Close));
+        menu.Items.Add("退出", null, (_, _) => Dispatcher.InvokeAsync(async () => await ExitApplication()));
         tray = new System.Windows.Forms.NotifyIcon { Text = BrandAssets.AppName + " · 监听已关闭", Icon = BrandAssets.TrayIcon, ContextMenuStrip = menu, Visible = true };
-        tray.DoubleClick += (_, _) => Dispatcher.Invoke(() => { Show(); WindowState = WindowState.Normal; Activate(); });
-        if (Environment.GetCommandLineArgs().Contains("--performance-smoke"))
-            _ = PerformanceSmoke();
+        tray.DoubleClick += (_, _) => Dispatcher.Invoke(RestoreFromTray);
     }
     private async void SaveSettings(object sender, RoutedEventArgs e)
     {
@@ -430,7 +453,7 @@ internal sealed partial class MainWindow : Window
         {
             File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "smoke-error.txt"), ex.ToString());
             JsonFile.Write(Path.Combine(AppContext.BaseDirectory, "ui-smoke.json"), new { passed = false, error = ex.ToString() });
-            Close();
+            await ExitApplication();
         }
     }
     private async Task ScreenshotSmoke()
@@ -899,14 +922,16 @@ internal sealed partial class MainWindow : Window
         var adaptivePassed = largeWidth >= smallWidth && overflowHeight <= maximumHeight + 1 &&
             !paginationPresent && allCandidatesReachable && allHistoryReachable && settingsFit.Values.All(fit => fit) &&
             shrunkAgain && historyOnScreen && centered && topAnchored && staysInGame && !overflowNeedsScroll;
-        var passed = adaptivePassed && comparisonFits && listeningDesignVisible && waitingViewVisible && liveThirteen && liveReplayPausesSampling && listeningThirteen && groupedFifteen && listeningOnePage && tileButtonsRight && imagesKeepAspect && backgroundsShown && commonGroupFits && noUnusedColumn && cardsCompact && largestGroupFits && editorFontPreservesText && operationFit.Values.All(fit => fit) && samePin && unlocked &&
+        var manualPlacement = await CheckManualPlacement();
+        var trayLifecycle = await CheckTrayLifecycle();
+        var passed = manualPlacement.Values.All(value => value) && trayLifecycle.Values.All(value => value) && adaptivePassed && comparisonFits && listeningDesignVisible && waitingViewVisible && liveThirteen && liveReplayPausesSampling && listeningThirteen && groupedFifteen && listeningOnePage && tileButtonsRight && imagesKeepAspect && backgroundsShown && commonGroupFits && noUnusedColumn && cardsCompact && largestGroupFits && editorFontPreservesText && operationFit.Values.All(fit => fit) && samePin && unlocked &&
             nearControlRemoved && replayStarted && replayStopped && referenceStarted && referenceStopped && capturePausedDuringReplay &&
             stopFollowsPlayback && liveFresh && liveStale && followUpMarked && menusStyled &&
             (liveStyles & (0x20 | 0x08000000)) == 0x08000000 && preserved &&
             (interactiveStyles & (0x20 | 0x08000000)) == 0 && (restoredStyles & (0x20 | 0x08000000)) == 0x08000000;
         JsonFile.Write(Path.Combine(AppContext.BaseDirectory, "ui-smoke.json"), new
         {
-            passed,
+            passed, manualPlacement, trayLifecycle,
             images = library.Items.Count(i => i.Thumbnail is not null && File.Exists(Path.Combine(libraryRoot, i.Thumbnail))),
             clickThrough = (liveStyles & 0x20) != 0, noActivate = (liveStyles & 0x08000000) != 0,
             layered = (liveStyles & 0x80000) != 0, topmost = overlay.Topmost,
@@ -929,7 +954,79 @@ internal sealed partial class MainWindow : Window
             note = "仅桌面浮窗属性与渲染检查，未在游戏中测试输入或独占全屏覆盖"
         });
         if (Environment.GetCommandLineArgs().Contains("--ui-hold")) { await EnterInteraction(demoSnapshot); return; }
-        Close();
+        Closed += (_, _) => JsonFile.Write(Path.Combine(AppContext.BaseDirectory, "ui-tray-exit-smoke.json"), new
+        {
+            passed = closing && shutdownReady && tray?.Visible == false && !diagnosticsTimer.IsEnabled,
+            exitedFromTray = true, windowClosed = true, trayRemoved = tray?.Visible == false
+        });
+        tray!.ContextMenuStrip!.Items.Cast<System.Windows.Forms.ToolStripItem>().Single(item => item.Text == "退出").PerformClick();
+    }
+    private async Task<Dictionary<string, bool>> CheckTrayLifecycle()
+    {
+        var checks = new Dictionary<string, bool>();
+        var handle = new WindowInteropHelper(this).Handle;
+        void OpenFromTray() => tray!.ContextMenuStrip!.Items.Cast<System.Windows.Forms.ToolStripItem>()
+            .Single(item => item.Text == "打开设置").PerformClick();
+        Descendants<Button>(this).Single(button => System.Windows.Automation.AutomationProperties.GetName(button) == "关闭到托盘")
+            .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        await Task.Delay(100);
+        checks["captionCloseHides"] = !IsVisible && !closing && tray?.Visible == true && diagnosticsTimer.IsEnabled;
+        OpenFromTray(); await Task.Delay(100);
+        checks["trayRestoresSameWindow"] = IsVisible && WindowState != WindowState.Minimized && new WindowInteropHelper(this).Handle == handle;
+        Close(); await Task.Delay(100);
+        checks["nativeCloseHides"] = !IsVisible && !closing && tray?.Visible == true;
+        OpenFromTray(); WindowState = WindowState.Minimized; await Task.Delay(100);
+        checks["minimizeHides"] = !IsVisible && !closing && tray?.Visible == true;
+        OpenFromTray(); await Task.Delay(100);
+        checks["restoreAfterMinimize"] = IsVisible && WindowState == WindowState.Normal && !closing;
+        return checks;
+    }
+    private async Task<Dictionary<string, bool>> CheckManualPlacement()
+    {
+        var checks = new Dictionary<string, bool>();
+        var original = (settings.PositionMode, settings.Left, settings.Top, settings.MonitorName, settings.MonitorOffsetX, settings.MonitorOffsetY);
+        var dpi = VisualTreeHelper.GetDpi(overlay);
+        var work = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(overlay).Handle).WorkingArea;
+        try
+        {
+            double? manualHeight = null;
+            foreach (var (edge, point) in new[]
+            {
+                ("left", new Point(work.Left - 180 * dpi.DpiScaleX, work.Top + 120 * dpi.DpiScaleY)),
+                ("right", new Point(work.Right - 80 * dpi.DpiScaleX, work.Top + 120 * dpi.DpiScaleY)),
+                ("bottom", new Point(work.Left + 120 * dpi.DpiScaleX, work.Bottom - 70 * dpi.DpiScaleY)),
+                ("top", new Point(work.Left + 120 * dpi.DpiScaleX, work.Top - 80 * dpi.DpiScaleY))
+            })
+            {
+                NativeInput.PositionOverlay(overlay, point.X, point.Y); overlay.RememberManualPosition();
+                // Round-trip the saved preferences, then let the placement timer run.
+                var saved = System.Text.Json.JsonSerializer.Deserialize<Settings>(
+                    System.Text.Json.JsonSerializer.Serialize(settings, JsonFile.Options), JsonFile.Options)!;
+                overlay.Apply(saved); await Task.Delay(350);
+                var actual = NativeInput.WindowPixels(overlay);
+                checks[edge + "RemainsOutside"] = Math.Abs(actual.Left - point.X) <= 1 && Math.Abs(actual.Top - point.Y) <= 1;
+                manualHeight ??= overlay.MaxHeight;
+                checks[edge + "KeepsHeightBudget"] = Math.Abs(overlay.MaxHeight - manualHeight.Value) <= 1;
+                overlay.Apply(settings);
+            }
+        }
+        finally
+        {
+            (settings.PositionMode, settings.Left, settings.Top, settings.MonitorName, settings.MonitorOffsetX, settings.MonitorOffsetY) = original;
+            overlay.Apply(settings);
+        }
+        var mainOrigin = NativeInput.WindowPixels(this);
+        NativeInput.PositionOverlay(this, work.Left - 120 * dpi.DpiScaleX, mainOrigin.Top);
+        var originalWidth = Width; Width += 1; await Task.Delay(80);
+        checks["mainWindowMayExtendOutside"] = NativeInput.WindowPixels(this).Left < work.Left - 100 * dpi.DpiScaleX;
+        Width = originalWidth; NativeInput.PositionOverlay(this, mainOrigin.Left, mainOrigin.Top);
+        var history = new HistoryWindow(controller.History, libraryRoot, settings) { Owner = this };
+        history.Show(); await Task.Delay(80);
+        NativeInput.PositionOverlay(history, work.Left - 120 * dpi.DpiScaleX, work.Top + 80 * dpi.DpiScaleY);
+        history.Width += 1; await Task.Delay(80);
+        checks["historyResizeKeepsManualPosition"] = NativeInput.WindowPixels(history).Left < work.Left - 100 * dpi.DpiScaleX;
+        history.Close();
+        return checks;
     }
     private static IEnumerable<T> Descendants<T>(DependencyObject parent) where T : DependencyObject
     {
@@ -968,7 +1065,7 @@ internal sealed partial class MainWindow : Window
             cpuPercentOfOneCore = cpu / clock.Elapsed.TotalMilliseconds * 100,
             workingSetMiB = own.WorkingSet64 / 1048576.0, privateBytesMiB = own.PrivateMemorySize64 / 1048576.0
         });
-        Close();
+        await ExitApplication();
     }
     private sealed class UniformGridCompat : System.Windows.Controls.Primitives.UniformGrid
     { public UniformGridCompat(int columns) { Columns = columns; } }

@@ -1,6 +1,26 @@
 # 当前接续状态 · 2026-10-15
 
-**拾点 v0.5.2.1 · 软件更名（最新）**：用户要求将软件更名为“拾点”，改好后打包并发布 0.5.2.1。主窗口、侧栏、托盘、监听浮窗、提示与 Windows 产品元数据使用 BrandAssets.AppName“拾点”；便携启动文件为 拾点.exe。内部托管程序集继续使用 AqtwListener，以保持资源与数据兼容；单实例互斥标识保持兼容，查找已有窗口同时支持新旧进程名。设置、录音及个人库继续位于 portable/local-data。
+**当前发布：行商助手 v0.5.2.1**。用户在图标清晰度、关闭到托盘与自由定位修正完成后，明确要求按 0.5.2.1 重新打包并发布。发布说明以 [v0.5.2.1](../releases/v0.5.2.1.md) 为准；发布构建目录为 `.tools/release/v0.5.2.1-xingshang-20261015/package`，便携附件为 `artifacts/XingshangAssistant-v0.5.2.1-win-x64.zip`，GitHub 目标为 https://github.com/affs99887/aqtw-listener/releases/tag/v0.5.2.1 。版本标签 v0.5.2.1 用于本轮发布提交，原拾点版本的提交保留在 Git 历史；先前的撤回与本地版记录均为历史。保留 portable/local-data，不关闭正常运行实例。
+
+本轮核心回归 44/44、应用回归 63/63，记录为 `docs/measurements/release-v0.5.2.1-xingshang-{core,app}-20261015.json`。最终发布提交构建后使用隔离目录运行窗口检查，完整复核记录和发布包校验保存在 `artifacts/release-v0.5.2.1-xingshang-validation.json`；公开附件包含便携 ZIP 与 SHA256SUMS.txt。
+
+以下为本轮发布内容的实现与预览检查记录。
+
+**补充：图标清晰度**。用户反馈放大后的图标发糊；源 PNG 为 1254×1254，旧界面直接用默认缩放显示。主窗口标题栏、72 侧栏和监听浮窗现通过 `BrandAssets.CreateMark` 按当前显示器物理像素尺寸加载，采用高质量缩放，加载和 DPI 变化时刷新，并按像素尺寸缓存；原图哈希及 ICO 保持不变。100 / 125 / 150 / 200% 的 36 个后台渲染用于比较缩放方式，不等同于真实跨屏拖动实测。候选对照网页默认比例由 75% 改为 100%，保留缩小查看选项。
+
+上一轮本地成品 `.tools/release/xingshang-sharpness-20261015/package`，隔离检查目录同级 `smoke`；完整窗口与托盘退出检查通过，记录 `docs/measurements/xingshang-sharpness-*-20261015.json`。当前品牌预览截图已更新。此前仅同步 portable 与本地 ZIP；本轮重新发布安排见上文。
+
+**行商助手 · IND70 头盔图标与窗口行为修复**。按选定的 D 版透明成品更新 PNG 和 ICO；PNG SHA-256 为 `F9B45B0D14A33652813152F71C10B3EAFFB4EC46DF700A38C2F9B623E17D771D`，未重绘，镜片暗部保留。主窗口、浮窗、托盘和产品元数据统一为“行商助手”，便携启动文件为 `portable/行商助手.exe`，内部程序集与数据路径保持兼容。侧栏图标由 47 放大到 72 逻辑像素。版本号保持 0.5.2.1；此前 GitHub Release 曾按用户要求删除，旧标签在本轮重新发布时更新到当前代码。
+
+右上角关闭与普通窗口关闭恢复为隐藏到托盘，监听状态和资源保留；托盘菜单“退出”才释放资源并结束程序。自定义浮窗位置不再限制坐标或拖回屏幕内，允许负的显示器相对偏移；靠近底边不会压缩高度，托盘“恢复顶部居中”可找回浮窗。历史等内容窗口尺寸变化不再强制回收位置。
+
+验证：应用回归 63/63、完整桌面 `--ui-smoke` 通过；关闭/恢复/最小化/托盘退出、浮窗四边越界后定时定位和设置重载、主窗口越界以及历史窗口尺寸变化的定位检查均通过。记录见 `docs/measurements/xingshang-window-*-20261015.json`。图标、九档 ICO 尺寸和更新后的实际窗口截图见 [当前品牌预览](../design/brand/ind70-2026-10-15/index.html)。本地候选对照页 `artifacts/candidate-width-study/preview.html` 使用新名称和头盔图标，保留 63 组、23 类、150 件物品预览。桌面检查不等于游戏内独占全屏验证。
+
+**介绍网站交接**：侧会话已将拾点介绍页部署到 https://affs99887.github.io/aqtw-listener/ ，使用独立 `gh-pages` 分支。网页项目、发布检出、验证记录和维护流程见 [WEBSITE-GITHUB-PAGES.md](WEBSITE-GITHUB-PAGES.md)。交接时固定下载链接仍为 v0.5.2；软件现名为行商助手，v0.5.2.1 已安排重新发布，后续维护官网时需核对名称、图标和链接。本次没有重复部署或修改公网网站。
+
+以下为此前的发布与设计记录。
+
+**拾点 v0.5.2.1 · 软件更名（历史，Release 已撤下）**：用户要求将软件更名为“拾点”，改好后打包并发布 0.5.2.1。主窗口、侧栏、托盘、监听浮窗、提示与 Windows 产品元数据使用 BrandAssets.AppName“拾点”；便携启动文件为 拾点.exe。内部托管程序集继续使用 AqtwListener，以保持资源与数据兼容；单实例互斥标识保持兼容，查找已有窗口同时支持新旧进程名。设置、录音及个人库继续位于 portable/local-data。
 
 发布说明：docs/releases/v0.5.2.1.md；构建目录 .tools/release/v0.5.2.1；压缩包 artifacts/Shidian-v0.5.2.1-win-x64.zip；目标 Release：https://github.com/affs99887/aqtw-listener/releases/tag/v0.5.2.1。界面与产品属性检查使用更名后的启动文件运行。portable 同步更新；旧启动文件转存 .tools/rollback/v0.5.2.1，保留用户数据。
 

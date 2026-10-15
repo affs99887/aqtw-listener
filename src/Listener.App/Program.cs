@@ -42,7 +42,7 @@ internal static class Program
     }
     private static bool ShowRunningWindow()
     {
-        foreach (var name in new[] { BrandAssets.AppName, "AqtwListener" })
+        foreach (var name in new[] { BrandAssets.AppName, "拾点", "AqtwListener" })
         foreach (var process in Process.GetProcessesByName(name))
         {
             using (process)

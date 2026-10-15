@@ -6,10 +6,10 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>disable</ImplicitUsings>
     <AssemblyName>AqtwListener</AssemblyName>
-    <Title>拾点</Title>
-    <AssemblyTitle>拾点</AssemblyTitle>
-    <Product>拾点</Product>
-    <Description>拾点 · 物品音效识别与同音候选浮窗</Description>
+    <Title>行商助手</Title>
+    <AssemblyTitle>行商助手</AssemblyTitle>
+    <Product>行商助手</Product>
+    <Description>行商助手 · 物品音效识别与同音候选浮窗</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets/listener.ico</ApplicationIcon>
   </PropertyGroup>
