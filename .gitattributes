@@ -1,0 +1,3 @@
+# The update files are signed byte for byte; the installer must stay identical to the release.
+update/** -text
+download/** binary
