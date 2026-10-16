@@ -10,7 +10,7 @@ $assets = @($release.assets | Where-Object { $_.name -match 'win-x64\.zip$' -and
 if ($release.draft -or $assets.Count -ne 1) { throw 'Expected one published Windows x64 portable archive.' }
 $download = $assets[0].browser_download_url
 $separator = if ($Url.Contains('?')) { '&' } else { '?' }
-$response = Invoke-WebRequest -Uri ($Url + $separator + 'release-check=' + [DateTimeOffset]::UtcNow.ToUnixTimeSeconds())
+$response = Invoke-WebRequest -UseBasicParsing -Uri ($Url + $separator + 'release-check=' + [DateTimeOffset]::UtcNow.ToUnixTimeSeconds())
 $html = $response.Content
 $hrefs = @([regex]::Matches($html, 'href="([^"]+)"') | ForEach-Object { [Net.WebUtility]::HtmlDecode($_.Groups[1].Value) })
 $downloads = @($hrefs | Where-Object { $_ -match '^https://github\.com/[^/]+/[^/]+/releases/download/.+\.zip(?:[?#].*)?$' })

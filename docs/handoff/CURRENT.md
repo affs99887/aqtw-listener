@@ -1,13 +1,13 @@
 # 当前接续状态 · 2026-10-16
 
-**当前发布：行商助手 v0.6.0（展示物品、共享数据目录与更新器）**。用户要求提交并发布，同步在线介绍页。发布说明见 [v0.6.0](../releases/v0.6.0.md)，便携附件 `XingshangAssistant-v0.6.0-win-x64.zip` 与 `SHA256SUMS.txt`，构建目录 `.tools/release/v0.6.0/package`；portable 已同步，覆盖前的旧程序在 `.tools/rollback/portable-20261016-before-display-items`。以下为本轮实现记录。用户反馈候选太多，要求可预先勾选浮窗显示的物品；配置按声音分类、区分红金紫，默认全选；配置与全部用户数据跨版本通用；并加入更新器。用户选择：大红概率仍按全部候选计算并注明未显示件数；设置、展示配置、个人库、录音全部共享；启动自动检查、一键下载校验替换并重启。
+**当前发布：行商助手 v0.6.0（展示物品、共享数据目录与更新器）**。用户要求提交并发布，同步在线介绍页。发布说明见 [v0.6.0](../releases/v0.6.0.md)，便携附件 `XingshangAssistant-v0.6.0-win-x64.zip` 与 `SHA256SUMS.txt`，构建目录 `.tools/release/v0.6.0/package`。标签 v0.6.0 对应 `d9149d636ff489c452781e6c667abeeffc8e9c81`，Release：https://github.com/affs99887/aqtw-listener/releases/tag/v0.6.0 ，ZIP SHA-256 `b015e010cf81caddf68e732ad53b53bea84d3ca920cfe62f93f5499ac0189f0e`（129,369,748 字节），GitHub 返回的附件摘要一致。介绍页 `gh-pages` 提交 `39e6f96921baaecd83e7c0c14527e8312931684b`，现网检查通过。portable 为发布前用户关闭助手时同步的同功能构建（显示版本仍为 0.5.2.1，覆盖前旧程序在 `.tools/rollback/portable-20261016-before-display-items`）；发布时助手正从 portable 运行，未覆盖，可由应用内更新器升级到 v0.6.0。以下为本轮实现记录。用户反馈候选太多，要求可预先勾选浮窗显示的物品；配置按声音分类、区分红金紫，默认全选；配置与全部用户数据跨版本通用；并加入更新器。用户选择：大红概率仍按全部候选计算并注明未显示件数；设置、展示配置、个人库、录音全部共享；启动自动检查、一键下载校验替换并重启。
 
 - 数据：`UserData`（`src/Listener.App/UserData.cs`）根目录 `%LOCALAPPDATA%\AqtwListener`，`AQTW_DATA_DIR` 可覆盖；`--ui-smoke` / `--performance-smoke` 使用程序目录 `check-data` 隔离目录，应用测试启动即隔离到临时目录。首次正常启动时若共享目录为空，复制（不移动）程序目录 `local-data`，写 `migrated.json`。`Settings.FilePath`、个人库、诊断导出都已改到共享目录。
 - 展示配置：`Listener.Core.DisplayFilter` 存隐藏 ID（新物品默认显示），`DisplayPreferences` 读写 `display.json` 并在变化时通知；`CandidatePanel` 只为勾选物品出卡片，`cellStats` 保留每格全部候选用于大红概率与“另有 N 件未显示”，整格隐藏仍保留分区。物品图鉴不过滤。
 - 声音分类：`Listener.Core.SoundClasses` 合并共用物品或参考录音的拾取组（23 类，花瓶与变异体样本因共用视频参考合并），类内 红→金→紫→蓝、格数大优先；类名取自“…类”组名，否则首件物品名。
 - 页面：`DisplayItemsPage`（侧栏“展示物品”）——汇总、按稀有度切换、三个预设、搜索、每类三态勾选与各稀有度计数；类内先按格数分区（整格切换，“N 件 · 显示 M”），格内按 红→金→紫→蓝 分行（整行切换），与浮窗分区一致；即时保存。物品图片统一由 `ItemPictures` 绘制（含透明图稀有度底色）。
 - 更新器：`Updater` 读 `releases/latest`，找 `*-win-x64.zip` 与 `SHA256SUMS*`，校验后解包到 `%TEMP%\AqtwListener-update`，写 UTF-8 BOM 的 `install.ps1`：等待进程退出、备份程序文件（不含 local-data）、整体替换 `library`、robocopy 覆盖、失败回滚并启动旧版、成功启动新版，日志 `update.log` 在共享目录。主窗口顶部横幅（立即更新 / 更新说明 / 跳过此版本），“诊断”页有版本、自动检查开关、手动检查与数据目录。程序文件夹不可写时打开下载页。
-- 验证：应用测试 71 项，含联网演练（`AQTW_NETWORK_TESTS=1`：取 v0.5.2.1、下载 132 MB、校验、解包通过）与安装脚本端到端（`AQTW_WINDOW_TESTS=1`：成功替换音效库并保留 local-data；复制失败时回滚旧版）；核心测试通过；用户允许后完整 `--ui-smoke` 通过，含展示物品页，未写入用户数据目录。离屏渲染 `display-items-page*.png`、`display-filter-overlay.png`。尚未发布；发布时按 `AGENTS.md` 同步介绍页。
+- 验证：应用测试 71 项，含联网演练（`AQTW_NETWORK_TESTS=1`：取 v0.5.2.1、下载 132 MB、校验、解包通过）与安装脚本端到端（`AQTW_WINDOW_TESTS=1`：成功替换音效库并保留 local-data；复制失败时回滚旧版）；核心测试通过；用户允许后完整 `--ui-smoke` 通过，含展示物品页，未写入用户数据目录。离屏渲染 `display-items-page*.png`、`display-filter-overlay.png`。介绍页三个下载按钮、首屏版本、页脚更新记录改为 v0.6.0，新增“候选太多，看不过来怎么办？”，“更新软件时，个人资料怎么办？”改为一键更新与共享数据目录；演示数据按 v0.6.0 重新生成。`scripts/check-introduction-release.ps1` 的网页请求加 `-UseBasicParsing`，Windows PowerShell 5.1 不再因 IE 解析引擎报空引用。
 
 以下为 2026-10-15 的状态记录。
 
@@ -31,7 +31,7 @@
 
 验证：应用回归 63/63、完整桌面 `--ui-smoke` 通过；关闭/恢复/最小化/托盘退出、浮窗四边越界后定时定位和设置重载、主窗口越界以及历史窗口尺寸变化的定位检查均通过。记录见 `docs/measurements/xingshang-window-*-20261015.json`。图标、九档 ICO 尺寸和更新后的实际窗口截图见 [当前品牌预览](../design/brand/ind70-2026-10-15/index.html)。本地候选对照页 `artifacts/candidate-width-study/preview.html` 使用新名称和头盔图标，保留 63 组、23 类、150 件物品预览。桌面检查不等于游戏内独占全屏验证。
 
-**介绍网站交接（历史）**：原拾点介绍页采用独立 `gh-pages` 分支部署。当前已按用户要求同步为行商助手 v0.5.2.1，下载链接和维护方法以上文与 [维护记录](WEBSITE-GITHUB-PAGES.md) 为准。
+**介绍网站交接（历史）**：原拾点介绍页采用独立 `gh-pages` 分支部署。之后已按用户要求同步为行商助手（现为 v0.6.0），下载链接和维护方法以上文与 [维护记录](WEBSITE-GITHUB-PAGES.md) 为准。
 
 以下为此前的发布与设计记录。
 
