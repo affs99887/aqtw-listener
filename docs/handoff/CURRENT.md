@@ -5,9 +5,9 @@
 - 数据：`UserData`（`src/Listener.App/UserData.cs`）根目录 `%LOCALAPPDATA%\AqtwListener`，`AQTW_DATA_DIR` 可覆盖；`--ui-smoke` / `--performance-smoke` 使用程序目录 `check-data` 隔离目录，应用测试启动即隔离到临时目录。首次正常启动时若共享目录为空，复制（不移动）程序目录 `local-data`，写 `migrated.json`。`Settings.FilePath`、个人库、诊断导出都已改到共享目录。
 - 展示配置：`Listener.Core.DisplayFilter` 存隐藏 ID（新物品默认显示），`DisplayPreferences` 读写 `display.json` 并在变化时通知；`CandidatePanel` 只为勾选物品出卡片，`cellStats` 保留每格全部候选用于大红概率与“另有 N 件未显示”，整格隐藏仍保留分区。物品图鉴不过滤。
 - 声音分类：`Listener.Core.SoundClasses` 合并共用物品或参考录音的拾取组（23 类，花瓶与变异体样本因共用视频参考合并），类内 红→金→紫→蓝、格数大优先；类名取自“…类”组名，否则首件物品名。
-- 页面：`DisplayItemsPage`（侧栏“展示物品”）——汇总、按稀有度切换、三个预设、搜索、每类三态勾选与各稀有度计数、类内按稀有度分行的物品方块，即时保存。物品图片统一由 `ItemPictures` 绘制（含透明图稀有度底色）。
+- 页面：`DisplayItemsPage`（侧栏“展示物品”）——汇总、按稀有度切换、三个预设、搜索、每类三态勾选与各稀有度计数；类内先按格数分区（整格切换，“N 件 · 显示 M”），格内按 红→金→紫→蓝 分行（整行切换），与浮窗分区一致；即时保存。物品图片统一由 `ItemPictures` 绘制（含透明图稀有度底色）。
 - 更新器：`Updater` 读 `releases/latest`，找 `*-win-x64.zip` 与 `SHA256SUMS*`，校验后解包到 `%TEMP%\AqtwListener-update`，写 UTF-8 BOM 的 `install.ps1`：等待进程退出、备份程序文件（不含 local-data）、整体替换 `library`、robocopy 覆盖、失败回滚并启动旧版、成功启动新版，日志 `update.log` 在共享目录。主窗口顶部横幅（立即更新 / 更新说明 / 跳过此版本），“诊断”页有版本、自动检查开关、手动检查与数据目录。程序文件夹不可写时打开下载页。
-- 验证：应用测试 69 项 + 联网演练（`AQTW_NETWORK_TESTS=1`：取 v0.5.2.1、下载 132 MB、校验、解包通过）；核心测试通过；离屏渲染 `display-items-page*.png`、`display-filter-overlay.png`。待用户允许弹窗后跑完整 `--ui-smoke` 与安装脚本端到端演练。
+- 验证：应用测试 71 项，含联网演练（`AQTW_NETWORK_TESTS=1`：取 v0.5.2.1、下载 132 MB、校验、解包通过）与安装脚本端到端（`AQTW_WINDOW_TESTS=1`：成功替换音效库并保留 local-data；复制失败时回滚旧版）；核心测试通过；用户允许后完整 `--ui-smoke` 通过，含展示物品页，未写入用户数据目录。离屏渲染 `display-items-page*.png`、`display-filter-overlay.png`。尚未发布；发布时按 `AGENTS.md` 同步介绍页。
 
 以下为 2026-10-15 的状态记录。
 
