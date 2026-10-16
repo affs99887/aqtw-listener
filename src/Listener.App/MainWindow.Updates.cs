@@ -79,7 +79,7 @@ internal sealed partial class MainWindow
         try
         {
             using var http = Updater.CreateClient();
-            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(manual ? 20 : 10));
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(manual ? 30 : 20));
             var latest = await Updater.Latest(http, timeout.Token);
             settings.LastUpdateCheck = DateTimeOffset.Now; SaveQuietly();
             if (latest is null || !Updater.IsNewer(latest.Version, Updater.Current))
@@ -93,7 +93,7 @@ internal sealed partial class MainWindow
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or System.Text.Json.JsonException or InvalidOperationException or KeyNotFoundException)
         {
-            updateStatus.Text = "检查更新失败：" + (ex is TaskCanceledException ? "连接 GitHub 超时，可稍后重试或打开下载页" : ex.Message);
+            updateStatus.Text = "检查更新失败：" + (ex is TaskCanceledException ? "连接更新服务器超时，可稍后重试或打开下载页" : ex.Message);
             updateStatus.Foreground = Theme.Alert;
         }
     }
@@ -105,7 +105,7 @@ internal sealed partial class MainWindow
         var size = latest.Package is { Size: > 0 } package ? $" · {package.Size / 1048576d:0} MB" : "";
         updateDetail.Text = $"{latest.Name}{size} · 当前 v{Updater.Current}。更新会下载并校验后替换本文件夹的程序，设置和个人库不受影响，完成后自动重启。";
         updateBanner.Visibility = Visibility.Visible;
-        installButton!.IsEnabled = latest.Package is not null && latest.Checksums is not null;
+        installButton!.IsEnabled = latest.Package is not null && (latest.Sha256 is not null || latest.Checksums is not null);
         updateStatus.Text = $"发现新版本 {latest.Tag}";
         // Only point it out from the tray when the game is not in front.
         if (!IsVisible && !controller.Foreground && tray is not null)

@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Text.Json;
 using System.Windows.Threading;
 using Listener.App;
@@ -215,12 +217,75 @@ internal static class Program
                 Check(release.Version == new Version(0, 6, 0) && release.Package?.Url == "https://example/z" && release.Checksums?.Url == "https://example/s", "release parsing");
                 var hash = new string('a', 64);
                 Check(Updater.ExpectedHash($"{hash}  XingshangAssistant-v0.6.0-win-x64.zip\n{new string('b', 64)}  other.zip\n", "XingshangAssistant-v0.6.0-win-x64.zip") == hash, "checksum lookup");
-                var urls = Updater.DownloadUrls("https://github.com/affs99887/aqtw-listener/releases/download/v0.5.3/XingshangAssistant-v0.5.3-win-x64.zip").ToArray();
-                Check(urls.Length == Updater.DownloadMirrors.Length + 1 && urls[0].StartsWith(Updater.DownloadMirrors[0]) && urls[^1].StartsWith("https://github.com/"), "mirrors come first and the GitHub URL stays last");
-                Check(Updater.DownloadUrls("https://example/z").Single() == "https://example/z", "a non-GitHub URL is left unchanged");
                 var script = Updater.InstallScript(@"C:\临时\pkg", @"C:\Users\O'Neil\行商助手", 4242, "行商助手.exe", @"C:\Users\O'Neil\行商助手\行商助手.exe", @"C:\t\rollback", @"C:\d\update.log");
                 Check(script.Contains("'C:\\Users\\O''Neil\\行商助手'") && script.Contains("Get-Process -Id 4242") && script.Contains("'/XD'") && script.Contains("restored the previous version"),
                     "install script does not quote paths, wait for the process, keep local-data or roll back");
+            }),
+            ("更新清单：签名才可信；两处清单取较新的一份，都不可用时退回 GitHub；下载依次换源直到校验通过", () =>
+            {
+                using var key = System.Security.Cryptography.ECDsa.Create(System.Security.Cryptography.ECCurve.NamedCurves.nistP256);
+                var publicKey = Convert.ToBase64String(key.ExportSubjectPublicKeyInfo());
+                var package = TestPackage();
+                var sha256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(package)).ToLowerInvariant();
+                byte[] Manifest(string tag, params string[] urls) => System.Text.Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new
+                {
+                    schema = 1, tag, name = tag + " · 测试", notes = "说明", page = "https://gitee.com/x/y/releases",
+                    package = new { name = "XingshangAssistant-test-win-x64.zip", size = package.Length, sha256, urls }
+                }));
+                string Sign(byte[] body) => Convert.ToBase64String(key.SignData(body, System.Security.Cryptography.HashAlgorithmName.SHA256));
+
+                var body = Manifest("v9.1.0", "https://a/z.zip", "http://plain/z.zip", "https://b/z.zip");
+                var release = Updater.ParseManifest(body, Sign(body), publicKey);
+                Check(release is { Version.Major: 9, Tag: "v9.1.0", Sha256.Length: 64 } && release.PackageUrls.SequenceEqual(["https://a/z.zip", "https://b/z.zip"]) && release.Package!.Size == package.Length,
+                    "a signed manifest was not read, or a plain-http source was kept");
+                var tampered = (byte[])body.Clone(); tampered[^3] ^= 1;
+                Check(Updater.ParseManifest(tampered, Sign(body), publicKey) is null, "a changed manifest was accepted");
+                using var other = System.Security.Cryptography.ECDsa.Create(System.Security.Cryptography.ECCurve.NamedCurves.nistP256);
+                Check(Updater.ParseManifest(body, Sign(body), Convert.ToBase64String(other.ExportSubjectPublicKeyInfo())) is null, "a manifest signed by another key was accepted");
+                Check(Updater.ParseManifest(body, Sign(body)) is null, "a manifest signed by the test key passed the shipped key");
+                var onlyPlain = Manifest("v9.1.0", "http://plain/z.zip");
+                Check(Updater.ParseManifest(onlyPlain, Sign(onlyPlain), publicKey) is null, "a manifest without an https source was accepted");
+
+                var older = Manifest("v9.0.0", "https://a/z.zip"); var newer = Manifest("v9.2.0", "https://b/z.zip");
+                var routes = new Dictionary<string, Func<HttpResponseMessage>>
+                {
+                    [Updater.ManifestUrls[0]] = () => Bytes(older), [Updater.ManifestUrls[0] + ".sig"] = () => Text(Sign(older)),
+                    [Updater.ManifestUrls[1]] = () => Bytes(newer), [Updater.ManifestUrls[1] + ".sig"] = () => Text(Sign(newer)),
+                };
+                using (var http = new HttpClient(new Routes(routes)))
+                    Check(Updater.Latest(http, CancellationToken.None, publicKey).GetAwaiter().GetResult()?.Tag == "v9.2.0", "the newer of the two manifests was not chosen");
+                routes[Updater.ManifestUrls[0] + ".sig"] = () => Text(Sign(newer));
+                routes.Remove(Updater.ManifestUrls[1]);
+                routes[$"https://api.github.com/repos/{Updater.Repository}/releases/latest"] = () => Text("""
+                    {"tag_name":"v9.0.1","name":"GitHub","html_url":"https://example/r","draft":false,"assets":[]}
+                    """);
+                using (var http = new HttpClient(new Routes(routes)))
+                    Check(Updater.Latest(http, CancellationToken.None, publicKey).GetAwaiter().GetResult()?.Tag == "v9.0.1", "with no valid manifest the GitHub release was not used");
+
+                var download = Manifest("v9.3.0", "https://down/missing.zip", "https://down/wrong.zip", "https://down/right.zip");
+                var signedRelease = Updater.ParseManifest(download, Sign(download), publicKey)!;
+                var fetched = new List<string>();
+                var files = new Dictionary<string, Func<HttpResponseMessage>>
+                {
+                    ["https://down/wrong.zip"] = () => Bytes(TestPackage("not the release")),
+                    ["https://down/right.zip"] = () => Bytes(package),
+                };
+                using (var http = new HttpClient(new Routes(files, fetched)))
+                {
+                    var unpacked = Updater.Prepare(http, signedRelease, new Progress<double>(), CancellationToken.None).GetAwaiter().GetResult();
+                    Check(fetched.SequenceEqual(["https://down/missing.zip", "https://down/wrong.zip", "https://down/right.zip"]) && File.Exists(Path.Combine(unpacked, "library", "library.json")),
+                        "the download did not move on to the next source after a missing file and a wrong file: " + string.Join(", ", fetched));
+                }
+                files.Remove("https://down/right.zip"); fetched.Clear();
+                using (var http = new HttpClient(new Routes(files, fetched)))
+                {
+                    var refused = false;
+                    try { Updater.Prepare(http, signedRelease, new Progress<double>(), CancellationToken.None).GetAwaiter().GetResult(); }
+                    catch (InvalidDataException) { refused = true; }
+                    Check(refused, "a package whose hash matched no source was installed");
+                }
+                var testFolder = Path.Combine(Updater.WorkFolder, "9.3.0");
+                if (Directory.Exists(testFolder)) Directory.Delete(testFolder, true);
             }),
             ("旧配置默认开启声音识别，显式关闭仍有效", () =>
             {
@@ -1260,6 +1325,33 @@ internal static class Program
         return failed == 0 ? 0 : 1;
     }
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
+
+    // A portable package as small as Prepare accepts: a launcher and the bundled library.
+    private static byte[] TestPackage(string marker = "release")
+    {
+        using var buffer = new MemoryStream();
+        using (var zip = new System.IO.Compression.ZipArchive(buffer, System.IO.Compression.ZipArchiveMode.Create, leaveOpen: true))
+        {
+            using (var writer = new StreamWriter(zip.CreateEntry("行商助手.exe").Open())) writer.Write(marker);
+            using (var writer = new StreamWriter(zip.CreateEntry("library/library.json").Open())) writer.Write("{}");
+        }
+        return buffer.ToArray();
+    }
+    private static HttpResponseMessage Bytes(byte[] body) => new(HttpStatusCode.OK) { Content = new ByteArrayContent(body) };
+    private static HttpResponseMessage Text(string body) => new(HttpStatusCode.OK) { Content = new StringContent(body) };
+
+    // Answers only the listed URLs; anything else is a 404, as a missing file on a real server would be.
+    private sealed class Routes(Dictionary<string, Func<HttpResponseMessage>> routes, List<string>? fetched = null) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var url = request.RequestUri!.ToString();
+            lock (routes) fetched?.Add(url);
+            Func<HttpResponseMessage>? answer;
+            lock (routes) routes.TryGetValue(url, out answer);
+            return Task.FromResult(answer?.Invoke() ?? new HttpResponseMessage(HttpStatusCode.NotFound));
+        }
+    }
     private static void CheckCandidateCoverage(CandidatePanel panel, RecognitionResult result)
     {
         var expected = result.Candidates.Select(c => c.Item.Id).ToHashSet();

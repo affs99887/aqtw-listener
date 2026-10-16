@@ -9,28 +9,37 @@ using System.Text.Json;
 namespace Listener.App;
 
 internal sealed record ReleaseAsset(string Name, string Url, long Size);
-internal sealed record ReleaseInfo(Version Version, string Tag, string Name, string Notes, string Page, ReleaseAsset? Package, ReleaseAsset? Checksums);
+internal sealed record ReleaseInfo(Version Version, string Tag, string Name, string Notes, string Page, ReleaseAsset? Package, ReleaseAsset? Checksums)
+{
+    // Set when the release came from a signed latest.json: the package hash and every place it can be fetched from, in order.
+    public string? Sha256 { get; init; }
+    public IReadOnlyList<string> PackageUrls { get; init; } = [];
+}
 
-// Updates from the project's GitHub Releases: the newest release's Windows package is downloaded,
-// checked against the release's SHA256SUMS and unpacked; once the assistant has exited, a small
-// script copies it over this folder (local-data kept, the bundled library replaced as a whole),
-// rolls back on any failure, and starts the assistant again.
+// Finds the newest release, downloads its Windows package, checks the hash and unpacks it; once
+// the assistant has exited, a small script copies it over this folder (local-data kept, the
+// bundled library replaced as a whole), rolls back on any failure, and starts the assistant again.
+//
+// GitHub is often unreachable from mainland China, so the release is first looked up in a signed
+// latest.json kept on Gitee (and copied to GitHub Pages). The signature, not the server, is what
+// makes it trustworthy: its hash decides what may be installed. The GitHub Releases API with the
+// release's SHA256SUMS remains the last resort.
 internal static class Updater
 {
     public const string Repository = "affs99887/aqtw-listener";
-    public static string ReleasesPage => $"https://github.com/{Repository}/releases/latest";
-    // GitHub's download servers are slow or unreachable from parts of mainland China, so the file
-    // is fetched through public mirrors first. The mirrors only relay the bytes: the hash still
-    // comes from the release's own SHA256SUMS, and a mirror that fails or serves other content is
-    // skipped. These services are run by volunteers and can disappear, which is why the GitHub URL
-    // stays last in line.
-    public static readonly string[] DownloadMirrors = ["https://ghfast.top/", "https://gh-proxy.com/"];
-    public static IEnumerable<string> DownloadUrls(string url)
-    {
-        if (url.StartsWith("https://github.com/", StringComparison.Ordinal))
-            foreach (var mirror in DownloadMirrors) yield return mirror + url;
-        yield return url;
-    }
+    public const string GiteeRepository = "scape0goat/aqtw-listener";
+    public static string ReleasesPage => $"https://gitee.com/{GiteeRepository}/releases";
+    public static string GitHubReleasesPage => $"https://github.com/{Repository}/releases/latest";
+    public static readonly string[] ManifestUrls =
+    [
+        $"https://gitee.com/{GiteeRepository}/raw/master/latest.json",
+        "https://affs99887.github.io/aqtw-listener/update/latest.json",
+    ];
+    // ECDSA P-256, SubjectPublicKeyInfo. The private half lives only on the releasing machine (see scripts/update-manifest.cs).
+    public const string ManifestPublicKey = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE+OtniNnT68OmXQbwjyYIwUxrOvjJchXpK87UELasUWBQ7DICeltiVsLzAjpgud37vv+0P7b/VicdIcR2GXgS4g==";
+    private static readonly TimeSpan ManifestTimeout = TimeSpan.FromSeconds(8);
+    // A source that sends nothing for this long is abandoned so the next one can be tried.
+    private static readonly TimeSpan StallTimeout = TimeSpan.FromSeconds(30);
     public static string WorkFolder => Path.Combine(Path.GetTempPath(), "AqtwListener-update");
 
     public static Version Current { get; } = ParseVersion(typeof(Updater).Assembly
@@ -54,10 +63,53 @@ internal static class Updater
         return http;
     }
 
-    public static async Task<ReleaseInfo?> Latest(HttpClient http, CancellationToken cancellation)
+    public static async Task<ReleaseInfo?> Latest(HttpClient http, CancellationToken cancellation, string publicKey = ManifestPublicKey)
     {
+        // Both copies are asked at once; a stale or unreachable one simply loses to the other.
+        var signed = await Task.WhenAll(ManifestUrls.Select(url => TryManifest(http, url, publicKey, cancellation)));
+        if (signed.OfType<ReleaseInfo>().MaxBy(release => Normalise(release.Version)) is { } newest) return newest;
         var json = await http.GetStringAsync($"https://api.github.com/repos/{Repository}/releases/latest", cancellation);
         return ParseRelease(json);
+    }
+
+    private static async Task<ReleaseInfo?> TryManifest(HttpClient http, string url, string publicKey, CancellationToken cancellation)
+    {
+        using var limit = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
+        limit.CancelAfter(ManifestTimeout);
+        try
+        {
+            var body = await http.GetByteArrayAsync(url, limit.Token);
+            var signature = await http.GetStringAsync(url + ".sig", limit.Token);
+            return ParseManifest(body, signature, publicKey);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException or FormatException or JsonException
+            or KeyNotFoundException or InvalidOperationException or CryptographicException) { return null; }
+    }
+
+    // null unless the signature matches and the package entry is usable.
+    public static ReleaseInfo? ParseManifest(byte[] body, string signature, string publicKey = ManifestPublicKey)
+    {
+        using (var key = ECDsa.Create())
+        {
+            key.ImportSubjectPublicKeyInfo(Convert.FromBase64String(publicKey), out _);
+            if (!key.VerifyData(body, Convert.FromBase64String(signature.Trim()), HashAlgorithmName.SHA256)) return null;
+        }
+        using var document = JsonDocument.Parse(body);
+        var root = document.RootElement;
+        var tag = root.GetProperty("tag").GetString() ?? "";
+        if (ParseVersion(tag) is not { } version) return null;
+        var package = root.GetProperty("package");
+        var sha256 = package.GetProperty("sha256").GetString()?.ToLowerInvariant() ?? "";
+        if (sha256.Length != 64 || !sha256.All(Uri.IsHexDigit)) return null;
+        var urls = package.GetProperty("urls").EnumerateArray().Select(url => url.GetString() ?? "")
+            .Where(url => url.StartsWith("https://", StringComparison.Ordinal)).ToArray();
+        if (urls.Length == 0) return null;
+        string Text(JsonElement element, string name, string fallback) =>
+            element.TryGetProperty(name, out var value) && value.GetString() is { Length: > 0 } text ? text : fallback;
+        var asset = new ReleaseAsset(Text(package, "name", Path.GetFileName(urls[0])), urls[0],
+            package.TryGetProperty("size", out var size) ? size.GetInt64() : 0);
+        return new(version, tag, Text(root, "name", tag), Text(root, "notes", ""), Text(root, "page", ReleasesPage), asset, null)
+            { Sha256 = sha256, PackageUrls = urls };
     }
 
     public static ReleaseInfo? ParseRelease(string json)
@@ -73,7 +125,7 @@ internal static class Updater
             : [];
         return new(version, tag, root.TryGetProperty("name", out var name) ? name.GetString() ?? tag : tag,
             root.TryGetProperty("body", out var body) ? body.GetString() ?? "" : "",
-            root.TryGetProperty("html_url", out var page) ? page.GetString() ?? ReleasesPage : ReleasesPage,
+            root.TryGetProperty("html_url", out var page) ? page.GetString() ?? GitHubReleasesPage : GitHubReleasesPage,
             assets.FirstOrDefault(asset => asset.Name.EndsWith("-win-x64.zip", StringComparison.OrdinalIgnoreCase)),
             assets.FirstOrDefault(asset => asset.Name.StartsWith("SHA256SUMS", StringComparison.OrdinalIgnoreCase)));
     }
@@ -98,21 +150,24 @@ internal static class Updater
     public static async Task<string> Prepare(HttpClient http, ReleaseInfo release, IProgress<double> progress, CancellationToken cancellation)
     {
         if (release.Package is null) throw new InvalidOperationException("这个版本没有 Windows 便携包。");
-        if (release.Checksums is null) throw new InvalidOperationException("这个版本没有附带校验文件，为安全起见不自动安装。");
+        if (release.Sha256 is null && release.Checksums is null) throw new InvalidOperationException("这个版本没有附带校验文件，为安全起见不自动安装。");
         var folder = Path.Combine(WorkFolder, release.Version.ToString());
         if (Directory.Exists(folder)) Directory.Delete(folder, true);
         Directory.CreateDirectory(folder);
-        // The checksum is small and decides whether the package may be installed, so it comes
-        // straight from GitHub; only the large archive uses the mirrors.
-        var sums = await http.GetStringAsync(release.Checksums.Url, cancellation);
-        var expected = ExpectedHash(sums, release.Package.Name) ?? throw new InvalidDataException("校验文件里没有这个便携包的记录。");
-        var zip = Path.Combine(folder, release.Package.Name);
-        var attempts = DownloadUrls(release.Package.Url).ToArray();
-        Exception? failure = null;
-        for (var index = 0; index < attempts.Length; index++)
+        string expected; string[] attempts;
+        if (release.Sha256 is { } signed) { expected = signed; attempts = [.. release.PackageUrls]; }
+        else
         {
-            try { await Download(http, attempts[index], zip, release.Package.Size, progress, cancellation); }
-            catch (Exception ex) when (ex is HttpRequestException or IOException or TaskCanceledException && !cancellation.IsCancellationRequested)
+            var sums = await http.GetStringAsync(release.Checksums!.Url, cancellation);
+            expected = ExpectedHash(sums, release.Package.Name) ?? throw new InvalidDataException("校验文件里没有这个便携包的记录。");
+            attempts = [release.Package.Url];
+        }
+        var zip = Path.Combine(folder, release.Package.Name);
+        Exception? failure = null;
+        foreach (var url in attempts)
+        {
+            try { await Download(http, url, zip, release.Package.Size, progress, cancellation); }
+            catch (Exception ex) when (ex is HttpRequestException or IOException or OperationCanceledException && !cancellation.IsCancellationRequested)
             {
                 failure = ex; continue;
             }
@@ -134,14 +189,17 @@ internal static class Updater
 
     private static async Task Download(HttpClient http, string url, string destination, long fallbackSize, IProgress<double> progress, CancellationToken cancellation)
     {
-        using var response = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellation);
+        using var stall = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
+        stall.CancelAfter(StallTimeout);
+        using var response = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, stall.Token);
         response.EnsureSuccessStatusCode();
         var total = response.Content.Headers.ContentLength ?? fallbackSize;
-        await using var input = await response.Content.ReadAsStreamAsync(cancellation);
+        await using var input = await response.Content.ReadAsStreamAsync(stall.Token);
         await using var output = File.Create(destination);
         var buffer = new byte[1 << 16]; long done = 0; int read;
-        while ((read = await input.ReadAsync(buffer, cancellation)) > 0)
+        while ((read = await input.ReadAsync(buffer, stall.Token)) > 0)
         {
+            stall.CancelAfter(StallTimeout);
             await output.WriteAsync(buffer.AsMemory(0, read), cancellation);
             done += read; if (total > 0) progress.Report(Math.Min(1, done / (double)total));
         }
