@@ -19,6 +19,18 @@ internal static class Updater
 {
     public const string Repository = "affs99887/aqtw-listener";
     public static string ReleasesPage => $"https://github.com/{Repository}/releases/latest";
+    // GitHub's download servers are slow or unreachable from parts of mainland China, so the file
+    // is fetched through public mirrors first. The mirrors only relay the bytes: the hash still
+    // comes from the release's own SHA256SUMS, and a mirror that fails or serves other content is
+    // skipped. These services are run by volunteers and can disappear, which is why the GitHub URL
+    // stays last in line.
+    public static readonly string[] DownloadMirrors = ["https://ghfast.top/", "https://gh-proxy.com/"];
+    public static IEnumerable<string> DownloadUrls(string url)
+    {
+        if (url.StartsWith("https://github.com/", StringComparison.Ordinal))
+            foreach (var mirror in DownloadMirrors) yield return mirror + url;
+        yield return url;
+    }
     public static string WorkFolder => Path.Combine(Path.GetTempPath(), "AqtwListener-update");
 
     public static Version Current { get; } = ParseVersion(typeof(Updater).Assembly
@@ -90,27 +102,26 @@ internal static class Updater
         var folder = Path.Combine(WorkFolder, release.Version.ToString());
         if (Directory.Exists(folder)) Directory.Delete(folder, true);
         Directory.CreateDirectory(folder);
+        // The checksum is small and decides whether the package may be installed, so it comes
+        // straight from GitHub; only the large archive uses the mirrors.
         var sums = await http.GetStringAsync(release.Checksums.Url, cancellation);
         var expected = ExpectedHash(sums, release.Package.Name) ?? throw new InvalidDataException("校验文件里没有这个便携包的记录。");
         var zip = Path.Combine(folder, release.Package.Name);
-        using (var response = await http.GetAsync(release.Package.Url, HttpCompletionOption.ResponseHeadersRead, cancellation))
+        var attempts = DownloadUrls(release.Package.Url).ToArray();
+        Exception? failure = null;
+        for (var index = 0; index < attempts.Length; index++)
         {
-            response.EnsureSuccessStatusCode();
-            var total = response.Content.Headers.ContentLength ?? release.Package.Size;
-            await using var input = await response.Content.ReadAsStreamAsync(cancellation);
-            await using var output = File.Create(zip);
-            var buffer = new byte[1 << 16]; long done = 0; int read;
-            while ((read = await input.ReadAsync(buffer, cancellation)) > 0)
+            try { await Download(http, attempts[index], zip, release.Package.Size, progress, cancellation); }
+            catch (Exception ex) when (ex is HttpRequestException or IOException or TaskCanceledException && !cancellation.IsCancellationRequested)
             {
-                await output.WriteAsync(buffer.AsMemory(0, read), cancellation);
-                done += read; if (total > 0) progress.Report(Math.Min(1, done / (double)total));
+                failure = ex; continue;
             }
-        }
-        await using (var stream = File.OpenRead(zip))
-        {
+            await using var stream = File.OpenRead(zip);
             var actual = Convert.ToHexString(await SHA256.HashDataAsync(stream, cancellation)).ToLowerInvariant();
-            if (actual != expected) throw new InvalidDataException("下载的文件校验不一致，已停止安装。请稍后重试或手动下载。");
+            if (actual == expected) { failure = null; break; }
+            failure = new InvalidDataException("下载的文件校验不一致。");
         }
+        if (failure is not null) throw new InvalidDataException("下载失败，请稍后重试或手动下载。" + failure.Message, failure);
         var unpacked = Path.Combine(folder, "package");
         ZipFile.ExtractToDirectory(zip, unpacked);
         // The package may hold the files directly or inside one folder.
@@ -119,6 +130,21 @@ internal static class Updater
               ?? throw new InvalidDataException("便携包里找不到程序文件。");
         if (!File.Exists(Path.Combine(top, "library", "library.json"))) throw new InvalidDataException("便携包缺少音效库。");
         return top;
+    }
+
+    private static async Task Download(HttpClient http, string url, string destination, long fallbackSize, IProgress<double> progress, CancellationToken cancellation)
+    {
+        using var response = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellation);
+        response.EnsureSuccessStatusCode();
+        var total = response.Content.Headers.ContentLength ?? fallbackSize;
+        await using var input = await response.Content.ReadAsStreamAsync(cancellation);
+        await using var output = File.Create(destination);
+        var buffer = new byte[1 << 16]; long done = 0; int read;
+        while ((read = await input.ReadAsync(buffer, cancellation)) > 0)
+        {
+            await output.WriteAsync(buffer.AsMemory(0, read), cancellation);
+            done += read; if (total > 0) progress.Report(Math.Min(1, done / (double)total));
+        }
     }
 
     // The program the new package starts with: the same file name as now when it still exists,

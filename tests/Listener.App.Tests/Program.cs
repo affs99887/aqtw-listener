@@ -215,6 +215,9 @@ internal static class Program
                 Check(release.Version == new Version(0, 6, 0) && release.Package?.Url == "https://example/z" && release.Checksums?.Url == "https://example/s", "release parsing");
                 var hash = new string('a', 64);
                 Check(Updater.ExpectedHash($"{hash}  XingshangAssistant-v0.6.0-win-x64.zip\n{new string('b', 64)}  other.zip\n", "XingshangAssistant-v0.6.0-win-x64.zip") == hash, "checksum lookup");
+                var urls = Updater.DownloadUrls("https://github.com/affs99887/aqtw-listener/releases/download/v0.5.3/XingshangAssistant-v0.5.3-win-x64.zip").ToArray();
+                Check(urls.Length == Updater.DownloadMirrors.Length + 1 && urls[0].StartsWith(Updater.DownloadMirrors[0]) && urls[^1].StartsWith("https://github.com/"), "mirrors come first and the GitHub URL stays last");
+                Check(Updater.DownloadUrls("https://example/z").Single() == "https://example/z", "a non-GitHub URL is left unchanged");
                 var script = Updater.InstallScript(@"C:\临时\pkg", @"C:\Users\O'Neil\行商助手", 4242, "行商助手.exe", @"C:\Users\O'Neil\行商助手\行商助手.exe", @"C:\t\rollback", @"C:\d\update.log");
                 Check(script.Contains("'C:\\Users\\O''Neil\\行商助手'") && script.Contains("Get-Process -Id 4242") && script.Contains("'/XD'") && script.Contains("restored the previous version"),
                     "install script does not quote paths, wait for the process, keep local-data or roll back");

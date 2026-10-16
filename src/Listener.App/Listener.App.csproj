@@ -21,6 +21,9 @@
     <ProjectReference Include="../Listener.Core/Listener.Core.csproj" />
     <PackageReference Include="NAudio.Wasapi" Version="3.1.0" />
     <Content Include="../../data/library/**/*" Link="library/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="../../docs/**/*" Link="docs/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Only the two documents the "诊断" page opens. The rest of docs/ is design material
+         and screenshots; shipping it made the portable package about 50 MB larger. -->
+    <Content Include="../../docs/COVERAGE.md" Link="docs/COVERAGE.md" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../docs/TEST-REPORT.md" Link="docs/TEST-REPORT.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

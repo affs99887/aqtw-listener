@@ -29,6 +29,18 @@ if ($LASTEXITCODE -ne 0) { throw 'CLI publish failed' }
 # bundled library, including cleanup of pre-0.3.3 putdown samples and indices,
 # and drop the retired Go engine folder. local-data is never cleared by this script.
 if (Test-Path -LiteralPath $libraryOutput) { Remove-Item -LiteralPath $libraryOutput -Recurse -Force }
+# The project used to ship the whole docs tree (design files, screenshots). Drop whatever
+# the new build no longer carries, so an updated portable folder does not keep the old bulk.
+$docsOutput = Join-Path $Output 'docs'
+if (Test-Path -LiteralPath $docsOutput) {
+    Get-ChildItem -LiteralPath $docsOutput -Recurse -File |
+        Where-Object { $_.Name -notin 'COVERAGE.md', 'TEST-REPORT.md' } |
+        Remove-Item -Force
+    Get-ChildItem -LiteralPath $docsOutput -Recurse -Directory |
+        Sort-Object { $_.FullName.Length } -Descending |
+        Where-Object { -not (Get-ChildItem -LiteralPath $_.FullName -Recurse -File -ErrorAction SilentlyContinue) } |
+        Remove-Item -Force
+}
 $engineOutput = Join-Path $Output 'engine'
 if (Test-Path -LiteralPath $engineOutput) { Remove-Item -LiteralPath $engineOutput -Recurse -Force }
 Copy-Item -LiteralPath (Join-Path $root 'data/library') -Destination $libraryOutput -Recurse
