@@ -25,7 +25,11 @@ public sealed class Settings
     public double Opacity { get; set; } = .94;
     public bool ShowNames { get; set; } = false;
     public bool HardwareAcceleration { get; set; } = false;
-    public static string FilePath => Path.Combine(AppContext.BaseDirectory, "local-data", "settings.json");
+    // Checked against GitHub Releases at most every few hours when the assistant starts.
+    public bool AutoCheckUpdates { get; set; } = true;
+    public DateTimeOffset? LastUpdateCheck { get; set; }
+    public string? SkippedVersion { get; set; }
+    public static string FilePath => UserData.File("settings.json");
     public static Settings Load() => File.Exists(FilePath) ? JsonFile.Read<Settings>(FilePath) : new();
     public void Save() => JsonFile.Write(FilePath, this);
 }

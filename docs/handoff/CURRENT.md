@@ -1,4 +1,15 @@
-# 当前接续状态 · 2026-10-15
+# 当前接续状态 · 2026-10-16
+
+**进行中（本地，未发布）：展示物品、共享数据目录与更新器**。用户反馈候选太多，要求可预先勾选浮窗显示的物品；配置按声音分类、区分红金紫，默认全选；配置与全部用户数据跨版本通用；并加入更新器。用户选择：大红概率仍按全部候选计算并注明未显示件数；设置、展示配置、个人库、录音全部共享；启动自动检查、一键下载校验替换并重启。
+
+- 数据：`UserData`（`src/Listener.App/UserData.cs`）根目录 `%LOCALAPPDATA%\AqtwListener`，`AQTW_DATA_DIR` 可覆盖；`--ui-smoke` / `--performance-smoke` 使用程序目录 `check-data` 隔离目录，应用测试启动即隔离到临时目录。首次正常启动时若共享目录为空，复制（不移动）程序目录 `local-data`，写 `migrated.json`。`Settings.FilePath`、个人库、诊断导出都已改到共享目录。
+- 展示配置：`Listener.Core.DisplayFilter` 存隐藏 ID（新物品默认显示），`DisplayPreferences` 读写 `display.json` 并在变化时通知；`CandidatePanel` 只为勾选物品出卡片，`cellStats` 保留每格全部候选用于大红概率与“另有 N 件未显示”，整格隐藏仍保留分区。物品图鉴不过滤。
+- 声音分类：`Listener.Core.SoundClasses` 合并共用物品或参考录音的拾取组（23 类，花瓶与变异体样本因共用视频参考合并），类内 红→金→紫→蓝、格数大优先；类名取自“…类”组名，否则首件物品名。
+- 页面：`DisplayItemsPage`（侧栏“展示物品”）——汇总、按稀有度切换、三个预设、搜索、每类三态勾选与各稀有度计数、类内按稀有度分行的物品方块，即时保存。物品图片统一由 `ItemPictures` 绘制（含透明图稀有度底色）。
+- 更新器：`Updater` 读 `releases/latest`，找 `*-win-x64.zip` 与 `SHA256SUMS*`，校验后解包到 `%TEMP%\AqtwListener-update`，写 UTF-8 BOM 的 `install.ps1`：等待进程退出、备份程序文件（不含 local-data）、整体替换 `library`、robocopy 覆盖、失败回滚并启动旧版、成功启动新版，日志 `update.log` 在共享目录。主窗口顶部横幅（立即更新 / 更新说明 / 跳过此版本），“诊断”页有版本、自动检查开关、手动检查与数据目录。程序文件夹不可写时打开下载页。
+- 验证：应用测试 69 项 + 联网演练（`AQTW_NETWORK_TESTS=1`：取 v0.5.2.1、下载 132 MB、校验、解包通过）；核心测试通过；离屏渲染 `display-items-page*.png`、`display-filter-overlay.png`。待用户允许弹窗后跑完整 `--ui-smoke` 与安装脚本端到端演练。
+
+以下为 2026-10-15 的状态记录。
 
 **发布后同步介绍页与精简 README**：用户明确要求每次发版都同步介绍页，至少更新下载链接；README 大幅精简且不得包含来源或鸣谢。要求已写入根目录 `AGENTS.md`，现网版本与下载一致性检查为 `scripts/check-introduction-release.ps1`。README 从约 9,373 字符缩为 821 字符，仅保留下载、使用、快捷键、更新和反馈。
 

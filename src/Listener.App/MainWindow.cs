@@ -35,6 +35,7 @@ internal sealed partial class MainWindow : Window
     private readonly TextBox interactionHotkey = new();
     private readonly TextBlock hotkeyStatus = Theme.Label("正在注册快捷键…", 11, Theme.Muted);
     private readonly Grid settingsPage = new();
+    private readonly DisplayItemsPage displayItems = new();
     private readonly Dictionary<string, (Button Button, UIElement Content)> sections = new();
     private readonly Slider opacity = new() { Minimum = .35, Maximum = 1, TickFrequency = .05 };
     private readonly CheckBox acceleration = new() { Content = "硬件加速（高分辨率卡顿时启用，重启生效）", Foreground = Theme.Muted, FontSize = 11, Margin = new Thickness(0, 4, 0, 8) };
@@ -43,7 +44,7 @@ internal sealed partial class MainWindow : Window
     public MainWindow(Settings settings, SoundLibrary library)
     {
         this.settings = settings;
-        personal = new(Path.Combine(AppContext.BaseDirectory, "library"), Path.Combine(AppContext.BaseDirectory, "local-data", "personal"));
+        personal = new(Path.Combine(AppContext.BaseDirectory, "library"), UserData.File("personal"));
         var active = personal.ResolveActive(); this.library = active.Library; libraryRoot = active.Root;
         Title = BrandAssets.AppName; Width = Math.Min(900, SystemParameters.WorkArea.Width); MinWidth = Math.Min(760, Width);
         Height = Math.Min(720, SystemParameters.WorkArea.Height); MinHeight = Math.Min(560, Height);
@@ -254,16 +255,19 @@ internal sealed partial class MainWindow : Window
         buttons.Children.Add(Theme.Button("测试报告", (_, _) => OpenDocument("TEST-REPORT.md"))); info.Children.Add(buttons);
         var diagnosticPage = new StackPanel(); diagnosticPage.Children.Add(Theme.Label("运行诊断", 18)); diagnosticPage.Children.Add(diagnostics);
         diagnosticPage.Children.Add(Theme.Button("导出诊断", (_, _) => ExportDiagnostics()));
-        foreach (var (label, content) in new[] { ("监听", stateBox), ("采音", captureConfig), ("位置", placement), ("浮窗", config), ("音效库", info), ("诊断", diagnosticPage) })
+        diagnosticPage.Children.Add(BuildUpdateSection());
+        foreach (var (label, content) in new (string, UIElement)[] { ("监听", stateBox), ("采音", captureConfig), ("位置", placement), ("浮窗", config),
+                     ("展示物品", displayItems), ("音效库", info), ("诊断", diagnosticPage) })
         {
             var button = NavigationButton(label);
-            sections[label] = (button, label == "监听" ? content : Theme.Box(content, 22)); navigation.Children.Add(button);
+            sections[label] = (button, label is "监听" or "展示物品" ? content : Theme.Box(content, 22)); navigation.Children.Add(button);
         }
         ShowSettingsSection("监听");
         return root;
     }
     private void ShowSettingsSection(string name)
     {
+        if (name == "展示物品") displayItems.Show(library, libraryRoot);
         settingsPage.Children.Clear(); settingsPage.Children.Add(sections[name].Content);
         foreach (var (label, section) in sections)
         {
@@ -308,6 +312,7 @@ internal sealed partial class MainWindow : Window
         RefreshDevices();
         UpdateDiagnostics();
         InitializeTray();
+        StartAutomaticUpdateCheck();
         if (Environment.GetCommandLineArgs().Contains("--performance-smoke"))
             _ = PerformanceSmoke();
     }
@@ -374,7 +379,7 @@ internal sealed partial class MainWindow : Window
     {
         try
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "local-data", $"diagnostics-{DateTime.Now:yyyyMMdd-HHmmss-fff}.json");
+            var path = UserData.File($"diagnostics-{DateTime.Now:yyyyMMdd-HHmmss-fff}.json");
             JsonFile.Write(path, new
             {
                 createdAt = DateTimeOffset.Now, listening = controller.Diagnostics(),
@@ -467,9 +472,15 @@ internal sealed partial class MainWindow : Window
         foreach (var name in sections.Keys)
         {
             ShowSettingsSection(name); await Task.Delay(100);
-            settingsFit[name] = Descendants<Button>(sections[name].Content).Where(b => b.IsVisible)
-                .All(b => b.TransformToAncestor(this).TransformBounds(new Rect(b.RenderSize)).Bottom <= ActualHeight + 1);
+            // 展示物品 scrolls through every class; its own controls are the ones that must be in view.
+            var controls = name == "展示物品" ? displayItems.HeaderButtons : Descendants<Button>(sections[name].Content).Where(b => b.IsVisible);
+            settingsFit[name] = controls.All(b => b.TransformToAncestor(this).TransformBounds(new Rect(b.RenderSize)).Bottom <= ActualHeight + 1);
             if (name == "浮窗") RenderSmoke(this, "settings-smoke.png");
+            if (name == "展示物品")
+            {
+                settingsFit["展示物品-全部物品"] = displayItems.ClassCount > 0 && displayItems.TileCount == library.Items.Count;
+                RenderSmoke(this, "display-items-smoke.png");
+            }
         }
         MaxHeight = originalMaximum; ShowSettingsSection("监听");
         var foregroundBefore = NativeInput.GetForegroundWindow();

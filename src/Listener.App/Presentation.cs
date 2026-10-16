@@ -58,13 +58,15 @@ internal sealed class CandidatePanel : Border
     private Border? summaryBar;
     private DateTimeOffset? resultAt;
     private readonly CandidateLayout layout;
-    private readonly Dictionary<string, BitmapImage> images = new();
     private readonly Dictionary<TextBlock, double> textSizes = new();
     private string libraryRoot;
     private readonly Settings settings;
     private readonly bool compact, minimal, interactive, design, previewButtons;
     private RecognitionResult? lastResult;
     private IReadOnlyList<Candidate> primary = [], near = [];
+    // The candidates the user chose to show; primary keeps all of them for counts and 大红概率.
+    private IReadOnlyList<Candidate> visible = [];
+    private Dictionary<int, (int Total, int Red, int Hidden)> cellStats = [];
     private HashSet<string> nearIds = [];
     private bool lastDemo, lastListening, catalogView;
     private Action<Candidate>? playReference;
@@ -79,7 +81,8 @@ internal sealed class CandidatePanel : Border
     internal bool NeedsScroll => layout.NeedsScroll;
     internal double ContentHeight => layout.ContentHeight;
     internal double ThumbnailSize => layout.ThumbnailSize;
-    internal int CandidateCount => primary.Count + nearIds.Count;
+    internal int CandidateCount => visible.Count + nearIds.Count;
+    internal int HiddenCandidateCount => primary.Count - visible.Count;
     internal string LayoutInfo => $"{RenderedIds.Count} 件 · 图片 {ThumbnailSize:0}px · 内容 {ContentHeight:0}px · 滚动 {NeedsScroll}";
     public event Action? LayoutChanged;
     public event Action<Candidate>? ReferenceRequested;
@@ -150,6 +153,10 @@ internal sealed class CandidatePanel : Border
             (candidates, width, thumbnail) => Large ? BuildDenseDesignGroups(candidates, width, thumbnail) : null,
             scrollOverflow: design);
         layout.Changed += () => LayoutChanged?.Invoke();
+        // A change on the 展示物品 page reaches every panel on screen at once.
+        void FilterChanged() => Dispatcher.BeginInvoke(() => ShowResult(lastResult, lastDemo, lastListening));
+        Loaded += (_, _) => DisplayPreferences.Changed += FilterChanged;
+        Unloaded += (_, _) => DisplayPreferences.Changed -= FilterChanged;
         Background = Theme.Background; BorderBrush = Theme.Line; BorderThickness = design ? new Thickness(0) : new Thickness(1);
         Padding = new Thickness(OuterPadding);
         var body = new DockPanel(); Child = body;
@@ -283,7 +290,7 @@ internal sealed class CandidatePanel : Border
         activityBanner.BorderBrush = failed ? Theme.Brush("#BE6565") : activity.Busy ? Theme.Accent : Theme.Line;
         progress.Visibility = activity.Busy ? Visibility.Visible : Visibility.Collapsed;
     }
-    public void SetLibraryRoot(string root) { if (root == libraryRoot) return; libraryRoot = root; images.Clear(); RefreshAppearance(); }
+    public void SetLibraryRoot(string root) { if (root == libraryRoot) return; libraryRoot = root; RefreshAppearance(); }
     public void SetToolbar(UIElement? toolbar)
     {
         toolbarHost.Content = toolbar;
@@ -348,7 +355,10 @@ internal sealed class CandidatePanel : Border
         else
         {
             ratio.Text = primary.Count.ToString();
-            designCount.Text = catalog ? $"{primary.Count} 件目录物品" : $"{primary.Count} 件候选";
+            var hiddenCount = catalog ? 0 : primary.Count(c => !DisplayPreferences.Filter.IsShown(c.Item));
+            designCount.Text = catalog ? $"{primary.Count} 件目录物品" : hiddenCount > 0
+                ? $"{primary.Count} 件候选 · 显示 {primary.Count - hiddenCount} 件" : $"{primary.Count} 件候选";
+            designCount.ToolTip = hiddenCount > 0 ? $"{hiddenCount} 件按「展示物品」设置不显示，仍计入每格的大红概率。" : null;
             count.Text = design ? "" : catalog ? $"{primary.Count} 件目录物品" : $"{primary.Count} 件候选";
             headline.Text = design ? "按格数查看大红概率"
                 : catalog ? "新增目录物品需补拾取音效后才能参与识别" : demo ? "布局演示 · 非识别结果" : result!.Message;
@@ -363,6 +373,10 @@ internal sealed class CandidatePanel : Border
 
     private void RefreshItems()
     {
+        // The catalogue lists everything; recognition results show only the items the user keeps.
+        visible = catalogView ? primary : primary.Where(c => DisplayPreferences.Filter.IsShown(c.Item)).ToArray();
+        cellStats = primary.GroupBy(c => c.Item.Cells).ToDictionary(g => g.Key,
+            g => (g.Count(), g.Count(c => c.Item.IsGold), g.Count(c => !visible.Contains(c))));
         var primaryIds = primary.Select(c => c.Item.Id).ToHashSet();
         var references = near.Where(c => !primaryIds.Contains(c.Item.Id)).GroupBy(c => c.Item.Id)
             .Select(g => g.OrderByDescending(c => c.Score).First()).ToArray();
@@ -372,7 +386,7 @@ internal sealed class CandidatePanel : Border
             summaryBar!.Height = Math.Round((CandidateCount > 20 ? 36 : 40) * FontScale);
             RefreshFreshness();
         }
-        layout.SetItems(primary.OrderBy(c => c.Item.Cells).ThenBy(c => c.Item.RarityRank)
+        layout.SetItems(visible.OrderBy(c => c.Item.Cells).ThenBy(c => c.Item.RarityRank)
             .ThenByDescending(c => c.Item.ReferenceValue).Concat(references.OrderBy(c => c.Item.Cells)).ToArray());
         LayoutChanged?.Invoke();
     }
@@ -383,14 +397,16 @@ internal sealed class CandidatePanel : Border
         var limit = double.IsFinite(maxWidth) ? Math.Max(1, maxWidth) : 1200;
         if (design)
         {
-            var shown = primary.Concat(near.Where(c => !primary.Any(p => p.Item.Id == c.Item.Id))).ToArray();
-            if (shown.Length == 0) return Math.Min(limit, MinimumDesignWidth);
+            var shown = visible.Concat(near.Where(c => !primary.Any(p => p.Item.Id == c.Item.Id))).ToArray();
+            if (shown.Length == 0) return Math.Min(limit, Math.Max(MinimumDesignWidth, primary.Count > 0 ? 420 * FontScale : 0));
             if (shown.Length > PackedCandidates)
                 return Math.Min(limit,
                     SectionLabelWidth + MaximumDesignColumns * DesignCardWidth(shown, PreferredThumbnail) + 4);
             // Prefer a modest landscape shape rather than the narrowest possible column
             // count. The four-column limit wins when that shape cannot fit naturally.
-            var sizes = shown.GroupBy(c => (Reference: nearIds.Contains(c.Item.Id), c.Item.Cells)).Select(g => g.Count()).ToArray();
+            // A grid size whose candidates are all hidden still keeps its label row.
+            var sizes = shown.GroupBy(c => (Reference: nearIds.Contains(c.Item.Id), c.Item.Cells)).Select(g => g.Count())
+                .Concat(cellStats.Where(cell => cell.Value.Hidden == cell.Value.Total).Select(_ => 0)).ToArray();
             var chrome = (summaryBar?.Height ?? 40 * FontScale) + 8;
             var budget = (double.IsFinite(maxHeight) ? Math.Min(maxHeight, 840) : 840) - chrome;
             double Height(int columns, double picture) => sizes.Sum(n => Math.Max(Math.Ceiling(n / (double)columns) *
@@ -400,7 +416,7 @@ internal sealed class CandidatePanel : Border
             // add a fractional third slot that would stay empty beside every full row.
             double Width(int columns) => SectionLabelWidth + Math.Max(2, columns) * designCard + 4;
             var most = Math.Max(1, Math.Min(MaximumDesignColumns,
-                Math.Min(sizes.Max(), (int)((limit - SectionLabelWidth - 4) / designCard))));
+                Math.Min(Math.Max(1, sizes.Max()), (int)((limit - SectionLabelWidth - 4) / designCard))));
             var columns = Enumerable.Range(1, most).FirstOrDefault(c =>
                 Height(c, PreferredThumbnail) <= budget && Width(c) >= 1.2 * (Height(c, PreferredThumbnail) + chrome));
             return Math.Min(limit, Width(columns == 0 ? most : columns));
@@ -483,7 +499,7 @@ internal sealed class CandidatePanel : Border
 
     private FrameworkElement BuildDesignGroups(IReadOnlyList<Candidate> candidates, double availableWidth, double thumbnail)
     {
-        if (candidates.Count == 0)
+        if (candidates.Count == 0 && primary.Count == 0)
             return new Border { Padding = new Thickness(18), Child = Theme.Label("物品声音出现后，在这里查看候选并试听原声", 12 * FontScale, Theme.Muted) };
         // Sections per grid size up to the largest merged class; the packed layout only
         // remains for a hypothetical personal library beyond that.
@@ -494,12 +510,15 @@ internal sealed class CandidatePanel : Border
     private FrameworkElement BuildSectionedDesignGroups(IReadOnlyList<Candidate> candidates,
         double availableWidth, double thumbnail)
     {
-        var groups = candidates.GroupBy(candidate => (Reference: nearIds.Contains(candidate.Item.Id), candidate.Item.Cells))
-            .OrderBy(group => group.Key.Reference).ThenBy(group => group.Key.Cells).ToArray();
-        var cardWidth = DesignCardWidth(candidates, thumbnail);
+        var shown = candidates.GroupBy(candidate => (Reference: nearIds.Contains(candidate.Item.Id), candidate.Item.Cells))
+            .ToDictionary(group => group.Key, group => group.ToArray());
+        // Every grid size of the result keeps its section, including one whose items are all hidden.
+        var keys = shown.Keys.Concat(cellStats.Keys.Select(cells => (Reference: false, Cells: cells))).Distinct()
+            .OrderBy(key => key.Reference).ThenBy(key => key.Cells).ToArray();
+        var cardWidth = candidates.Count > 0 ? DesignCardWidth(candidates, thumbnail) : 0;
         var sections = new StackPanel();
-        foreach (var group in groups)
-            sections.Children.Add(BuildSizeSection(group, availableWidth, thumbnail, cardWidth));
+        foreach (var key in keys)
+            sections.Children.Add(BuildSizeSection(key, shown.GetValueOrDefault(key) ?? [], availableWidth, thumbnail, cardWidth));
         return sections;
     }
 
@@ -529,13 +548,16 @@ internal sealed class CandidatePanel : Border
     }
 
     private FrameworkElement BuildSizeSection(
-        IGrouping<(bool Reference, int Cells), Candidate> group, double width, double thumbnail, double cardWidth)
+        (bool Reference, int Cells) key, IReadOnlyList<Candidate> group, double width, double thumbnail, double cardWidth)
     {
         const double labelWidth = SectionLabelWidth;
         var cardAreaWidth = Math.Max(1, width - labelWidth - 2);
         // Within a grid size: 红, 金, 紫, 蓝, then by known reference value.
         var ordered = group.OrderBy(candidate => candidate.Item.RarityRank)
             .ThenByDescending(candidate => candidate.Item.ReferenceValue).ToArray();
+        // 大红概率 and the count cover every candidate of the size, shown or hidden.
+        var (total, red, hidden) = !key.Reference && cellStats.TryGetValue(key.Cells, out var stats)
+            ? stats : (ordered.Length, ordered.Count(candidate => candidate.Item.IsGold), 0);
         // Rows hold as many equal cards as the width allows, filled in order, so the columns
         // of all sections line up.
         var columns = Math.Max(1, Math.Min(MaximumDesignColumns, (int)Math.Floor((cardAreaWidth + 1) / cardWidth)));
@@ -550,25 +572,37 @@ internal sealed class CandidatePanel : Border
                 row.Children.Add(DenseDesignCard(candidate, thumbnail, Math.Min(cardWidth, cardAreaWidth), rowHeight, style, nameSize));
             cardRows.Children.Add(row);
         }
-        var title = Theme.Label(group.Key.Reference ? $"参考 · {group.Key.Cells} 格" :
-            group.Key.Cells == 0 ? "格数待核实" : $"{group.Key.Cells} 格", 15 * FontScale);
+        if (hidden > 0)
+        {
+            // Hidden candidates leave the cards but not the decision: say how many this size holds.
+            var note = Theme.Label(ordered.Length == 0 ? $"这 {hidden} 件已设为不显示" : $"另有 {hidden} 件未显示",
+                10 * FontScale, Theme.Faint);
+            note.Margin = new Thickness(10, ordered.Length == 0 ? 0 : 3, 0, 4); note.TextTrimming = TextTrimming.None;
+            note.VerticalAlignment = VerticalAlignment.Center;
+            note.ToolTip = "在主窗口「展示物品」里勾选后显示；不显示的物品仍计入左侧的大红概率。";
+            AutomationProperties.SetName(note, "未显示的候选");
+            cardRows.Children.Add(note);
+            if (ordered.Length == 0) cardRows.VerticalAlignment = VerticalAlignment.Center;
+        }
+        var title = Theme.Label(key.Reference ? $"参考 · {key.Cells} 格" :
+            key.Cells == 0 ? "格数待核实" : $"{key.Cells} 格", 15 * FontScale);
         title.Margin = new Thickness(0); title.FontWeight = FontWeights.Bold;
         title.TextTrimming = TextTrimming.None; title.VerticalAlignment = VerticalAlignment.Bottom;
-        var amount = Theme.Label($"{ordered.Length} 件", 11 * FontScale, Theme.Muted);
+        var amount = Theme.Label($"{total} 件", 11 * FontScale, Theme.Muted);
         amount.Margin = new Thickness(6, 0, 0, 1); amount.TextTrimming = TextTrimming.None;
         amount.VerticalAlignment = VerticalAlignment.Bottom;
         var titleRow = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 3) };
         titleRow.Children.Add(title); titleRow.Children.Add(amount);
         var heading = new StackPanel { Margin = new Thickness(8, 6, 4, 0) };
         heading.Children.Add(titleRow);
-        if (!group.Key.Reference)
+        if (!key.Reference)
         {
             // The grid size is visible on the trader's screen; this share is what
             // the player reads to decide, so it is the largest number in the row.
-            var redCount = ordered.Count(candidate => candidate.Item.IsGold);
-            var share = redCount / (double)ordered.Length;
-            var help = $"{redCount}/{ordered.Length} 件为大红；按该格候选计算，不是游戏的真实出货概率。";
-            var caption = Theme.Label($"大红概率 {redCount}/{ordered.Length}", 10 * FontScale, Theme.Muted);
+            var redCount = red;
+            var share = redCount / (double)Math.Max(1, total);
+            var help = $"{redCount}/{total} 件为大红；按该格全部候选计算（含未显示的），不是游戏的真实出货概率。";
+            var caption = Theme.Label($"大红概率 {redCount}/{total}", 10 * FontScale, Theme.Muted);
             caption.Margin = new Thickness(0); caption.ToolTip = help; heading.Children.Add(caption);
             var probability = new TextBlock { TextWrapping = TextWrapping.NoWrap, TextTrimming = TextTrimming.None,
                 Margin = new Thickness(0, -2, 0, 0), ToolTip = help };
@@ -611,9 +645,11 @@ internal sealed class CandidatePanel : Border
                 .ThenByDescending(candidate => candidate.Item.ReferenceValue).ToArray();
             if (usedWidth > 0 && (usedWidth + categoryWidth + targetCardWidth > usableWidth ||
                 pending.Count(entry => entry.Item is not null) >= MaximumDesignColumns)) AddRow();
+            (int Total, int Red, int Hidden) stats = cellStats.TryGetValue(group.Key.Cells, out var known)
+                ? known : (entries.Length, entries.Count(candidate => candidate.Item.IsGold), 0);
             var category = group.Key.Cells == 0 ? "格数待核实" : group.Key.Reference
                 ? $"参考 {group.Key.Cells} 格"
-                : $"{group.Key.Cells} 格\n大红概率 {entries.Count(candidate => candidate.Item.IsGold) / (double)entries.Length:P0}";
+                : $"{group.Key.Cells} 格\n大红概率 {stats.Red / (double)Math.Max(1, stats.Total):P0}" + (stats.Hidden > 0 ? $"\n另 {stats.Hidden} 件未显示" : "");
             pending.Add((null, category));
             usedWidth += categoryWidth;
             foreach (var candidate in entries)
@@ -664,59 +700,8 @@ internal sealed class CandidatePanel : Border
         return rows;
     }
 
-    // The item picture, always scaled uniformly. A picture without the game's rarity background
-    // (情报站 renders) sits on that colour drawn over the item's grid footprint, like the
-    // screenshot thumbnails, so every card shows rarity and size the same way.
-    private UIElement ItemPicture(ItemDefinition item, double margin, int decodeWidth, double labelSize)
-    {
-        if (item.Thumbnail is null) return Theme.Label("暂无图片", labelSize * FontScale, Theme.Muted);
-        try
-        {
-            var path = Path.Combine(libraryRoot, item.Thumbnail);
-            if (!images.TryGetValue(path, out var image))
-            {
-                image = new BitmapImage(); image.BeginInit(); image.CacheOption = BitmapCacheOption.OnLoad;
-                image.DecodePixelWidth = decodeWidth; image.UriSource = new Uri(path); image.EndInit(); image.Freeze(); images[path] = image;
-            }
-            var picture = new Image { Source = image, Stretch = Stretch.Uniform, Margin = new Thickness(margin) };
-            if (item.ThumbnailBackground is not { } colour) return picture;
-            // Fit the item's visible outline, not the render's transparent canvas, to the footprint;
-            // the file itself is left as it is.
-            picture.Source = VisibleArea(path, image);
-            const double cell = 100;
-            picture.Margin = new Thickness(cell * .06);
-            var footprint = new Border { Width = item.GridWidth * cell, Height = item.GridHeight * cell, Background = Theme.Brush(colour), Child = picture };
-            return new Viewbox { Child = footprint, Stretch = Stretch.Uniform, Margin = new Thickness(margin) };
-        }
-        catch (Exception ex) when (ex is IOException or NotSupportedException or FileFormatException or ArgumentException)
-        { return Theme.Label("暂无图片", labelSize * FontScale, Theme.Muted); }
-    }
-
-    // The opaque part of a transparent render (alpha above 8, with a 3% border), cut at display time.
-    private readonly Dictionary<string, BitmapSource> visibleAreas = [];
-    private BitmapSource VisibleArea(string path, BitmapSource image)
-    {
-        if (visibleAreas.TryGetValue(path, out var cached)) return cached;
-        var pixels = new FormatConvertedBitmap(image, PixelFormats.Bgra32, null, 0);
-        int width = pixels.PixelWidth, height = pixels.PixelHeight, stride = width * 4;
-        var data = new byte[stride * height];
-        pixels.CopyPixels(data, stride, 0);
-        int left = width, top = height, right = -1, bottom = -1;
-        for (var y = 0; y < height; y++)
-            for (var x = 0; x < width; x++)
-                if (data[y * stride + x * 4 + 3] > 8)
-                { left = Math.Min(left, x); right = Math.Max(right, x); top = Math.Min(top, y); bottom = Math.Max(bottom, y); }
-        BitmapSource result = image;
-        if (right >= left)
-        {
-            var pad = (int)Math.Round(.03 * Math.Max(right - left + 1, bottom - top + 1));
-            left = Math.Max(0, left - pad); top = Math.Max(0, top - pad);
-            right = Math.Min(width - 1, right + pad); bottom = Math.Min(height - 1, bottom + pad);
-            result = new CroppedBitmap(pixels, new Int32Rect(left, top, right - left + 1, bottom - top + 1));
-            result.Freeze();
-        }
-        return visibleAreas[path] = result;
-    }
+    private UIElement ItemPicture(ItemDefinition item, double margin, int decodeWidth, double labelSize) =>
+        ItemPictures.Create(item, libraryRoot, margin, decodeWidth, labelSize * FontScale);
 
     private UIElement DenseDesignCard(Candidate candidate, double thumbnail, double width, double height, int rowSize = 0,
         double nameSize = 0)

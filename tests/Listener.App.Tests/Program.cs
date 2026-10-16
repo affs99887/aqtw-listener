@@ -10,8 +10,152 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        // The shared per-user data folder must never see test settings or filters.
+        UserData.UseIsolated(Path.Combine(Path.GetTempPath(), $"aqtw-app-tests-{Environment.ProcessId}"));
         var tests = new (string Name, Action Run)[]
         {
+            ("共享数据目录：首次启动复制程序目录的 local-data，不移动原文件，复制过一次后不再覆盖", () =>
+            {
+                var legacy = UserData.LegacyRoot;
+                var hadLegacy = Directory.Exists(legacy);
+                Check(!hadLegacy, "the test folder unexpectedly holds a local-data folder");
+                try
+                {
+                    Directory.CreateDirectory(Path.Combine(legacy, "personal"));
+                    File.WriteAllText(Path.Combine(legacy, "settings.json"), "{\"fontScale\":1.15}");
+                    File.WriteAllText(Path.Combine(legacy, "personal", "draft.json"), "{}");
+                    UserData.UseIsolated(Path.Combine(Path.GetTempPath(), $"aqtw-migrate-{Environment.ProcessId}"));
+                    var first = UserData.MigrateLegacy();
+                    Check(first.Migrated && first.Files == 2 && File.Exists(UserData.File("settings.json")) && File.Exists(UserData.File("personal", "draft.json"))
+                        && File.Exists(Path.Combine(legacy, "settings.json")), "legacy data was not copied, or the original moved");
+                    Check(Settings.Load().FontScale == 1.15, "settings were not read from the shared folder");
+                    File.WriteAllText(Path.Combine(legacy, "settings.json"), "{\"fontScale\":0.9}");
+                    Check(!UserData.MigrateLegacy().Migrated && Settings.Load().FontScale == 1.15, "a second start overwrote the shared settings");
+                }
+                finally
+                {
+                    if (Directory.Exists(legacy)) Directory.Delete(legacy, true);
+                    UserData.UseIsolated(Path.Combine(Path.GetTempPath(), $"aqtw-app-tests-{Environment.ProcessId}"));
+                    DisplayPreferences.Reload();
+                }
+            }),
+            ("展示配置：默认全部显示，隐藏后立即保存到共享目录，新物品默认显示", () =>
+            {
+                DisplayPreferences.Reload();
+                var filter = DisplayPreferences.Filter;
+                Check(filter.IsShown("any-item") && filter.HiddenCount == 0, "a fresh filter hides something");
+                filter.Set(["a", "b"], false);
+                var saved = DisplayFilter.Load(DisplayPreferences.FilePath);
+                Check(!saved.IsShown("a") && !saved.IsShown("b") && saved.IsShown("item-added-later"), "hidden ids were not saved, or a new item is hidden");
+                filter.Set(["a"], true);
+                Check(DisplayFilter.Load(DisplayPreferences.FilePath).HiddenItemIds.SequenceEqual(["b"]), "showing an item again did not save");
+                filter.Set(["b"], true);
+            }),
+            ("隐藏物品后：卡片只显示勾选的，大红概率仍按该格全部候选，并注明未显示件数；整格隐藏仍保留分区", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                DisplayPreferences.Reload();
+                var fourCells = library.Items.Where(item => item.Cells == 4).ToArray();
+                var four = fourCells.Where(item => item.IsGold).Take(2).Concat(fourCells.Where(item => !item.IsGold).Take(2)).ToArray();
+                var six = library.Items.Where(item => item.Cells == 6).Take(2).ToArray();
+                Check(four.Count(item => item.IsGold) is > 0 and < 4, "fixture needs red and non-red 4-cell items");
+                var hide = four.Where(item => !item.IsGold).Concat(six).Select(item => item.Id).ToArray();
+                DisplayPreferences.Filter.Set(hide, false);
+                try
+                {
+                    var panel = new CandidatePanel(root, new Settings { ShowNames = true }, interactive: true, compact: true);
+                    panel.SetAudioPreview(_ => { }, _ => true);
+                    var result = new RecognitionResult(1, RecognitionStatus.Matched, true,
+                        four.Concat(six).Select(item => new Candidate(item, .9, "filter")).ToArray(), 1, "test");
+                    panel.ShowResult(result); Layout(panel, 900, 700);
+                    var cards = Descendants<System.Windows.Controls.Border>(panel).Where(card => card.Tag is Candidate).Select(card => ((Candidate)card.Tag).Item.Id).ToArray();
+                    var reds = four.Count(item => item.IsGold);
+                    var shares = ShareLabels(panel).Select(ShareText).ToArray();
+                    var notes = Descendants<System.Windows.Controls.TextBlock>(panel).Select(label => label.Text).ToArray();
+                    Check(cards.Length == reds && cards.All(id => !hide.Contains(id)), "hidden candidates still have cards: " + string.Join(",", cards));
+                    Check(shares.Contains($"大红概率 {reds / 4d:P0}") && shares.Length == 2, "大红概率 ignored the hidden candidates: " + string.Join(" | ", shares));
+                    Check(notes.Contains($"另有 {4 - reds} 件未显示") && notes.Contains($"这 {six.Length} 件已设为不显示") &&
+                        notes.Any(text => text.Contains($"显示 {reds} 件", StringComparison.Ordinal)), "the hidden-count notes are missing: " + string.Join(" | ", notes.Where(t => t.Contains('件'))));
+                }
+                finally { DisplayPreferences.Filter.Set(hide, true); }
+            }),
+            ("声音分类：每件物品恰好在一类，共用物品或参考录音的音效组合并，类内按红金紫蓝排序", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                var classes = SoundClasses.Build(library, ReferenceAudio.Load(root));
+                var placed = classes.SelectMany(sound => sound.Items).Select(item => item.Id).ToArray();
+                Check(placed.Length == library.Items.Count && placed.Distinct().Count() == placed.Length, "an item is missing or listed twice");
+                Check(classes.Zip(classes.Skip(1)).All(pair => pair.First.Items.Count >= pair.Second.Items.Count), "classes are not largest first");
+                Check(classes.All(sound => sound.Items.Select(item => item.RarityRank).SequenceEqual(sound.Items.Select(item => item.RarityRank).Order())), "a class is not ordered 红→金→紫→蓝");
+                Check(classes.Any(sound => sound.Name == "电脑硬件类") && classes.Any(sound => sound.Name == "奢华茶具类"), "named classes lost their names");
+                var vase = classes.Single(sound => sound.Items.Any(item => item.Name == "花瓶"));
+                Check(vase.Items.Any(item => item.Name == "变异体样本"), "groups sharing a reference recording were not joined");
+            }),
+            ("展示物品页：按声音分类列出全部物品，点物品、整类、按稀有度都能切换并即时生效", () =>
+            {
+                var root = Path.Combine(AppContext.BaseDirectory, "library");
+                var library = JsonFile.Read<SoundLibrary>(Path.Combine(root, "library.json"));
+                DisplayPreferences.Reload();
+                var page = new DisplayItemsPage(); page.Show(library, root);
+                var host = new System.Windows.Controls.Border { Child = page, Width = 860 };
+                host.Measure(new System.Windows.Size(860, double.PositiveInfinity)); host.Arrange(new System.Windows.Rect(host.DesiredSize)); host.UpdateLayout();
+                var classes = SoundClasses.Build(library, ReferenceAudio.Load(root));
+                var tiles = Descendants<System.Windows.Controls.Button>(page).Where(button => button.Tag is ItemDefinition).ToArray();
+                Check(page.ClassCount == classes.Count && tiles.Length == library.Items.Count, $"page lists {page.ClassCount} classes / {tiles.Length} tiles");
+                var first = tiles[0]; var item = (ItemDefinition)first.Tag;
+                first.RaiseEvent(new System.Windows.RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                Check(!DisplayPreferences.Filter.IsShown(item), "clicking a tile did not hide it");
+                first.RaiseEvent(new System.Windows.RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                Check(DisplayPreferences.Filter.IsShown(item), "clicking again did not show it");
+                var redChip = Descendants<System.Windows.Controls.Button>(page).First(button => System.Windows.Automation.AutomationProperties.GetName(button) == "红色物品全部显示或隐藏");
+                redChip.RaiseEvent(new System.Windows.RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                Check(library.Items.Where(i => i.IsGold).All(i => !DisplayPreferences.Filter.IsShown(i)) && library.Items.Where(i => !i.IsGold).All(DisplayPreferences.Filter.IsShown),
+                    "the 红 chip did not toggle exactly the red items");
+                var preset = Descendants<System.Windows.Controls.Button>(page).First(button => Equals(button.Content, "全部显示"));
+                preset.RaiseEvent(new System.Windows.RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                Check(DisplayPreferences.Filter.HiddenCount == 0, "全部显示 left items hidden");
+                // Off-screen renders for review: the default page, and one with purple and blue hidden.
+                page.Refresh(); SaveRender(host, "display-items-page.png");
+                DisplayPreferences.Filter.Set(library.Items.Where(i => i.Rarity is "紫" or "蓝").Select(i => i.Id), false);
+                page.Refresh(); SaveRender(host, "display-items-page-hidden.png");
+                var overlay = new CandidatePanel(root, new Settings { ShowNames = true }, interactive: true, compact: true);
+                overlay.SetAudioPreview(_ => { }, _ => true);
+                overlay.ShowResult(new(1, RecognitionStatus.Matched, true, classes[0].Items.Select(i => new Candidate(i, .9, "class")).ToArray(), 1, "test"));
+                Layout(overlay, overlay.GetPreferredWidth(1600, 840), 760); SaveRender(overlay, "display-filter-overlay.png");
+                DisplayPreferences.Filter.Set(library.Items.Select(i => i.Id), true);
+            }),
+            ("更新器联网演练（AQTW_NETWORK_TESTS=1 时运行）：取最新发布、下载、SHA256 校验并解包，不安装", () =>
+            {
+                if (Environment.GetEnvironmentVariable("AQTW_NETWORK_TESTS") != "1") return;
+                using var http = Updater.CreateClient(); http.Timeout = TimeSpan.FromMinutes(10);
+                var latest = Updater.Latest(http, CancellationToken.None).GetAwaiter().GetResult();
+                Check(latest is { Package: not null, Checksums: not null }, "the latest release lacks a package or checksums");
+                var package = Updater.Prepare(http, latest!, new Progress<double>(), CancellationToken.None).GetAwaiter().GetResult();
+                var launcher = Updater.Launcher(package, Path.Combine(AppContext.BaseDirectory, "行商助手.exe"));
+                Check(File.Exists(Path.Combine(package, launcher)) && File.Exists(Path.Combine(package, "library", "library.json")),
+                    $"unpacked package lacks its launcher or library: {package}");
+                File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "update-dry-run.json"),
+                    JsonSerializer.Serialize(new { latest!.Tag, latest.Package!.Name, latest.Package.Size, package, launcher }));
+            }),
+            ("更新器：版本比较、发布信息解析、校验值查找、安装脚本路径转义", () =>
+            {
+                Check(Updater.ParseVersion("v0.5.2.1") == new Version(0, 5, 2, 1) && Updater.ParseVersion("0.5.1+96de641") == new Version(0, 5, 1), "version parsing");
+                Check(Updater.IsNewer(new(0, 5, 3), new(0, 5, 2, 1)) && !Updater.IsNewer(new(0, 5, 2), new(0, 5, 2, 0)) && !Updater.IsNewer(new(0, 5, 2, 1), new(0, 5, 2, 1)), "version comparison");
+                var json = """
+                    {"tag_name":"v0.6.0","name":"v0.6.0 · 展示物品","body":"notes","html_url":"https://example/r","draft":false,
+                     "assets":[{"name":"XingshangAssistant-v0.6.0-win-x64.zip","browser_download_url":"https://example/z","size":123},
+                               {"name":"SHA256SUMS.txt","browser_download_url":"https://example/s","size":98}]}
+                    """;
+                var release = Updater.ParseRelease(json)!;
+                Check(release.Version == new Version(0, 6, 0) && release.Package?.Url == "https://example/z" && release.Checksums?.Url == "https://example/s", "release parsing");
+                var hash = new string('a', 64);
+                Check(Updater.ExpectedHash($"{hash}  XingshangAssistant-v0.6.0-win-x64.zip\n{new string('b', 64)}  other.zip\n", "XingshangAssistant-v0.6.0-win-x64.zip") == hash, "checksum lookup");
+                var script = Updater.InstallScript(@"C:\临时\pkg", @"C:\Users\O'Neil\行商助手", 4242, "行商助手.exe", @"C:\Users\O'Neil\行商助手\行商助手.exe", @"C:\t\rollback", @"C:\d\update.log");
+                Check(script.Contains("'C:\\Users\\O''Neil\\行商助手'") && script.Contains("Get-Process -Id 4242") && script.Contains("'/XD'") && script.Contains("restored the previous version"),
+                    "install script does not quote paths, wait for the process, keep local-data or roll back");
+            }),
             ("旧配置默认开启声音识别，显式关闭仍有效", () =>
             {
                 var old = JsonSerializer.Deserialize<Settings>("{\"processName\":\"wrong\"}", JsonFile.Options)!;
@@ -1090,6 +1234,20 @@ internal static class Program
     }
     private static RecognitionResult CatalogResult(SoundLibrary library, int count) => new(1, RecognitionStatus.Matched, true,
         library.Items.Take(count).Select(i => new Candidate(i, .9, "test")).ToArray(), 1, "test");
+    private static void SaveRender(System.Windows.FrameworkElement element, string name)
+    {
+        element.Measure(new System.Windows.Size(element.ActualWidth > 0 ? element.ActualWidth : double.PositiveInfinity, double.PositiveInfinity));
+        element.Arrange(new System.Windows.Rect(new System.Windows.Point(), element.DesiredSize)); element.UpdateLayout();
+        var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap((int)Math.Ceiling(element.ActualWidth), (int)Math.Ceiling(element.ActualHeight), 96, 96,
+            System.Windows.Media.PixelFormats.Pbgra32);
+        var backdrop = new System.Windows.Media.DrawingVisual();
+        using (var context = backdrop.RenderOpen())
+            context.DrawRectangle(Theme.Background, null, new System.Windows.Rect(0, 0, element.ActualWidth, element.ActualHeight));
+        bitmap.Render(backdrop); bitmap.Render(element);
+        var png = new System.Windows.Media.Imaging.PngBitmapEncoder();
+        png.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+        using var stream = File.Create(Path.Combine(AppContext.BaseDirectory, name)); png.Save(stream);
+    }
     private static void Layout(CandidatePanel panel, double width, double height)
     {
         panel.Measure(new System.Windows.Size(width, height));

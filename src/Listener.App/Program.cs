@@ -18,6 +18,10 @@ internal static class Program
         }
         try
         {
+            // Checks run against a throwaway data folder; a normal start brings the program folder's
+            // old local-data into the shared per-user folder once.
+            if (smoke || args.Contains("--performance-smoke")) UserData.UseIsolated(Path.Combine(AppContext.BaseDirectory, "check-data"));
+            else UserData.MigrateLegacy();
             var settings = smoke ? new Settings() : Settings.Load();
             // The static overlay does not benefit from a permanent GPU rendering context.
             // Measured locally: software rendering reduced total working set from 253 to 167 MiB.

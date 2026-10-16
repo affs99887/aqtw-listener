@@ -51,6 +51,7 @@ internal sealed partial class MainWindow
         footer.Children.Add(Theme.Label("监听浮窗与个人库 · 预览版", 9, Theme.Muted)); DockPanel.SetDock(footer, Dock.Bottom); side.Children.Add(footer);
         navigation = new StackPanel(); side.Children.Add(navigation);
         var main = new DockPanel { Margin = new Thickness(26, 24, 26, 18) }; Grid.SetColumn(main, 1); columns.Children.Add(main);
+        var banner = BuildUpdateBanner(); DockPanel.SetDock(banner, Dock.Top); main.Children.Add(banner);
         var heading = new StackPanel { Margin = new Thickness(0, 0, 0, 14) };
         pageHeading.FontWeight = FontWeights.SemiBold; heading.Children.Add(pageHeading); heading.Children.Add(pageDescription);
         DockPanel.SetDock(heading, Dock.Top); main.Children.Add(heading);
@@ -59,13 +60,14 @@ internal sealed partial class MainWindow
     }
 
     private static string SectionTitle(string section) => section switch
-    { "监听" => "监听控制", "采音" => "采音与快捷键", "位置" => "浮窗位置", "浮窗" => "浮窗外观", "音效库" => "音效库", _ => "运行诊断" };
+    { "监听" => "监听控制", "采音" => "采音与快捷键", "位置" => "浮窗位置", "浮窗" => "浮窗外观", "展示物品" => "展示物品", "音效库" => "音效库", _ => "运行诊断" };
     private static string SectionDescription(string section) => section switch
     {
         "监听" => "听见线索，看清所有可能。",
         "采音" => "连接游戏声音，设置顺手的快捷键。",
         "位置" => "让候选信息停在你习惯的位置。",
         "浮窗" => "调整图片、字号与透明度，让线索清晰可见。",
+        "展示物品" => "按声音分类挑选浮窗里显示的物品，一眼看清关心的那几件。",
         "音效库" => "查看声音参考，逐步完善自己的物品库。",
         _ => "检查输入、采音与识别状态。"
     };
@@ -81,7 +83,7 @@ internal sealed partial class MainWindow
 
     private Button NavigationButton(string label)
     {
-        var glyph = label switch { "监听" => "\uE7F6", "采音" => "\uE767", "位置" => "\uE707", "浮窗" => "\uE737", "音效库" => "\uE8F1", _ => "\uE9D9" };
+        var glyph = label switch { "监听" => "\uE7F6", "采音" => "\uE767", "位置" => "\uE707", "浮窗" => "\uE737", "展示物品" => "\uE71C", "音效库" => "\uE8F1", _ => "\uE9D9" };
         var row = new StackPanel { Orientation = Orientation.Horizontal }; var icon = Theme.Glyph(glyph, 17); icon.Margin = new Thickness(0, 0, 13, 0); row.Children.Add(icon);
         row.Children.Add(new TextBlock { Text = label, VerticalAlignment = VerticalAlignment.Center });
         var button = Theme.Button("", (_, _) => ShowSettingsSection(label)); button.Content = row; button.Height = 43;
