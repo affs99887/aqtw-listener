@@ -113,6 +113,17 @@ internal static class Program
                 redChip.RaiseEvent(new System.Windows.RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
                 Check(library.Items.Where(i => i.IsGold).All(i => !DisplayPreferences.Filter.IsShown(i)) && library.Items.Where(i => !i.IsGold).All(DisplayPreferences.Filter.IsShown),
                     "the 红 chip did not toggle exactly the red items");
+                // Inside a class: one section per grid size, each with its own whole-size toggle.
+                var biggest = classes[0];
+                var sizes = biggest.Items.Select(i => i.Cells).Distinct().Order().ToArray();
+                var sizeToggles = sizes.Select(cells => Descendants<System.Windows.Controls.Button>(page)
+                    .FirstOrDefault(button => System.Windows.Automation.AutomationProperties.GetName(button) == $"{cells} 格整格显示或隐藏")).ToArray();
+                Check(sizeToggles.All(button => button is not null), "a grid size of the first class has no section toggle");
+                DisplayPreferences.Filter.Set(library.Items.Select(i => i.Id), true);
+                var fourCellToggle = sizeToggles[Array.IndexOf(sizes, 4)]!;
+                fourCellToggle.RaiseEvent(new System.Windows.RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                Check(biggest.Items.Where(i => i.Cells == 4).All(i => !DisplayPreferences.Filter.IsShown(i)) &&
+                      biggest.Items.Where(i => i.Cells != 4).All(DisplayPreferences.Filter.IsShown), "the 4 格 toggle did not hide exactly that grid size");
                 var preset = Descendants<System.Windows.Controls.Button>(page).First(button => Equals(button.Content, "全部显示"));
                 preset.RaiseEvent(new System.Windows.RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
                 Check(DisplayPreferences.Filter.HiddenCount == 0, "全部显示 left items hidden");
@@ -138,6 +149,58 @@ internal static class Program
                     $"unpacked package lacks its launcher or library: {package}");
                 File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "update-dry-run.json"),
                     JsonSerializer.Serialize(new { latest!.Tag, latest.Package!.Name, latest.Package.Size, package, launcher }));
+            }),
+            ("安装脚本端到端（AQTW_WINDOW_TESTS=1 时运行）：等待退出、替换音效库、保留 local-data；复制失败时恢复旧版", () =>
+            {
+                if (Environment.GetEnvironmentVariable("AQTW_WINDOW_TESTS") != "1") return;
+                var work = Path.Combine(Path.GetTempPath(), $"aqtw-install-test-{Environment.ProcessId}");
+                var system = Environment.GetFolderPath(Environment.SpecialFolder.System);
+                (string Target, string Log, string Backup) Rehearse(string name, bool breakCopy)
+                {
+                    var target = Path.Combine(work, name, "行商助手 O'Neil"); var package = Path.Combine(work, name, "package");
+                    Directory.CreateDirectory(Path.Combine(target, "library")); Directory.CreateDirectory(Path.Combine(target, "local-data"));
+                    Directory.CreateDirectory(Path.Combine(package, "library"));
+                    File.Copy(Path.Combine(system, "whoami.exe"), Path.Combine(target, "行商助手.exe"));
+                    File.WriteAllText(Path.Combine(target, "library", "library.json"), "old"); File.WriteAllText(Path.Combine(target, "library", "old-only.wav"), "x");
+                    File.WriteAllText(Path.Combine(target, "local-data", "settings.json"), "keep");
+                    File.Copy(Path.Combine(system, "hostname.exe"), Path.Combine(package, "行商助手.exe"));
+                    File.WriteAllText(Path.Combine(package, "library", "library.json"), "new"); File.WriteAllText(Path.Combine(package, "new.txt"), "n");
+                    // A package file nobody may read makes the copy fail after robocopy's retries.
+                    using var hold = breakCopy ? new FileStream(Path.Combine(package, "new.txt"), FileMode.Open, FileAccess.ReadWrite, FileShare.None) : null;
+                    using var waiter = Process.Start(new ProcessStartInfo("powershell.exe", "-NoProfile -Command Start-Sleep -Seconds 2") { CreateNoWindow = true, UseShellExecute = false })!;
+                    var backup = Path.Combine(work, name, "rollback"); var log = Path.Combine(work, name, "update.log");
+                    var script = Path.Combine(work, name, "install.ps1");
+                    File.WriteAllText(script, Updater.InstallScript(package, target, waiter.Id, "行商助手.exe", Path.Combine(target, "行商助手.exe"), backup, log), new System.Text.UTF8Encoding(true));
+                    var run = new ProcessStartInfo("powershell.exe") { CreateNoWindow = true, UseShellExecute = false, RedirectStandardError = true, RedirectStandardOutput = true };
+                    foreach (var argument in new[] { "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script }) run.ArgumentList.Add(argument);
+                    using var installer = Process.Start(run)!;
+                    var errors = installer.StandardError.ReadToEndAsync(); var output = installer.StandardOutput.ReadToEndAsync();
+                    Check(installer.WaitForExit(120000), name + ": the install script did not finish");
+                    Check(waiter.HasExited, name + ": the script did not wait for the assistant to exit");
+                    return (target, File.ReadAllText(log) + " | stderr: " + errors.Result + " | stdout: " + output.Result, backup);
+                }
+                try
+                {
+                    var ok = Rehearse("success", false);
+                    Check(File.ReadAllText(Path.Combine(ok.Target, "library", "library.json")) == "new" && !File.Exists(Path.Combine(ok.Target, "library", "old-only.wav")) &&
+                          File.Exists(Path.Combine(ok.Target, "new.txt")) && File.ReadAllText(Path.Combine(ok.Target, "local-data", "settings.json")) == "keep" &&
+                          ok.Log.Contains("installed") && !Directory.Exists(Path.Combine(ok.Backup, "local-data")),
+                        "successful install: " + ok.Log);
+                    var broken = Rehearse("failure", true);
+                    Check(broken.Log.Contains("failed") && broken.Log.Contains("restored the previous version") &&
+                          File.ReadAllText(Path.Combine(broken.Target, "library", "library.json")) == "old" &&
+                          File.ReadAllText(Path.Combine(broken.Target, "local-data", "settings.json")) == "keep",
+                        "failed install was not rolled back: " + broken.Log);
+                }
+                finally
+                {
+                    // The stand-in programs the script started may still hold their files for a moment.
+                    for (var attempt = 0; attempt < 10 && Directory.Exists(work); attempt++)
+                    {
+                        try { Directory.Delete(work, true); }
+                        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { Thread.Sleep(500); }
+                    }
+                }
             }),
             ("更新器：版本比较、发布信息解析、校验值查找、安装脚本路径转义", () =>
             {
@@ -1187,6 +1250,8 @@ internal static class Program
         {
             try { run(); report.Add(new { name, passed = true }); Console.WriteLine("PASS " + name); }
             catch (Exception ex) { failed++; report.Add(new { name, passed = false, error = ex.ToString() }); Console.WriteLine("FAIL " + name + ": " + ex); }
+            // Each case starts with every item shown, whatever the previous one left behind.
+            DisplayPreferences.Filter.Set([.. DisplayPreferences.Filter.HiddenItemIds], true);
         }
         if (args.Length > 0) JsonFile.Write(args[0], new { total = report.Count, passed = report.Count - failed, failed, tests = report });
         return failed == 0 ? 0 : 1;

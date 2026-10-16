@@ -163,14 +163,50 @@ internal sealed class DisplayItemsPage : StackPanel
             Card = new Border { Child = stack, Background = Theme.Panel, BorderBrush = Theme.Line, BorderThickness = new Thickness(1),
                 Padding = new Thickness(14, 10, 14, 10), Margin = new Thickness(0, 0, 0, 8) };
             AutomationProperties.SetName(Card, sound.Name);
+            // The header counts each rarity across the class; the body follows the overlay: one
+            // section per grid size, and inside it one row per rarity.
             foreach (var (tier, accent) in Tiers.Append(("", Theme.Muted)))
             {
-                var items = sound.Items.Where(item => tier.Length == 0 ? !Tiers.Any(t => t.Tier == item.Rarity) : item.Rarity == tier).ToArray();
-                if (items.Length == 0) continue;
-                AddTierSummary(tier, accent, items);
-                body.Children.Add(TierRow(tier, accent, items));
+                var items = sound.Items.Where(item => InTier(item, tier)).ToArray();
+                if (items.Length > 0) AddTierSummary(tier, accent, items);
             }
+            foreach (var size in sound.Items.GroupBy(item => item.Cells).OrderBy(group => group.Key))
+                body.Children.Add(CellSection(size.Key, size.ToArray()));
             page.refreshers.Add(Refresh);
+        }
+
+        private static bool InTier(ItemDefinition item, string tier) => tier.Length == 0 ? !Tiers.Any(t => t.Tier == item.Rarity) : item.Rarity == tier;
+
+        private FrameworkElement CellSection(int cells, ItemDefinition[] items)
+        {
+            var section = new StackPanel { Margin = new Thickness(0, 4, 0, 6) };
+            var heading = new DockPanel { Margin = new Thickness(0, 0, 0, 4) };
+            var title = Theme.Label(cells == 0 ? "格数待核实" : $"{cells} 格", 13); title.Margin = new Thickness(0); title.FontWeight = FontWeights.Bold;
+            title.VerticalAlignment = VerticalAlignment.Center;
+            DockPanel.SetDock(title, Dock.Left); heading.Children.Add(title);
+            var amount = Theme.Label("", 11, Theme.Muted); amount.Margin = new Thickness(8, 0, 0, 0); amount.VerticalAlignment = VerticalAlignment.Center;
+            DockPanel.SetDock(amount, Dock.Left); heading.Children.Add(amount);
+            var toggle = Theme.Button("", (_, _) => page.Filter.Set(items.Select(item => item.Id), !items.All(page.Filter.IsShown)));
+            toggle.Padding = new Thickness(8, 2, 8, 2); toggle.FontSize = 10; toggle.Margin = new Thickness(10, 0, 0, 0); toggle.VerticalAlignment = VerticalAlignment.Center;
+            AutomationProperties.SetName(toggle, $"{cells} 格整格显示或隐藏");
+            DockPanel.SetDock(toggle, Dock.Left); heading.Children.Add(toggle);
+            heading.Children.Add(new Border { Height = 1, Background = Theme.Line, Margin = new Thickness(12, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center });
+            section.Children.Add(heading);
+            var rows = new StackPanel { Margin = new Thickness(14, 0, 0, 0) };
+            foreach (var (tier, accent) in Tiers.Append(("", Theme.Muted)))
+            {
+                var tierItems = items.Where(item => InTier(item, tier)).ToArray();
+                if (tierItems.Length > 0) rows.Children.Add(TierRow(tier, accent, tierItems));
+            }
+            section.Children.Add(rows);
+            page.refreshers.Add(() =>
+            {
+                var shown = items.Count(page.Filter.IsShown);
+                amount.Text = $"{items.Length} 件 · 显示 {shown}";
+                toggle.Content = shown == items.Length ? "整格隐藏" : "整格显示";
+                section.Visibility = items.Any(page.Matches) ? Visibility.Visible : Visibility.Collapsed;
+            });
+            return section;
         }
 
         private static bool IsInside(DependencyObject source, DependencyObject container)
@@ -189,8 +225,8 @@ internal sealed class DisplayItemsPage : StackPanel
 
         private FrameworkElement TierRow(string tier, Brush accent, ItemDefinition[] items)
         {
-            var row = new DockPanel { Margin = new Thickness(0, 4, 0, 4) };
-            var side = new StackPanel { Width = 78, Margin = new Thickness(0, 6, 8, 0) };
+            var row = new DockPanel { Margin = new Thickness(0, 2, 0, 2) };
+            var side = new StackPanel { Width = 72, Margin = new Thickness(0, 6, 8, 0) };
             var title = new StackPanel { Orientation = Orientation.Horizontal };
             title.Children.Add(new Border { Width = 8, Height = 8, Background = accent, Margin = new Thickness(0, 0, 6, 0), VerticalAlignment = VerticalAlignment.Center });
             var name = Theme.Label($"{(tier.Length == 0 ? "其他" : tier)} · {items.Length}", 12, accent); name.Margin = new Thickness(0); name.FontWeight = FontWeights.SemiBold;
@@ -202,9 +238,10 @@ internal sealed class DisplayItemsPage : StackPanel
             var tiles = new WrapPanel();
             foreach (var item in items) tiles.Children.Add(Tile(item, accent));
             row.Children.Add(tiles);
+            AutomationProperties.SetName(toggle, $"{(tier.Length == 0 ? "其他" : tier)}色这一行显示或隐藏");
             page.refreshers.Add(() =>
             {
-                toggle.Content = items.All(page.Filter.IsShown) ? "全部隐藏" : "全部显示";
+                toggle.Content = items.All(page.Filter.IsShown) ? "隐藏" : "显示";
                 row.Visibility = items.Any(page.Matches) ? Visibility.Visible : Visibility.Collapsed;
             });
             return row;
