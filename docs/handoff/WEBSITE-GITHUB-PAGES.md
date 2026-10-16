@@ -1,10 +1,10 @@
 # 行商助手介绍页 · GitHub Pages 维护
 
-- 介绍页：https://aqtw-listener.pages.dev/ （Cloudflare Pages 项目 `aqtw-listener`）。`gh-pages` 上的 https://affs99887.github.io/aqtw-listener/ 保留为存档，并继续提供 `update/latest.json` 给更新器作第二来源。
+- 介绍页两个地址都可用，内容相同，对外都要写：https://aqtw-listener.pages.dev/ （Cloudflare Pages 项目 `aqtw-listener`）和 https://affs99887.github.io/aqtw-listener/ （`gh-pages`）。页脚的“另一地址”按当前网址自动指向对方。`gh-pages` 同时提供 `update/latest.json` 给更新器作第二来源。
 - 仓库：`affs99887/aqtw-listener`；网页发布分支：`gh-pages`，保留 `.nojekyll`。
 - 本轮网页提交：`4c74b9de6f345d5eea6152f9e45badf166473ab8`，对应软件 v0.5.3.1（`9cd50ac`、`895e12d` 曾指向已撤下的 v0.5.4；`301d202` 对应 v0.5.3；`39e6f96` 曾指向已撤下的 v0.6.0；`54ddda2` 对应 v0.5.2.1）。
 - 导航、首屏和“开始使用”的主按钮指向 Gitee 附件 `https://gitee.com/scape0goat/aqtw-listener/releases/download/<版本>/XingshangAssistant-<版本>-win-x64.zip`；两个“从 GitHub 下载”直达 Release 附件。站内仍放一份 `download/<安装包>`（只留当前版本）和 `update/latest.json`、`update/latest.json.sig`，供更新器作为第二来源。`dist/.gitattributes` 让 `update/` 与安装包原样提交：签名覆盖原始字节，git 的换行转换曾使这里的签名失效。
-- 国内打开慢：GitHub Pages 在国内本身时好时坏，免费又免备案的国内网页托管基本没有（Gitee Pages 已下线；EdgeOne 大陆节点需备案域名）。介绍页因此改由 Cloudflare Pages 对外展示，账号 `laidexin121@gmail.com`，用 `wrangler pages deploy` 部署（本机已 `wrangler login`）。Pages 单文件上限 25 MiB，安装包放不上去，所以只部署页面，下载按钮仍指向 Gitee。每次更新两处都要发：先推 `gh-pages`，再从发布检出排除 `download/` 和 `.git` 后部署到 Cloudflare。国内用户打不开时用 Gitee 仓库首页。介绍页首屏下载量从 1,077 KB 降到 84 KB。
+- 国内打开慢：GitHub Pages 在国内本身时好时坏，免费又免备案的国内网页托管基本没有（Gitee Pages 已下线；EdgeOne 大陆节点需备案域名）。介绍页因此同时部署在 Cloudflare Pages 和 GitHub Pages，两个地址都对外。Cloudflare 账号 `laidexin121@gmail.com`，用 `wrangler pages deploy` 部署（本机已 `wrangler login`）。Pages 单文件上限 25 MiB，安装包放不上去，所以只部署页面，下载按钮仍指向 Gitee。每次更新两处都要发：先推 `gh-pages`，再从发布检出排除 `download/` 和 `.git` 后部署到 Cloudflare。国内用户打不开时用 Gitee 仓库首页。介绍页首屏下载量从 1,077 KB 降到 84 KB。
 
 ## 每次发版必须同步
 

@@ -2,7 +2,7 @@
 
 暗区突围 PC 版听音辅助：拿起物品后显示同音候选，按格数分组，支持回放、试听和识别历史。
 
-[国内下载（Gitee）](https://gitee.com/scape0goat/aqtw-listener/releases) · [GitHub 下载](https://github.com/affs99887/aqtw-listener/releases/latest) · [介绍与在线演示](https://aqtw-listener.pages.dev/)
+[国内下载（Gitee）](https://gitee.com/scape0goat/aqtw-listener/releases) · [GitHub 下载](https://github.com/affs99887/aqtw-listener/releases/latest) · [介绍与在线演示](https://aqtw-listener.pages.dev/) · [介绍页（GitHub Pages）](https://affs99887.github.io/aqtw-listener/)
 
 ## 开始使用
 
