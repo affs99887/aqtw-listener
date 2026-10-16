@@ -47,9 +47,11 @@ function Find($path) {
 }
 # What an anonymous visitor gets: the total size behind the public download link.
 function PublicSize($url) {
-    $headers = curl.exe -sL -r 0-0 -D - -o NUL --max-time 90 -A 'AqtwListener-Updater' $url
-    $range = @($headers | Where-Object { $_ -match '^Content-Range:\s*bytes\s+\d+-\d+/(\d+)' }) | Select-Object -Last 1
-    if ($range -and $range -match '/(\d+)\s*$') { return [int64]$Matches[1] }
+    # HEAD, following redirects: Gitee's CDN ignores range requests but answers HEAD with the full length.
+    $headers = curl.exe -sIL --max-time 90 -A 'AqtwListener-Updater' $url
+    $final = @($headers | Where-Object { $_ -match '^HTTP/' }) | Select-Object -Last 1
+    $length = @($headers | Where-Object { $_ -match '^Content-Length:\s*(\d+)' }) | Select-Object -Last 1
+    if ($final -match '\s200\s' -and $length -match '(\d+)\s*$') { return [int64]$Matches[1] }
     return -1
 }
 function PublicBytes($url) {

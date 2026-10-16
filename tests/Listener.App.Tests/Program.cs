@@ -144,13 +144,14 @@ internal static class Program
                 if (Environment.GetEnvironmentVariable("AQTW_NETWORK_TESTS") != "1") return;
                 using var http = Updater.CreateClient(); http.Timeout = TimeSpan.FromMinutes(10);
                 var latest = Updater.Latest(http, CancellationToken.None).GetAwaiter().GetResult();
-                Check(latest is { Package: not null, Checksums: not null }, "the latest release lacks a package or checksums");
+                Check(latest is { Package: not null } && (latest.Sha256 is not null || latest.Checksums is not null), "the latest release lacks a package or checksums");
+                Check(latest!.Sha256 is not null && latest.PackageUrls[0].StartsWith("https://gitee.com/"), "the release did not come from the signed manifest with Gitee first");
                 var package = Updater.Prepare(http, latest!, new Progress<double>(), CancellationToken.None).GetAwaiter().GetResult();
                 var launcher = Updater.Launcher(package, Path.Combine(AppContext.BaseDirectory, "行商助手.exe"));
                 Check(File.Exists(Path.Combine(package, launcher)) && File.Exists(Path.Combine(package, "library", "library.json")),
                     $"unpacked package lacks its launcher or library: {package}");
                 File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "update-dry-run.json"),
-                    JsonSerializer.Serialize(new { latest!.Tag, latest.Package!.Name, latest.Package.Size, package, launcher }));
+                    JsonSerializer.Serialize(new { latest.Tag, latest.Package!.Name, latest.Package.Size, latest.Sha256, latest.PackageUrls, package, launcher }));
             }),
             ("安装脚本端到端（AQTW_WINDOW_TESTS=1 时运行）：等待退出、替换音效库、保留 local-data；复制失败时恢复旧版", () =>
             {

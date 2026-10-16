@@ -17,11 +17,13 @@ $updater = [IO.File]::ReadAllText((Join-Path $root 'src\Listener.App\Updater.cs'
 $gitee = [regex]::Match($updater, 'GiteeRepository\s*=\s*"([^"]+)"').Groups[1].Value
 $giteeZip = "https://gitee.com/$gitee/releases/download/$($release.tag_name)/$($asset.name)"
 
-# Total size an anonymous visitor would get behind a public link, read from a one-byte range request.
+# Total size an anonymous visitor would get behind a public link.
 function PublicSize($link) {
-    $headers = curl.exe -sL -r 0-0 -D - -o NUL --max-time 90 -A 'AqtwListener-Updater' $link
-    $range = @($headers | Where-Object { $_ -match '^Content-Range:\s*bytes\s+\d+-\d+/(\d+)' }) | Select-Object -Last 1
-    if ($range -and $range -match '/(\d+)\s*$') { return [int64]$Matches[1] }
+    # HEAD, following redirects: Gitee's CDN ignores range requests but answers HEAD with the full length.
+    $headers = curl.exe -sIL --max-time 90 -A 'AqtwListener-Updater' $link
+    $final = @($headers | Where-Object { $_ -match '^HTTP/' }) | Select-Object -Last 1
+    $length = @($headers | Where-Object { $_ -match '^Content-Length:\s*(\d+)' }) | Select-Object -Last 1
+    if ($final -match '\s200\s' -and $length -match '(\d+)\s*$') { return [int64]$Matches[1] }
     return -1
 }
 

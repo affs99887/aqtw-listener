@@ -97,7 +97,8 @@ string PublicKey()
 static byte[] Json(Action<Utf8JsonWriter> fill)
 {
     using var buffer = new MemoryStream();
-    using (var writer = new Utf8JsonWriter(buffer, new JsonWriterOptions { Indented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping }))
+    // LF on every machine: the signature covers the exact bytes, and git may rewrite CRLF on the way to a host.
+    using (var writer = new Utf8JsonWriter(buffer, new JsonWriterOptions { Indented = true, NewLine = "\n", Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping }))
     {
         writer.WriteStartObject(); fill(writer); writer.WriteEndObject();
     }
