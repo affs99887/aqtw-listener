@@ -2,8 +2,8 @@
 
 - 介绍页：https://affs99887.github.io/aqtw-listener/
 - 仓库：`affs99887/aqtw-listener`；网页发布分支：`gh-pages`，保留 `.nojekyll`。
-- 本轮网页提交：`39e6f96921baaecd83e7c0c14527e8312931684b`，对应软件 v0.6.0（上一轮 `54ddda2` 对应 v0.5.2.1）。
-- 三个下载按钮统一指向 `https://github.com/affs99887/aqtw-listener/releases/download/v0.6.0/XingshangAssistant-v0.6.0-win-x64.zip`。
+- 本轮网页提交：`301d202713d04aa2516786fc3ac80e807afd4a80`，对应软件 v0.5.3（`39e6f96` 曾指向已撤下的 v0.6.0；`54ddda2` 对应 v0.5.2.1）。
+- 三个下载按钮统一指向 `https://github.com/affs99887/aqtw-listener/releases/download/v0.5.3/XingshangAssistant-v0.5.3-win-x64.zip`。
 
 ## 每次发版必须同步
 
@@ -28,7 +28,7 @@
 
 页面使用 HTML/CSS/JavaScript 的交互演示，支持候选分组、字号、模拟回放、暂停与返回监听、历史和自动演示。声音流程与差异率均为模拟，网页不采集麦克风。
 
-v0.6.0 轮更新下载入口、首屏与页脚版本，新增展示物品问答，并把“更新软件时，个人资料怎么办？”改为一键更新与 `%LOCALAPPDATA%\AqtwListener` 共享数据。`check.mjs` 通过；浏览器打开现网核对名称“行商助手”、头盔图标、v0.6.0 文案与新问答，21 张图片全部加载。
+v0.5.3 轮更新下载入口、首屏与页脚版本，新增展示物品问答，并把“更新软件时，个人资料怎么办？”改为一键更新与 `%LOCALAPPDATA%\AqtwListener` 共享数据。`check.mjs` 通过；浏览器打开现网核对名称“行商助手”、头盔图标、v0.5.3 文案与新问答，页面不含 0.6.0，图片全部加载。
 
 检查脚本在 Windows PowerShell 5.1 下运行即可（本机无 pwsh）；网页请求使用 `-UseBasicParsing`。
 
