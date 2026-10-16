@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "tag": "v0.5.3.1",
+  "name": "v0.5.3.1 · 国内下载与更新",
+  "notes": "# v0.5.3.1 · 国内下载与更新\r\n\r\n## 更新内容\r\n\r\n- 国内下载改走 Gitee：介绍页的下载按钮和助手里的一键更新，都优先从 Gitee 取安装包，国内可以直接下载。\r\n- 一键更新先读取 Gitee 上带签名的版本信息，读不到再查 GitHub。安装包依次尝试 Gitee、介绍页、GitHub，某个地址 30 秒没有数据就换下一个；签名和 SHA256 都对得上才会安装。\r\n- 安装包不再附带设计稿和截图，从约 123 MB 降到约 79 MB。程序功能不变。\r\n\r\n## 使用\r\n\r\n下载 `XingshangAssistant-v0.5.3.1-win-x64.zip`，完整解压后运行 `行商助手.exe`，无需安装 .NET。国内下载：https://gitee.com/scape0goat/aqtw-listener/releases 。从 v0.5.3 升级时，这一次建议手动下载安装；之后在国内也能一键更新。\r\n",
+  "page": "https://gitee.com/scape0goat/aqtw-listener/releases/tag/v0.5.3.1",
+  "published": "2026-10-16T06:10:58Z",
+  "package": {
+    "name": "XingshangAssistant-v0.5.3.1-win-x64.zip",
+    "size": 82714834,
+    "sha256": "9b988d3ae2656c41f98f0fc06a45e20e3134bbd563688b440d431698bdd6eaea",
+    "urls": [
+      "https://gitee.com/scape0goat/aqtw-listener/releases/download/v0.5.3.1/XingshangAssistant-v0.5.3.1-win-x64.zip",
+      "https://affs99887.github.io/aqtw-listener/download/XingshangAssistant-v0.5.3.1-win-x64.zip",
+      "https://github.com/affs99887/aqtw-listener/releases/download/v0.5.3.1/XingshangAssistant-v0.5.3.1-win-x64.zip"
+    ]
+  }
+}
