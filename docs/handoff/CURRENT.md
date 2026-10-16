@@ -1,6 +1,6 @@
 # 当前接续状态 · 2026-10-16
 
-**进行中（本地，未发布）：展示物品、共享数据目录与更新器**。用户反馈候选太多，要求可预先勾选浮窗显示的物品；配置按声音分类、区分红金紫，默认全选；配置与全部用户数据跨版本通用；并加入更新器。用户选择：大红概率仍按全部候选计算并注明未显示件数；设置、展示配置、个人库、录音全部共享；启动自动检查、一键下载校验替换并重启。
+**当前发布：行商助手 v0.6.0（展示物品、共享数据目录与更新器）**。用户要求提交并发布，同步在线介绍页。发布说明见 [v0.6.0](../releases/v0.6.0.md)，便携附件 `XingshangAssistant-v0.6.0-win-x64.zip` 与 `SHA256SUMS.txt`，构建目录 `.tools/release/v0.6.0/package`；portable 已同步，覆盖前的旧程序在 `.tools/rollback/portable-20261016-before-display-items`。以下为本轮实现记录。用户反馈候选太多，要求可预先勾选浮窗显示的物品；配置按声音分类、区分红金紫，默认全选；配置与全部用户数据跨版本通用；并加入更新器。用户选择：大红概率仍按全部候选计算并注明未显示件数；设置、展示配置、个人库、录音全部共享；启动自动检查、一键下载校验替换并重启。
 
 - 数据：`UserData`（`src/Listener.App/UserData.cs`）根目录 `%LOCALAPPDATA%\AqtwListener`，`AQTW_DATA_DIR` 可覆盖；`--ui-smoke` / `--performance-smoke` 使用程序目录 `check-data` 隔离目录，应用测试启动即隔离到临时目录。首次正常启动时若共享目录为空，复制（不移动）程序目录 `local-data`，写 `migrated.json`。`Settings.FilePath`、个人库、诊断导出都已改到共享目录。
 - 展示配置：`Listener.Core.DisplayFilter` 存隐藏 ID（新物品默认显示），`DisplayPreferences` 读写 `display.json` 并在变化时通知；`CandidatePanel` 只为勾选物品出卡片，`cellStats` 保留每格全部候选用于大红概率与“另有 N 件未显示”，整格隐藏仍保留分区。物品图鉴不过滤。
