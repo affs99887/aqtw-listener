@@ -2,8 +2,8 @@
 
 - 介绍页：https://affs99887.github.io/aqtw-listener/
 - 仓库：`affs99887/aqtw-listener`；网页发布分支：`gh-pages`，保留 `.nojekyll`。
-- 本轮网页提交：`301d202713d04aa2516786fc3ac80e807afd4a80`，对应软件 v0.5.3（`39e6f96` 曾指向已撤下的 v0.6.0；`54ddda2` 对应 v0.5.2.1）。
-- 三个下载按钮统一指向 `https://github.com/affs99887/aqtw-listener/releases/download/v0.5.3/XingshangAssistant-v0.5.3-win-x64.zip`。
+- 本轮网页提交：`9cd50acb99d912607884f9e8e3e58f4da13b4e7a`，对应软件 v0.5.4（`301d202` 对应 v0.5.3；`39e6f96` 曾指向已撤下的 v0.6.0；`54ddda2` 对应 v0.5.2.1）。
+- 导航、首屏和“开始使用”的主按钮指向 `https://ghfast.top/https://github.com/affs99887/aqtw-listener/releases/download/v0.5.4/XingshangAssistant-v0.5.4-win-x64.zip`；另有两个“从 GitHub 下载”直达同一附件。镜像前缀与 `Updater.DownloadMirrors` 保持一致，现网检查同时核对直链和镜像。
 
 ## 每次发版必须同步
 
@@ -27,6 +27,8 @@
 ## 页面与验证
 
 页面使用 HTML/CSS/JavaScript 的交互演示，支持候选分组、字号、模拟回放、暂停与返回监听、历史和自动演示。声音流程与差异率均为模拟，网页不采集麦克风。
+
+v0.5.4 轮把主下载改为 ghfast.top，保留 GitHub 直链，并补充“下载很慢怎么办？”。浏览器核对桌面与 390 像素宽：首屏“国内下载”“从 GitHub 下载”和“开始使用”的两个按钮互不重叠。
 
 v0.5.3 轮更新下载入口、首屏与页脚版本，新增展示物品问答，并把“更新软件时，个人资料怎么办？”改为一键更新与 `%LOCALAPPDATA%\AqtwListener` 共享数据。`check.mjs` 通过；浏览器打开现网核对名称“行商助手”、头盔图标、v0.5.3 文案与新问答，页面不含 0.6.0，图片全部加载。
 
