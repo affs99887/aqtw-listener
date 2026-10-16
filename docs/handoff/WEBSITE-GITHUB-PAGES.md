@@ -3,7 +3,7 @@
 - 介绍页：https://affs99887.github.io/aqtw-listener/
 - 仓库：`affs99887/aqtw-listener`；网页发布分支：`gh-pages`，保留 `.nojekyll`。
 - 本轮网页提交：`9cd50acb99d912607884f9e8e3e58f4da13b4e7a`，对应软件 v0.5.4（`301d202` 对应 v0.5.3；`39e6f96` 曾指向已撤下的 v0.6.0；`54ddda2` 对应 v0.5.2.1）。
-- 导航、首屏和“开始使用”的主按钮指向 `https://ghfast.top/https://github.com/affs99887/aqtw-listener/releases/download/v0.5.4/XingshangAssistant-v0.5.4-win-x64.zip`；另有两个“从 GitHub 下载”直达同一附件。镜像前缀与 `Updater.DownloadMirrors` 保持一致，现网检查同时核对直链和镜像。
+- 用户反馈 ghfast.top 国内仍下不动，`gh-pages` 提交 `895e12dc960d6a2c683bf4ffedb85f7dd1602748` 把安装包放到站内 `download/XingshangAssistant-v0.5.4-win-x64.zip`，导航、首屏和“开始使用”的主按钮改为这个站内地址；另有两个“从 GitHub 下载”直达 Release 附件。现网检查核对 Release 直链、站内文件存在且大小与附件一致；镜像链接已从页面撤下，如再加入仍须是同一附件。站内文件与页面同在 GitHub Pages，页面打不开时下载同样不可用。
 
 ## 每次发版必须同步
 
