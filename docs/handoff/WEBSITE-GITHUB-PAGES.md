@@ -1,15 +1,5 @@
 # 行商助手介绍页 · GitHub Pages 维护
 
-## 2026-10-27：旧版本手动升级说明
-
-- 正式版仍为 v0.5.3.1。本轮只改文档和静态介绍页，不重新打包、不更新签名清单或下载附件。
-- `gh-pages` 的 `index.html` 在首屏下载区域之后新增旧版本提醒，FAQ 区分 v0.5.3 网络受限与已撤下 v0.5.4 不提示降级；新增 `upgrade.html`、`upgrade.css`，完整展示 [手动升级指南](../UPGRADING.md)。指南 HTML 从该 Markdown 生成；以后维护时保持一致。首页页脚的“预览版”改为“正式版”。原有 3 个 Gitee、2 个 GitHub 下载按钮保持当前正式版地址。
-- **Cloudflare 待同步：**当前执行环境没有 Cloudflare 发布连接，直接访问该站返回 HTTP 403，无法确认或更新其线上内容。本轮提供基于 `gh-pages` 原提交 `6dfd680ccffe95475d4484b535f3027ca88bd9a9` 的介绍页补丁，包含上述 3 个文件。GitHub Pages 修改不代表 Cloudflare 已自动更新；仍需按下文既有流程，从更新后的 `gh-pages` 排除 `.git`、`download/` 后部署到原 Cloudflare 项目。已有新文件时不要重复应用补丁。
-- 验证：GitHub `releases/latest` 为 v0.5.3.1；Gitee 与 GitHub Pages 线上原始清单均通过现有公钥的 ECDSA P-256 / SHA-256 验签，包名、大小、哈希一致；完整下载 Gitee ZIP，实测 82,714,834 字节，SHA-256 为 `9b988d3ae2656c41f98f0fc06a45e20e3134bbd563688b440d431698bdd6eaea`，并核对 GitHub `SHA256SUMS.txt`。Gitee 本版没有同名校验文件附件，指南提供固定值并链接 GitHub 校验文件。
-- 静态检查覆盖 HTML 标签、重复 ID、本地链接、下载按钮与版本一致性、README 限制和 `git diff --check`。当前 Linux 环境没有 Windows PowerShell / 项目 .NET SDK，无法直接执行 `scripts/check-introduction-release.ps1`，故用上述等价联网核验；浏览器内核下载失败，未完成桌面与移动端视觉验收。未运行 Windows 助手或触碰个人数据。
-
-以下为原部署约定与历史记录。
-
 - 介绍页两个地址都可用，内容相同，对外都要写：https://aqtw-listener.pages.dev/ （Cloudflare Pages 项目 `aqtw-listener`）和 https://affs99887.github.io/aqtw-listener/ （`gh-pages`）。页脚的“另一地址”按当前网址自动指向对方。`gh-pages` 同时提供 `update/latest.json` 给更新器作第二来源。
 - 仓库：`affs99887/aqtw-listener`；网页发布分支：`gh-pages`，保留 `.nojekyll`。
 - 本轮网页提交：`4c74b9de6f345d5eea6152f9e45badf166473ab8`，对应软件 v0.5.3.1（`9cd50ac`、`895e12d` 曾指向已撤下的 v0.5.4；`301d202` 对应 v0.5.3；`39e6f96` 曾指向已撤下的 v0.6.0；`54ddda2` 对应 v0.5.2.1）。
